@@ -577,7 +577,7 @@ def send_email_with_attachment(subject: str, body: str, attachment: str, sender:
         password = getenv('email1_pass')
         server   = 'smtp.mail.yahoo.com'
     elif sender == getenv('email2'):
-        password = getenv('email1_pass')
+        password = getenv('email2_pass')
         server   = 'smtp.gmail.com'
 
     port = 465
