@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+source $HOME/scripts/gb-fir-blu-batt
+
+function help(){ source $HOME/scripts/.help; firewall_help ;}
+function update_firewall(){ $HOME/scripts/awesome-widgets firewall ;}
+
+while getopts 'ha:' flag; do
+     case "$flag" in
+        h ) help          ;;
+        a ) app="$OPTARG" ;;
+     esac
+done
+
+title="${0##*/}"
+heading "$title"
+
+main_items=( "status" "turn on" "turn off" "enable" "disable" "allow outgoing" "deny outgoing" "allow incoming" "deny incoming" "allow app" "allow kdeconnect" "deny kdeconnect" "help" )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+
+case "$main_item" in
+    status )             sudo ufw status verbose && accomplished ;;
+    "turn on" )          sudo ufw enable  && update_firewall && accomplished ;;
+    "turn off" )         sudo ufw disable && update_firewall && accomplished ;;
+    enable )             sudo systemctl enable ufw && accomplished ;;
+    disable )            sudo systemctl disable ufw && accomplished ;;
+    "allow outgoing" )   sudo ufw default allow outgoing && accomplished ;;
+    "deny outgoing" )    sudo ufw default deny outgoing && accomplished ;;
+    "allow incoming" )   sudo ufw default allow incoming && accomplished ;;
+    "deny incoming" )    sudo ufw default deny incoming && accomplished ;;
+    "allow app" )        [ ! "$app" ] && get_input "App to allow" && app="$input"
+                         sudo ufw allow "$app" && accomplished ;;
+    "allow kdeconnect" ) # https://community.kde.org/KDEConnect
+                         action_now "opening udp"
+                         sudo ufw allow 1714:1764/udp && accomplished
+                         action_now "opening tcp"
+                         sudo ufw allow 1714:1764/tcp && accomplished
+                         accomplished "Please reboot now." ;;
+    "deny kdeconnect" )  action_now "denying udp"
+                         sudo ufw deny 1714:1764/udp && accomplished
+                         action_now "denying tcp"
+                         sudo ufw deny 1714:1764/tcp && accomplished
+                         accomplished "Please reboot now." ;;
+    help )               help ;;
+esac
+
+exit

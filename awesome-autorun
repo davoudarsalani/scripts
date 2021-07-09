@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+autorun_file="/tmp/autorun"
+[ -f "$autorun_file" ] && exit || touch "$autorun_file"
+
+## tricks for the time when power saving screws audio
+# echo "0" | sudo tee /sys/module/snd_hda_intel/parameters/power_save
+# echo "N" | sudo tee /sys/module/snd_hda_intel/parameters/power_save_controller
+# sleep 2
+
+pulseaudio --start &
+start-pulseaudio-x11
+
+source $HOME/scripts/gb-audio
+pactl set-sink-volume $def_sink_index 30%
+audacious "$HOME/linux/sounds/login_mint.ogg" &
+
+# source $HOME/scripts/gb-screen
+# xrandr --output  "$scr_1_name" --mode 1366x768 --rate 60 --primary
+# xrandr --addmode "$scr_2_name" 1600x900
+# xrandr --output  "$scr_2_name" --mode 1600x900 --rate 60 --right-of "$scr_1_name"
+# xrandr --output  "$scr_2_name" --gamma .85:1:1.14  ## + custom mode (80 100 75)
+# xrandr --output  "$scr_2_name" --gamma .65:1:.9    ## + standard mode
+
+nm-applet &
+greenclip daemon &
+picom -b &
+
+current_date=$(get_datetime "jymd")
+$HOME/scripts/.venv_keylogger/bin/python3 $HOME/scripts/.venv_keylogger/bin/keylogger --log-file $HOME/linux/keylogs/keylog-${current_date} &
+
+# source $HOME/scripts/gb-network
+# [ ! "$eth_ip" ] && add_desired_ip_to_ethernet && msgn "added <span color=\"$orange\">$desired_eth_ip</span> to <span color=\"$orange\">$eth_devc</span>"
+
+widgets=(
+    "audio"
+    "firewall"
+    "brightness"
+    "bluetooth"
+    "clipboard"
+    "klgr"  ## it is updated regularly with watch, but this had better be here too
+    "tor"
+    "turn_off_scr_3"
+)
+
+for widget in "${widgets[@]}"; do
+    $HOME/scripts/awesome-widgets "$widget"
+done
+
+msgn " " " " "$HOME/linux/themes/ok-w.png"
+
+exit

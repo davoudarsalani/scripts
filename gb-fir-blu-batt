@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+firewall_status="$(sudo ufw status | \grep -i status | awk '{print $NF}')"
+
+bluetooth_status="$(rfkill list | \grep -iA 1 bluetooth | xargs | awk '{print $NF}')"
+def_ctrlr_mac="$(bluetoothctl list | \grep -i default | awk '{print $2}')"
+headset_mac="$(bluetoothctl devices | \grep 'Headset$' | awk '{print $2}')"
+
+battery_level="$(printf "%02d" "$(acpi | awk '{print $4}' | tr -d "%,")")"  ## OR "$(printf "%02d" "$(cat /sys/class/power_supply/BAT1/capacity)")"
+battery_status="$(acpi | awk '{print $3 }' | tr -d ',')"  ## OR "$(cat /sys/class/power_supply/BAT1/status)"
+battery_rem="$(acpi    | awk '{print $5}' | cut -d ":" -f 1-2)"
+battery_temp="$(acpi -t | awk '{print $4}' | cut -d "." -f 1)"

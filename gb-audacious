@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+length_in_seconds=$(audtool --current-song-length-seconds)  ## 3304
+length="$(audtool --current-song-length)"  ## 55:04
+
+current_position_in_seconds=$(audtool --current-song-output-length-seconds)  ## 369
+current_position="$(audtool --current-song-output-length)"  ## 5:47
+
+position_in_playlist=$(audtool playlist-position)  ## 3
+playlist_length=$(audtool playlist-length)  ## 5
+
+preamp=$(audtool equalizer-get-preamp | awk '{print $NF}')  ## -2.10/0/etc
+
+title="$(audtool --current-song-tuple-data title)"
+album="$(audtool --current-song-tuple-data album)"
+artist="$(audtool --current-song-tuple-data artist)"
+
+shuffle_status="$(audtool --playlist-shuffle-status)"  ## on/off
+play_status="$(audtool --playback-status)"  ## playing/paused
+
+bar_position=$(printf "%02d" $(( $current_position_in_seconds * 100 / $length_in_seconds )))  ## <--,-- 19
+                                                                                              ##    |-- do NOT remove printf "%02d"
+                                                                                              ##    '-- otherwise bar will not display amounts properly

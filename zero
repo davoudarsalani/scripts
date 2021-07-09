@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+function help(){ source $HOME/scripts/.help; zero_help ;}
+
+function prompt(){
+    for args in "$@"; do
+        case "$1" in
+            -f ) [ ! "$file" ] && get_input "File" && file="$input" ;;
+        esac
+        shift
+    done ;}
+
+while getopts 'hf:' flag; do
+    case "$flag" in
+        h ) help           ;;
+        f ) file="$OPTARG" ;;
+    esac
+done
+
+title="${0##*/}"
+heading "$title"
+
+main_items=( ">" ": >" "true >" "cat /dev/null >" "cp /dev/null" "truncate -s 0" "dd if=/dev/null" "help" )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+
+case "$main_item" in
+    ">" ) prompt -f && > "$file" && accomplished ;;
+    ": >" ) prompt -f && : > "$file" && accomplished ;;
+    "true >" ) prompt -f && true > "$file" && accomplished ;;
+    "cat /dev/null >" ) prompt -f && cat /dev/null > "$file" && accomplished ;;
+    "cp /dev/null" ) prompt -f && cp /dev/null "$file" && accomplished ;;
+    "truncate -s 0" ) prompt -f && truncate -s 0 "$file" && accomplished ;;
+    "dd if=/dev/null" ) prompt -f && dd if=/dev/null of="$file" && accomplished ;;
+    help ) help ;;
+esac
+
+exit
+dd

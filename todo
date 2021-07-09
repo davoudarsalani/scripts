@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+file="$HOME/todo/todo"
+content="$(cat $file)"
+
+main_items=( "ADD" "REMOVE" "EMPTY" "" "$content" )
+main_item="$(pipe_to_dmenu "todo" "${main_items[@]}" "")" || exit 37
+
+case "$main_item" in
+    ADD ) add_items=()  ## no members needed here
+          add_item="$(pipe_to_dmenu "add" "${add_items[@]}" "")" || exit 37
+
+          ## exit if it already exists
+          [ "$(\grep -w "$add_item" "$file")" ] && msgc "ERROR" "<span color=\"$orange\">$add_item</span> already exists" "$HOME/linux/themes/alert-w.png" && exit
+
+          echo "$add_item" >> "$file" && msgn "added <span color=\"$orange\">$add_item</span>" ;;
+    REMOVE ) [ ! "$content" ] && msgc "ERROR" "todo is empty" "$HOME/linux/themes/alert-w.png" && exit
+
+             remove_items=( "$content" )
+             remove_item="$(pipe_to_dmenu "remove" "${remove_items[@]}" "red")" || exit 37
+
+             sed -i "/^$remove_item$/d" "$file" && msgn "removed <span color=\"$red\">$remove_item</span>" ;;  ## do NOT replace " with ' in sed
+    EMPTY ) empty_items=( "no" "yes" )
+            empty_item="$(pipe_to_dmenu "you sure?" "${empty_items[@]}" "red")" || exit 37
+
+            case "$empty_item" in
+                yes ) > "$file" && msgn "emptied" ;;
+            esac ;;
+esac
+
+exit

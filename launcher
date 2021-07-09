@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+case "$1" in
+    rofi ) rofi -show combi & ;;
+    dmenu ) dmenu_run -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "dmenu" & ;;
+esac
+
+exit

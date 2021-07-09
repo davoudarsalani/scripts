@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+current_wallpapers_file="/tmp/current_wallpapers"
+
+case "$1" in
+    select ) cd $HOME/wallpapers/
+             wallpapers=( $(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort) )
+             wallpaper="$(pipe_to_dmenu "wallpaper" "${wallpapers[@]}" "")" || exit 37
+
+             echo "$wallpaper" > "$current_wallpapers_file"
+             feh --bg-fill "$wallpaper" ;;
+    random ) random_wallpaper ;;
+    current ) cur_walls="$(cat "$current_wallpapers_file")"
+              text="$(echo -e "current wallpapers:\n<span color=\"$orange\">${cur_walls}</span>")"  ## do NOT quote $cur_walls
+              msgn "$text" ;;
+esac
+
+exit

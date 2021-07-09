@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+case "$1" in
+     goldendict ) words="$(cat $HOME/bgls/words)"
+
+                  gold_items=( "open" "" "$words" )
+                  gold_item="$(pipe_to_dmenu "goldendict" "${gold_items[@]}" "")" || exit 37
+
+                  case "$gold_item" in
+                      open ) goldendict              1>/dev/null 2>&1 & ;;
+                      * )    goldendict "$gold_item" 1>/dev/null 2>&1 & ;;
+                  esac
+esac
+
+exit

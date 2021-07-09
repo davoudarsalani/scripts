@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+echo -e "Normal:\n"
+curl ipinfo.io
+## also:
+  # curl -s http://myip.enix.org/REMOTE_ADDR
+  # wget -qO - https://api.ipify.org (https://github.com/rkienjet/torscripts/blob/master/newcircuit)
+echo -e "\n\n----------------------\nTor:\n"
+torsocks curl ipinfo.io
+echo

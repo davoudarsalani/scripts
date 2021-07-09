@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+function hi_li(){ eval "$HIGHLIGHT" "$1" 2>/dev/null ;}
+function me_in(){ mediainfo "$1" ;}
+attr="$(lsattr "$1" | awk '{print $1}')"
+file_mime_type="$(file --mime-type "$1" -bL)"
+sep="\n\n"
+
+case "$file_mime_type" in
+    audio/* )            echo -e "${attr} ${file_mime_type}${sep}$(me_in "$1" | sed 's/\s\+:\s/: /g')" ;;
+    video/* )            echo -e "${attr} ${file_mime_type}${sep}$(me_in "$1" | sed 's/\s\+:\s/: /g')" ;;
+    text/* )             echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
+    application/json )   echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
+    application/csv )    echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
+    message/news )       echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
+    */octet-stream )     echo -e "${attr} ${file_mime_type}" ;;
+    application/msword ) echo -e "${attr} ${file_mime_type}" ;;
+    */*spreadsheet* )    echo -e "${attr} ${file_mime_type}" ;;
+    */*officedocument* ) echo -e "${attr} ${file_mime_type}" ;;
+    */pdf)               echo -e "${attr} ${file_mime_type}" ;;
+    image/* )            echo -e "${attr} ${file_mime_type}${sep}$(me_in "$1" | sed 's/\s\+:\s/: /g')" ;;
+    */*tar )             echo -e "${attr} ${file_mime_type}${sep}$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+    */gzip )             echo -e "${attr} ${file_mime_type}${sep}$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+    *bzip2 )             echo -e "${attr} ${file_mime_type}" ;;
+    */zip )              echo -e "${attr} ${file_mime_type}${sep}$(unzip -l "$1" | sed '1,3d' | awk '{print $4}' | sed '/^$/d' | sort)" ;;
+    */*rar )             echo -e "${attr} ${file_mime_type}${sep}$(unrar l "$1" | sed '1,8d' | head -n -3 | awk '{print $NF}' | sort)" ;;
+    * )                  echo -e "${attr} ${file_mime_type}" ;;
+esac
+
+exit

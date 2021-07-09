@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+function help(){ source $HOME/scripts/.help; user_help ;}
+
+function prompt(){
+    for args in "$@"; do
+        case "$1" in
+            -g ) [ ! "$group"    ] && get_input "Group"    && group="$input" ;;
+            -o ) [ ! "$old_name" ] && get_input "Old name" && old_name="$input" ;;
+            -n ) [ ! "$new_name" ] && get_input "New name" && new_name="$input" ;;
+        esac
+        shift
+    done ;}
+
+while getopts 'hg:o:n:' flag; do
+    case "$flag" in
+        h ) help               ;;
+        g ) group="$OPTARG"    ;;
+        o ) old_name="$OPTARG" ;;
+        n ) new_name="$OPTARG" ;;
+    esac
+done
+
+title="${0##*/}"
+heading "$title"
+
+main_items=( "info" "create group" "add $USER to a group" "remove $USER from a group" "change user's login name" "how to useradd" "help" )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+
+case "$main_item" in
+    info ) echo -e "User/ID:\t\t$(id -un)/$(id -u)"  ## OR $EUID (for user ID)
+           echo -e "Groups:\t\t\t$(groups $(id -un))"
+           echo -e "Groups IDs:\t\t$(id -G)"
+           echo -e "Effective group ID:\t$(id -g)" && accomplished ;;
+    "create group" ) prompt -g
+                     sudo groupadd -r "$group" && accomplished ;;
+    "add $USER to a group" ) prompt -g
+                            sudo gpasswd -a $USER "$group" && accomplished ;;
+    "remove $USER from a group" ) prompt -g
+                                 sudo gpasswd -d $USER "$group" && accomplished ;;
+    "change user's login name" ) red_blink " Use tty logged in as root"
+                                 prompt -o -n
+                                 usermod -l "$new_name" "$old_name" && accomplished ;;
+    "how to useradd" ) echo -e "Syntax\t\tuseradd -m -g <initial_group> -G <additional_groups> -s <login_shell> <username> ( -m creates the user home directory as /home/<username> )"
+                       echo -e "e.g.:\t\tuseradd -m -g users -G wheel,data,autologin -s /bin/bash/ jack" && accomplished ;;
+    help ) help ;;
+esac
+
+exit

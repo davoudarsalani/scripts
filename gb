@@ -1,0 +1,498 @@
+#!/usr/bin/env bash
+
+function get_datetime(){  ## {{{
+    case "$1" in
+            ymdhms )   local output=$(date +%Y%m%d%H%M%S)  ;;
+            ymd )      local output=$(date +%Y%m%d)        ;;
+            hms )      local output=$(date +%H%M%S)        ;;
+            seconds )  local output=$(date +%s)            ;;
+            weekday )  local output=$(date +%A)            ;;
+            jymdhms )  local output=$(jdate +%Y%m%d%H%M%S) ;;
+            jymd )     local output=$(jdate +%Y%m%d)       ;;
+            jhms )     local output=$(jdate +%H%M%S)       ;;
+            jseconds ) local output=$(jdate +%s)           ;;
+            jweekday ) local output=$(jdate +%A)           ;;
+    esac
+    echo "$output" ;}
+## }}}
+function get_mountable_umountable(){  ## {{{
+    mountable="$( \lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE "part $|rom $")"
+    umountable="$(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i "/tmp/")" ;}
+## }}}
+function action_now(){  ## {{{
+    echo -e "$(green "→") $(grey $@)" ;}
+## }}}
+function accomplished(){  ## {{{
+    echo -e "$(green "✔") $(grey $@)" ;}
+## }}}
+function heading(){  ## {{{
+    echo -e "$(purple "$@")" ;}
+## }}}
+function wrap_fzf_choice(){  ## {{{
+    echo -e "$(brown "--=[") $@ $(brown "]=--")" ;}
+## }}}
+function pipe_to_fzf(){  ## {{{
+    local fzf_choice="$(printf "%s\n" "$@" | fzf)"
+    [ "$fzf_choice" ] && echo "$fzf_choice" || return 37 ;}
+## }}}
+function pipe_to_dmenu(){  ## {{{
+    ## Usage: this function expects 3 args, for example:
+    ##
+    ##        item="$(pipe_to_dmenu "<title>" "${items[@]}")" ""
+    ##        item="$(pipe_to_dmenu ""        "${items[@]}")" ""     ## <--,-- $3 can only be either "red" or ""
+    ##        item="$(pipe_to_dmenu "<title>" "${items[@]}")" "red"  ## <--'
+    ##        item="$(pipe_to_dmenu ""        "${items[@]}")" "red"
+    local received=( "$@" )
+    local received_length=${#received[@]}
+    local title="${received[0]}"
+    local fg="${received[-1]}"
+    local remaining=( "${received[@]:1:$(($received_length-2))}" )  ## remove first and last args
+    [ "$fg" == "red" ] && local sel_fg="$dmenusf2" || local sel_fg="$dmenusf"
+    local dmenu_choice="$(printf "%s\n" "${remaining[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$sel_fg" -fn "$dmenufn" -p "$title")"
+    [ "$dmenu_choice" ] && echo "$dmenu_choice" || return 37 ;}
+## }}}
+function lsblk_full(){  ## {{{
+    \lsblk -o NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT,OWNER,GROUP,MODE,MAJ:MIN,RM,RO ;}
+## }}}
+function copy_pacman_log(){  ## {{{
+    cp /var/log/pacman.log $HOME/linux/pacman.log
+    msgn "<span color=\"$orange\">/var/log/pacman.log</span> copied" ;}
+## }}}
+function msgn(){  ## {{{
+    notify-send -u normal "${1}" "${2}" -i "${3}" -t 10000 ;}
+## }}}
+function msgc(){  ## {{{
+    notify-send -u critical "${1}" "${2}" -i "${3}" ;}
+## }}}
+function clear_playlist(){  ## {{{
+    audtool --playlist-clear ;}
+## }}}
+function if_speech(){  ## {{{
+    source $HOME/scripts/gb-audacious
+    case "$play_status" in
+        playing|paused ) case "$album" in
+                             speech ) local current_position="$(audtool --current-song-output-length)"
+                                      local current_position_in_seconds="$(audtool --current-song-output-length-seconds)"
+                                      echo $current_position_in_seconds > $HOME/speech/csols
+                                      msgn "sent to csol" "<span color=\"$orange\">$current_position</span>" ;;
+                             # * )    exit ;;  ## ◄─╮
+                         esac ;;               ##   ├── do NOT uncomment
+        # * ) exit ;;                          ## ◄─╯
+    esac ;}
+## }}}
+function play_shutdown_track(){  ## {{{
+    source $HOME/scripts/gb-audio
+    pacmd play-file "$HOME/linux/sounds/shutdown.ogg" $def_sink_index ;}
+## }}}
+function day_hour_min_sec(){  ## {{{
+    local seconds=${1%.*}  ## remove decimal in case arg is a float
+    local sec=$(printf  "%02d" $(($seconds % 60)))
+    local min=$(printf  "%02d" $(($seconds / 60 % 60)))
+    local hour=$(printf "%02d" $(($seconds / 60 / 60 % 24)))
+    local day=$(printf  "%02d" $(($seconds / 60 / 60 / 24)))
+    [ $day -eq 0 ] && local dur=${hour}:${min}:${sec} || local dur=${day}:${hour}:${min}:${sec}
+    echo "$dur" ;}
+## }}}
+function clear_clipboard(){  ## {{{
+    greenclip clear
+    msgn "cleared" "" "$HOME/linux/themes/greenclip.png" ;}
+## }}}
+function random_wallpaper(){  ## {{{
+    source $HOME/scripts/gb-screen
+
+    ## PREVIOUSLY: feh --bg-fill "$rand_wall"
+
+    cd $HOME/wallpapers/
+    ## pick two random wallpapers
+    local rand_walls=( $(shuf -n 2 <<< "$(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort)") )
+
+    local file="/tmp/current_wallpapers"
+    echo "${rand_walls[@]}" > "$file"
+
+    for ((i=0; i<$screens_count; i++)); do
+        echo "local gears = require('gears'); gears.wallpaper.maximized('$HOME/wallpapers/${rand_walls[$i]}', $((i+1)), true)" | awesome-client  ## do NOT quote $((i+1))
+        sleep .1
+    done ;}
+## }}}
+function copy_random_wallpaper_for_startup(){  ## {{{
+    cd $HOME/wallpapers/
+    local rand_wall="$(shuf -n 1 <<< "$(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort)")"
+    sudo cp "$rand_wall" /usr/share/wallpapers/startup_background.jpg
+    msgn "<span color=\"$orange\">$rand_wall</span> copied" ;}
+## }}}
+function get_input(){  ## {{{
+    unset input
+    local color_mode="${2:-olive}"
+    while [ ! "$input" ]; do read -p "$($color_mode "$1") " input; printf "\33[A"; done && echo ;}
+## }}}
+function get_single_input(){  ## {{{
+    unset single_input
+    local color_mode="${2:-olive}"
+    while [ ! "$single_input" ]; do read -p "$($color_mode "$1") " -n 1 single_input; printf "\33[A"; done && echo && echo ;}
+## }}}
+function set_widget(){  ## {{{
+    ## only the awesome-widgets use this function but it'd better be here (rather than the script itself)
+    ## because sometimes it's needed by 0-test
+    local widget="$1"
+    local attr="$2"
+    local value="$3"
+    echo "${widget}:set_${attr}('${value}')" | awesome-client ;}
+## }}}
+## colors {{{ 40 for black, 49 for transparent, ∅  for no background
+## {{{
+function red(){  ## {{{
+    echo -e "\033[0;49;31m$@\033[0m" ;}
+## }}}
+function green(){  ## {{{
+    echo -e "\033[0;49;32m$@\033[0m" ;}
+## }}}
+function yellow(){  ## {{{
+    echo -e "\033[0;49;33m$@\033[0m" ;}
+## }}}
+function blue(){  ## {{{
+    echo -e "\033[0;49;34m$@\033[0m" ;}
+## }}}
+function purple(){  ## {{{
+    echo -e "\033[0;49;35m$@\033[0m" ;}
+## }}}
+function cyan(){  ## {{{
+    echo -e "\033[0;49;36m$@\033[0m" ;}
+## }}}
+function white(){  ## {{{
+    echo -e "\033[0;49;37m$@\033[0m" ;}
+## }}}
+function grey(){  ## {{{
+    echo -e "\033[0;49;90m$@\033[0m" ;}
+## }}}
+function brown(){  ## {{{
+    echo -e "\033[38;5;94m$@\033[0m" ;}
+## }}}
+function orange(){  ## {{{
+    echo -e "\033[38;5;202m$@\033[0m" ;}
+## }}}
+function olive(){  ## {{{
+    echo -e "\033[38;5;64m$@\033[0m" ;}
+## }}}
+## }}}
+## bold {{{
+function red_bold(){  ## {{{
+    echo -e "\033[1;49;31m$@\033[0m" ;}
+## }}}
+function green_bold(){  ## {{{
+    echo -e "\033[1;49;32m$@\033[0m" ;}
+## }}}
+function yellow_bold(){  ## {{{
+    echo -e "\033[1;49;33m$@\033[0m" ;}
+## }}}
+function blue_bold(){  ## {{{
+    echo -e "\033[1;49;34m$@\033[0m" ;}
+## }}}
+function purple_bold(){  ## {{{
+    echo -e "\033[1;49;35m$@\033[0m" ;}
+## }}}
+function cyan_bold(){  ## {{{
+    echo -e "\033[1;49;36m$@\033[0m" ;}
+## }}}
+function white_bold(){  ## {{{
+    echo -e "\033[1;49;37m$@\033[0m" ;}
+## }}}
+function grey_bold(){  ## {{{
+    echo -e "\033[1;49;90m$@\033[0m" ;}
+## }}}
+## }}}
+## dim {{{
+function red_dim(){  ## {{{
+    echo -e "\033[2;49;31m$@\033[0m" ;}
+## }}}
+function green_dim(){  ## {{{
+    echo -e "\033[2;49;32m$@\033[0m" ;}
+## }}}
+function yellow_dim(){  ## {{{
+    echo -e "\033[2;49;33m$@\033[0m" ;}
+## }}}
+function blue_dim(){  ## {{{
+    echo -e "\033[2;49;34m$@\033[0m" ;}
+## }}}
+function purple_dim(){  ## {{{
+    echo -e "\033[2;49;35m$@\033[0m" ;}
+## }}}
+function cyan_dim(){  ## {{{
+    echo -e "\033[2;49;36m$@\033[0m" ;}
+## }}}
+function white_dim(){  ## {{{
+    echo -e "\033[2;49;37m$@\033[0m" ;}
+## }}}
+function grey_dim(){  ## {{{
+    echo -e "\033[2;49;90m$@\033[0m" ;}
+## }}}
+## }}}
+## italiac {{{
+function red_italic(){  ## {{{
+    echo -e "\033[3;49;31m$@\033[0m" ;}
+## }}}
+function green_italic(){  ## {{{
+    echo -e "\033[3;49;32m$@\033[0m" ;}
+## }}}
+function yellow_italic(){  ## {{{
+    echo -e "\033[3;49;33m$@\033[0m" ;}
+## }}}
+function blue_italic(){  ## {{{
+    echo -e "\033[3;49;34m$@\033[0m" ;}
+## }}}
+function purple_italic(){  ## {{{
+    echo -e "\033[3;49;35m$@\033[0m" ;}
+## }}}
+function cyan_italic(){  ## {{{
+    echo -e "\033[3;49;36m$@\033[0m" ;}
+## }}}
+function white_italic(){  ## {{{
+    echo -e "\033[3;49;37m$@\033[0m" ;}
+## }}}
+function grey_italic(){  ## {{{
+    echo -e "\033[3;49;90m$@\033[0m" ;}
+## }}}
+## }}}
+## underline {{{
+function red_underline(){  ## {{{
+    echo -e "\033[4;49;31m$@\033[0m" ;}
+## }}}
+function green_underline(){  ## {{{
+    echo -e "\033[4;49;32m$@\033[0m" ;}
+## }}}
+function yellow_underline(){  ## {{{
+    echo -e "\033[4;49;33m$@\033[0m" ;}
+## }}}
+function blue_underline(){  ## {{{
+    echo -e "\033[4;49;34m$@\033[0m" ;}
+## }}}
+function purple_underline(){  ## {{{
+    echo -e "\033[4;49;35m$@\033[0m" ;}
+## }}}
+function cyan_underline(){  ## {{{
+    echo -e "\033[4;49;36m$@\033[0m" ;}
+## }}}
+function white_underline(){  ## {{{
+    echo -e "\033[4;49;37m$@\033[0m" ;}
+## }}}
+function grey_underline(){  ## {{{
+    echo -e "\033[4;49;90m$@\033[0m" ;}
+## }}}
+## }}}
+## blink {{{
+function red_blink(){  ## {{{
+    echo -e "\033[5;49;31m$@\033[0m" ;}
+## }}}
+function green_blink(){  ## {{{
+    echo -e "\033[5;49;32m$@\033[0m" ;}
+## }}}
+function yellow_blink(){  ## {{{
+    echo -e "\033[5;49;33m$@\033[0m" ;}
+## }}}
+function blue_blink(){  ## {{{
+    echo -e "\033[5;49;34m$@\033[0m" ;}
+## }}}
+function purple_blink(){  ## {{{
+    echo -e "\033[5;49;35m$@\033[0m" ;}
+## }}}
+function cyan_blink(){  ## {{{
+    echo -e "\033[5;49;36m$@\033[0m" ;}
+## }}}
+function white_blink(){  ## {{{
+    echo -e "\033[5;49;37m$@\033[0m" ;}
+## }}}
+function grey_blink(){  ## {{{
+    echo -e "\033[5;49;90m$@\033[0m" ;}
+## }}}
+## }}}
+## bg {{{
+function red_bg(){  ## {{{
+    echo -e "\033[7;49;31m$@\033[0m" ;}
+## }}}
+function green_bg(){  ## {{{
+    echo -e "\033[7;49;32m$@\033[0m" ;}
+## }}}
+function yellow_bg(){  ## {{{
+    echo -e "\033[7;49;33m$@\033[0m" ;}
+## }}}
+function blue_bg(){  ## {{{
+    echo -e "\033[7;49;34m$@\033[0m" ;}
+## }}}
+function purple_bg(){  ## {{{
+    echo -e "\033[7;49;35m$@\033[0m" ;}
+## }}}
+function cyan_bg(){  ## {{{
+    echo -e "\033[7;49;36m$@\033[0m" ;}
+## }}}
+function white_bg(){  ## {{{
+    echo -e "\033[7;49;37m$@\033[0m" ;}
+## }}}
+function grey_bg(){  ## {{{
+    echo -e "\033[7;49;90m$@\033[0m" ;}
+## }}}
+function brown_bg(){  ## {{{
+    echo -e "\033[48;5;94m$@\033[0m" ;}
+## }}}
+function orange_bg(){  ## {{{
+    echo -e "\033[48;5;202m$@\033[0m" ;}
+## }}}
+function olive_bg(){  ## {{{
+    echo -e "\033[48;5;64m$@\033[0m" ;}
+## }}}
+## }}}
+## strikethrough {{{
+function red_strikethrough(){  ## {{{
+    echo -e "\033[9;49;31m$@\033[0m" ;}
+## }}}
+function green_strikethrough(){  ## {{{
+    echo -e "\033[9;49;32m$@\033[0m" ;}
+## }}}
+function yellow_strikethrough(){  ## {{{
+    echo -e "\033[9;49;33m$@\033[0m" ;}
+## }}}
+function blue_strikethrough(){  ## {{{
+    echo -e "\033[9;49;34m$@\033[0m" ;}
+## }}}
+function purple_strikethrough(){  ## {{{
+    echo -e "\033[9;49;35m$@\033[0m" ;}
+## }}}
+function cyan_strikethrough(){  ## {{{
+    echo -e "\033[9;49;36m$@\033[0m" ;}
+## }}}
+function white_strikethrough(){  ## {{{
+    echo -e "\033[9;49;37m$@\033[0m" ;}
+## }}}
+function grey_strikethrough(){  ## {{{
+    echo -e "\033[9;49;90m$@\033[0m" ;}
+## }}}
+## }}}
+## }}}
+
+function find_duplicate_images(){  ## {{{
+    [ ! "$1" ] && red "arg needed" && exit
+    [ ! -d "$1" ] && { red "no such dir" && exit ;} || cd "$1"
+
+    pics=( $(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort) )
+    dups=""
+    start=$(get_datetime "jseconds")
+
+    for ((i=0; i<${#pics[@]}; i++)); do
+        p1="${pics[$i]}"
+
+        ## start comparing only if p1 is not already in dups
+        if_p1_in_dups="$(echo "${dups}" | \grep $p1)"
+        if [ ! "$if_p1_in_dups" ]; then
+            echo "$p1"
+            for p2 in "${pics[@]:$i}"; do
+                ## prevent comparing with itself
+                if [ ! "$p1" == "$p2" ]; then
+                    difference="$(diff "$p1" "$p2")"
+                    [ ! "$(echo "$difference" | \grep 'differ$')" ] && dups+="$p1 = $p2, "
+                fi
+            done
+
+            ## write dups already found if any
+            [ "$dups" ] && green "dups: ${dups}"
+
+            grey "-------------------------"
+
+        fi
+    done
+
+    green "\ndups: ${dups}"
+
+    end=$(get_datetime "jseconds")
+    diff=$(( end - start ))
+    dur="$(day_hour_min_sec $diff)"
+    echo "Total duration: $dur" ;}
+## }}}
+# timer and record_* {{{
+# function timer(){  ## {{{
+#    source $HOME/scripts/gb-screen
+#    source $HOME/scripts/gb-audio
+#    start=$(get_datetime "jhms")
+#    for ((i=1; i<="$1"; i++)); do
+#        current=$(get_datetime "jhms")
+#        seconds="$(( current - start ))"
+#        echo -en "\r  \r"
+#        w=$(printf "$2 %02d:%02d:%02d" "$((seconds/3600%24))" "$((seconds/60%60))" "$((seconds%60))")
+#        set_widget "record" "markup" "<span color=\"$red\">$record_icon <b>$w</b></span>"
+#        sleep 1
+#    done ;}
+## }}}
+# function record_audio(){  ## {{{
+#     source $HOME/scripts/gb-screen
+#     source $HOME/scripts/gb-audio
+#     timer "$3" "$4" &
+#     ffmpeg -f pulse -i $def_source_mon_index \
+#            -f pulse -i default               \
+#            -filter_complex amix=inputs=2     \
+#            -t "$1" "$2" 2>/dev/null ;}
+## }}}
+# function record_audio_ul(){  ## {{{
+#     source $HOME/scripts/gb-screen
+#     source $HOME/scripts/gb-audio
+#     ffmpeg -f pulse -i $def_source_mon_index \
+#            -f pulse -i default \
+#            -filter_complex amix=inputs=2 \
+#            "$1" 2>/dev/null ;}
+## }}}
+# function record_screen(){  ## {{{
+#     source $HOME/scripts/gb-screen
+#     timer "$3" "$6" &
+#     ffmpeg -f pulse -i $def_source_mon_index \
+#            -f pulse -i default \
+#            -filter_complex amix=inputs=2 \
+#            -f x11grab -r 30 -s "$4" -i :0.0+"$5",0 \
+#            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
+#            -t "$1" "$2" 2>/dev/null ;}
+## }}}
+# function record_screen_ul(){  ## {{{
+#     source $HOME/scripts/gb-screen
+#     source $HOME/scripts/gb-audio
+#     ffmpeg -f pulse -i $def_source_mon_index \
+#            -f pulse -i default \
+#            -filter_complex amix=inputs=2 \
+#            -f x11grab -r 30 -s "$2" -i :0.0+"$3",0 \
+#            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
+#            "$1" 2>/dev/null ;}
+## }}}
+# function record_video(){  ## {{{
+#     source $HOME/scripts/gb-screen
+#     source $HOME/scripts/gb-audio
+#     timer "$3" "$4" &
+#     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
+#            -f pulse -i $def_source_mon_index \
+#            -f pulse -i default \
+#            -filter_complex amix=inputs=2 \
+#            -t "$1" "$2" 2>/dev/null ;}
+## }}}
+# function record_video_ul(){  ## {{{
+#     source $HOME/scripts/gb-screen
+#     source $HOME/scripts/gb-audio
+#     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
+#            -f pulse -i $def_source_mon_index \
+#            -f pulse -i default \
+#            -filter_complex amix=inputs=2 \
+#            "$1" 2>/dev/null ;}
+## }}}
+# function record_mic_mon_on(){  ## {{{
+#     source $HOME/scripts/gb-audio
+#     unmute_mic
+#     mic_25
+#     unmute_mon
+#     mon_100 ;}
+## }}}
+# function record_mon_on(){  ## {{{
+#     source $HOME/scripts/gb-audio
+#     unmute_mon
+#     mon_100 ;}
+## }}}
+# function record_mic_mon_off(){  ## {{{
+#     source $HOME/scripts/gb-audio
+#     mute_mic
+#     mic_0
+#     mute_mon
+#     mon_0 ;}
+## }}}
+## }}}
+

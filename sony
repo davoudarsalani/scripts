@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+
+function help(){ source $HOME/scripts/.help; sony_help ;}
+
+function prompt(){
+    for args in "$@"; do
+        case "$1" in
+            -n ) [ ! "$name" ] && get_input "Dir/file name" && name="$input" ;;
+        esac
+        shift
+    done ;}
+
+function upload(){   scp -r "$@" $USER@sony-${bed}:$HOME/downloads && accomplished ;}
+function download(){ scp -r $USER@sony-${bed}:"$@" $HOME/downloads && accomplished ;}
+function connect(){ ssh -Y $USER@sony-${bed} && accomplished ;}
+function connect_plus_x2x(){ ssh -Y $USER@sony-${bed} "x2x -west -to :0" ;}
+
+while getopts 'hn:' flag; do
+    case "$flag" in
+        h ) help           ;;
+        n ) name="$OPTARG" ;;
+    esac
+done
+
+title="${0##*/}"
+heading "$title"
+
+main_items=( "ethernet connect + x2x" "ethernet connect" "ethernet download" "ethernet upload" "wifi connect + x2x" "wifi connect" "wifi download" "wifi upload" "help" )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+
+case "$main_item" in
+    "ethernet connect + x2x" ) bed="ethernet"
+                               connect_plus_x2x ;;
+    "ethernet connect" ) bed="ethernet"
+                         connect ;;
+    "ethernet download" ) prompt -n
+                          bed="ethernet"
+                          download "$name" ;;
+    "ethernet upload" ) prompt -n
+                        bed="ethernet"
+                        upload "$name" ;;
+
+    "wifi connect + x2x" ) bed="wifi"
+                           connect_plus_x2x ;;
+    "wifi connect" ) bed="wifi"
+                     connect ;;
+    "wifi download" ) prompt -n
+                      bed="wifi"
+                      download "$name" ;;
+    "wifi upload" ) prompt -n
+                    bed="wifi"
+                    upload "$name" ;;
+    help ) help ;;
+esac
+
+exit

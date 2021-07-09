@@ -1,0 +1,624 @@
+#!/usr/bin/env bash
+
+threshhold=70
+
+case "$1" in
+    rand_wall )  ## {{{
+                source $HOME/scripts/gb
+
+                rand_wall_allowed_file="/tmp/rand_wall_allowed"
+                [ -f "$rand_wall_allowed_file" ] && [ ! $(pgrep "vlc") ] && [ ! $(pgrep "ffmpeg") ] && random_wallpaper || touch "$rand_wall_allowed_file" ;;
+                ## }}}
+    jadi )  ## {{{
+           $HOME/scripts/jadi.py ;;
+           ## }}}
+    restart_picom )  ## {{{
+                    pkill picom && sleep 2 && picom -b ;;
+                    ## }}}
+    turn_off_scr_3 )  ## {{{
+                     source $HOME/scripts/gb
+                     source $HOME/scripts/gb-screen
+
+                     [ "$scr_3_name" ] && { xrandr --output "$scr_3_name" --off  ## https://superuser.com/questions/618127/disable-unplugged-displays-xrandr
+                                            msgn "turned off <span color=\"$orange\">screen 3 ("$scr_3_name")</span>" ;} ;;
+                     ## }}}
+
+    date_jdate )  ## {{{
+                 source $HOME/scripts/gb
+
+                 message="$(echo -e "$(get_datetime "jweekday")\n$(get_datetime "ymdhms")\n$(get_datetime "jymdhms")")"
+                 msgn "$message" ;;
+                ## }}}
+    weather )  ## {{{
+              case "$2" in
+                  update )   $HOME/scripts/weather.py "update"   ;;
+                  forecast ) $HOME/scripts/weather.py "forecast" ;;
+              esac ;;
+              ## }}}
+    audio )  ## {{{
+            source $HOME/scripts/gb
+
+            function update_variables(){ source $HOME/scripts/gb-audio ;}
+            update_variables
+
+            function mute_vol(){   pactl set-sink-mute $def_sink_index 1 ;}  ## OR pactl set-sink-mute $def_sink_index true  <--,
+            function unmute_vol(){ pactl set-sink-mute $def_sink_index 0 ;}  ## OR pactl set-sink-mute $def_sink_index false <--'-- pactl set-sink-mute $def_sink_index toggle
+
+            function mute_mic(){   pactl set-source-mute $def_source_index 1 ;}
+            function unmute_mic(){ pactl set-source-mute $def_source_index 0 ;}
+
+            # function mic_0(){  pactl set-source-volume $def_source_index 0%  ;}
+            # function mic_25(){ pactl set-source-volume $def_source_index 25% ;}
+
+            function mute_mon(){   pactl set-source-mute $def_source_mon_index 1 ;}
+            function unmute_mon(){ pactl set-source-mute $def_source_mon_index 0 ;}
+
+            # function mon_0(){   pactl set-source-volume $def_source_mon_index 0%   ;}
+            # function mon_100(){ pactl set-source-volume $def_source_mon_index 100% ;}
+
+            function connecttoheadset(){
+                source $HOME/scripts/gb-fir-blu-batt
+
+                msgn "connecting to headset <span color=\"$orange\">$headset_mac</span>"
+
+                local output="$(bluetoothctl connect "$headset_mac")"
+                [ ! "$(echo "$output" | \grep -i "failed to connect")" ] \
+                && msgn "connected to <span color=\"$orange\">$headset_mac</span>" \
+                || { local text="$(echo -e "connecting to <span color=\"$orange\">$headset_mac</span>\n$output")"
+                     msgc "ERROR" "$text" "$HOME/linux/themes/alert-w.png" ;}
+            }
+
+
+            case "$2" in
+                vol_30 )     pactl set-sink-volume $def_sink_index 30% ;;
+
+                toggle_vol ) [ "$vol_mute_status" == "yes" ] && unmute_vol || mute_vol ;;
+                vol_up )     pactl set-sink-volume $def_sink_index +5% ;;
+                vol_down )   pactl set-sink-volume $def_sink_index -5% ;;
+
+                toggle_mic ) [ "$mic_mute_status" == "yes" ] && unmute_mic || mute_mic ;;
+                mic_up )     pactl set-source-volume $def_source_index +5% ;;
+                mic_down )   pactl set-source-volume $def_source_index -5% ;;
+
+                toggle_mon ) [ "$mon_mute_status" == "yes" ] && unmute_mon || mute_mon ;;
+                mon_up )     pactl set-source-volume $def_source_mon_index +5% ;;
+                mon_down )   pactl set-source-volume $def_source_mon_index -5% ;;
+
+                connect_to_headset ) connecttoheadset ;;
+                full_info )
+text="$(echo -e "\
+<span color=\"$orange\">Vol</span>\n\
+name:\t$def_sink_name\n\
+index:\t$def_sink_index\n\
+level:\t$vol_level\n\
+state:\t$vol_state\n\
+mute:\t$vol_mute_status\n\
+\n\
+<span color=\"$orange\">Mic</span>\n\
+name:\t$def_source_name\n\
+index:\t$def_source_index\n\
+level:\t$mic_level\n\
+state:\t$mic_state\n\
+mute:\t$mic_mute_status\n\
+\n\
+<span color=\"$orange\">Mon</span>\n\
+name:\t$def_source_mon_name\n\
+index:\t$def_source_mon_index\n\
+level:\t$mon_level\n\
+state:\t$mon_state\n\
+mute:\t$mon_mute_status\n\
+\n\
+<span color=\"$orange\">Active ports</span>\n\
+sink:\t$active_sink_port\n\
+source:\t$active_source_port\n")"
+msgn "$text" ;;
+            esac
+
+            update_variables
+
+            [ "$vol_mute_status" == "yes" ] && vol_on_off="<span color=\"$red\">:OF</span>" || vol_on_off=""
+            [ $vol_level -eq 0 ] && vol_level="<span color=\"$red\">${vol_level}</span>"    || vol_level="${vol_level}"
+
+            [ "$mic_mute_status" == "no" ] && mic_on_off="<span color=\"$red\">:ON</span>" || mic_on_off=""
+            [ ! $mic_level -eq 0 ] && mic_level="<span color=\"$red\">${mic_level}</span>" || mic_level="${mic_level}"
+
+
+            [ "$mon_mute_status" == "no" ] && mon_on_off="<span color=\"$red\">:ON</span>" || mon_on_off=""
+            [ ! $mon_level -eq 0 ] && mon_level="<span color=\"$red\">${mon_level}</span>" || mon_level="${mon_level}"
+
+            states_initials="${vol_state::1}${mic_state::1}${mon_state::1}"  ## RSI
+            indeces="${def_sink_index}${def_source_index}${def_source_mon_index}"  ## 010
+            [ "$(echo "$def_sink_name" | \grep '^bluez_sink')" ] && headset_connectivity="<span color=\"$green\"> HE</span>"
+
+            set_widget "audio" "markup" "${vol_level}${vol_on_off} ${mic_level}${mic_on_off} ${mon_level}${mon_on_off} ${states_initials} ${indeces}${headset_connectivity}" ;;
+            ## }}}
+    battery )  ## {{{
+              source $HOME/scripts/gb
+              source $HOME/scripts/gb-fir-blu-batt
+
+              [ $battery_level -lt 15 ] && set_widget "battery_ct" "fg" "$red" || set_widget "battery_ct" "fg" "$fg_d"
+
+              case "$battery_status" in
+                  Full )        ac_or_dc="" ;;
+                  Charging )    ac_or_dc="<span color=\"$red\">CH </span>" ;;
+                  Discharging ) ac_or_dc="" ;;
+                  * )           ac_or_dc="<span color=\"$red\">?? </span>" ;;
+              esac
+
+              [ $battery_level -eq 100 ] && battery_level="" || battery_level="BA:$battery_level "
+              [ "$battery_rem" ] && battery_rem="$battery_rem " || battery_rem=""
+              [ $battery_temp -gt $threshhold ] && battery_temp="<span color=\"$red\">$battery_temp</span>"
+
+              set_widget "battery" "markup" "${ac_or_dc}${battery_level}${battery_rem}${battery_temp}°" ;;
+              ## }}}
+    memory_cpu )  ## {{{
+        source $HOME/scripts/gb
+        source $HOME/scripts/gb-calculation
+
+        case "$2" in
+            intensives ) top_memory="$(ps axch -o cmd:15,%mem --sort=-%mem | head -n 10)"  ## <--,-- 15 makes it only 15 characters long
+                         top_cpu="$(ps axch -o cmd:15,%cpu --sort=-%cpu | head -n 10)"     ## <--'
+                         message_text="$(echo -e "<span color=\"$orange\">Memory</span>\n${top_memory}\n\n\n<span color=\"$orange\">CPU</span>\n${top_cpu}")"
+                         msgn "${message_text}" ;;
+            usage )  ## >>>> Note <<<< memory should be calculated at the end becuase IFS=$ in memory section interferes with the calculations in cpu and cpu temperature
+
+                    ## cpu temperature
+                    cpu_temp="$(sensors | \grep "Package" | cut -d "+" -f 2 | cut -d "." -f 1)"
+                    [ $cpu_temp -gt $threshhold ] && cpu_temp="<span color=\"$red\">$cpu_temp</span>"
+
+
+                    ## cpu (https://www.idnt.net/en-US/kb/941772)
+                    ## get last usage
+                    cpu_last_file="$HOME/scripts/.last/cpu"
+                    cpu_sum_last_file="$HOME/scripts/.last/cpu_sum"
+                    cpu_last=( $(tail -n 1 "$cpu_last_file" 2>/dev/null) ) || cpu_last=( cpu 0 0 0 0 0 0 0 0 0 0 )  # do NOT change 2>/dev/null
+                    cpu_sum_last=$(tail -n 1 "$cpu_sum_last_file" 2>/dev/null) || cpu_sum_last=0  # do NOT change 2>/dev/null
+
+                    ## get new usage
+                    cpu_now=( $(head -n 1 /proc/stat) )     ## get the first line with aggregate of all cpus
+                    cpu_sum="${cpu_now[@]:1}"               ## get all columns but skip the first (which is the "cpu" string)
+                    cpu_sum=$((${cpu_sum// /+}))            ## replace the column seperator (space) with +
+                    cpu_delta=$((cpu_sum - cpu_sum_last))   ## get the delta between two reads
+                    cpu_idle=$((cpu_now[4] - cpu_last[4]))  ## get the idle time delta
+                    cpu_used=$((cpu_delta - cpu_idle))      ## calc time spent working
+                    cpu_perc="$(float_pad "100*$cpu_used/$cpu_delta" 1 2)"
+
+                    ## save these as last to compare in our next read
+                    echo "${cpu_now[@]}" > "$cpu_last_file"
+                    echo "$cpu_sum"      > "$cpu_sum_last_file"
+
+                    cpu_geater="$(compare_floats $cpu_perc ">" $threshhold)"
+                    [ "$cpu_geater" == "true" ] && cpu_perc="<span color=\"$red\">${cpu_perc}</span>"
+
+
+                    ## memory
+                    IFS=$
+                    mem_info="$(cat /proc/meminfo)"
+                    mem_total="$(echo   $mem_info | \grep "^MemTotal"     | awk '{print $2}')"
+                    mem_free="$(echo    $mem_info | \grep "^MemFree"      | awk '{print $2}')"
+                    mem_buffers="$(echo $mem_info | \grep "^Buffers"      | awk '{print $2}')"
+                    mem_cached="$(echo  $mem_info | \grep "^Cached"       | awk '{print $2}')"
+                    mem_srec="$(echo    $mem_info | \grep "^SReclaimable" | awk '{print $2}')"
+
+                    mem_used=$((mem_total - mem_free - mem_buffers - mem_cached - mem_srec))
+                    mem_perc="$(float_pad "$mem_used/$mem_total*100" 1 2)"
+
+                    mem_geater="$(compare_floats $mem_perc ">" $threshhold)"
+                    [ "$mem_geater" == "true" ] && mem_perc="<span color=\"$red\">${mem_perc}</span>"
+
+                    set_widget "memory_cpu" "markup" "${mem_perc} ${cpu_perc} $cpu_temp°" ;;
+        esac ;;
+                 ## }}}
+    # gpu )  ## {{{
+    #       source $HOME/scripts/gb
+    #
+    #       active_gpu="$(optimus-manager --status | \grep "Current GPU mode" | awk '{print $NF}')"
+    #       active_gpu="${active_gpu::1}"
+    #       [ "$active_gpu" == "n" ] && active_gpu="<span color=\"$red\">$active_gpu</span>"
+    #       set_widget "gpu" "markup" "$active_gpu" ;;
+            ## }}}
+    pkg_count )  ## {{{
+                source $HOME/scripts/gb
+
+                pkg_count=$(wc -l <<< "$(pacman -Q)")
+                set_widget "pkg_count" "markup" "$pkg_count" ;;
+                ## }}}
+    processes )  ## {{{
+                source $HOME/scripts/gb
+
+                processes_count=$(wc -l <<< $(pgrep .))  ## previously: $(wc -l <<< $(ps -aux))
+                set_widget "processes" "markup" "$processes_count" ;;
+                ## }}}
+    harddisk )  ## {{{
+        source $HOME/scripts/gb
+        source $HOME/scripts/gb-calculation
+
+        case "$2" in
+            partitions ) partitions="$(lsblk_full)"
+                   msgn "$partitions" ;;
+            usage )
+
+               root_size=$(df -T | \grep "\/$" | awk '{print $3}')
+               root_used=$(df -T | \grep "\/$" | awk '{print $4}')
+               [ $root_used -eq 0 ] && root_used=0 || root_used="$(float_pad "$root_used*100/$root_size" 1 2)"
+               root_geater="$(compare_floats $root_used ">" $threshhold)"
+               [ "$root_geater" == "true" ] && root_used="<span color=\"$red\">${root_used}</span>"
+
+               home_size=$(df -T | \grep "\/home$" | awk '{print $3}')
+               home_used=$(df -T | \grep "\/home$" | awk '{print $4}')
+               [ $home_used -eq 0 ] && home_used=0 || home_used="$(float_pad "$home_used*100/$home_size" 1 2)"
+               home_geater="$(compare_floats $home_used ">" $threshhold)"
+               [ "$home_geater" == "true" ] && home_used="<span color=\"$red\">${home_used}</span>"
+
+               swap_size=$(swapon --summary | \grep -i partition | awk '{print $3}')
+               swap_used=$(swapon --summary | \grep -i partition | awk '{print $4}')
+               [ $swap_used -eq 0 ] && swap_used=0 || swap_used="$(float_pad "$swap_used*100/$swap_size" 1 2)"
+               swap_geater="$(compare_floats $swap_used ">" $threshhold)"
+               [ "$swap_geater" == "true" ] && swap_used="<span color=\"$red\">${swap_used}</span>"
+
+               ## this is execptionally needed here because sometimes the swap_used in bytes is so small
+               ## that it becomes 0.00 after being converted by float_pad. If so, it's better to display it as 0:
+               swap_still_zero="$(compare_floats $swap_used "=" 0)"
+               [ "$swap_still_zero" == "true" ] && swap_used=0
+
+               set_widget "harddisk" "markup" "$root_used $home_used $swap_used" ;;
+        esac ;;
+               ## }}}
+    idle )  ## {{{
+           source $HOME/scripts/gb
+           source $HOME/scripts/gb-calculation
+
+           weekday=$(get_datetime "jweekday")
+           current_date=$(get_datetime "jymd")
+           current_datetime=$(get_datetime "jymdhms")
+
+           idle_file="$HOME/linux/idle/idle-${current_date}"  ##    ,-- do NOT use printf "%02d" because it causes errors for 07 and 08 inside day_hour_min_sec function
+           idle_secs="$(echo $(($(xprintidle)/1000)))"        ## <--'-- 103
+           perc=$(float_pad "${idle_secs}*100/600" 1 2)
+
+           ## it's better to display perc as 0 if it is 0.00
+           perc_is_zero="$(compare_floats $perc "=" 0)"
+           [ "$perc_is_zero" == "true" ] && perc=0
+
+           echo -e "${current_datetime}\t${weekday}\t${perc}" >> "$idle_file"
+           is_bigger="$(compare_floats $perc ">" 90)"
+           [ "$is_bigger" == "true" ] && perc="<span color=\"$red\">$perc</span>"
+           set_widget "idle" "markup" "${perc}" ;;
+           ## }}}
+    reputation )  ## {{{
+            $HOME/scripts/reputation.py ;;
+            ## }}}
+    youtube )  ## {{{
+              source $HOME/scripts/gb
+              source $HOME/scripts/gb-screen
+
+              cur_scr_index="$(echo 'local awful = require("awful") ; return awful.screen.focused().index' | awesome-client | awk '{print $NF}')"
+              [ $cur_scr_index -eq 1 ] && x=$((scr_1_x / 2)) || x=$(( scr_1_x + (scr_2_x / 2) ))
+              y=300
+              $HOME/scripts/awesome-widgets audacious pause
+              xdotool mousemove $x $y
+              sleep 0.1
+              xdotool click --repeat 2 --delay 200 1
+              msgn "fullscreen" ;;
+              ## }}}
+    mbl_umbl )  ## {{{
+               source $HOME/scripts/gb
+
+               get_mountable_umountable
+
+               ## $(wc -l <<< $(echo "$mountable")) returns 1 even if there are no mountable
+               ## so, we have to do this:
+               [ "$mountable" ] && m_count=$(wc -l <<< $(echo "$mountable")) || m_count=0
+
+               ## $(wc -l <<< $(echo "$umountable")) returns 1 even if there are no umountable
+               ## so, we have to do this:
+               [ "$umountable" ] && u_count=$(wc -l <<< $(echo "$umountable")) || u_count=0
+
+               [ $m_count -gt 0 ] && M="M:$m_count" || M=""
+               [ $u_count -gt 0 ] && U="U:$u_count" || U=""
+               [ $m_count -gt 0 ] && [ $u_count -gt 0 ] && seperator="," || seperator=""
+               [ $m_count -gt 0 ] || [ $u_count -gt 0 ] && { text="<span color=\"$red\">${M}${seperator}${U}</span>" ;} || text="MU"
+               set_widget "mbl_umbl" "markup" "$text" ;;
+               ## }}}
+    firewall )  ## {{{
+               source $HOME/scripts/gb
+
+               function update_variables(){ source $HOME/scripts/gb-fir-blu-batt ;}
+               update_variables
+
+               case "$2" in
+                   turn_on )  sudo ufw enable  ;;
+                   turn_off ) sudo ufw disable ;;
+               esac
+
+               update_variables
+
+               case "$firewall_status" in
+                   active ) set_widget "firewall" "markup" "FI" ;;
+                   * )      set_widget "firewall" "markup" "<span color=\"$red\">FI:OF</span>" ;;
+               esac ;;
+               ## }}}
+    bluetooth )  ## {{{
+                source $HOME/scripts/gb
+
+                function update_variables(){ source $HOME/scripts/gb-fir-blu-batt ;}
+                update_variables
+
+                case "$2" in
+                    turn_on )  sudo rfkill unblock bluetooth ;;
+                    turn_off ) sudo rfkill block bluetooth   ;;
+                esac
+
+                update_variables
+
+                case "$bluetooth_status" in
+                    yes ) set_widget "bluetooth" "markup" "BL" ;;
+                    * )   set_widget "bluetooth" "markup" "<span color=\"$red\">BL:ON</span>" ;;
+                esac ;;
+                ## }}}
+    ymail )  ## {{{
+            $HOME/scripts/e-mail.py "ymail" ;;
+            ## }}}
+    gmail )  ## {{{
+            sleep 10  ## only to prevent probable collision with ymail
+            $HOME/scripts/e-mail.py "gmail" ;;
+            ## }}}
+    security_remote )  ## {{{
+                      $HOME/scripts/security-remote.py ;;
+                      ## }}}
+    webcam )  ## {{{
+             source $HOME/scripts/gb
+
+             webcam_status="$(lsmod | \grep -i "^uvcvideo" | awk '{print $NF}')"
+             [ $webcam_status -eq 0 ] && webcam_text="WE" || webcam_text="<span color=\"$red\">WE:ON</span>"
+             set_widget "webcam" "markup" "$webcam_text" ;;
+             ## }}}
+    git )  ## {{{
+          source $HOME/scripts/gb
+
+          set_widget "git" "markup" "$refresh_icon"
+          modified_repos=""
+          repos=( $(find $HOME -iname ".git" ! -path "*.cache*" ! -path "*git-fdpo*" ! -path "*.config*" ! -path "*.vim*" ! -path "*go*" | sort) )
+          for repo in "${repos[@]}"; do
+              repo="${repo%/*}"  ## remove /.git from the end
+              cd "$repo"
+
+              git_status="$(git status -s)"
+              ## $(wc -l <<< $(echo "$git_status")) returns 1 even if there are no git_status
+              ## so, we have to do this:
+              [ "$git_status" ] && count=$(wc -l <<< $(echo "$git_status")) || count=0
+
+              if [ $count -gt 0 ]; then
+                  base="${repo##*/}"
+                  initial="${base::1}"
+                  modified_repos+="${initial}${count},"
+              fi
+          done
+          modified_repos="${modified_repos%,}"  ## remove the last ,
+          [ "$modified_repos" ] && git_text="<span color=\"$red\">GI:${modified_repos}</span>" || git_text="GI"
+          set_widget "git" "markup" "$git_text" ;;
+          ## }}}
+    clipboard )  ## {{{
+                source $HOME/scripts/gb
+
+                case "$2" in
+                    start ) greenclip daemon & ;;
+                    stop )  pkill greenclip ;;
+                esac
+
+                [ $(pgrep "greenclip") ] && clipboard_text="CL" || clipboard_text="<span color=\"$red\">CL:OF</span>"
+                set_widget "clipboard" "markup" "$clipboard_text" ;;
+                ## }}}
+    klgr )  ## {{{
+           source $HOME/scripts/gb
+
+           ## append current_datetime to the most recent log
+           current_datetime=$(get_datetime "jymdhms")
+           weekday=$(get_datetime "jweekday")
+           most_recent_log="$(find $HOME/linux/keylogs/ -mindepth 1 -maxdepth 1 | sort | tail -n 1)"
+           dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"  ## https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html
+           echo -e "$dashed\n$current_datetime\t$weekday" >> "$most_recent_log"
+
+           ## check status (exceptionally used ps because pgrep cannot find this)
+           keylogger_status="$(ps -f -u $UID | sed 1d | \grep -v "\-remote" | \grep "[k]eylogger")"
+           [ "$keylogger_status" ] && keylogger_text="KE" || keylogger_text="<span color=\"$red\">KE:OF</span>"
+           set_widget "keylogger" "markup" "$keylogger_text" ;;
+           ## }}}
+    established )  ## {{{
+                  source $HOME/scripts/gb
+
+                  ## we can drop sudo in this case to get only the user-related results:
+                  estab="$(sudo lsof -i -P -n | \grep ESTABLISHED | awk '{print $1}' | sort -u)"  ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
+
+                  ## $(wc -l <<< $(echo "$estab")) returns 1 even if there are no estab
+                  ## so, we have to do this:
+                  [ "$estab" ] && estab_count=$(wc -l <<< $(echo "$estab")) || estab_count=0
+
+                  [ $estab_count -gt 0 ] && estab_text="ES:$estab_count" || estab_text="ES"
+                  set_widget "established" "markup" "$estab_text"
+
+                  case "$2" in
+                      message ) [ $estab_count -gt 0 ] && message_text="$(echo -e "<span color=\"$orange\">Established</span>\n$estab")" || message_text="No established connections"
+                                msgn "$message_text" ;;
+                  esac ;;
+                  ## }}}
+    open_ports )  ## {{{
+                 source $HOME/scripts/gb
+
+                 open_ports="$(sudo lsof -i -P -n | \grep "LISTEN")"  ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
+
+                 ## $(wc -l <<< $(echo "$open_ports")) returns 1 even if there are no open_ports
+                 ## so, we have to do this:
+                 [ "$open_ports" ] && open_ports_count=$(wc -l <<< $(echo "$open_ports")) || open_ports_count=0
+
+                 [ $open_ports_count -gt 0 ] && open_ports_text="<span color=\"$red\">OP:$open_ports_count</span>" || open_ports_text="OP"
+                 set_widget "open_ports" "markup" "$open_ports_text"
+
+                 case "$2" in
+                     message ) [ $open_ports_count -gt 0 ] && message_text="$(echo -e "<span color=\"$orange\">Open ports</span>\n$open_ports")" || message_text="No open ports"
+                               msgn "$message_text" ;;
+                 esac ;;
+                 ## }}}
+    tor )  ## {{{
+          source $HOME/scripts/gb
+
+          case "$2" in
+              start )   sudo systemctl start   tor && msgn "<span color=\"$orange\">tor</span> started"   ;;
+              stop )    sudo systemctl stop    tor && msgn "<span color=\"$orange\">tor</span> stopped"   ;;
+              restart ) sudo systemctl restart tor && msgn "<span color=\"$orange\">tor</span> restarted" ;;
+          esac
+
+          tor_status="$(sudo lsof -i -P -n | \grep "LISTEN" | \grep "^tor" )"
+          [ "$tor_status" ] && tor_status_text="<span color=\"$red\">TO:ON</span>" || tor_status_text="TO"
+          set_widget "tor" "markup" "$tor_status_text" ;;
+          ## }}}
+    bwu )  ## {{{
+          $HOME/scripts/bwu.py ;;
+          ## }}}
+    network )  ## {{{
+        source $HOME/scripts/gb
+        source $HOME/scripts/gb-calculation
+        source $HOME/scripts/gb-network
+
+        down_up_text=""
+
+        case "$2" in
+            usage )
+                    # connections {{{
+                    [ "$vpn_info" ] && vpn_conn="[${vpn_conn}] " || vpn_conn=""
+
+                    ## set wf_conn_color based on wf_strength
+                    wf_strength=$(tail -n 1 /proc/net/wireless | awk '{print $4}' | tr -d '.')
+                    if   [ "$wf_strength" -lt -75 ]; then wf_conn_color="$orange"
+                    elif [ "$wf_strength" -lt -50 ]; then wf_conn_color="$yellow"
+                    elif [ "$wf_strength" -lt -25 ]; then wf_conn_color="$fg_d"
+                    elif [ "$wf_strength" -lt   0 ]; then wf_conn_color="$fg_d"
+                    else wf_conn_color="$purple"
+                    fi
+                    connections_text="<span color=\"$fg_d\">${vpn_conn}${eth_conn}</span> <span color=\"$wf_conn_color\">${wf_conn}</span>"
+                    # connections_text="<span color=\"$fg_d\">${vpn_conn}${eth_conn} ${wf_conn}</span>"
+                    ## }}}
+                    # down/up {{{ https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
+                    for interface in "ethernet" "wifi"; do
+
+                        ## get last down/up
+                        case "$interface" in
+                            ethernet ) cur_interface="$eth_devc"; pref="eth" ;;
+                            wifi )     cur_interface="$wf_devc"; pref="wf" ;;
+                        esac
+                        down_last_file="$HOME/scripts/.last/network_${pref}_down"
+                        up_last_file="$HOME/scripts/.last/network_${pref}_up"
+
+                        down_last=$(tail -n 1 "$down_last_file" 2>/dev/null) || down_last=0  ## 19410508
+                        up_last=$(tail -n 1 "$up_last_file" 2>/dev/null) || up_last=0        ## 19410508
+
+                        ## get new down/up
+                        down_up=$(cat /proc/net/dev | \grep "$cur_interface" | awk '{print "down="$2, "up="$10}')
+                        eval "$down_up"  ## 19410509 789384
+
+                        ## save new down/up as last (in bytes, before converting them) for our next read
+                        echo "$down" > "$down_last_file"
+                        echo "$up"   > "$up_last_file"
+
+                        ## get+convert total down/up before converting down/up
+                        down_total="$(convert_byte $down)"  ## 4.32GB
+                        up_total="$(convert_byte $up)"      ## 4.32GB
+
+                        ## set total down/up color
+                        case "$down_total" in
+                            [0-9][0-9].*MB )      down_total_color="$grey_dark"  ;;  ## 00MB-99MB
+                            [1-3][0-9][0-9].*MB ) down_total_color="$grey_dark"  ;;  ## 100MB-399MB
+                            [4-6][0-9][0-9].*MB ) down_total_color="$grey"       ;;  ## 400MB-699MB
+                            [7-9][0-9][0-9].*MB ) down_total_color="$pink"       ;;  ## 700MB-999MB
+                            *GB )                 down_total_color="$red"        ;;  ## *GB
+                            * )                   down_total_color="$grey_dark"  ;;
+                        esac
+
+                        case "$up_total" in
+                            [0-9][0-9].*MB )      up_total_color="$grey_dark"  ;;  ## 00MB-99MB
+                            [1-3][0-9][0-9].*MB ) up_total_color="$grey_dark"  ;;  ## 100MB-399MB
+                            [4-6][0-9][0-9].*MB ) up_total_color="$grey"       ;;  ## 400MB-699MB
+                            [7-9][0-9][0-9].*MB ) up_total_color="$pink"       ;;  ## 700MB-999MB
+                            *GB )                 up_total_color="$red"        ;;  ## *GB
+                            * )                   up_total_color="$grey_dark"  ;;
+                        esac
+
+                        ## calculate diff and convert bytes
+                        let down_diff=$down-$down_last  ## 1341440
+                        let up_diff=$up-$up_last        ## 1341440
+                        down="$(convert_byte $down_diff)"  ## 1.31MB
+                        up="$(convert_byte $up_diff)"      ## 1.31MB
+
+                        ## set down/up color
+                        case "$down" in
+                            *[MG]B ) down_color="$green" ;;
+                            * ) down_color="$fg_l" ;;
+                        esac
+
+                        case "$up" in
+                            *[MG]B ) up_color="$green" ;;
+                            * ) up_color="$fg_l" ;;
+                        esac
+
+                        down_up_text+=" <span color=\"$down_color\">${down}</span> <span color=\"$up_color\">${up}</span> \
+<span color=\"$down_total_color\">${down_total}</span> <span color=\"$up_total_color\">${up_total}</span>"   ## 317KB 2.31MB 4.32GB 4.32GB
+
+                    done
+## }}}
+                    set_widget "network" "markup" "${connections_text} ${down_up_text# }"  ## remove leading space
+                    ;;
+            turn_on_wifi ) nmcli radio wifi on ;;
+            turn_off_wifi ) nmcli radio wifi off ;;
+        esac ;;
+## }}}
+    audacious )  ## {{{
+                source $HOME/scripts/gb
+                source $HOME/scripts/gb-calculation
+
+                function update_variables(){ source $HOME/scripts/gb-audacious ;}
+                update_variables
+
+                [ "$album" == "speech" ] && audtool --equalizer-set 0 0 0 0 0 0 0 0 0 0 0 || audtool --equalizer-set -2.10 -10.86 4.00 5.14 2.10 -0.19 -2.10 -2.86 -4.00 -4.00 -4.00
+
+                case "$2" in
+                    play_pause )  audacious -t ;;
+                    pause )       [ "$play_status" == "playing" ] && audacious -t ;;
+                    main_window ) audacious -H ;;  ## OR audacious -m
+                    resume )      [ "$album" == "speech" ] && audtool --playback-seek $(cat $HOME/speech/csols) ;;
+                    stcm )        if_speech ;;
+                    tog_shuff )   audtool --playlist-shuffle-toggle ;;
+                    prev )        audacious -r ;;
+                    next )        audacious -f ;;
+                    forward )     forward_length=120
+                                  remaining_seconds=$(( $length_in_seconds - $current_position_in_seconds ))
+                                  [ $remaining_seconds -lt $forward_length ] && audacious -f || audtool --playback-seek-relative +${forward_length} ;;
+                    +60 )         audtool --playback-seek-relative +60 ;;
+                    -60 )         audtool --playback-seek-relative -60 ;;
+                    songs )       IFS=$'\n'
+                                  songs=( $(audtool --playlist-display) )
+                                  song="$(pipe_to_dmenu "Songs" "${songs[@]}" "")" || exit 37
+
+                                  sel_song_position_in_playlist="$(echo "$song" | awk '{print $1}')"
+                                  audtool --playlist-jump "$sel_song_position_in_playlist" ;;
+                esac
+
+                update_variables
+
+                [ "$play_status" == "playing" ] && pause_text="" || pause_text="PAUSED "
+                preamp_iz_zero="$(compare_floats $preamp "=" 0)"
+                [ "$preamp_iz_zero" == "false" ] && equalizer="EQ " || equalizer=""
+                [ "$shuffle_status" == "on" ] && shuffle_text="SH " || shuffle_text=""
+                order="${position_in_playlist}/${playlist_length}"  ## 1/5
+                [ ! "$length" ] && time="0:00/0:00" || time="${current_position}/${length}"  ## 2:24/18:54
+                [ $bar_position -gt 99 ] && bar_position=1 || bar_position=0.${bar_position}
+                echo "audacious_bar:set_value($bar_position)" | awesome-client
+
+                text="<span color=\"$grey\">${pause_text}</span><span color=\"$fg_l\">${equalizer}</span><span color=\"$fg_d\">${shuffle_text}</span><span color=\"$fg_l\">${order}</span> <span color=\"$fg_d\">${time}</span> <span color=\"$fg_l\">${title}</span> <span color=\"$fg_d\">${album}</span> <span color=\"$fg_l\">${artist}</span>"
+                set_widget "audacious"     "markup"           "$text"
+                set_widget "audacious_bar" "background_color" "$fg_l"
+                set_widget "audacious_bar" "color"            "$fg_d"
+                ;;
+                ## }}}
+esac
+
+exit

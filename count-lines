@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+files=( $(find . -mindepth 1 -maxdepth 1 -type f | cut -c 3- | sort) )
+declare -i total=0
+
+for file in "${files[@]}"; do
+    mime_type="$(file --mime-type $file -bL)"
+
+    case "$mime_type" in
+        text/* ) lines=$(wc -l <<< $(cat "$file"))
+                 echo -e "$lines\t$file"
+                 total+=$lines ;;
+    esac
+done
+
+echo -e "\n$total\ttotal"
+
+exit

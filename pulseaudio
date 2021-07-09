@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+source $HOME/scripts/gb-audio
+
+function help(){ source $HOME/scripts/.help; pulseaudio_help ;}
+
+while getopts 'hd:' flag; do
+    case "$flag" in
+        h ) help              ;;
+        d ) default="$OPTARG" ;;
+    esac
+done
+
+title="${0##*/}"
+heading "$title"
+
+main_items=( "cards" "sinks/sources" "default sink/source/mon" "all levels + mute status" "active sink/source port" "app responsible for sound card" "apps using sink/source" "set default sink/source" "restart" "help" )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+
+case "$main_item" in
+    cards ) pacmd list-cards && accomplished ;;
+    "sinks/sources" ) pacmd list-sinks | egrep -i 'index:|name:'  ## OR  echo "$(pacmd list-cards | \grep -iA 5 sinks | sed '/sources/q' | \egrep -iv 'sinks|sources' | cut -d "#" -f 2 | cut -c 1)"sources" )
+                      pacmd list-sources | egrep -i 'index:|name:' && accomplished ;;  ## OR  echo "$(pacmd list-cards | \grep -iA 5 sources | sed '/ports/q' | \egrep -iv 'sources|ports' | cut -d "#" -f 2 | cut -c 1)
+    "default sink/source/mon" ) echo -e "default sink name:\t$def_sink_name"
+                                echo -e "default sink index:\t$def_sink_index"
+                                echo -e "default source name:\t$def_source_name"
+                                echo -e "default source index:\t$def_source_index"
+                                echo -e "default mon name:\t$def_source_mon_name"
+                                echo -e "default mon index:\t$def_source_mon_index" && accomplished ;;
+    "all levels + mute status" ) echo -e "vol level: $vol_level %"
+                                 echo -e "muted:     $vol_mute_status\n"
+                                 echo -e "mic level: $mic_level %"
+                                 echo -e "muted:     $mic_mute_status\n"
+                                 echo -e "mon level: $mon_level %"
+                                 echo -e "muted:     $mon_mute_status" && accomplished ;;
+    "active sink/source port" )  echo -e "active sink port:\t$active_sink_port"
+                                 echo -e "active source port:\t$active_source_port" && accomplished ;;
+    "app responsible for sound card" ) ## application which is responsible for a direct access to the sound card via alsa
+                                       fuser -v /dev/snd/* && accomplished ;;
+    "apps using sink/source" ) echo "apps using sink:"
+                               pacmd list-sink-inputs | \grep -i "application.name =" | \grep -ioP '(?<=").*?(?=")'
+                               echo "apps using source:"
+                               pacmd list-source-outputs && accomplished ;;
+    "set default sink/source" ) defaults=( "set default sink\nset default source" )
+                                default="$(pipe_to_fzf "${defaults[@]}")" && wrap_fzf_choice "$default" || exit 37
+
+                                case "$default" in
+                                    "set default sink" ) [ ! "$default" ] && get_input "Default sink (index or name)" && default="$input"
+                                                         pacmd set-default-sink "$default" && accomplished ;;
+                                    "set default source" ) [ ! "$default" ] && get_input "Default source (index or name)" && default="$input"
+                                                           pacmd set-default-source "$default" && accomplished ;;
+                                esac ;;
+    restart ) get_single_input "You sure?" "red_blink" && restart_prompt="$single_input"
+              case "$restart_prompt" in
+                  y ) pulseaudio --kill && sleep 1 && pulseaudio --start && msgn "pulseaudio restarted" && accomplished ;;
+              esac ;;
+    help ) help ;;
+esac
+
+exit

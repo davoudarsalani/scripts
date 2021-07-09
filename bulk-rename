@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+source $HOME/scripts/gb
+
+function help(){ source $HOME/scripts/.help; bulk_rename_help ;}
+
+function prompt(){
+    for args in "$@"; do
+        case "$1" in
+            -d ) [ ! "$dir"    ] && get_input "Directory (no ~ or \$HOME allowed)" && dir="$input"
+                 [ ! -d "$dir" ] && red "No such dir" && exit
+                 cd "$dir" && green "pwd: $(pwd)" ;;
+            -f ) [ ! "$first"  ] && get_input "First number"      && first="$input" ;;
+            -l ) [ ! "$length" ] && get_input "Length"            && length="$input" ;;
+            -o ) [ ! "$o_ext"  ] && get_input "Output exntension" && o_ext="$input"; o_ext=".${o_ext}" ;;
+        esac
+        shift
+    done
+
+    [ ! "$all" ] && get_single_input "Rename all? (y/n)" && all="$single_input"
+    case "$all" in
+        n ) [ ! "$i_ext" ] && get_input "Input extension" && i_ext="$input" ;;
+    esac ;}
+
+while getopts 'hd:f:l:o:a:i:' flag; do
+    case "$flag" in
+        h ) help             ;;
+        d ) dir="$OPTARG"    ;;
+        f ) first="$OPTARG"  ;;
+        l ) length="$OPTARG" ;;
+        o ) o_ext="$OPTARG"  ;;
+        a ) all="$OPTARG"    ;;
+        i ) i_ext="$OPTARG"  ;;
+    esac
+done
+
+title="${0##*/}"
+heading "$title"
+
+main_items=( "numerically" "prepend asc numbers" "help" )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+
+case "$main_item" in
+    numerically ) prompt -d -f -l -o
+                  files=( $(find . -mindepth 1 -maxdepth 1 -iname "*$i_ext" | sort) )
+                  files_count=${#files[@]}
+                  [ $files_count -eq 0 ] && { red "No files found" && exit ;} || green "$files_count files found\n"
+                  for file in "${files[@]}"; do
+                      mv -nv "$file" "$(printf %0"$length"d"$o_ext" "$first")"
+                      sleep 0.01
+                      ((first++))
+                  done
+                  accomplished ;;
+    "prepend asc numbers" ) prompt -d -f -l
+                            files=( $(find . -mindepth 1 -maxdepth 1 -iname "*$i_ext" | sort) )
+                            files_count=${#files[@]}
+                            [ $files_count -eq 0 ] && { red "No files found" && exit ;} || green "$files_count files found\n"
+                            for file in "${files[@]}"; do
+                                mv -nv "$file" "$(echo $(printf %0"$length"d "$first")"$file")"
+                                sleep 0.01
+                                ((first++))
+                            done
+                            accomplished ;;
+    help ) help ;;
+esac
+
+exit
