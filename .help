@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 function application_help(){  ## {{{
 clear
 echo -e """$(heading "$title") $(yellow "Help")
@@ -7,13 +8,6 @@ $(purple -g) group
 $(purple -f) file
 $(purple -r) repository
 $(purple -u) unit"""
-exit ;}
-## }}}
-function bulk_rename_help(){  ## {{{
-clear
-echo -e """$(heading "$title") $(yellow "Help")
-numerically         $(purple -d) directory $(purple -f) first number $(purple -l) length $(purple -o) output extension $(purple -a) rename all: y/n $(green [)$(purple -i) input extension$(green ])
-prepend asc numbers $(purple -d) directory $(purple -f) first number $(purple -l) length $(purple -a) rename all: y/n $(green [)$(purple -i) input extension$(green ])"""
 exit ;}
 ## }}}
 function checksum_help(){  ## {{{

@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
 
 function float_pad(){  ## {{{
-    local input=$1                  ## an int, float or expression, e.g. 43, 6.82, or "87*932/12" (no spaces allowd in expression)
-    local desired_l_length=${2:-1}  ## min   length for l, e.g. 1
-    local desired_r_length=${3:-2}  ## exact length for r, e.g. 2
+    local input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or "87*932/12" (no spaces allowd in expression)
+    local desired_l_length="${2:-1}"  ## min   length for l, e.g. 1
+    local desired_r_length="${3:-2}"  ## exact length for r, e.g. 2
 
     ## make input a float even if it is an int or an expression (https://www.shell-tips.com/bash/math-arithmetic-calculation)
-    local float=$(awk "BEGIN {printf \"%.${desired_r_length}f\n\", "$input"}")
+    local float="$(awk "BEGIN {printf \"%.${desired_r_length}f\n\", "$input"}")"
 
     ## separate l and r
-    local l=${float%.*}  ## 8
-    local r=${float#*.}  ## 123
+    local l="${float%.*}"  ## 8
+    local r="${float#*.}"  ## 123
 
     ## make l have the desired_l_length
-    local l=$(printf "%0${desired_l_length}d" "$l")  ## 8 >> 08
+    local l="$(printf "%0${desired_l_length}d" "$l")"  ## 8 to 08
 
     ## make r have the desired_r_length
-    local r_length=${#r}
-    if [ $desired_r_length -gt $r_length ]; then  ## add trailing zeros to r if shorter than desired_r_length
-        local lacking_pad=$((desired_r_length - r_length))
-        for ((i=0; i<$lacking_pad; i++)); do
+    local r_length="${#r}"
+    if [ "$desired_r_length" -gt "$r_length" ]; then  ## add trailing zeros to r if shorter than desired_r_length
+        local lacking_pad="$(( "$desired_r_length" - "$r_length" ))"
+        for ((i=0; i<"$lacking_pad"; i++)); do
             local r="${r}0"
         done
-    elif [ $desired_r_length -lt $r_length ]; then  ## cut r if longer than desired_r_length
-        r=${r::$desired_r_length}
+    elif [ "$desired_r_length" -lt "$r_length" ]; then  ## cut r if longer than desired_r_length
+        r="${r::$desired_r_length}"
     fi
 
     local converted="${l}.${r}"
@@ -38,14 +38,14 @@ function compare_floats(){  ## {{{
     local float2="$3"
 
     ## validate floatness
-    # [[ $float1 =~ ^-*[[:digit:]]*[.][[:digit:]]* ]] || float1=$(float_pad $float1 2 2)
-    # [[ $float2 =~ ^-*[[:digit:]]*[.][[:digit:]]* ]] || float2=$(float_pad $float2 2 2)
+    # [[ "$float1" =~ ^-*[[:digit:]]*[.][[:digit:]]* ]] || float1="$(float_pad "$float1" 2 2)"
+    # [[ "$float2" =~ ^-*[[:digit:]]*[.][[:digit:]]* ]] || float2="$(float_pad "$float2" 2 2)"
 
     ## compare
     case "$oper" in
-         "<" ) [ $(awk '{printf($1 <  $2) ? 1 : 0}' <<< "$float1 $float2") -eq 1 ] && local result="true" || local result="false" ;;
-         "=" ) [ $(awk '{printf($1 == $2) ? 1 : 0}' <<< "$float1 $float2") -eq 1 ] && local result="true" || local result="false" ;;
-         ">" ) [ $(awk '{printf($1 >  $2) ? 1 : 0}' <<< "$float1 $float2") -eq 1 ] && local result="true" || local result="false" ;;
+         "<" ) [ "$(awk '{printf($1 <  $2) ? 1 : 0}' <<< "$float1 $float2")" -eq 1 ] && local result="true" || local result="false" ;;
+         "=" ) [ "$(awk '{printf($1 == $2) ? 1 : 0}' <<< "$float1 $float2")" -eq 1 ] && local result="true" || local result="false" ;;
+         ">" ) [ "$(awk '{printf($1 >  $2) ? 1 : 0}' <<< "$float1 $float2")" -eq 1 ] && local result="true" || local result="false" ;;
     esac
 
     echo "$result" ;}
@@ -53,26 +53,26 @@ function compare_floats(){  ## {{{
 function convert_byte(){  ## {{{
     ## conversion table:
     ## bytes=2546790
-    ## B  = $bytes               ## 2546790
-    ## KB = $bytes / 1024        ## 248720.50KB
-    ## MB = $bytes / 1024000     ## 248.72MB
-    ## GB = $bytes / 1024000000  ## 00.25GB
+    ## B  = "$bytes"               ## 2546790
+    ## KB = "$bytes" / 1024        ## 248720.50KB
+    ## MB = "$bytes" / 1024000     ## 248.72MB
+    ## GB = "$bytes" / 1024000000  ## 00.25GB
 
-    local bytes=$1
-    if [ $bytes -eq 0 ]; then
+    local bytes="$1"
+    if [ "$bytes" -eq 0 ]; then
         local number=0
         local suffix="B"
-    elif [ $bytes -gt 1024000000 ]; then
-        local number=$(float_pad "$bytes/1024000000" 1 2)
+    elif [ "$bytes" -gt 1024000000 ]; then
+        local number="$(float_pad "${bytes}/1024000000" 1 2)"
         local suffix="GB"
-    elif [ $bytes -gt 1024000 ]; then
-        local number=$(float_pad "$bytes/1024000" 1 2)
+    elif [ "$bytes" -gt 1024000 ]; then
+        local number="$(float_pad "${bytes}/1024000" 1 2)"
         local suffix="MB"
-    elif [ $bytes -gt 1024 ]; then
-        local number=$(float_pad "$bytes/1024" 1 2)
+    elif [ "$bytes" -gt 1024 ]; then
+        local number="$(float_pad "${bytes}/1024" 1 2)"
         local suffix="KB"
     else
-        local number=$bytes
+        local number="$bytes"
         local suffix="B"
     fi
 

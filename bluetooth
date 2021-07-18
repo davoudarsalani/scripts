@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
-source $HOME/scripts/gb-fir-blu-batt
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-fir-blu-batt
 
-function update_bluetooth(){ $HOME/scripts/awesome-widgets bluetooth ;}
+function update_bluetooth(){ "$HOME"/scripts/awesome-widgets bluetooth ;}
 
 title="${0##*/}"
 heading "$title"
@@ -86,5 +86,5 @@ esac
 
 exit
 
-## The default group the user must be a member of is lp. You can change it here: sudo $editor /etc/dbus-1/system.d/bluetooth.conf
+## The default group the user must be a member of is lp. You can change it here: sudo "$editor" /etc/dbus-1/system.d/bluetooth.conf
 ## (https://wiki.archlinux.org/index.php/bluetooth)

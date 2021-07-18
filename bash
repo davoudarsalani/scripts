@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 title="${0##*/}"
 heading "$title"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
-function help(){ source $HOME/scripts/.help; user_help ;}
+function help(){ source "$HOME"/scripts/.help; user_help ;}
 
 function prompt(){
     for args in "$@"; do
@@ -36,9 +36,9 @@ case "$main_item" in
     "create group" ) prompt -g
                      sudo groupadd -r "$group" && accomplished ;;
     "add $USER to a group" ) prompt -g
-                            sudo gpasswd -a $USER "$group" && accomplished ;;
+                            sudo gpasswd -a "$USER" "$group" && accomplished ;;
     "remove $USER from a group" ) prompt -g
-                                 sudo gpasswd -d $USER "$group" && accomplished ;;
+                                 sudo gpasswd -d "$USER" "$group" && accomplished ;;
     "change user's login name" ) red_blink " Use tty logged in as root"
                                  prompt -o -n
                                  usermod -l "$new_name" "$old_name" && accomplished ;;

@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
-function help(){ source $HOME/scripts/.help; mime_type_help ;}
-# [ "$1" == "-h" ] || [ "$1" == "help" ] || [ ! "$1" ] && help && exit
+function help(){ source "$HOME"/scripts/.help; mime_type_help ;}
 
 function prompt(){
     for args in "$@"; do

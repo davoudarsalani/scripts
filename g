@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 function if_git(){  ## {{{
     [ "$1" ] && {
         if [ "$1" == "s" ]; then
-            cd $HOME/scripts
+            cd "$HOME"/scripts
         elif [ "$1" == "l" ]; then
-            cd $HOME/linux
+            cd "$HOME"/linux
         # else
         #     red "Wrong arg" && exit
         fi ;}
@@ -15,7 +15,8 @@ function if_git(){  ## {{{
 if_git "$1"
 
 function if_lock_file(){  ## {{{
-    lock_file=".git/index.lock"; [ -f "$lock_file" ] && red "" && exit ;}
+    lock_file=.git/index.lock
+    [ -f "$lock_file" ] && red "" && exit ;}
 ## }}}
 if_lock_file
 
@@ -24,7 +25,8 @@ function check_pattern(){  ## {{{
     [ ! "$matches" ] && red "No such pattern" && exit ;}
 ## }}}
 function if_amend_allowed(){  ## {{{
-    commits_ahead="$(\git status -sb | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g')"
+    commits_ahead="$(git branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
+    ## previously: commits_ahead="$(\git status -sb | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g')"
     [ ! "$commits_ahead" ] && red "Amend not allowed" && exit ;}
 ## }}}
 function if_changes(){  ## {{{
@@ -37,39 +39,40 @@ function if_changes(){  ## {{{
     unt_s=(   $(git status -sb | \grep '??'            | awk '{print $2}' | sed 's/\/$//') )
 
     ## deconstruction (https://unix.stackexchange.com/questions/166217/using-a-for-loop-to-loop-over-multiple-arrays-in-bash)
-    mod_s=${mod_s[@]}
-    del_s=${del_s[@]}
-    idA_s=${idA_s[@]}
-    idR_s=${idR_s[@]}
-    std_s=${std_s[@]}
-    sts_s=${sts_s[@]}
-    unt_s=${unt_s[@]}
+    mod_s=${mod_s[@]}  ## <--,
+    del_s=${del_s[@]}  ## <--|
+    idA_s=${idA_s[@]}  ## <--|
+    idR_s=${idR_s[@]}  ## <--|-- not sure if we can quote them
+    std_s=${std_s[@]}  ## <--|
+    sts_s=${sts_s[@]}  ## <--|
+    unt_s=${unt_s[@]}  ## <--'
 
     master=()
     for array in "$mod_s" "$del_s" "$idA_s" "$idR_s" "$std_s" "$sts_s" "$unt_s"; do
         array=( $array )
         icon="${array[0]}"
         trimmed_array="${array[@]:1}"
-        for member in ${trimmed_array[@]}; do
+        for member in ${trimmed_array[@]}; do  ## do NOT change quotes
             master+=( ${icon}---${member} )
         done
     done
 
-    [ ${#master[@]} -eq 0 ] && green "Sleeping ..." && exit ;}
+    [ "${#master[@]}" -eq 0 ] && green "Sleeping ..." && exit ;}
 ## }}}
 function pipe_to_fzf_locally(){  ## {{{ https://revelry.co/terminal-workflow-fzf/
-    [ "$preview_setting" == "hidden" ] || local preview_setting="noborder:right:80%:wrap"
-    local fzf_choice="$(printf "%s\n" "$@" | fzf --nth 2..,.. --no-multi \
-                        --preview '(git diff --color=always -- {-1} | sed 1,4d)' \
-                        --preview-window "$preview_setting")"  ## ^^ ORIG: --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500'
+    local fzf_choice="$(printf "%s\n" "$@" | fzf --nth 2..,.. \
+                        --preview-window "$preview_setting" \
+                        --preview '(git diff --color=always -- {-1} | sed 1,4d)'
+                       )"  ## ^^ ORIG: --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500'
     [ "$fzf_choice" ] && echo "$fzf_choice" || return 37 ;}
 ## }}}
 function get_branches(){  ## {{{ https://revelry.co/terminal-workflow-fzf/
-    local preview_setting="noborder:right:80%:wrap"
-    local fzf_choice="$(printf "%s\n" "$@" | fzf --no-multi \
+    ## no need to --preview-window "$preview_setting" because it uses the value set in bahrc in FZF_DEFAULT_OPTS
+    local fzf_choice="$(printf "%s\n" "$@" | fzf \
                         --preview 'git log --graph --full-history --color --abbrev-commit --date=relative \
                         --pretty="format:%C(blue)%h%Creset %C(bold black)%cr%C(green)%d%Creset %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES \
-                        --preview-window "$preview_setting" | sed 's/^..//' | cut -d " " -f 1)"  ## ^^ ORIG: --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
+                        | sed 's/^..//' | cut -d " " -f 1  ## ^^ ORIG: --preview 'git log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
+                       )"
     [ "$fzf_choice" ] && echo "$fzf_choice" || return 37 ;}
 ## }}}
 
@@ -108,6 +111,7 @@ case "$main_item" in
                                                                 ##    |-- line 107: [:  zero: unary operator expected
                                                                 ##    '-- so we have to use either "${std_s}" or "${std_s[@]}" 2>/dev/null
 
+             preview_setting="hidden"
              commit_items=( "open $editor" "write here" )
              commmit_item="$(pipe_to_fzf_locally "${commit_items[@]}")" && wrap_fzf_choice "$commit_item" || exit 37
 
@@ -129,7 +133,7 @@ case "$main_item" in
                                check_pattern
                                get_input "Message" && message="$input"
                                if_lock_file
-                               git add "$pattern" && git commit -m "$pattern: $message" && accomplished "$pattern added, message: $pattern: $message" ;;
+                               git add "$pattern" && git commit -m "${pattern}: $message" && accomplished "$pattern added, message: ${pattern}: $message" ;;
                      all ) get_input "Message" && message="$input"
                            if_lock_file
                            git add -A && git commit -m "MANY: $message" && accomplished "all added, message: MANY: $message" ;;
@@ -144,6 +148,7 @@ case "$main_item" in
                  ## }}}
     commit_amend )  ## {{{
                    if_amend_allowed
+                   preview_setting="hidden"
                    commit_amend_items=( "open $editor" "write here" )
                    commit_amend_item="$(pipe_to_fzf_locally "${commit_amend_items[@]}")" && wrap_fzf_choice "$commit_amend_item" || exit 37
 
@@ -168,6 +173,7 @@ case "$main_item" in
                                                                  ##    |-- line 107: [:  zero: unary operator expected
                                                                  ##    '-- so we have to use either "${std_s}" or "${std_s[@]}" 2>/dev/null
 
+              preview_setting="hidden"
               instage_items=( "all" "file/pattern" )
               unstage_item="$(pipe_to_fzf_locally "${instage_items[@]}")" && wrap_fzf_choice "$unstage_item" || exit 37
 
@@ -184,7 +190,6 @@ case "$main_item" in
           IFS=$'\n'
           if_lock_file
           preview_setting="hidden"
-
           log_items=( $(git log --graph --full-history --all --color --abbrev-commit --date=relative --pretty=format:"%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s") )
           log_item="$(pipe_to_fzf_locally "${log_items[@]}")" && wrap_fzf_choice "$log_item" || exit 37 ;;
           ## }}}
@@ -205,6 +210,7 @@ case "$main_item" in
            ## }}}
     empty_commit )  ## commit with nothing staged {{{
 
+                   preview_setting="hidden"
                    empty_commit_items=( "open $editor" "write here" )
                    empty_commit_item="$(pipe_to_fzf_locally "${empty_commit_items[@]}")" && wrap_fzf_choice "$empty_commit_item" || exit 37
 
@@ -222,6 +228,7 @@ case "$main_item" in
              git rm -r --cached "$pattern" && accomplished "$pattern removed" ;;
              ## }}}
     branch )  ## {{{
+             preview_setting="hidden"
              branch_items=( "show branches" "create branch" "checkout to a branch" "delete all branches" "force delete all branches" "delete a specific branch" "force delete a specific branch" )
              branch_item="$(pipe_to_fzf_locally "${branch_items[@]}")" && wrap_fzf_choice "$branch_item" || exit 37
 
@@ -229,16 +236,14 @@ case "$main_item" in
                  "show branches" ) if_lock_file
                                    IFS=$'\n'
                                    show_branches_items=( $(git branch -a --color=always | \grep -v '/HEAD\s' | sort ) )  ## branches
-                                   show_branches_item="$(get_branches "${show_branches_items[@]}")" && accomplished
-                                   [ ! "$show_branches_item" ] && exit 37 ;;
+                                   show_branches_item="$(get_branches "${show_branches_items[@]}")" && wrap_fzf_choice "$show_branches_item" && accomplished || exit 37 ;;
                  "create branch" ) get_input "Branch to create" && new_branch="$input"
                                    if_lock_file
                                    git branch "$new_branch" && accomplished "$new_branch branch created" ;;
                  "checkout to a branch" ) if_lock_file
                                           IFS=$'\n'
                                           cd_to_branch_items=( $(git branch -a --color=always | \grep -v '/HEAD\s' | sort ) )  ## branches
-                                          cd_to_branch_item="$(get_branches "${cd_to_branch_items[@]}")"
-                                          [ ! "$cd_to_branch_item" ] && exit 37
+                                          cd_to_branch_item="$(get_branches "${cd_to_branch_items[@]}")" && wrap_fzf_choice "$cd_to_branch_item" || exit 37
 
                                           git checkout "$cd_to_branch_item" && accomplished "$cd_to_branch_item branch checkedout to" ;;
                  "delete all branches" ) if_lock_file
@@ -248,20 +253,19 @@ case "$main_item" in
                  "delete a specific branch" ) if_lock_file
                                               IFS=$'\n'
                                               delete_branch_items=( $(git branch -a --color=always | \grep -v '/HEAD\s' | sort ) )  ## branches
-                                              delete_branch_item="$(get_branches "${delete_branch_items[@]}")"
-                                              [ ! "$delete_branch_item" ] && exit 37
+                                              delete_branch_item="$(get_branches "${delete_branch_items[@]}")" && wrap_fzf_choice "$delete_branch_item" || exit 37
 
                                               git branch -d "$delete_branch_item" && accomplished "$delete_branch_item branch deleted" ;;
                  "force delete a specific branch" ) if_lock_file
                                                     IFS=$'\n'
                                                     force_delete_branch_items=( $(git branch -a --color=always | \grep -v '/HEAD\s' | sort ) )  ## branches
-                                                    force_delete_branch_item="$(get_branches "${force_delete_branch_items[@]}")"
-                                                    [ ! "$force_delete_branch_item" ] && exit 37
+                                                    force_delete_branch_item="$(get_branches "${force_delete_branch_items[@]}")" && wrap_fzf_choice "$force_delete_branch_item" || exit 37
 
                                                     git branch -D "$force_delete_branch_item" && accomplished "$force_delete_branch_item branch force deleted" ;;
              esac ;;
              ## }}}
     tag )  ## {{{
+          preview_setting="hidden"
           tag_items=( "show tags" "show a specific tag" "create tag" "create tag + message" "create tag + message for a specific commit" "delete all tags" "delete a specific tag")
           tag_item="$(pipe_to_fzf_locally "${tag_items[@]}")" && wrap_fzf_choice "$tag_item" || exit 37
 
@@ -272,20 +276,20 @@ case "$main_item" in
                                       if_lock_file
                                       git show "$tag" && accomplished "$tag tag shown" ;;
               "create tag" ) get_input "Tag to create" && new_tag="$input"
-                             new_tag=${new_tag// /_}
+                             new_tag="${new_tag// /_}"
                              if_lock_file
                              git tag "$new_tag" && accomplished "$new_tag tag created" ;;
               "create tag + message" ) get_input "Tag to create" && new_tag="$input"
                                        get_input "Message"       && message="$input"
-                                       new_tag=${new_tag// /_}
+                                       new_tag="${new_tag// /_}"
                                        if_lock_file
                                        git tag -a "$new_tag" -m "$message" && accomplished "$new_tag tag created, message: $message" ;;
               "create tag + message for a specific commit" ) get_input "Tag to create" && new_tag="$input"
                                                              get_input "Message"       && message="$input"
                                                              get_input "Commit hash"   && com_hash="$input"
-                                                             new_tag=${new_tag// /_}
+                                                             new_tag"=${new_tag// /_}"
                                                              if_lock_file
-                                                             git tag -a "$new_tag" -m "$message" "$com_hash" && accomplished "$new_tag tag created, message: $message, for commit: $com_hash" ;;
+                                                             git tag -a "$new_tag" -m "$message" "$com_hash" && accomplished "$new_tag tag created, message: ${message}, for commit: $com_hash" ;;
               "delete all tags" ) if_lock_file
                                   git tag | xargs git tag -d && accomplished "all tags deleted" ;;
               "delete a specific tag" ) get_input "Tag to delete" && tag="$input"
@@ -297,13 +301,12 @@ case "$main_item" in
              IFS=$'\n'
              if_lock_file
              preview_setting="hidden"
-
              revert_items=( $(git log --pretty=oneline --color --abbrev-commit --date=relative --pretty=format:"%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s") )
              revert_item="$(pipe_to_fzf_locally "${revert_items[@]}")" && wrap_fzf_choice "$revert_item" || exit 37
 
              revert_item="$(echo "$revert_item" | sed 's/ .*//g')"
 
-             get_single_input "Revert to ${revert_item}?" "red_blink" && revert_prompt="$single_input"
+             get_single_input "Revert to ${revert_item}?" && revert_prompt="$single_input"
              case "$revert_prompt" in
                  y ) git checkout "$revert_item" && accomplished "$revert_item reverted to" ;;
              esac ;;

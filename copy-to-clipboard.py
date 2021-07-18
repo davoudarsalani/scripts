@@ -10,13 +10,14 @@ from gp import Color, fzf, get_input, invalid, msgn, get_datetime
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
+C = Color()
 
 def help():  ## {{{
     run('clear', shell=True)
-    print(f'''{Color().heading(f'{title}')} {Color().yellow('Help')}
-{Color().flag(f'-s --string=')}
-{Color().flag(f'-f --file=')}
-{Color().flag(f'-c --command=')}''')
+    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
+{C.flag(f'-s --string=')}
+{C.flag(f'-f --file=')}
+{C.flag(f'-c --command=')}''')
     exit()
 ## }}}
 def getopts():  ## {{{
@@ -52,7 +53,7 @@ def prompt(*args: str):  ## {{{
 
 getopts()
 
-print(Color().heading(title))
+print(C.heading(title))
 
 main_items = ['string', 'file', 'command', 'datetime', 'jalali datetime', 'help']
 main_item = fzf(main_items)

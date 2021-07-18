@@ -9,12 +9,13 @@ from gp import Color, fzf, invalid, get_input, get_single_input, get_password, c
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
+C = Color()
 
 def help():  ## {{{
     run('clear', shell=True)
-    print(f'''{Color().heading(f'{title}')} {Color().yellow('Help')}
-{Color().flag(f'-i --input=')}
-{Color().flag(f'-p --password=')}''')
+    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
+{C.flag(f'-i --input=')}
+{C.flag(f'-p --password=')}''')
     exit()
 ## }}}
 def getopts():  ## {{{
@@ -45,7 +46,7 @@ def prompt(*args: str):  ## {{{
 
 getopts()
 
-print(Color().heading(title))
+print(C.heading(title))
 
 main_items = ['tar', 'untar', 'zip', 'unzip', 'unrar', 'help']
 main_item = fzf(main_items)

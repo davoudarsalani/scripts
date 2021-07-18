@@ -15,12 +15,12 @@ if arg == 'ymail':
     prefix   = 'YA'
     server   = 'imap.mail.yahoo.com'
     username = getenv('email1')
-    password = getenv('email1_pass')
+    password = getenv('email1_password2')
 elif arg == 'gmail':
     prefix   = 'GM'
     server   = 'imap.gmail.com'
     username = getenv('email2')
-    password = getenv('email2_pass')
+    password = getenv('email2_password2')
 else:
     exit()
 
@@ -51,4 +51,4 @@ except Exception as exc:
     set_widget(dest_widget, 'fg', getenv('red'))
 
 finally:
-    set_widget(dest_widget, 'markup', f'<b>{text}</b>')
+    set_widget(dest_widget, 'markup', text)

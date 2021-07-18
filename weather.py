@@ -77,10 +77,10 @@ if arg == 'update':
         else:
             icon = ''
 
-        text = f'<b>{icon}{temp}</b>° <b>{description}</b>'
+        text = f'{icon}{temp}° {description}'
 
     except Exception as exc:
-        text = '<b>WE</b>'
+        text = 'WE'
 
         ## save error
         save_error(error_file, f'{exc!r}')

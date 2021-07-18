@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
-source $HOME/scripts/gb-fir-blu-batt
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-fir-blu-batt
 
-function help(){ source $HOME/scripts/.help; firewall_help ;}
-function update_firewall(){ $HOME/scripts/awesome-widgets firewall ;}
+function help(){ source "$HOME"/scripts/.help; firewall_help ;}
+function update_firewall(){ "$HOME"/scripts/awesome-widgets firewall ;}
 
 while getopts 'ha:' flag; do
      case "$flag" in

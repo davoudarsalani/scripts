@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 ## https://revelry.co/terminal-workflow-fzf/
 ## https://github.com/junegunn/fzf/wiki/examples
 
 IFS=$'\n'
-[ $UID -eq 0 ] && processes=( $(ps -ef | sed 1d) ) || processes=( $(ps -f -u $UID | sed 1d) )
+[ "$UID" -eq 0 ] && processes=( $(ps -ef | sed 1d) ) || processes=( $(ps -f -u "$UID" | sed 1d) )
 process="$(pipe_to_fzf "${processes[@]}")" && wrap_fzf_choice "$process" || exit 37
 
-process=$(echo $process | awk '{print $2}')
+process="$(echo "$process" | awk '{print $2}')"
 
-get_single_input "Kill ${process}?" "red_blink" && sure_prompt="$single_input"
+get_single_input "Kill ${process}?" && sure_prompt="$single_input"
 case "$sure_prompt" in
     y ) [ "$process" ] && echo "$process" | xargs kill -9 ;;
 esac

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 
-function help(){ source $HOME/scripts/.help; sony_help ;}
+function help(){ source "$HOME"/scripts/.help; sony_help ;}
 
 function prompt(){
     for args in "$@"; do
@@ -12,10 +12,10 @@ function prompt(){
         shift
     done ;}
 
-function upload(){   scp -r "$@" $USER@sony-${bed}:$HOME/downloads && accomplished ;}
-function download(){ scp -r $USER@sony-${bed}:"$@" $HOME/downloads && accomplished ;}
-function connect(){ ssh -Y $USER@sony-${bed} && accomplished ;}
-function connect_plus_x2x(){ ssh -Y $USER@sony-${bed} "x2x -west -to :0" ;}
+function upload(){   scp -r "$@" "$USER"@sony-"$bed":"$HOME"/downloads && accomplished ;}
+function download(){ scp -r "$USER"@sony-"$bed":"$@" "$HOME"/downloads && accomplished ;}
+function connect(){ ssh -Y "$USER"@sony-"$bed" && accomplished ;}
+function connect_plus_x2x(){ ssh -Y "$USER"@sony-"$bed" "x2x -west -to :0" ;}
 
 while getopts 'hn:' flag; do
     case "$flag" in

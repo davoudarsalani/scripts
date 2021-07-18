@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-screens_count=$(wc -l <<< "$(xrandr | \grep -iw connected | \grep "[0-9]\{3,4\}x[0-9]\{3,4\}")")
-## OR <--,-- screens_count=$(xrandr --listmonitors | sed '1q;d' | awk '{print $NF}')
-##       '-- screens_count=$(echo 'return screen.count()' | awesome-client | awk '{print $NF}')
+screens_count="$(wc -l <<< "$(xrandr | \grep -iw connected | \grep "[0-9]\{3,4\}x[0-9]\{3,4\}")")"
+## OR <--,-- "$(xrandr --listmonitors | sed '1q;d' | awk '{print $NF}')"
+##       '-- "$(echo 'return screen.count()' | awesome-client | awk '{print $NF}')"
 
 scr_1_name="$(xrandr | \grep -iw connected  | \grep -i primary | awk '{print $1}')"
 scr_1_res="$(xrandr  | \grep "^$scr_1_name" | awk '{print $4}' | cut -d "+" -f 1)"
 scr_1_x="$(xrandr    | \grep "^$scr_1_name" | awk '{print $4}' | cut -d "+" -f 1 | cut -d "x" -f 1)"
 scr_1_y="$(xrandr    | \grep "^$scr_1_name" | awk '{print $4}' | cut -d "+" -f 1 | cut -d "x" -f 2)"
 
-# scr_1_brightness="$(printf "%02d" "$(( $(cat /sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-"$scr_1_name"/intel_backlight/brightness) * 200 / 187 / 2 ))")"
+# scr_1_brightness="$(printf "%02d" "$(( "$(cat /sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-"$scr_1_name"/intel_backlight/brightness)" * 200 / 187 / 2 ))")"
 ## OR:
-# $(xbacklight | cut -d "." -f 1)
+# "$(xbacklight | cut -d "." -f 1)"
 
 scr_2_name="$(xrandr | \grep -iw connected  | \grep -iv primary | sed '1q;d' | awk '{print $1}')"
 scr_2_res="$(xrandr  | \grep "^$scr_2_name" | awk '{print $3}'  | cut -d "+" -f 1)"

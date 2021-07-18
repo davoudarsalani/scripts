@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
-source $HOME/scripts/gb-audio
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-audio
 
-function help(){ source $HOME/scripts/.help; pulseaudio_help ;}
+function help(){ source "$HOME"/scripts/.help; pulseaudio_help ;}
 
 while getopts 'hd:' flag; do
     case "$flag" in
@@ -28,13 +28,13 @@ case "$main_item" in
                                 echo -e "default mon name:\t$def_source_mon_name"
                                 echo -e "default mon index:\t$def_source_mon_index" && accomplished ;;
     "all levels + mute status" ) echo -e "vol level: $vol_level %"
-                                 echo -e "muted:     $vol_mute_status\n"
+                                 echo -e "muted:     ${vol_mute_status}\n"
                                  echo -e "mic level: $mic_level %"
-                                 echo -e "muted:     $mic_mute_status\n"
+                                 echo -e "muted:     ${mic_mute_status}\n"
                                  echo -e "mon level: $mon_level %"
                                  echo -e "muted:     $mon_mute_status" && accomplished ;;
-    "active sink/source port" )  echo -e "active sink port:\t$active_sink_port"
-                                 echo -e "active source port:\t$active_source_port" && accomplished ;;
+    "active sink/source port" )  echo -e "active sink port:\t${active_sink_port}"
+                                 echo -e "active source port:\t${active_source_port}" && accomplished ;;
     "app responsible for sound card" ) ## application which is responsible for a direct access to the sound card via alsa
                                        fuser -v /dev/snd/* && accomplished ;;
     "apps using sink/source" ) echo "apps using sink:"
@@ -50,7 +50,7 @@ case "$main_item" in
                                     "set default source" ) [ ! "$default" ] && get_input "Default source (index or name)" && default="$input"
                                                            pacmd set-default-source "$default" && accomplished ;;
                                 esac ;;
-    restart ) get_single_input "You sure?" "red_blink" && restart_prompt="$single_input"
+    restart ) get_single_input "You sure?" && restart_prompt="$single_input"
               case "$restart_prompt" in
                   y ) pulseaudio --kill && sleep 1 && pulseaudio --start && msgn "pulseaudio restarted" && accomplished ;;
               esac ;;

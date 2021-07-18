@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 case "$1" in
     rofi ) rofi -show combi & ;;

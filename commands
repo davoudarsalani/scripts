@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 function ctc_msg(){
     local trimmed="$(echo "$@" | tr -d \<,\&)"
-    msgn "copied to clipboard" "<span color=\"$orange\">$trimmed</span>" ;}
+    msgn "copied to clipboard" "<span color=\"${orange}\">${trimmed}</span>" ;}
 
 IFS=$'\n'
 
@@ -32,7 +32,7 @@ remove columns 1 and 2 ---> awk '{ $1=$2=""; print $0 }'
 print last column ---> awk '{ print $NF }'
 remove last column ---> sed -r 's/\s+\S+$//'
 print first n characters (X is your number) ---> cut -c 1-X
-print last n characters (X is your number) ---> ${<variable>:(-X)}
+print last n characters (X is your number) ---> "${<variable>:(-X)}"
 remove first 6 letters of each line ---> cut -c 6-
 remove last 6 letters of each line ---> sed 's/.\{6\}$//'
 remove empty lines [i]  ---> sed '/^$/d'
@@ -84,25 +84,24 @@ make awk case-insensitive [ii] ---> awk 'tolower($0) ~ <command>'
 add string to the second line ---> awk 'NR==1{print; print "<string>"} NR!=1'
 print after the last / ---> "${x##*/}" = basename "$x"
 remove/replace n characters before a string ---> sed -e 's/.\{<number>\}<string>/<substitute>/'
-keep from nth character until nth character (and repeat) ---> ${<var>:0:9}${<var>:13:8}
-uppercase variable's first letter ---> echo ${<var>^}
-uppercase variable's all letters  ---> echo ${<var>^^}
-lowercase variable's first letter ---> echo ${<var>,}
-lowercase variable's all letters  ---> echo ${<var>,,}
+keep from nth character until nth character (and repeat) ---> "${<var>:0:9}${<var>:13:8}"
+uppercase variable's first letter ---> echo "${<var>^}"
+uppercase variable's all letters  ---> echo "${<var>^^}"
+lowercase variable's first letter ---> echo "${<var>,}"
+lowercase variable's all letters  ---> echo "${<var>,,}"
 print 1-2-3-4-5-6-7-8-9-10 ---> seq -s - 10
 add column from another file ---> paste -d' ' <file1> <file2>
 clears the line ---> printf "\33[A"
 fading line  ---> for i in {17..20} {19..17} ; do echo -ne "\e[38;5;${i}m-\e[0m" ; done ; echo
 to not show errors ---> <command> 2>/dev/null
 check if root ---> if [ "$EUID" -ne "0" ]; then echo "You are not root"; fi
-: (called null command) [i]   ---> The : command (which equals the command true) means do nothing, and its exit status (i.e. $?) is true (i.e. 0)
+: (called null command) [i]   ---> The : command (which equals the command true) means do nothing, and its exit status (i.e. "$?") is true (i.e. 0)
 : (called null command) [ii]  ---> Example 1: while : equals while true
 : (called null command) [iii] ---> Example 2: if [ <condition> ]; then : ; else <command> ; fi
 print "These" "words" "are" "quoted" ---> echo \"{These,words,are,quoted}\"
 print function name ---> myfunction(){ echo "This function is $FUNCNAME" ;} ; myfunction
 print lines with whose length are between 10 to 20 ---> grep -x '.\{10,20\}'
-generate random number [i]  ---> echo $((1 + RANDOM % 1000))
-generate random number [ii] ---> echo $((1 + RANDOM%=1000))
+generate random number ---> echo $((1 + "$RANDOM" % 1000))
 sequence [i]   ---> for i in `seq 1 10` ; do <command> ; done
 sequence [ii]  ---> for i in {1..10} ; do <command> ; done
 sequence [iii] ---> for i in $(seq 10) ; do <command> ; done
@@ -110,23 +109,25 @@ mutt pattern ---> echo "<message body>" | mutt -s "<subject>" <recepient-email> 
 type unicode characters ---> crl + shift + u + <hexadecimal digits>
 close terminal without terminating tasks ---> disown -a && exit
 system clock ---> timedatectl status
-print variable length [i]  ---> echo ${#<variable>}
+print variable length [i]  ---> echo "${#<variable>}"
 print variable length [ii] ---> echo -n "$<variable>" | wc -c
-arrays ---> Syntax         Result
-arrays ---> arr=()         Create an empty array
-arrays ---> arr=(1 2 3)    Initialize array
-arrays ---> ${arr[2]}      Retrieve third element
-arrays ---> ${arr[@]}      Retrieve all elements
-arrays ---> ${!arr[@]}     Retrieve array indices
-arrays ---> ${#arr[@]}     Calculate array size
-arrays ---> arr[0]=3       Overwrite 1st element
-arrays ---> arr+=(4)       Append value(s)
-arrays ---> str=$(ls)      Save ls output as a string
-arrays ---> arr=( $(ls) )  Save ls output as an array of files
-arrays ---> ${arr[@]:s:n}  Retrieve n elements starting at index s
+arrays ---> arr=()          create an empty array
+arrays ---> arr=(1 2 3)     initialize array
+arrays ---> "${arr[2]}"     retrieve third element
+arrays ---> "${arr[@]}"     retrieve all elements
+arrays ---> "${!arr[@]}"    retrieve array indices
+arrays ---> "${#arr[@]}"    calculate array size
+arrays ---> arr[0]=3        overwrite 1st element
+arrays ---> arr+=(4)        append value(s)
+arrays ---> str="$(ls)"     save ls output as a string
+arrays ---> arr=( $(ls) )   save ls output as an array of files
+arrays ---> "${arr[@]:x:n}" retrieve n elements starting at index x
+remove first element of array ($ and {} NOT needed) ---> unset "<ARRAY>[0]"
+remove last element of array ($ and {} NOT needed) ---> unset "<ARRAY>[-1]"
+assign a member of array to a variable ($ and {} needed) ---> <var>="${<ARRAY>[-2]}"
 setaf syntax (https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/) ---> echo (tput setaf 0) <text> (tput sgr0)
 diff the output of two commands ---> diff <(<command1>) <(<command2>)
-print sth on the right in bash (align right) ---> printf "%*s\n" $COLUMNS "<string>"
+print sth on the right in bash (align right) ---> printf "%*s\n" "$COLUMNS" "<string>"
 make read input invisible when entering ---> -s
 make read input 1 character long ---> -n 1
 make sure read input is a number ---> while [ ! "$number" =~ ^[0-9]+$ ]; do read -p "> Numbers only. Try again: " number ; printf "\33[A" ; done ; echo
@@ -138,8 +139,8 @@ ignore terminal interrupt (CTRL+C, SIGINT) ---> trap '' INT
 call a function or do a command on window resize ---> trap '<COMMAND or FUNCTION>' SIGWINCH
 do something before every command ---> trap '<COMMAND>' DEBUG
 do something when a shell function or a sourced file finishes executing ---> trap '<COMMAND>' RETURN
-get terminal columns [i]  ---> echo $(tput cols)
-get terminal columns [ii] ---> echo $COLUMNS
+get terminal columns [i]  ---> echo "$(tput cols)"
+get terminal columns [ii] ---> echo "$COLUMNS"
 convert ---> convert <SOURCE_IMAGE> -verbose -resize <WIDTH(xHEIGHT)>\> <DEST_PATH>
 in terminal [i]   ---> !<command>       runs the commands as it was last run (with all the flags, etc)
 in terminal [ii]  ---> Ctl + u          cut to the beginning
@@ -151,15 +152,31 @@ in terminal [vii] ---> Alt + Shift + 3  comment the command and run it
 http torsocks ---> http_proxy=socks5://127.0.0.1:9050 torsocks
 toggle keyboard layout ---> setxkbmap -layout us,ir -option grp:caps_toggle
 show swap files ---> swapon --show
+weather [i]   ---> curl -s wttr.in/$city?format=1  ## or wget -qO-
+weather [ii]  --->   format=1  >> ☀️ +24°C
+weather [iii] --->   format=2  >> ☀️ 🌡️e+24°C 🌬️+↓7km/h
+weather [iv]  --->   format=3  >> $city: ☀️ +24°C
+weather [v]   --->   format=4  >> $city: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
+weather [vi]  --->   format=j1 >> in json format
+                      for parsing the json: format=j1 | jq -rM ."current_condition[0]|(.temp_C)"  ## <--,-- (https://www.youtube.com/watch?v=_Xm3HYGW3lg)
+                                                                                                  ##    |-- NOTE: no space after .
+                                                                                                  ##    |-- -r removes quotes, -M gives monochrome output
+                                                                                                  ##    |-- also: (.weatherDesc[0].value)
+                                                                                                  ##    \-- to combine: (.temp_C,.humidity)
+weather [vii] ---> curl -s wttr.in/$city?format=%t+%h+%p >> +10°C 54% 0.0mm
 delete duplicate, nonconsecutive and nonempty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq <FILE>
 ddpattern ---> sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
 turn off screensaver ---> xset s 0 0 && xset -dpms
 expand alias in script: ---> shopt -s expand_aliases (put it at the top of script)
 stop pop sound ---> add 'options snd-hda-intel power_save=0 power_save_controller=N' to the end of /etc/modprobe.d/alsa-base.conf
 repeated character (https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html) ---> dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"
-chack if variable is a number [i]  ---> re="^[0-9]+$"; [[ $variable =~ $re ]] && echo "number" || echo "no number"  ## do not replace [[ with [, and do NOT quote $re
-chack if variable is a number [ii] ---> [ $variable -eq $variable ] 2>/dev/null && echo "number" || echo "no number"
+chack if variable is a number [i]  ---> re="^[0-9]+$"; [[ "$variable" =~ $re ]] && echo "number" || echo "no number"  ## do not replace [[ with [, and do NOT quote $re
+chack if variable is a number [ii] ---> [ "$variable" -eq "$variable" ] 2>/dev/null && echo "number" || echo "no number"
 chack if variable matches pattern ---> re="*abc*"; [[ "$variable" == $re ]] && echo "match"  ## do not replace [[ with [, and do NOT quote $re
 newest item in clipboard ---> xclip -o
 join many mp3 files (NOT tested) ---> ffmpeg -f concat -safe 0 -i <(for f in ./*.mp3; do echo "file '$PWD/$f'"; done) -c copy ./output.mp3
-colors with span ---> <span background=\"#f3f300\"><span color=\"#000000\"></span></span>
+to debug bash script ---> set -x; trap read debug
+ls /usr/share/xsessions/ returns awesome.desktop
+send both stdout and stderr to null ---> >&/dev/null
+include stderr as well when piping ---> |& grep something
+colors with span ---> <span background=\"#f3f300\"><span color=\"${orange}\"><TEXT></span></span>

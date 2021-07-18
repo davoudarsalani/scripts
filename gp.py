@@ -1,3 +1,7 @@
+# {{{ requirements
+## keylogger
+## wget jdatetime requests requests[socks] beautifulsoup4 youtube_dl dbus-python notify2 vext.gi pillow pynput halo python-magic rarfile pyminizip clipboard tabulate black google-api-python-client [jedi]
+## }}}
 # {{{ imports
 from os import getenv  ## for send_email* functions
 from typing import List  ## for fzf and dmenu functions
@@ -46,9 +50,6 @@ class Color:  ## {{{
     def cyan_italic(self, text: str):   return f'\033[03;49;036m{text}\033[0m'
     def white_italic(self, text: str):  return f'\033[03;49;037m{text}\033[0m'
     def grey_italic(self, text: str):   return f'\033[03;49;090m{text}\033[0m'
-    def brown_italic(self, text: str):  return f'\033[48;05;094m{text}\033[0m'
-    def orange_italic(self, text: str): return f'\033[48;05;202m{text}\033[0m'
-    def olive_italic(self, text: str):  return f'\033[48;05;064m{text}\033[0m'
     ## }}}
     ## underline {{{
     def red_underline(self, text: str):    return f'\033[04;49;031m{text}\033[0m'
@@ -388,6 +389,16 @@ def get_datetime(frmt: str):  ## {{{
 
     return output
 ## }}}
+def if_exists(dest):  ## {{{
+    from os import path
+    append_index = 2
+    if path.exists(dest):
+        while path.exists(f'{dest}_{append_index:02}'):
+            append_index += 1
+        dest = f'{dest}_{append_index:02}'
+
+    return dest
+## }}}
 def last_file_exists(last_file):  ## {{{
     from os import path
     condition = [path.exists(last_file)]
@@ -490,7 +501,7 @@ def set_widget(widget: str, attr: str, value: str):  ## {{{
     run(f'echo "{widget}:set_{attr}(\'{value}\')" | awesome-client', shell=True)
 ## }}}
 def record_icon():  ## {{{
-    return '<b>RE</b>'
+    return 'RE'
 ## }}}
 def refresh_icon():  ## {{{
     from os import getenv
@@ -513,7 +524,7 @@ def timer(suffix: str, timer_secs: int):  ## {{{
         current = int(get_datetime('jhms'))
         diff = current - start
         dur = duration(diff)
-        hms = f'<b>{record_icon_suffix} {dur}</b>'
+        hms = f'{record_icon_suffix} {dur}'
         set_widget('record', 'markup', hms)
         dorm(1)
 ## }}}
@@ -545,10 +556,10 @@ def send_email(subject: str, body: str, sender: str=getenv('email1'), receiver: 
     from ssl import create_default_context
 
     if sender == getenv('email1'):
-        password = getenv('email1_pass')
+        password = getenv('email1_password1')
         server   = 'smtp.mail.yahoo.com'
     elif sender == getenv('email2'):
-        password = getenv('email2_pass')
+        password = getenv('email2_password1')
         server   = 'smtp.gmail.com'
 
     port    = 465
@@ -574,10 +585,10 @@ def send_email_with_attachment(subject: str, body: str, attachment: str, sender:
     from ssl import create_default_context
 
     if sender == getenv('email1'):
-        password = getenv('email1_pass')
+        password = getenv('email1_password1')
         server   = 'smtp.mail.yahoo.com'
     elif sender == getenv('email2'):
-        password = getenv('email2_pass')
+        password = getenv('email2_password1')
         server   = 'smtp.gmail.com'
 
     port = 465

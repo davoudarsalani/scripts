@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 function now(){
     if_speech
@@ -38,13 +38,13 @@ case "$1" in
     kdenlive )          kdenlive 2>/dev/null & ;;
     keepass )           keepass 2>/dev/null & ;;
     kid3 )              kid3 2>/dev/null & ;;
-    lf )                "$terminal" -e "lf $HOME/downloads/" & ;;
+    lf )                "$terminal" -e "lf "$HOME"/downloads/" & ;;
     libreoffice )       libreoffice 2>/dev/null & ;;
     lxappearance )      lxappearance & ;;
     qutebrowser )       qutebrowser --target tab & ;;
-    ranger )            "$terminal" -e "ranger $HOME/downloads/" & ;;
+    ranger )            "$terminal" -e "ranger "$HOME"/downloads/" & ;;
     terminal )          "$terminal" ;;
-    terminal_tmux )     [ ! $(pgrep "tmux") ] && "$terminal" -e "tmux new -s 1" || "$terminal" -e "tmux new" ;;
+    terminal_tmux )     [ ! "$(pgrep "tmux")" ] && "$terminal" -e "tmux new -s 1" || "$terminal" -e "tmux new" ;;
     terminal_torsocks ) torsocks "$terminal" ;;
     uget )              uget-gtk 2>/dev/null & ;;
     vlc )               vlc 2>/dev/null & ;;

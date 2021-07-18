@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
-autorun_file="/tmp/autorun"
+autorun_file=/tmp/autorun
 [ -f "$autorun_file" ] && exit || touch "$autorun_file"
 
 ## tricks for the time when power saving screws audio
@@ -12,11 +12,16 @@ autorun_file="/tmp/autorun"
 pulseaudio --start &
 start-pulseaudio-x11
 
-source $HOME/scripts/gb-audio
-pactl set-sink-volume $def_sink_index 30%
-audacious "$HOME/linux/sounds/login_mint.ogg" &
+source "$HOME"/scripts/gb-audio
+while [ "$vol_level" -ne 30 ]; do
+    echo "tried to set volume to 30 at $(get_datetime "jymdhms")" >> /tmp/vol_30  ## just to keep record of how many times the loop tried
+    pactl set-sink-volume "$def_sink_index" 30%
+    source "$HOME"/scripts/gb-audio
+    sleep 1
+done
+audacious "$HOME"/linux/sounds/login_mint.ogg &
 
-# source $HOME/scripts/gb-screen
+# source "$HOME"/scripts/gb-screen
 # xrandr --output  "$scr_1_name" --mode 1366x768 --rate 60 --primary
 # xrandr --addmode "$scr_2_name" 1600x900
 # xrandr --output  "$scr_2_name" --mode 1600x900 --rate 60 --right-of "$scr_1_name"
@@ -27,11 +32,11 @@ nm-applet &
 greenclip daemon &
 picom -b &
 
-current_date=$(get_datetime "jymd")
-$HOME/scripts/.venv_keylogger/bin/python3 $HOME/scripts/.venv_keylogger/bin/keylogger --log-file $HOME/linux/keylogs/keylog-${current_date} &
+current_date="$(get_datetime "jymd")"
+"$HOME"/scripts/.venv_keylogger/bin/python3 "$HOME"/scripts/.venv_keylogger/bin/keylogger --log-file "$HOME"/linux/keylogs/keylog-"$current_date" &
 
-# source $HOME/scripts/gb-network
-# [ ! "$eth_ip" ] && add_desired_ip_to_ethernet && msgn "added <span color=\"$orange\">$desired_eth_ip</span> to <span color=\"$orange\">$eth_devc</span>"
+# source "$HOME"/scripts/gb-network
+# [ ! "$eth_ip" ] && add_desired_ip_to_ethernet && msgn "added <span color=\"${orange}\">${desired_eth_ip}</span> to <span color=\"${orange}\">${eth_devc}</span>"
 
 widgets=(
     "audio"
@@ -45,9 +50,9 @@ widgets=(
 )
 
 for widget in "${widgets[@]}"; do
-    $HOME/scripts/awesome-widgets "$widget"
+    "$HOME"/scripts/awesome-widgets "$widget"
 done
 
-msgn " " " " "$HOME/linux/themes/ok-w.png"
+msgn " " " " "$HOME"/linux/themes/ok-w.png
 
 exit

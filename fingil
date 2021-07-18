@@ -9,8 +9,8 @@ function convert(){
     text="$@"  ## get arguments and set to variable
     out=""  ## set variable
 
-    for i in $(seq 0 $((${#text} - 1))); do  ## split charactor
-        hex=$(echo "${text:$i:1}" | xxd -p)  ## convert ASCII to HEX
+    for i in $(seq 0 "$(( "${#text}" - 1 ))"); do  ## split charactor  ## do NOT change quotes
+        hex="$(echo "${text:$i:1}" | xxd -p)"  ## convert ASCII to HEX
 
         case "$hex" in  ## convert HEXs
             "220a" ) #"
@@ -336,13 +336,13 @@ function convert(){
             * ) out="${hex}" ;;
         esac
 
-        out=$(echo "$out" | xxd -p -r)  ## convert HEX to ACSII
+        out="$(echo "$out" | xxd -p -r)"  ## convert HEX to ACSII
         echo -ne "$out"  ## return out variable
     done ;}
 
-window_pid=$(xdotool getactivewindow)  ## get active window PID
-clipboard=$(xclip -o -sel clip)
+window_pid="$(xdotool getactivewindow)"  ## get active window PID
+clipboard="$(xclip -o -sel clip)"
 
-xdotool type --delay 400 --window $window_pid "$(convert $clipboard)"
+xdotool type --delay 400 --window "$window_pid" "$(convert "$clipboard")"
 
 exit

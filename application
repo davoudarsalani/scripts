@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
-shopt -s globstar
+source "$HOME"/scripts/gb
+shopt -s globstar  ## is it needed?
 
-function help(){ source $HOME/scripts/.help; application_help ;}
+function help(){ source "$HOME"/scripts/.help; application_help ;}
 
 function prompt(){
     for args in "$@"; do
@@ -71,8 +71,8 @@ case "$main_item" in
                packages_item="$(pipe_to_fzf "${packages_items[@]}")" && wrap_fzf_choice "$packaegs_item" || exit 37
 
                case "$packages_item" in
-                   count ) pkg_count=$(wc -l <<< "$(pacman -Q)")
-                           echo $pkg_count && accomplished ;;
+                   count ) pkg_count="$(wc -l <<< "$(pacman -Q)")"
+                           echo "$pkg_count" && accomplished ;;
                    names ) pacman -Q | fzf --preview 'pacman -Si {1}' && accomplished ;;
                    "AUR packages" ) pacman -Qem | fzf --preview 'yay -Si {1}' && accomplished ;;  ## also -Qqem and -Qqm
                    "pacman tools" ) pacman -Ql pacman | \grep -E 'bin/.+' | fzf && accomplished ;;  ## Also: pacman -Ql pacman pacman-contrib | \grep -E 'bin/.+'
@@ -84,66 +84,66 @@ case "$main_item" in
                                   action_now "removing cache and database"
                                   sudo pacman -Sc --noconfirm  ## cc will clean all the files (which is not a good idea)
                                   action_now "removing orphans"
-                                  sudo pacman -Qtdq && sudo pacman -Rns $(pacman -Qtdq) --noconfirm || echo "  No orphans"
-                                  action_now "removing \$HOME/.cache (size: $(du -sh $HOME/.cache/ | awk '{print $1}')):"
-                                  rm -rf $HOME/.cache
+                                  sudo pacman -Qtdq && sudo pacman -Rns "$(pacman -Qtdq)" --noconfirm || echo "  No orphans"
+                                  action_now "removing \$HOME/.cache (size: "$(du -sh "$HOME"/.cache/ | awk '{print $1}')"):"
+                                  rm -rf "$HOME"/.cache
                                   accomplished ;;
     update ) update_items=( "pacman" "yay" "yay + torsocks" "sync repos" "available updates" "last update" )
              update_item="$(pipe_to_fzf "${update_items[@]}")" && wrap_fzf_choice "$update_item" || exit 37
 
              case "$update_item" in
-                 pacman ) start=$(get_datetime "jseconds")
+                 pacman ) start="$(get_datetime "jseconds")"
                           sudo pacman -Syu
-                          end=$(get_datetime "jseconds")
-                          diff=$(( end - start ))
-                          dur="$(day_hour_min_sec $diff)"
+                          end="$(get_datetime "jseconds")"
+                          diff="$(( "$end" - "$start" ))"
+                          dur="$(day_hour_min_sec "$diff")"
                           accomplished "Total duration: $dur" ;;
-                 yay ) start=$(get_datetime "jseconds")
+                 yay ) start="$(get_datetime "jseconds")"
                        yay --answerdiff None --answerclean All --removemake -Syua
-                       end=$(get_datetime "jseconds")
-                       diff=$(( end - start ))
-                       dur="$(day_hour_min_sec $diff)"
+                       end="$(get_datetime "jseconds")"
+                       diff="$(( "$end" - "$start" ))"
+                       dur="$(day_hour_min_sec "$diff")"
                        accomplished "Total duration: $dur" ;;
-                 "yay + torsocks" ) start=$(get_datetime "jseconds")
+                 "yay + torsocks" ) start="$(get_datetime "jseconds")"
                                     torsocks yay --answerdiff None --answerclean All --removemake -Syua
-                                    end=$(get_datetime "jseconds")
-                                    diff=$(( end - start ))
-                                    dur="$(day_hour_min_sec $diff)"
+                                    end="$(get_datetime "jseconds")"
+                                    diff="$(( "$end" - "$start" ))"
+                                    dur="$(day_hour_min_sec "$diff")"
                                     accomplished "Total duration: $dur" ;;
                  "sync repos" ) sudo pacman -Sy && accomplished ;;
-                 "available updates" ) msgn "synchronizing repositories ..." "" "$HOME/linux/themes/pacman-w.png"
+                 "available updates" ) msgn "synchronizing repositories ..." "" "$HOME"/linux/themes/pacman-w.png
                                        sudo pacman -Sy && \
                                        ups="$(pacman -Qu | \grep -iv "IgnorePkg")"
-                                       ## $(wc -l <<< $(echo "$ups")) returns 1 even if there are no ups
+                                       ## "$(wc -l <<< "$(echo "$ups")")" returns 1 even if there are no ups
                                        ## so, we have to do this:
-                                       [ "$ups" ] && ups_count=$(wc -l <<< $(echo "$ups")) || ups_count=0
+                                       [ "$ups" ] && ups_count="$(wc -l <<< "$(echo "$ups")")" || ups_count=0
 
                                        sleep 0.1
 
                                        ## AUR updates
                                        aur_ups="$(yay -Qua)"
-                                       ## $(wc -l <<< $(echo "$aur_ups")) returns 1 even if there are no aur_ups
+                                       ## "$(wc -l <<< "$(echo "$aur_ups")")" returns 1 even if there are no aur_ups
                                        ## so, we have to do this:
-                                       [ "$aur_ups" ] && aur_ups_count=$(wc -l <<< $(echo "$aur_ups")) || aur_ups_count=0
+                                       [ "$aur_ups" ] && aur_ups_count="$(wc -l <<< "$(echo "$aur_ups")")" || aur_ups_count=0
 
                                        sleep 0.1
 
-                                       if [ $ups_count -eq 0 ] && [ $aur_ups_count -eq 0 ]; then
-                                           msgn "available updates: <span color=\"$orange\">none</span>"
+                                       if [ "$ups_count" -eq 0 ] && [ "$aur_ups_count" -eq 0 ]; then
+                                           msgn "available updates: <span color=\"${orange}\">none</span>"
                                        else
-                                           msgn "available updates: <span color=\"$orange\">$ups_count</span> / <span color=\"$orange\">$aur_ups_count</span>"
+                                           msgn "available updates: <span color=\"${orange}\">${ups_count}</span> / <span color=\"${orange}\">${aur_ups_count}</span>"
                                        fi ;;
                  "last update" ) last_update_date="$(egrep 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/g')"  ## 2021-04-15T11:10:03+0430
-                                 last_update_sec="$(date -d $last_update_date +%s)"  ## <--,  ## convert 2021-04-15T11:10:03+0430 to 1618468803
-                                 current_seconds=$(get_datetime "jseconds")          ## <--'---  ## only +%s and jseconds (OR seconds) work
-                                 diff=$(( current_seconds - last_update_sec ))
+                                 last_update_sec="$(date -d "$last_update_date" +%s)"  ## <--,  ## convert 2021-04-15T11:10:03+0430 to 1618468803
+                                 current_seconds="$(get_datetime "jseconds")"          ## <--'---  ## only +%s and jseconds (OR seconds) work
+                                 diff="$(( "$current_seconds" - "$last_update_sec" ))"
                                  dur="$(day_hour_min_sec "$diff")"
-                                 echo "last update: $dur ago (on $last_update_date)" ;;
+                                 echo "last update: "$dur" ago (on "$last_update_date")" ;;
              esac ;;
     "rank mirrors" ) red "Come back later!" ;;
     "restore pacman database" ) get_single_input "You sure?" "red_blink" && restore_prompt="$single_input"
                                 case "$restore_prompt" in
-                                    y ) cp $HOME/linux/cfg-pacman-database/pacman_database.tar.bz2 / && cd /
+                                    y ) cp "$HOME"/linux/cfg-pacman-database/pacman_database.tar.bz2 / && cd /
                                         sleep 0.5
                                         tar -xjvf pacman_database.tar.bz2 && accomplished ;;
                                 esac ;;

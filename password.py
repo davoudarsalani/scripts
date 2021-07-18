@@ -10,11 +10,12 @@ from gp import Color, invalid, fzf, get_input
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
+C = Color()
 
 def help():  ## {{{
     run('clear', shell=True)
-    print(f'''{Color().heading(f'{title}')} {Color().yellow('Help')}
-{Color().flag(f'-l --length=')}''')
+    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
+{C.flag(f'-l --length=')}''')
     exit()
 ## }}}
 def getopts():  ## {{{
@@ -57,7 +58,7 @@ def generate():  ## {{{
 
     global length
     if length > len(letters):
-        print(Color().orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
+        print(C.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
         length = len(letters)
 
     for x in range(5):
@@ -76,7 +77,7 @@ def generate():  ## {{{
     if sy: letters += s
 
     if length > len(letters):
-        print(Color().orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
+        print(C.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
         length = len(letters)
 
     for x in range(5):
@@ -86,7 +87,7 @@ def generate():  ## {{{
 
 getopts()
 
-print(Color().heading(title))
+print(C.heading(title))
 
 main_items = ['password', 'help']
 main_item = fzf(main_items)

@@ -6,9 +6,10 @@ from clipboard import copy as clipboard_copy
 from gp import Color, fzf, msgn
 
 title = path.basename(__file__).replace('.py', '')
+C = Color()
 
 chdir(f'{getenv("HOME")}/linux/emojis')
-print(Color().heading(title))
+print(C.heading(title))
 
 main_items = listdir()
 main_item = fzf(main_items)

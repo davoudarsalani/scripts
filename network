@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
-source $HOME/scripts/gb-network
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-network
 
-function help(){ source $HOME/scripts/.help; network_help ;}
+function help(){ source "$HOME"/scripts/.help; network_help ;}
 
 function prompt(){
     for args in "$@"; do
@@ -17,7 +17,7 @@ function prompt(){
     done ;}
 
 function add_desired_ip_to_ethernet(){
-    source $HOME/scripts/gb-network
+    source "$HOME"/scripts/gb-network
     sudo ip address add "$desired_eth_ip" broadcast + dev "$eth_devc" ;}
 
 while getopts 'hi:d:c:s:p:' flag; do
@@ -40,21 +40,24 @@ main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" ||
 case "$main_item" in
     all ) nmcli connection show && accomplished ;;  ## OR find /sys/class/net -mindepth 1 -maxdepth 1 | sort
     "status + ip + mac address" ) nmcli device
-                                  echo -e "\n-------------------------\n"
-                                  echo -e "$(ip link show dev $eth_devc)\n\n$(ip link show dev $wf_devc)"
-                                  echo -e "ip"
-                                  echo -e "$eth_devc\t$eth_ip"
-                                  echo -e "$wf_devc\t\t$wf_ip"
-                                  echo -e "$vpn_devc\t\t$vpn_ip"
-                                  echo -e "mac address"
-                                  echo -e "$eth_devc\t$eth_mac"
-                                  echo -e "$wf_devc\t\t$wf_mac"
-                                  echo -e "$vpn_devc\t\t$vpn_mac" && accomplished ;;
+echo -e """-------------------------
+status:
+$(ip link show dev ${eth_devc})
+$(ip link show dev ${wf_devc})
+
+ip:
+${eth_devc}\t${eth_ip}
+${wf_devc}\t\t${wf_ip}
+${vpn_devc}\t\t${vpn_ip}
+mac address:
+${eth_devc}\t${eth_mac}
+${wf_devc}\t\t${wf_mac}
+${vpn_devc}\t\t${vpn_mac}""" && accomplished ;;
     "available wifi access points" ) nmcli device wifi list && accomplished ;;
-    "connect $eth_devc" ) nmcli device connect "$eth_devc" && accomplished ;;        ## OR sudo ip link set $eth_devc up
-    "disconnect $eth_devc" ) nmcli device disconnect "$eth_devc" && accomplished ;;  ## OR sudo ip link set $eth_devc down
-    "connect $wf_devc" ) nmcli device connect "$wf_devc" && accomplished ;;          ## OR sudo ip link set $wf_devc up
-    "disconnect $wf_devc" ) nmcli device disconnect "$wf_devc" && accomplished ;;    ## OR sudo ip link set $wf_devc down
+    "connect $eth_devc" ) nmcli device connect "$eth_devc" && accomplished ;;        ## OR sudo ip link set "$eth_devc" up
+    "disconnect $eth_devc" ) nmcli device disconnect "$eth_devc" && accomplished ;;  ## OR sudo ip link set "$eth_devc" down
+    "connect $wf_devc" ) nmcli device connect "$wf_devc" && accomplished ;;          ## OR sudo ip link set "$wf_devc" up
+    "disconnect $wf_devc" ) nmcli device disconnect "$wf_devc" && accomplished ;;    ## OR sudo ip link set "$wf_devc" down
     "up ethernet/wifi connection" ) prompt -c
                                     nmcli connection up "$connection" && accomplished ;;
     "down ethernet/wifi connection" ) prompt -c
@@ -66,7 +69,7 @@ case "$main_item" in
     "nearby wifi networks" ) nmcli device wifi list && accomplished ;;
     "add ip to a device" ) prompt -i -d
                            sudo ip address add "$ip" broadcast + dev "$device" && accomplished ;;
-    "add "$desired_eth_ip" to $eth_devc" ) add_desired_ip_to_ethernet && accomplished ;;
+    "add $desired_eth_ip to $eth_devc" ) add_desired_ip_to_ethernet && accomplished ;;
     "delete all ips" ) prompt -d
                        ip address flush dev "$device" && accomplished ;;
     "enable NetworkManager" ) sudo systemctl enable NetworkManager && accomplished ;;

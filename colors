@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
 ## https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
@@ -21,26 +21,26 @@ case "$main_item" in
           done
           echo "$(yellow Pattern:)    \"\033[0;49;39m <TEXT> \033[0m\"" ;;
     "38;5;{0-255} (foreground)" ) for clfg in {0..255}; do
-                                      printf '\e[38;5;%dm %03d \e[0m' $clfg $clfg
+                                      printf '\e[38;5;%dm %03d \e[0m' "$clfg" "$clfg"
                                   done
                                   echo
                                   echo "$(yellow Pattern:)    \"\033[38;5;39m <TEXT> \033[0m\"" ;;
     "48;5;{0-255} (background)" ) for clfg in {0..255}; do
-                                      printf '\e[48;5;%dm %03d \e[0m' $clfg $clfg
+                                      printf '\e[48;5;%dm %03d \e[0m' "$clfg" "$clfg"
                                   done
                                   echo
                                   echo "$(yellow Pattern:)    \"\033[48;5;39m <TEXT> \033[0m\"" ;;
     "tput setaf" ) ## https://unix.stackexchange.com/questions/269077/tput-setaf-color-table-how-to-determine-color-codes
                    function color(){
                        for c; do
-                           printf '\e[48;5;%dm%03d' $c $c
+                           printf '\e[48;5;%dm%03d' "$c" "$c"
                        done
                        printf '\e[0m \n' ;}
 
                    IFS=$' \t\n'
                    color {0..15}
-                   for ((i=0;i<6;i++)); do
-                       color $(seq $((i*36+16)) $((i*36+51)))
+                   for ((i=0; i<6; i++)); do
+                       color $(seq "$(( "$i" * 36 + 16 ))" "$(( "$i" * 36 + 51 ))")  ## do NOT change quotes
                    done
                    color {232..255}
                    echo

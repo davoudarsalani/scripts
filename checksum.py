@@ -9,12 +9,13 @@ from gp import Color, fzf, invalid, get_input, hash_string, hash_file
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
+C = Color()
 
 def help():  ## {{{
     run('clear', shell=True)
-    print(f'''{Color().heading(f'{title}')} {Color().yellow('Help')}
-string  {Color().flag(f'-s --string=')}
-file    {Color().flag(f'-f --file=')}''')
+    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
+string  {C.flag(f'-s --string=')}
+file    {C.flag(f'-f --file=')}''')
     exit()
 ## }}}
 def getopts():  ## {{{
@@ -46,7 +47,7 @@ def prompt(*args: str):  ## {{{
 
 getopts()
 
-print(Color().heading(title))
+print(C.heading(title))
 
 main_items = ['string', 'file', 'help']
 main_item = fzf(main_items)

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
-trap 'width=$(tput cols)' SIGWINCH
+trap 'width="$(tput cols)"' SIGWINCH
 
-function help(){ source $HOME/scripts/.help; video_subtitle_help ;}
+function help(){ source "$HOME"/scripts/.help; video_subtitle_help ;}
 
 function prompt(){
     for args in "$@"; do
@@ -14,7 +14,7 @@ function prompt(){
     done ;}
 
 function line(){
-    width=$(tput cols)
+    width="$(tput cols)"
     echo -e "$(grey "$(printf "%${width}s\n" | sed "s/ /▬/g")")" ;}
 
 while getopts 'hd:' flag; do
@@ -41,7 +41,7 @@ case "$main_item" in
                                              [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
 
                                              echo
-                                             cd $HOME/downloads/$dir
+                                             cd "$HOME"/downloads/"$dir"
                                              replaced_count=0
                                              files=( $(find . -mindepth 1 -maxdepth 1 | sort) )
                                              for file in "${files[@]}"; do
@@ -83,13 +83,13 @@ case "$main_item" in
                                     done
                                     echo
                                     blue "$srt_count srts changed to #f3f300" ;;
-    burn ) total_start=$(get_datetime "jseconds")
+    burn ) total_start="$(get_datetime "jseconds")"
            prompt -d
            [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
 
            burn_dir="${dir}-BURN"
            if [ ! -d "$HOME/downloads/$burn_dir" ]; then
-               mkdir "$HOME/downloads/$burn_dir" && echo " $HOME/downloads/$burn_dir created"
+               mkdir "$HOME/downloads/$burn_dir" && echo " ${HOME}/downloads/${burn_dir} created"
            else
                get_single_input "$burn_dir already exists. Continue?" && continue_prompt="$single_input"
                case "$continue_prompt" in
@@ -103,27 +103,27 @@ case "$main_item" in
            vid_count=0
            vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
            for vid in "${vids[@]}"; do
-               video_start=$(get_datetime "jseconds")
+               video_start="$(get_datetime "jseconds")"
                already_burnt="$(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort)"
-               ## $(wc -l <<< $(echo "$already_burnt")) returns 1 even if there are no already_burnt
+               ## "$(wc -l <<< "$(echo "$already_burnt")")" returns 1 even if there are no already_burnt
                ## so, we have to do this:
-               [ "$already_burnt" ] && already_burnt_count=$(wc -l <<< $(echo "$already_burnt")) || already_burnt_count=0
+               [ "$already_burnt" ] && already_burnt_count="$(wc -l <<< "$(echo "$already_burnt")")" || already_burnt_count=0
 
-               brown "→ $vid $(grey "(#$((${already_burnt_count}+1)) in ${burn_dir})")"
+               brown "→ $vid $(grey "(#"$(( "$already_burnt_count" + 1 ))" in ${burn_dir})")"
                no_suff="${vid%.mp4}"
                HandBrakeCLI -i "$vid" -o "$HOME/downloads/${burn_dir}/${no_suff}----BURN.mp4" --srt-file "${no_suff}.srt" --srt-codeset UTF-8 --srt-lang eng --srt-burn --encoder x264 --audio 1  2>/dev/null && accomplished
-               exit_status=$?
-               [ $exit_status -ne 0 ] && red "burn failed"
+               exit_status="$?"
+               [ "$exit_status" -ne 0 ] && red "burn failed"
                ((vid_count++))
-               video_end=$(get_datetime "jseconds")
-               dur="$(day_hour_min_sec $(( video_end - video_start )))"
+               video_end="$(get_datetime "jseconds")"
+               dur="$(day_hour_min_sec "$(( "$video_end" - "$video_start" ))")"
                blue "Video burn duration: $dur"
                line
            done
            echo
            blue "$vid_count videos burned"
-           total_end=$(get_datetime "jseconds")
-           dur="$(day_hour_min_sec $(( total_end - total_start )))"
+           total_end="$(get_datetime "jseconds")"
+           dur="$(day_hour_min_sec "$(( "$total_end" - "$total_start" ))")"
            blue "Total burn duration: $dur" ;;
     "remove COMMMMMA and ----BURN" ) prompt -d
                                      [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
@@ -134,8 +134,8 @@ case "$main_item" in
                                      rename_vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
                                      for rename_vid in "${rename_vids[@]}"; do
                                          brown "→ $rename_vid"
-                                         new_name="$(echo $rename_vid | sed -e 's/COMMMMMA/,/g' -e 's/----BURN//g')"
-                                         purple $(mv -nv "$rename_vid" "$new_name") && accomplished
+                                         new_name="$(echo "$rename_vid" | sed -e 's/COMMMMMA/,/g' -e 's/----BURN//g')"
+                                         purple "$(mv -nv "$rename_vid" "$new_name")" && accomplished
                                          ((vids_count++))
                                          line
                                      done
@@ -152,7 +152,7 @@ case "$main_item" in
                           for burned_vid in "${burned_vids[@]}"; do
                               brown "→ $burned_vid"
                               new_name="$(echo "$burned_vid" | sed -e 's/.\{13\}mp4$/.mp4/')"
-                              purple $(mv -nv "$burned_vid" "$new_name") && accomplished
+                              purple "$(mv -nv "$burned_vid" "$new_name")" && accomplished
                               ((burned_vid_count++))
                               line
                           done
@@ -166,8 +166,8 @@ case "$main_item" in
                                          rename_vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
                                          number_of_vids="${#rename_vids[@]}"
                                          action_now "Creating list"
-                                         for ((numbers=1; numbers<=$number_of_vids; numbers++)); do
-                                             echo "$(printf "%03d" $numbers)" >> /tmp/"$number_of_vids".txt
+                                         for ((numbers=1; numbers<="$number_of_vids"; numbers++)); do
+                                             echo "$(printf "%03d" "$numbers")" >> /tmp/"$number_of_vids".txt
                                          done
 
                                          action_now "Shuffling"
@@ -178,7 +178,7 @@ case "$main_item" in
                                          action_now "Renaming"
                                          for rename_vid in "${rename_vids[@]}"; do
                                              brown "→ $rename_vid"
-                                             purple $(mv -nv "$rename_vid" "${shuffled_numbers[$index]}-$rename_vid") && accomplished
+                                             purple "$(mv -nv "$rename_vid" "${shuffled_numbers[$index]}-${rename_vid}")" && accomplished
                                              ((index++))
                                              ((vids_count++))
                                              line
@@ -191,21 +191,21 @@ case "$main_item" in
                       [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
 
                       echo
-                      cd $HOME/downloads/$dir
+                      cd "$HOME"/downloads/"$dir"
                       find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort | sed -e 's/---/zzzzz/g' -e 's/--/zzzzz/g' -e 's/-/ /g' -e 's/zzzzz/ - /g' -e 's/\.mp4$//g' > 0-list.txt && accomplished ;;
     "rename numerically" ) prompt -d
                            [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
 
                            echo
-                           cd $HOME/downloads/$dir
+                           cd "$HOME"/downloads/"$dir"
                            count=0
                            index=1
                            vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
 
                            for vid in "${vids[@]}"; do
                                brown "→ $vid"
-                               vid_new_name="$(printf %0.3d.mp4 $index)"
-                               purple $(mv -nv "$vid" "$vid_new_name" 2>/dev/null) && accomplished
+                               vid_new_name="$(printf %0.3d.mp4 "$index")"
+                               purple "$(mv -nv "$vid" "$vid_new_name" 2>/dev/null)" && accomplished
                                ((index++))
                                ((count++))
                                line

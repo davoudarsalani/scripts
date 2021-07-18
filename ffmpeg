@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-source $HOME/scripts/gb
+source "$HOME"/scripts/gb
 
-function help(){ source $HOME/scripts/.help; ffmpeg_help ;}
+function help(){ source "$HOME"/scripts/.help; ffmpeg_help ;}
 
 function prompt(){
     for args in "$@"; do
