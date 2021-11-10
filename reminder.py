@@ -1,24 +1,26 @@
 #!/usr/bin/env python
 
-from gp import dmenu, msgn, msgc, dorm, remove_leading_zeros, get_datetime
+from time import sleep
+
+from gp import rofi, msgn, msgc, remove_leading_zeros, get_datetime
 
 modes = ['at relative time (e.g. 30, 600, etc)', 'at specific time (e.g. 14:25)']
-mode = dmenu(modes, title='reminder')
+mode = rofi(modes, title='reminder')
 
 if 'relative' in mode:
     try:
-        relative = int(dmenu(title='relative time'))
+        relative = int(rofi(title='relative time'))
     except Exception as exc:
         msgc('ERROR', f'{exc!r}')
         exit()
 
-    message = dmenu(title='message')
+    message = rofi(title='message')
     msgn(f'Reminder in {relative} seconds', message)
-    dorm(relative)
+    sleep(relative)
     msgc('Reminder', message)
 elif 'specific' in mode:
     try:
-        specific  = dmenu(title='specific time')
+        specific  = rofi(title='specific time')
         specific2 = specific.replace(':', '')
         specific2 = remove_leading_zeros(specific2)
         specific2 = int(specific2)
@@ -26,7 +28,7 @@ elif 'specific' in mode:
         msgc('ERROR', f'{exc!r}')
         exit()
 
-    message = dmenu(title='message')
+    message = rofi(title='message')
     msgn(f'Reminder at {specific}', message)
     while True:
         current_time = int(get_datetime('jhms')[:4])
@@ -34,4 +36,4 @@ elif 'specific' in mode:
         if current_time == specific2:
             msgc('Reminder', message)
             break
-        dorm(30)
+        sleep(30)

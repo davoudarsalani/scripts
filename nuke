@@ -5,12 +5,16 @@ source "$HOME"/scripts/gb
 ## https://github.com/junegunn/fzf/wiki/examples
 
 IFS=$'\n'
-[ "$UID" -eq 0 ] && processes=( $(ps -ef | sed 1d) ) || processes=( $(ps -f -u "$UID" | sed 1d) )
+if [ "$UID" -eq 0 ]; then
+    readarray -t processes <<< "$(ps -ef)"
+else
+    readarray -t processes <<< "$(ps -f -u "$UID")"
+fi
 process="$(pipe_to_fzf "${processes[@]}")" && wrap_fzf_choice "$process" || exit 37
 
-process="$(echo "$process" | awk '{print $2}')"
+process="$(printf '%s\n' "$process" | awk '{print $2}')"
 
 get_single_input "Kill ${process}?" && sure_prompt="$single_input"
 case "$sure_prompt" in
-    y ) [ "$process" ] && echo "$process" | xargs kill -9 ;;
+    y ) [ "$process" ] && printf '%s\n' "$process" | xargs kill -9 ;;
 esac

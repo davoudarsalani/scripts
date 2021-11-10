@@ -1,148 +1,141 @@
 #!/usr/bin/env bash
 source "$HOME"/scripts/gb
 
-function ctc_msg(){
-    local trimmed="$(echo "$@" | tr -d \<,\&)"
-    msgn "copied to clipboard" "<span color=\"${orange}\">${trimmed}</span>" ;}
+function ctc_msg {
+    local trimmed="$(printf '%s\n' "$@" | tr -d \<,\&)"
+    msgn 'copied to clipboard' "<span color=\"${orange}\">${trimmed}</span>"
+}
 
 IFS=$'\n'
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( $(cat "$0" | sed '1,23d') )
+readarray -t main_items <<< "$(sed -n '/^\[COMMANDS START\]/,//p' "$0" | sed '1d')"
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 main_item="${main_item##*---> }"
 
-echo "$main_item" | tr -d '\n' | xclip -selection clipboard
+printf '%s\n' "$main_item" | tr -d '\n' | xclip -selection clipboard
 ctc_msg "$main_item" && accomplished
 exit
 
-############################################
-
-print line 5 [i]  ---> sed '21q;d'
-print line 5 [ii] ---> awk NR==21
+[COMMANDS START]
+print line 5 [i]  ---> sed '5q;d'
+print line 5 [ii] ---> awk NR==5
 print last line ---> sed -e '$!d'
 remove first line ---> sed '1d'
 remove last line ---> sed '$d'
 remove lines 1 to 3 ---> sed '1,3d'
-print columns 4 and 5 ---> awk '{ print $4 " " $5 }'
-remove columns 1 and 2 ---> awk '{ $1=$2=""; print $0 }'
+print columns 4 and 5 ---> awk '{ print $4 " " $5 }'  ## NOTE do NOT replace " with '
+remove columns 1 and 2 ---> awk '{ $1=$2=""; print $0 }'  ## NOTE do NOT replace " with '
 print last column ---> awk '{ print $NF }'
 remove last column ---> sed -r 's/\s+\S+$//'
 print first n characters (X is your number) ---> cut -c 1-X
-print last n characters (X is your number) ---> "${<variable>:(-X)}"
+print last n characters (X is your number) ---> "${VAR:(-X)}"
 remove first 6 letters of each line ---> cut -c 6-
 remove last 6 letters of each line ---> sed 's/.\{6\}$//'
 remove empty lines [i]  ---> sed '/^$/d'
 remove empty lines [ii] ---> awk NF
-remove one line before a string ---> sed -ni '/<string>/{x;d;};1h;1!{x;p;};${x;p;}'
-remove one line after  a string ---> sed -i '/<string>/{N;s/\n.*//;}'
+remove one line before a string ---> sed -ni '/STRING/{x;d;};1h;1!{x;p;};${x;p;}'
+remove one line after  a string ---> sed -i '/STRING/{N;s/\n.*//;}'
 
-remove suffix ---> "${<variable>%<suffix>}"
-remove prefix ---> "${<variable>#<prefix>}"
-remove long suffix  ---> "${<variable>%%<suffix>}"
-remove long prefix  ---> "${<variable>##<prefix>}"
-replace first match ---> "${<variable>/<first-match>/<substitute>}"
-replace all ---> "${<variable>//<first-match>/<substitute>}"
-replace suffix ---> "${<variable>/%<suffix>/<substitute>}"
-replace prefix ---> "${<variable>/#<prefix>/<substitute>}"
-replace all the initial occurences of a string [i]  --> sed 's/^<string>*/<substitute>/'
-replace all the initial occurences of a string [ii] --> sed 's/^\(<string>\)*/<substitute>/'
-reverse-case first character ---> "${<variable>~}"
-reverse-case all characters ---> "${<variable>~~}"
-print extension ---> "${<variable>##*.}"
-remove extension ---> "${<variable>%.*}"
+remove prefix       ---> "${VAR#PREFIX}"   ## "${x#*/}"  turns a/b/c/d  to  b/c/d
+remove long prefix  ---> "${VAR##PREFIX}"  ## "${x##*/}" turns a/b/c/d  to  d      ## JUMP_1
+remove suffix       ---> "${VAR%SUFFIX}"   ## "${x%/*}"  turns a/b/c/d  to  a/b/c  ## JUMP_2
+remove long suffix  ---> "${VAR%%SUFFIX}"  ## "${x%%/*}" turns a/b/c/d  to  a
 
-remove after the last occurrence of a character [i]   ---> sed 's/\(.*\)<character>.*/\1/'
-remove after the last occurrence of a character [ii]  ---> sed 's/<character>[^<character>]*$//'
-remove after the last occurrence of a character [iii] ---> "${<variable>%<character>*}"
-add string to the end of the line ---> sed 's/$/<string>/'
-add word to the nth column in every line ---> awk '$1=$1"-word"'
+print extension ---> "${VAR##*.}"  ## JUMP_1
+remove extension ---> "${VAR%.*}"  ## JUMP_2
+
+replace first match ---> "${VAR/FIRSTMATCH/SUBSTITUTE}"
+replace all         ---> "${VAR//FIRSTMATCH/SUBSTITUTE}"
+replace suffix      ---> "${VAR/%SUFFIX/SUBSTITUTE}"
+replace prefix      ---> "${VAR/#PREFIX/SUBSTITUTE}"
+
+reverse-case first character ---> "${VAR~}"
+reverse-case all characters  ---> "${VAR~~}"
+replace all the initial occurences of a string [i]  --> sed 's/^STRING*/SUBSTITUTE/'
+replace all the initial occurences of a string [ii] --> sed 's/^\(STRING\)*/SUBSTITUTE/'
+remove after the last occurrence of a character [i]   ---> sed 's/\(.*\)CHAR.*/\1/'
+remove after the last occurrence of a character [ii]  ---> sed 's/CHAR[^CHAR]*$//'
+remove after the last occurrence of a character [iii] ---> "${VAR%CHAR*}"
+add string to the end of the line ---> sed 's/$/STRING/'
+add word to the nth column in every line ---> awk '$1=$1"-word"'  ## NOTE do NOT replace " with '
 replace lowercase with uppercase ---> sed 's/[a-z]/\U&/g'
 replace uppercase with lowercase ---> sed 's/[A-Z]/\L&/g'
 print number of lines ---> sed -n '$='
-set delimiter X and print column 2 [i]  ---> cut -d "<delimiter>" -f 2
-set delimiter X and print column 2 [ii] ---> awk -F[<delimiter>] '{ print $2 }'
+set delimiter X and print column 2 [i]  ---> awk -F 'DELIMITER' '{print $2}'
+set delimiter X and print column 2 [ii] ---> cut -d 'DELIMITER' -f 2
 make first letter capital ---> sed 's/.*/\u&/'
 sort alphabetically ---> sort
-replace the first occurrence ---> sed -e '0,/<string>/ s/<string>/<substitute>/'
-show the line that starts with a string (it is case-sensitive) ---> awk '/^<string>/'
+replace the first occurrence ---> sed -e '0,/STRING/ s/STRING/SUBSTITUTE/'
+show the line that starts with a string (it is case-sensitive) ---> awk '/^STRING/'
 print before a string ---> ??
 only print numbers (each in a separate line) [i]  ---> grep -io '[0-9]*'
 only print numbers (each in a separate line) [ii] ---> grep -io -P '\d*'
 print string between Y and Z [i]  ---> grep -ioP '(?<=Y).*?(?=Z)'
 print string between Y and Z [ii] ---> grep -ioP 'Y\K.*?(?=Z)'
-print extension ---> "${<variable>##*.}"
-remove extension ---> "${<variable>%.*}"
-print next word after a string [i]  ---> awk '{for(i=1;i<=NF;i++) if ($i=="<string>") print $(i+1)}'
-print next word after a string [ii] ---> grep -oP "(?<=<string> )[^ ]+"
+print next word after a string [i]  ---> awk '{for(i=1;i<=NF;i++) if ($i=="STRING") print $(i+1)}'  ## NOTE do NOT replace " with '
+print next word after a string [ii] ---> grep -oP '(?<=STRING )[^ ]+'
 grep and awk (awk is case-sensitive) ---> grep -i <string> = awk '/<string>/'
-make awk case-insensitive [i]  ---> awk '{IGNORECASE=1} <command> ;'
-make awk case-insensitive [ii] ---> awk 'tolower($0) ~ <command>'
-add string to the second line ---> awk 'NR==1{print; print "<string>"} NR!=1'
+make awk case-insensitive [i]  ---> awk '{IGNORECASE=1} MYCOMMAND ;'
+make awk case-insensitive [ii] ---> awk 'tolower($0) ~ MYCOMMAND'
+add string to the second line ---> awk 'NR==1{print; print "STRING"} NR!=1'  ## NOTE do NOT replace " with '
 print after the last / ---> "${x##*/}" = basename "$x"
-remove/replace n characters before a string ---> sed -e 's/.\{<number>\}<string>/<substitute>/'
-keep from nth character until nth character (and repeat) ---> "${<var>:0:9}${<var>:13:8}"
-uppercase variable's first letter ---> echo "${<var>^}"
-uppercase variable's all letters  ---> echo "${<var>^^}"
-lowercase variable's first letter ---> echo "${<var>,}"
-lowercase variable's all letters  ---> echo "${<var>,,}"
+remove/replace n characters before a string ---> sed -e 's/.\{NUMBER\}STRING/SUBSTITUTE/'
+keep from nth character until nth character (and repeat) ---> "${VAR:0:9}${VAR:13:8}"
+uppercase variable's first letter ---> printf '%s\n' "${VAR^}"
+uppercase variable's all letters  ---> printf '%s\n' "${VAR^^}"
+lowercase variable's first letter ---> printf '%s\n' "${VAR,}"
+lowercase variable's all letters  ---> printf '%s\n' "${VAR,,}"
 print 1-2-3-4-5-6-7-8-9-10 ---> seq -s - 10
-add column from another file ---> paste -d' ' <file1> <file2>
-clears the line ---> printf "\33[A"
-fading line  ---> for i in {17..20} {19..17} ; do echo -ne "\e[38;5;${i}m-\e[0m" ; done ; echo
-to not show errors ---> <command> 2>/dev/null
-check if root ---> if [ "$EUID" -ne "0" ]; then echo "You are not root"; fi
-: (called null command) [i]   ---> The : command (which equals the command true) means do nothing, and its exit status (i.e. "$?") is true (i.e. 0)
-: (called null command) [ii]  ---> Example 1: while : equals while true
-: (called null command) [iii] ---> Example 2: if [ <condition> ]; then : ; else <command> ; fi
-print "These" "words" "are" "quoted" ---> echo \"{These,words,are,quoted}\"
-print function name ---> myfunction(){ echo "This function is $FUNCNAME" ;} ; myfunction
+add column from another file ---> paste -d' ' <FILE1> <FILE2>
+clears the line ---> printf '\33[A'
+print function name ---> function myfunction { printf 'This function is %s\n' "$FUNCNAME" ;} ; myfunction
 print lines with whose length are between 10 to 20 ---> grep -x '.\{10,20\}'
-generate random number ---> echo $((1 + "$RANDOM" % 1000))
-sequence [i]   ---> for i in `seq 1 10` ; do <command> ; done
-sequence [ii]  ---> for i in {1..10} ; do <command> ; done
-sequence [iii] ---> for i in $(seq 10) ; do <command> ; done
-mutt pattern ---> echo "<message body>" | mutt -s "<subject>" <recepient-email> -a <file-to-attach>
-type unicode characters ---> crl + shift + u + <hexadecimal digits>
+generate random number ---> let var="$RANDOM % 1000"
+sequence [i]   ---> for i in `seq 1 10`; { MYCOMMAND ;}
+sequence [ii]  ---> for i in {1..10}   ; { MYCOMMAND ;}
+sequence [iii] ---> for i in $(seq 10) ; { MYCOMMAND ;}
+mutt pattern ---> printf '%s\n' 'MESSAGEBODY' | mutt -s 'SUBJECT' RECEPIENTEMAIL -a FILE
+type unicode characters ---> crl + shift + u + HEXADECIMALDIGITS
 close terminal without terminating tasks ---> disown -a && exit
 system clock ---> timedatectl status
-print variable length [i]  ---> echo "${#<variable>}"
-print variable length [ii] ---> echo -n "$<variable>" | wc -c
-arrays ---> arr=()          create an empty array
-arrays ---> arr=(1 2 3)     initialize array
-arrays ---> "${arr[2]}"     retrieve third element
-arrays ---> "${arr[@]}"     retrieve all elements
-arrays ---> "${!arr[@]}"    retrieve array indices
-arrays ---> "${#arr[@]}"    calculate array size
-arrays ---> arr[0]=3        overwrite 1st element
-arrays ---> arr+=(4)        append value(s)
-arrays ---> str="$(ls)"     save ls output as a string
-arrays ---> arr=( $(ls) )   save ls output as an array of files
-arrays ---> "${arr[@]:x:n}" retrieve n elements starting at index x
-remove first element of array ($ and {} NOT needed) ---> unset "<ARRAY>[0]"
-remove last element of array ($ and {} NOT needed) ---> unset "<ARRAY>[-1]"
-assign a member of array to a variable ($ and {} needed) ---> <var>="${<ARRAY>[-2]}"
-setaf syntax (https://linux.101hacks.com/ps1-examples/prompt-color-using-tput/) ---> echo (tput setaf 0) <text> (tput sgr0)
-diff the output of two commands ---> diff <(<command1>) <(<command2>)
-print sth on the right in bash (align right) ---> printf "%*s\n" "$COLUMNS" "<string>"
+print variable length [i]   ---> printf '%s\n' "${#VAR}"
+print variable length [ii]  ---> printf '%s' "$VAR" | wc -c  ## NOTE no \n
+print variable length [iii] ---> echo -n "$VAR" | wc -c
+arrays ---> ARRAY=()             create an empty array
+arrays ---> declare -a ARRAY=()  create an empty array (local)
+arrays ---> ARRAY=(1 2 3)        initialize array
+arrays ---> "${ARRAY[2]}"        retrieve third element
+arrays ---> "${ARRAY[@]}"        retrieve all elements
+arrays ---> "${!ARRAY[@]}"       retrieve array indices
+arrays ---> "${#ARRAY[@]}"       calculate array size
+arrays ---> ARRAY[0]=3           overwrite 1st element
+arrays ---> ARRAY+=(4)           append value(s)
+arrays ---> STRING="$(ls)"       save ls output as a string
+arrays ---> ARRAY=( $(ls) )      save ls output as an array of files
+arrays ---> "${ARRAY[@]:x:n}"    retrieve n elements starting at index x
+remove first element of array ($ and {} NOT needed) ---> unset 'ARRAY[0]'
+remove last element of array ($ and {} NOT needed) ---> unset 'ARRAY[-1]'
+assign a member of array to a variable ($ and {} needed) ---> VAR="${ARRAY[-2]}"
+diff the output of two commands ---> diff <(MYCOMMAND1) <(MYCOMMAND2)
+print sth on the right in bash (align right) ---> printf '%*s\n' "$COLUMNS" 'STRING'
 make read input invisible when entering ---> -s
 make read input 1 character long ---> -n 1
-make sure read input is a number ---> while [ ! "$number" =~ ^[0-9]+$ ]; do read -p "> Numbers only. Try again: " number ; printf "\33[A" ; done ; echo
-make sure read input is a letter ---> while [ ! "$letter" =~ ^[a-Z]+$ ]; do read -p "> Letters only. Try again: " letter ; printf "\33[A" ; done ; echo
-erase everything on the line, regardless of cursor position ---> printf "\33[A" OR echo -en "\033[1K\r" OR echo -en "\033[2K"
-print emoji ---> echo -e '\u'<code>
+make sure read input is a number ---> while [ ! "$number" =~ ^[0-9]+$ ]; do read -p '> Numbers only. Try again: ' number ; printf '\33[A' ; done ; printf '\n'
+make sure read input is a letter ---> while [ ! "$letter" =~ ^[a-Z]+$ ]; do read -p '> Letters only. Try again: ' letter ; printf '\33[A' ; done ; printf '\n'
+erase everything on the line, regardless of cursor position ---> printf '\33[A' OR echo -en '\e[1K\r' OR echo -en '\e[2K'
+print emoji ---> echo -e '\u'CODE  ## what about printf?
 clear ---> printf \\e[2J\\e[H\\e[m # = clear
 ignore terminal interrupt (CTRL+C, SIGINT) ---> trap '' INT
-call a function or do a command on window resize ---> trap '<COMMAND or FUNCTION>' SIGWINCH
-do something before every command ---> trap '<COMMAND>' DEBUG
-do something when a shell function or a sourced file finishes executing ---> trap '<COMMAND>' RETURN
-get terminal columns [i]  ---> echo "$(tput cols)"
-get terminal columns [ii] ---> echo "$COLUMNS"
-convert ---> convert <SOURCE_IMAGE> -verbose -resize <WIDTH(xHEIGHT)>\> <DEST_PATH>
-in terminal [i]   ---> !<command>       runs the commands as it was last run (with all the flags, etc)
+call a function or do a command on window resize ---> trap 'MYCOMMAND OR MYFUNCTION' SIGWINCH
+do something before every command ---> trap 'MYCOMMAND' DEBUG
+do something when a shell function or a sourced file finishes executing ---> trap 'MYCOMMAND' RETURN
+get terminal columns [i]  ---> printf '%s\n' "$(tput cols)"
+get terminal columns [ii] ---> printf '%s\n' "$COLUMNS"
+in terminal [i]   ---> !MYCOMMAND       runs the commands as it was last run (with all the flags, etc)
 in terminal [ii]  ---> Ctl + u          cut to the beginning
 in terminal [iii] ---> Ctl + k          cut to the end
 in terminal [iv]  ---> Ctl + y          paste
@@ -152,31 +145,76 @@ in terminal [vii] ---> Alt + Shift + 3  comment the command and run it
 http torsocks ---> http_proxy=socks5://127.0.0.1:9050 torsocks
 toggle keyboard layout ---> setxkbmap -layout us,ir -option grp:caps_toggle
 show swap files ---> swapon --show
-weather [i]   ---> curl -s wttr.in/$city?format=1  ## or wget -qO-
-weather [ii]  --->   format=1  >> ☀️ +24°C
-weather [iii] --->   format=2  >> ☀️ 🌡️e+24°C 🌬️+↓7km/h
-weather [iv]  --->   format=3  >> $city: ☀️ +24°C
-weather [v]   --->   format=4  >> $city: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
-weather [vi]  --->   format=j1 >> in json format
-                      for parsing the json: format=j1 | jq -rM ."current_condition[0]|(.temp_C)"  ## <--,-- (https://www.youtube.com/watch?v=_Xm3HYGW3lg)
-                                                                                                  ##    |-- NOTE: no space after .
-                                                                                                  ##    |-- -r removes quotes, -M gives monochrome output
-                                                                                                  ##    |-- also: (.weatherDesc[0].value)
-                                                                                                  ##    \-- to combine: (.temp_C,.humidity)
-weather [vii] ---> curl -s wttr.in/$city?format=%t+%h+%p >> +10°C 54% 0.0mm
-delete duplicate, nonconsecutive and nonempty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq <FILE>
+delete duplicate, nonconsecutive and nonempty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq FILE
 ddpattern ---> sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
 turn off screensaver ---> xset s 0 0 && xset -dpms
 expand alias in script: ---> shopt -s expand_aliases (put it at the top of script)
 stop pop sound ---> add 'options snd-hda-intel power_save=0 power_save_controller=N' to the end of /etc/modprobe.d/alsa-base.conf
-repeated character (https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html) ---> dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"
-chack if variable is a number [i]  ---> re="^[0-9]+$"; [[ "$variable" =~ $re ]] && echo "number" || echo "no number"  ## do not replace [[ with [, and do NOT quote $re
-chack if variable is a number [ii] ---> [ "$variable" -eq "$variable" ] 2>/dev/null && echo "number" || echo "no number"
-chack if variable matches pattern ---> re="*abc*"; [[ "$variable" == $re ]] && echo "match"  ## do not replace [[ with [, and do NOT quote $re
+repeated character (https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html) ---> dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"  ## NOTE do NOT replace double quote with single quote
+chack if variable is a number [i]  ---> re='^[0-9]+$'; if [[ "$VAR" =~ $re ]]; then printf '%s\n' 'number'; else printf '%s\n' 'not number'; fi  ## NOTE do not replace [[ with [, and do NOT quote $re
+chack if variable is a number [ii] ---> if [ "$VAR" -eq "$VAR" ] 2>/dev/null; then printf '%s\n' 'number';  else printf '%s\n' 'not number'; fi
+chack if variable matches pattern ---> re='*abc*'; [[ "$VAR" == $re ]] && printf '%s\n' 'match'  ## NOTE do not replace [[ with [, and do NOT quote $re
 newest item in clipboard ---> xclip -o
-join many mp3 files (NOT tested) ---> ffmpeg -f concat -safe 0 -i <(for f in ./*.mp3; do echo "file '$PWD/$f'"; done) -c copy ./output.mp3
+join many mp3 files (NOT tested) ---> ffmpeg -f concat -safe 0 -i <(for f in ./*.mp3; { printf '%s\n' "file '$PWD/$f'" ;} ) -c copy ./output.mp3
 to debug bash script ---> set -x; trap read debug
 ls /usr/share/xsessions/ returns awesome.desktop
-send both stdout and stderr to null ---> >&/dev/null
+send both stdout and stderr to null ---> &>/dev/null OR >&/dev/null
 include stderr as well when piping ---> |& grep something
-colors with span ---> <span background=\"#f3f300\"><span color=\"${orange}\"><TEXT></span></span>
+get service status ---> systemctl --property=Result show tor  ## returns Result=success
+reolution of first framebuffer ---> cat /sys/class/graphics/fb0/virtual_size  ## returns 1366,768
+
+truncate [i]   ---> > FILE
+truncate [ii]  ---> : > FILE
+truncate [iii] ---> true > FILE
+truncate [iv]  ---> cat /dev/null > FILE
+truncate [v]   ---> cp /dev/null FILE
+truncate [vi]  ---> truncate -s 0 FILE
+truncate [vii] ---> dd if=/dev/null of=FILE
+
+weather [i]   ---> curl -s wttr.in/zahedan?format=1  ## or wget -qO-
+weather [ii]  --->   format=1  >> ☀️ +24°C
+weather [iii] --->   format=2  >> ☀️ 🌡️e+24°C 🌬️+↓7km/h
+weather [iv]  --->   format=3  >> zahedan: ☀️ +24°C
+weather [v]   --->   format=4  >> zahedan: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
+weather [vi]  --->   format=j1 >> in json format
+                      for parsing the json: format=j1 | jq -rM ."current_condition[0]|(.temp_C)"  ## <--,-- will single quote work too?
+                                                                                                  ##    |-- (https://www.youtube.com/watch?v=_Xm3HYGW3lg)
+                                                                                                  ##    |-- NOTE: no space after .
+                                                                                                  ##    |-- -r removes quotes, -M gives monochrome output
+                                                                                                  ##    |-- also: (.weatherDesc[0].value)
+                                                                                                  ##    \-- to combine: (.temp_C,.humidity)
+weather [vii] ---> curl -s wttr.in/zahedan?format=%t+%h+%p >> +10°C 54% 0.0mm
+
+print lines between two phrases ---> sed -n '/PHRASE1/,/PHRASE2/p' PATH
+get installation date ---> stat / | grep 'Birth'
+get signal names and integers ---> kill -l
+insert string before 3rd line ---> sed '3i\STRING'
+insert string after 3rd line ---> sed '3a\STRING'
+insert string before lines containing pattern (e.g. book) ---> sed '/PATTERN/i\STRING'
+insert string after lines containing pattern (e.g. book) ---> sed '/PATTERN/a\STRING'
+check if array is full  ---> [ "$ARRAY" ] && MYCOMMAND  ## no need to [@]
+check if array is empty ---> [ ! "$ARRAY" ] && MYCOMMAND  ## no need to [@]
+create var using printf ---> printf -v VAR 'STRING'/NUMBER
+insert commas into number ---> printf "%'d\n" NUMBER  ## returns 5,364,536  ## NOTE do NOT change quotes
+turn seconds (obtained with $(date +%s) or printf '%(%s)T\n') into a date format ---> printf '%(%F %X)T\n' SECONDS  ## returns 1971-09-14 12:59:24 AM
+uniq lines [i]  ---> | sort -u
+uniq lines [ii] ---> | sort | uniq
+list fonts ---> fc-list -f '%{file}\n'
+
+baskreference ---> [[ 'this is a random string' =~ ^this\ is\ (.*)\ st(ri)ng$ ]]
+                   printf '%s\n' "${BASH_REMATCH[0]}"  ## returns this is a random string
+                   printf '%s\n' "${BASH_REMATCH[1]}"  ## returns a random
+                   printf '%s\n' "${BASH_REMATCH[2]}"  ## returns ri
+
+ignore leading whitespaces/tabs when using EOF:
+cat <<-'EOF' > FILE
+    #!/usr/bin/env bash
+    printf '%s\n' 'STRING'
+EOF
+
+join multiple videos ---> ## https://askubuntu.com/questions/637074/how-to-merge-multiple-more-than-two-videos-on-ubuntu
+VID_1="PATH_1"; VID_1_TS="${VID_1}.ts"; ffmpeg -i "$VID_1" -c copy -f mpegts "$VID_1_TS" 2>/dev/null
+VID_2="PATH_2"; VID_2_TS="${VID_2}.ts"; ffmpeg -i "$VID_2" -c copy -f mpegts "$VID_2_TS" 2>/dev/null
+VID_3="PATH_3"; VID_3_TS="${VID_3}.ts"; ffmpeg -i "$VID_3" -c copy -f mpegts "$VID_3_TS" 2>/dev/null
+output="PATH_4"; ffmpeg -i "concat:${VID_1_TS}|${VID_2_TS}|${VID_3_TS}" "$output" 2>/dev/null
+

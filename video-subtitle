@@ -1,218 +1,179 @@
 #!/usr/bin/env bash
 source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-color
 
 trap 'width="$(tput cols)"' SIGWINCH
 
-function help(){ source "$HOME"/scripts/.help; video_subtitle_help ;}
+function display_help {
+    source "$HOME"/scripts/.help
+    video_subtitle_help
+}
 
-function prompt(){
-    for args in "$@"; do
+function prompt {
+    for args in "$@"; {
         case "$1" in
-            -d ) [ ! "$dir" ] && get_input "Dir (e.g. lucy)" && dir="$input" ;;
+            -d ) [ ! "$dir" ] && get_input 'Dir' && dir="$input"
+                 [ ! -d "$dir" ] && red ' No such dir' && exit
         esac
         shift
-    done ;}
+    }
+}
 
-function line(){
-    width="$(tput cols)"
-    echo -e "$(grey "$(printf "%${width}s\n" | sed "s/ /▬/g")")" ;}
+function get_opts {
+    while getopts 'hd:' flag; do
+        case "$flag" in
+            h ) display_help  ;;
+            d ) dir="$OPTARG" ;;
+        esac
+    done
+}
 
-while getopts 'hd:' flag; do
-    case "$flag" in
-        h ) help          ;;
-        d ) dir="$OPTARG" ;;
-    esac
-done
+get_opts "$@"
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( "replace ' ', ---, -_-, !, %, & and ," "convert vtt to srt" "change srt color to #f3f300" "burn" "remove COMMMMMA and ----BURN" "remove youtube ID" "append random numerical prefixes" "create 0-list" "rename numerically" "help" )
+main_items=( "replace ' ', ---, -_-, !, %, & and ," 'convert vtt to srt' 'change srt color to #f3f300' 'burn' 'remove COMMMMMA and ----BURN' 'remove youtube ID' 'prepend random numbers' 'create 0-list' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    "replace ' ', ---, -_-, !, %, & and ," ) get_single_input " Have you replaced .en.vtt with .vtt?" && rep_en="$single_input"
+    "replace ' ', ---, -_-, !, %, & and ," ) get_single_input ' Have you replaced .en.vtt with .vtt?' && rep_en="$single_input"
                                              case "$rep_en" in
                                                  y ) : ;;
-                                                 * ) exit ;;  ## do NOT remove
+                                                 * ) exit ;;  ## NOTE do NOT remove
                                              esac
 
                                              prompt -d
-                                             [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
 
-                                             echo
-                                             cd "$HOME"/downloads/"$dir"
+                                             printf '\n'
+
                                              replaced_count=0
-                                             files=( $(find . -mindepth 1 -maxdepth 1 | sort) )
-                                             for file in "${files[@]}"; do
+                                             readarray -t files <<< "$(find "$dir" -mindepth 1 -maxdepth 1 | sort)"
+                                             for file in "${files[@]}"; {
                                                  brown "→ $file"
-                                                 new_name="$(echo "$file" | sed -e 's/ /-/g' -e 's/---/--/g' -e 's/-_-/--/g' -e 's/-–-/--/g' -e 's/\!//g' -e 's/\%//g' -e 's/\&/and/g' -e 's/,/COMMMMMA/g')"
+                                                 new_name="$(printf '%s\n' "$file" | \
+                                                             sed -e 's/ /-/g' -e 's/\(---\|-_-\|-–-\|\%\|\!\)//g' -e 's/\&/and/g' -e 's/,/COMMMMMA/g')"
                                                  mv -nv "$file" "$new_name" && accomplished
-                                                 ((replaced_count++))
+                                                 let replaced_count++
                                                  line
-                                                 done
-                                             echo
+                                             }
+                                             printf '\n'
                                              blue "$replaced_count symbols replaced" ;;
-    "convert vtt to srt" ) prompt -d
-                           [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
+    'convert vtt to srt' ) prompt -d
 
-                           echo
-                           cd "$HOME/downloads/$dir"
+                           printf '\n'
                            vtt_count=0
-                           vtts=( $(find . -mindepth 1 -maxdepth 1 -iname "*.vtt" | cut -c 3- | sort) )
-                           for vtt in "${vtts[@]}"; do
+                           readarray -t vtts <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.vtt' | sort)"
+                           for vtt in "${vtts[@]}"; {
                                brown "→ $vtt"
-                               ffmpeg -i "$vtt" "$HOME/downloads/$dir/${vtt%.vtt}.srt" 2>/dev/null && accomplished
-                               ((vtt_count++))
+                               ffmpeg -i "$vtt" "${vtt%.vtt}".srt 2>/dev/null && accomplished
+                               let vtt_count++
                                line
-                           done
-                           echo
+                           }
+                           printf '\n'
                            blue "$vtt_count vtts converted to srt" ;;
-    "change srt color to #f3f300" ) prompt -d
-                                    [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
+    'change srt color to #f3f300' ) prompt -d
 
-                                    echo
-                                    cd "$HOME/downloads/$dir"
+                                    printf '\n'
                                     srt_count=0
-                                    srts=( $(find . -mindepth 1 -maxdepth 1 -iname "*.srt" | cut -c 3- | sort) )
-                                    for srt in "${srts[@]}"; do
+                                    readarray -t srts <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.srt' | sort)"
+                                    for srt in "${srts[@]}"; {
                                         brown "→ $srt"
                                         sed -Ei '/(-->|^$|^[0-9][0-9]*$)/!s/^/<font color="#f3f300">/g' "$srt" && accomplished
-                                        ((srt_count++))
+                                        let srt_count++
                                         line
-                                    done
-                                    echo
+                                    }
+                                    printf '\n'
                                     blue "$srt_count srts changed to #f3f300" ;;
-    burn ) total_start="$(get_datetime "jseconds")"
+    burn ) total_start="$(get_datetime 'jseconds')"
            prompt -d
-           [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
 
-           burn_dir="${dir}-BURN"
-           if [ ! -d "$HOME/downloads/$burn_dir" ]; then
-               mkdir "$HOME/downloads/$burn_dir" && echo " ${HOME}/downloads/${burn_dir} created"
-           else
-               get_single_input "$burn_dir already exists. Continue?" && continue_prompt="$single_input"
-               case "$continue_prompt" in
-                   y ) : ;;
-                   * ) exit ;;  ## do NOT remove
-               esac
-           fi
-
-           echo
-           cd "$HOME/downloads/$dir"
+           printf '\n'
            vid_count=0
-           vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
-           for vid in "${vids[@]}"; do
-               video_start="$(get_datetime "jseconds")"
-               already_burnt="$(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort)"
-               ## "$(wc -l <<< "$(echo "$already_burnt")")" returns 1 even if there are no already_burnt
-               ## so, we have to do this:
-               [ "$already_burnt" ] && already_burnt_count="$(wc -l <<< "$(echo "$already_burnt")")" || already_burnt_count=0
+           readarray -t vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+           for vid in "${vids[@]}"; {
+               SECONDS=0
+               already_burnt_count="$(wc -l < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*----BURN.mp4' | sort))"
 
-               brown "→ $vid $(grey "(#"$(( "$already_burnt_count" + 1 ))" in ${burn_dir})")"
-               no_suff="${vid%.mp4}"
-               HandBrakeCLI -i "$vid" -o "$HOME/downloads/${burn_dir}/${no_suff}----BURN.mp4" --srt-file "${no_suff}.srt" --srt-codeset UTF-8 --srt-lang eng --srt-burn --encoder x264 --audio 1  2>/dev/null && accomplished
-               exit_status="$?"
-               [ "$exit_status" -ne 0 ] && red "burn failed"
-               ((vid_count++))
-               video_end="$(get_datetime "jseconds")"
-               dur="$(day_hour_min_sec "$(( "$video_end" - "$video_start" ))")"
+               brown "→ $vid $(grey "(#"$(( "$already_burnt_count" + 1 ))")")"
+               HandBrakeCLI -i "$vid" -o "${vid%.mp4}----BURN.mp4" --srt-file "${vid%.mp4}.srt" \
+               --srt-codeset UTF-8 --srt-lang eng --srt-burn --encoder x264 --audio 1 2>/dev/null && {
+                   accomplished
+               } || {
+                   red 'burn failed'
+               }
+               let vid_count++
+               dur="$(day_hour_min_sec "$SECONDS")"
                blue "Video burn duration: $dur"
                line
-           done
-           echo
-           blue "$vid_count videos burned"
-           total_end="$(get_datetime "jseconds")"
-           dur="$(day_hour_min_sec "$(( "$total_end" - "$total_start" ))")"
-           blue "Total burn duration: $dur" ;;
-    "remove COMMMMMA and ----BURN" ) prompt -d
-                                     [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
+           }
+           printf '\n'
+           blue "$vid_count videos burned" ;;
+    'remove COMMMMMA and ----BURN' ) prompt -d
 
-                                     echo
-                                     cd "$HOME/downloads/$dir"
+                                     printf '\n'
                                      vids_count=0
-                                     rename_vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
-                                     for rename_vid in "${rename_vids[@]}"; do
+                                     readarray -t rename_vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+                                     for rename_vid in "${rename_vids[@]}"; {
                                          brown "→ $rename_vid"
-                                         new_name="$(echo "$rename_vid" | sed -e 's/COMMMMMA/,/g' -e 's/----BURN//g')"
+                                         new_name="$(printf '%s\n' "$rename_vid" | sed -e 's/COMMMMMA/,/g;s/----BURN//g')"
                                          purple "$(mv -nv "$rename_vid" "$new_name")" && accomplished
-                                         ((vids_count++))
+                                         let vids_count++
                                          line
-                                     done
-
-                                     echo
+                                     }
+                                     printf '\n'
                                      blue "$vids_count videos removed COMMMMMA and ----BURN" ;;
-    "remove youtube ID" ) prompt -d
-                          [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
+    'remove youtube ID' ) prompt -d
 
-                          echo
-                          cd "$HOME/downloads/$dir"
+                          printf '\n'
                           burned_vid_count=0
-                          burned_vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
-                          for burned_vid in "${burned_vids[@]}"; do
+                          readarray -t burned_vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+                          for burned_vid in "${burned_vids[@]}"; {
                               brown "→ $burned_vid"
-                              new_name="$(echo "$burned_vid" | sed -e 's/.\{13\}mp4$/.mp4/')"
+                              new_name="$(printf '%s\n' "$burned_vid" | sed -e 's/.\{13\}mp4$/.mp4/')"
                               purple "$(mv -nv "$burned_vid" "$new_name")" && accomplished
-                              ((burned_vid_count++))
+                              let burned_vid_count++
                               line
-                          done
-                          echo
+                          }
+                          printf '\n'
                           blue "$burned_vid_count youtube IDs removed" ;;
-    "append random numerical prefixes" ) prompt -d
-                                         [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
+    'prepend random numbers' ) prompt -d
 
-                                         echo
-                                         cd "$HOME/downloads/$dir"
-                                         rename_vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
-                                         number_of_vids="${#rename_vids[@]}"
-                                         action_now "Creating list"
-                                         for ((numbers=1; numbers<="$number_of_vids"; numbers++)); do
-                                             echo "$(printf "%03d" "$numbers")" >> /tmp/"$number_of_vids".txt
-                                         done
+                               printf '\n'
+                               readarray -t rename_vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+                               number_of_vids="${#rename_vids[@]}"
 
-                                         action_now "Shuffling"
-                                         shuf /tmp/"$number_of_vids".txt > /tmp/"$number_of_vids"-shuffle.txt
-                                         shuffled_numbers=( $(cat /tmp/"$number_of_vids"-shuffle.txt) )
-                                         vids_count=0
-                                         index=0
-                                         action_now "Renaming"
-                                         for rename_vid in "${rename_vids[@]}"; do
-                                             brown "→ $rename_vid"
-                                             purple "$(mv -nv "$rename_vid" "${shuffled_numbers[$index]}-${rename_vid}")" && accomplished
-                                             ((index++))
-                                             ((vids_count++))
-                                             line
-                                         done
+                               ## create list and rand_list
+                               readarray -t list <<< "$(seq "$number_of_vids")"
 
-                                         rm /tmp/{"$number_of_vids".txt,"$number_of_vids"-shuffle.txt}
-                                         echo
-                                         blue "$vids_count videos renamed randomly" ;;
-    "create 0-list" ) prompt -d
-                      [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
+                               list_length="${#list[@]}"
+                               declare -a rand_list=()
 
-                      echo
-                      cd "$HOME"/downloads/"$dir"
-                      find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort | sed -e 's/---/zzzzz/g' -e 's/--/zzzzz/g' -e 's/-/ /g' -e 's/zzzzz/ - /g' -e 's/\.mp4$//g' > 0-list.txt && accomplished ;;
-    "rename numerically" ) prompt -d
-                           [ ! -d "$HOME/downloads/$dir" ] && red " No such dir" && exit
+                               while [ "$list" ]; do  ## NOTE no need to [@]
+                                   let rand_index="$RANDOM % $list_length"
+                                   rand_member="${list[$rand_index]}"
+                                   rand_list+=( "$rand_member" )
+                                   unset "list[$rand_index]"
+                                   readarray -t list <<< "$(printf '%s\n' "${list[@]}")"
+                                   list_length="${#list[@]}"
+                               done
 
-                           echo
-                           cd "$HOME"/downloads/"$dir"
-                           count=0
-                           index=1
-                           vids=( $(find . -mindepth 1 -maxdepth 1 -iname "*.mp4" | cut -c 3- | sort) )
-
-                           for vid in "${vids[@]}"; do
-                               brown "→ $vid"
-                               vid_new_name="$(printf %0.3d.mp4 "$index")"
-                               purple "$(mv -nv "$vid" "$vid_new_name" 2>/dev/null)" && accomplished
-                               ((index++))
-                               ((count++))
-                               line
-                           done
-                           echo
-                           blue "$count videos renamed numerically" ;;
-    help ) help ;;
+                               ## prepend prefixes
+                               for ((i=0; i<"$number_of_vids"; i++)); {
+                                   cur_vid="${rename_vids[$i]}"
+                                   brown "→ $cur_vid"
+                                   root="${cur_vid%/*}"
+                                   base="${cur_vid##*/}"
+                                   prefix="$(printf '%03d' "${rand_list[$i]}")"
+                                   purple "$(mv -nv "$cur_vid" "${root}/${prefix}-${base}")" && accomplished
+                                   line
+                               }
+                               printf '\n'
+                               blue "$i videos renamed randomly" ;;
+    'create 0-list' ) prompt -d
+                      find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort | \
+                      sed -e 's/---/zzzzz/g;s/--/zzzzz/g;s/-/ /g;s/zzzzz/ - /g' -e 's/\.mp4$//g' -e 's/^.\+\///g' > "$dir"/0-list.txt && accomplished ;;
+    help ) display_help ;;
 esac
 
 exit

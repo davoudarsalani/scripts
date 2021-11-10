@@ -1,88 +1,123 @@
 #!/bin/bash
 source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-audio
 source "$HOME"/scripts/gb-calculation
 
-function help(){ source "$HOME"/scripts/.help; typer_help ;}
+function display_help {
+    source "$HOME"/scripts/.help
+    typer_help
+}
 
-function countdown(){
-    for ((i=10; i>0; i--)); do
-        echo -ne "$(blue "$i")\033[0K\r"
+function countdown {
+    for ((i=10; i>0; i--)); {
+        printf '%s\e[0K\r' "$(blue "$i")"
         sleep 1
-    done ;}
+    }
+}
 
-function sleep_now(){ [ "$slp" == "random" ] && sleep "${times["$(( "$RANDOM" % "$times_length" ))"]}" || sleep "$slp" ;}
+function sleep_now {
+    if [ "$slp" == 'random' ]; then
+        sleep "${intervals["$(( "$RANDOM" % "$intervals_length" ))"]}"
+    else
+        sleep "$slp"
+    fi
+}
 
-function type_in_vim(){
-    total_chars="$(wc -c <<< "$(cat "$file")")"
-    total_chars="$(( "$total_chars" + 100 ))"
+function play_random_key_sound {
+    pacmd play-file "$key_sound" "${key_sounds["$(( "$RANDOM" % "$key_sounds_length" ))"]}" "$def_sink_index"
+}
 
-    ## countdown to wait before starting
+function type_in_vim {
+    let chars_count="$(wc -c < "$file")"
+    # let chars_count+=100  ## add 100 just in case
+
     countdown
 
     ## strike keys
-    for ((j=1; j<="$total_chars"; j++)); do
-        perc="$(( "$j" * 100 / "$total_chars" ))"
-
-        remaining_chars="$(( "$total_chars" - "$j" ))"
-
-        eta_mid="$(float_pad "${remaining_chars}*${times_middle_member}")"
+    for ((i=1; i<="$chars_count"; i++)); {
+        let perc="$i * 100 / $chars_count"
+        let remaining_chars="$chars_count - $i"
+        eta_mid="$(float_pad "${remaining_chars}*${intervals_middle_member}")"
         eta_mid_conv="$(day_hour_min_sec "$eta_mid")"
 
-        echo -ne "$(green "${j}/${total_chars}") $(yellow "${perc}%") $(brown "ETA: ${eta_mid_conv}")\033[0K\r"
+        printf '%s %s %s\e[0K\r' "$(green "${i}/${chars_count}")" "$(yellow "${perc}%")" "$(brown "eta: ${eta_mid_conv}")"
 
         xdotool key c
-        sleep_now
-    done
-    echo
+        play_random_key_sound && sleep_now
+    }
+    printf '\n'
 
-    accomplished "Done. Press Ctrl+C in vim to exit" ;}
+    accomplished 'Done. Press Ctrl+C in vim to exit'
+}
 
-function type_in_terminal(){  ## by Metalx1000 (https://pastebin.com/Uqf6DPmZ)
+function type_in_terminal {  ## by Metalx1000 (https://pastebin.com/Uqf6DPmZ)
+    clear
     while read line; do  ## read file one line at a time
         lines_count="${#line}"
-        for ((i=0; i<"$lines_count"; i++)); do  ## read line one character at a time
-            echo -n "${line:$i:1}"
-            sleep_now
-        done
-        echo
-    done < "$file" ;}
+        for ((i=0; i<"$lines_count"; i++)); {  ## read line one character at a time
+            printf '%s' "${line:$i:1}"  ## NOTE no \n
+            play_random_key_sound && sleep_now
+        }
+        printf '\n'
+    done < "$file"
+}
 
-function prompt(){
-    for args in "$@"; do
+function prompt {
+    for args in "$@"; {
         case "$1" in
-            -f ) [ ! "$file" ] && get_input "File"                             && file="$input" ;;
-            -s ) [ ! "$slp"  ] && get_input "Sleep (e.g. 0.2, 1, random, etc)" && slp="$input" ;;
+            -f ) [ ! "$file" ] && get_input 'File'                             && file="$input" ;;
+            -s ) [ ! "$slp"  ] && get_input 'Sleep (e.g. 0.2, 1, random, etc)' && slp="$input" ;;
         esac
         shift
-    done ;}
+    }
+}
 
-while getopts 'hf:s:' flag; do
-    case "$flag" in
-        h ) help           ;;
-        f ) file="$OPTARG" ;;
-        s ) slp="$OPTARG"  ;;
-    esac
-done
+function get_opts {
+    while getopts 'hf:s:' flag; do
+        case "$flag" in
+            h ) display_help   ;;
+            f ) file="$OPTARG" ;;
+            s ) slp="$OPTARG"  ;;
+        esac
+    done
+}
 
-IFS=  ## prevent leading spaces from being ignored (https://stackoverflow.com/questions/29689172/bash-read-ignores-leading-spaces)
-times=( 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 0.2 0.3 )
-times_length="${#times[@]}"
-times_middle_member="${times["$(( "$times_length" / 2 ))"]}"
+get_opts "$@"
+
+IFS=   ## prevent leading spaces from being ignored (https://stackoverflow.com/questions/29689172/bash-read-ignores-leading-spaces)
+intervals=(
+    0.05
+    0.06
+    0.07
+    0.08
+    0.09
+    0.1
+    0.2
+    0.3
+)
+intervals_length="${#intervals[@]}"
+intervals_middle_member="${intervals["$(( "$intervals_length" / 2 ))"]}"
+
+key_sounds=(
+    "$HOME"/linux/sounds/key_press_1.wav
+    "$HOME"/linux/sounds/key_press_1_dance.wav
+    "$HOME"/linux/sounds/key_press_2.wav
+    "$HOME"/linux/sounds/key_press_2_fullbase.wav
+)
+key_sounds_length="${#key_sounds[@]}"
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( "in vim" "in terminal" "help" )
+main_items=( 'in vim' 'in terminal' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    "in vim" ) prompt -f
-               prompt -s
+    'in vim' ) prompt -f -s
                type_in_vim ;;
-    "in terminal" ) prompt -f
-                    prompt -s
+    'in terminal' ) prompt -f -s
                     type_in_terminal ;;
-    help ) help ;;
+    help ) display_help ;;
 esac
 
 exit

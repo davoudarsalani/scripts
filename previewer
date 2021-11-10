@@ -1,31 +1,36 @@
 #!/usr/bin/env bash
 
-function hi_li(){ eval "$HIGHLIGHT" "$1" 2>/dev/null ;}
-function me_in(){ mediainfo "$1" ;}
+function hi_li {
+    eval "$HIGHLIGHT" "$1" 2>/dev/null  ## NOTE do not replace 2 with &
+}
+
+function me_in {
+    mediainfo "$1"
+}
 
 attr="$(lsattr "$1" | awk '{print $1}')"
 file_mime_type="$(file --mime-type "$1" -bL)"
-sep="\n\n"
 
 case "$file_mime_type" in
-    audio/* )            echo -e "${attr} ${file_mime_type}${sep}$(me_in "$1")" ;;  # | sed 's/\s\+:\s/: /g')"
-    video/* )            echo -e "${attr} ${file_mime_type}${sep}$(me_in "$1")" ;;  # | sed 's/\s\+:\s/: /g')"
-    text/* )             echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
-    application/json )   echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
-    application/csv )    echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
-    message/news )       echo -e "${attr} ${file_mime_type}${sep}$(hi_li "$1")" ;;
-    */octet-stream )     echo -e "${attr} ${file_mime_type}${sep}" ;;
-    application/msword ) echo -e "${attr} ${file_mime_type}${sep}" ;;
-    */*spreadsheet* )    echo -e "${attr} ${file_mime_type}${sep}" ;;
-    */*officedocument* ) echo -e "${attr} ${file_mime_type}${sep}" ;;
-    */pdf)               echo -e "${attr} ${file_mime_type}${sep}" ;;
-    image/* )            echo -e "${attr} ${file_mime_type}${sep}$(me_in "$1")" ;;  # | sed 's/\s\+:\s/: /g')"
-    */*tar )             echo -e "${attr} ${file_mime_type}${sep}$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
-    */gzip )             echo -e "${attr} ${file_mime_type}${sep}$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
-    *bzip2 )             echo -e "${attr} ${file_mime_type}${sep}" ;;
-    */zip )              echo -e "${attr} ${file_mime_type}${sep}$(unzip -l "$1" | sed '1,3d' | awk '{print $4}' | sed '/^$/d' | sort)" ;;
-    */*rar )             echo -e "${attr} ${file_mime_type}${sep}$(unrar l "$1" | sed '1,8d' | head -n -3 | awk '{print $NF}' | sort)" ;;
-    * )                  echo -e "${attr} ${file_mime_type}${sep}" ;;
+    audio/* )            printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
+    video/* )            printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
+    text/* )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    application/json )   printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    application/csv )    printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    message/news )       printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    */octet-stream )     printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    application/msword ) printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */*spreadsheet* )    printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */*officedocument* ) printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */pdf)               printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    image/* )            printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
+    */*tar )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+    */gzip )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+    *bzip2 )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */zip )              printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unzip -l "$1" | sed '1,3d' | awk '{print $4}' | sed '/^$/d' | sort)" ;;
+    */*rar )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unrar l "$1" | sed '1,8d' | head -n -3 | awk '{print $NF}' | sort)" ;;
+    */*iso*image)        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    * )                  printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
 esac
 
 exit

@@ -1,180 +1,185 @@
 #!/usr/bin/env bash
 source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-color
 shopt -s globstar  ## is it needed?
 
-function help(){ source "$HOME"/scripts/.help; application_help ;}
+function display_help {
+    source "$HOME"/scripts/.help
+    application_help
+}
 
-function prompt(){
-    for args in "$@"; do
+function prompt {
+    for args in "$@"; {
         case "$1" in
-            -p ) [ ! "$package" ] && get_input "Package name" && package="$input" ;;
-            -u ) [ ! "$unit"    ] && get_input "Unit name"    && unit="$input"    ;;
+            -p ) [ ! "$package" ] && get_input 'Package name' && package="$input" ;;
+            -u ) [ ! "$unit"    ] && get_input 'Unit name'    && unit="$input"    ;;
         esac
         shift
-    done ;}
+    }
+}
 
-while getopts 'hp:u:' flag; do
-    case "$flag" in
-        h ) help              ;;
-        p ) package="$OPTARG" ;;
-        u ) unit="$OPTARG"    ;;
-    esac
-done
+function get_opts {
+    while getopts 'hp:u:' flag; do
+        case "$flag" in
+            h ) display_help      ;;
+            p ) package="$OPTARG" ;;
+            u ) unit="$OPTARG"    ;;
+        esac
+    done
+}
+
+get_opts "$@"
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( "install" "remove" "packages" "clear cache and clipboard" "update" "rank mirrors" "restore pacman database" "systemd" "systemctl" "help" )
+main_items=( 'install' 'remove' 'packages' 'clear cache and clipboard' 'update' 'restore pacman database' 'systemd' 'systemctl' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    install ) install_items=( "pacman" "yay" "yay + torsocks" "local" "download (no install)" "reinstall all packages" "lts kernel & header" "search: normal" "search: detailed summary" "search: in local repository" )
+    install ) install_items=( 'pacman' 'yay' 'yay + torsocks' 'local' 'download (no install)' 'reinstall all packages' 'lts kernel & header' 'search: normal' 'search: detailed summary' 'search: in local repository' )
               install_item="$(pipe_to_fzf "${install_items[@]}")" && wrap_fzf_choice "$install_item" || exit 37
 
               case "$install_item" in
                   pacman ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S --needed ;;
                   yay ) yay -Slq | fzf --preview 'yay -Si {1}' | xargs -ro yay --sortby name --topdown --nodiffmenu --noeditmenu -a --answerclean All --removemake && accomplished ;;
-                  "yay + torsocks" ) yay -Slq | fzf --preview 'yay -Si {1}' | xargs -ro torsocks yay --sortby name --topdown --nodiffmenu --noeditmenu -a --answerclean All --removemake && accomplished ;;
-                  local ) prompt -pi
+                  'yay + torsocks' ) yay -Slq | fzf --preview 'yay -Si {1}' | xargs -ro torsocks yay --sortby name --topdown --nodiffmenu --noeditmenu -a --answerclean All --removemake && accomplished ;;
+                  local ) prompt -p
                           sudo pacman -U "$package" && accomplished ;;
-                  "download (no install)" ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Sw && accomplished ;;
-                  "reinstall all packages" ) get_single_input "You sure?" "red_blink" && reinstall_prompt="$single_input"
+                  'download (no install)' ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Sw && accomplished ;;
+                  'reinstall all packages' ) get_single_input 'You sure?' && reinstall_prompt="$single_input"
                                              case "$reinstall_prompt" in
                                                  y ) sudo pacman -Qnq | pacman -S - && accomplished ;;
                                              esac ;;
-                  "lts kernel & header" ) get_single_input "Start?" "red_blink" && start_prompt="$single_input"
+                  'lts kernel & header' ) get_single_input 'Start?' && start_prompt="$single_input"
                                           case "$start_prompt" in
-                                              y ) action_now "Installing"
+                                              y ) action_now 'Installing'
                                                   sudo pacman -S --needed linux-lts linux-lts-headers
-                                                  echo
-                                                  get_single_input "Update bootloader?" && update_prompt="$single_input"
+                                                  printf '\n'
+                                                  get_single_input 'Update bootloader?' && update_prompt="$single_input"
                                                   case "$update_prompt" in
-                                                      y ) action_now "Updating bootloader"
-                                                          sudo grub-mkconfig -o /boot/grub/grub.cfg && accomplished "Please reboot now.\n  You can choose linux-lts in grub menu when booting.\n  You can remove the latest kernel after reboot." ;;
+                                                      y ) action_now 'Updating bootloader'
+                                                          sudo grub-mkconfig -o /boot/grub/grub.cfg && accomplished 'Please reboot now.\n  You can choose linux-lts in grub menu when booting.\n  You can remove the latest kernel after reboot.' ;;
                                                   esac ;;
                                           esac ;;
-                  "search: normal" ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro pacman -Ss && accomplished ;;
-                  "search: detailed summary" ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro pacman -Si && accomplished ;;
-                  "search: in local repository" ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro pacman -Qs && accomplished ;;
+                  'search: normal' ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro pacman -Ss && accomplished ;;
+                  'search: detailed summary' ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro pacman -Si && accomplished ;;
+                  'search: in local repository' ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro pacman -Qs && accomplished ;;
               esac ;;
-    remove ) remove_items=( "normal" "with all dependencies" "forceful" "yay" "latest kernel" )
+    remove ) remove_items=( 'normal' 'with all dependencies' 'forceful' 'yay' 'latest kernel' )
              remove_item="$(pipe_to_fzf "${remove_items[@]}")" && wrap_fzf_choice "$remove_item" || exit 37
 
              case "$remove_item" in
                  normal ) pacman -Qq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Rns && accomplished ;;  ## s removes dependencies not being used by other packages, and n removes package configuration files
-                 "with all dependencies" ) pacman -Qq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Rnsc && accomplished ;;  ## Be careful. c removes needed dependencies, too. (NOTE: Maybe n is not needed here.)
+                 'with all dependencies' ) pacman -Qq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Rnsc && accomplished ;;  ## Be careful. c removes needed dependencies, too. (NOTE: Maybe n is not needed here.)
                  forceful ) pacman -Qq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Rdd && accomplished ;;  ## Be careful. It forcefully removes a package required by another package, without removing the dependent package.
                  yay ) yay -Qem | fzf --preview 'yay -Si {1}' | xargs -ro yay -Rns && accomplished ;;  ## also -Qqem and -Qqm
-                 "remove latest kernel" ) sudo pacman -R linux && accomplished ;;
+                 'remove latest kernel' ) sudo pacman -R linux && accomplished ;;
              esac ;;
-    packages ) packages_items=( "count" "names" "AUR packages" "pacman tools" "system stats (using yay)" )
+    packages ) packages_items=( 'count' 'names' 'AUR packages' 'pacman tools' 'system stats (using yay)' )
                packages_item="$(pipe_to_fzf "${packages_items[@]}")" && wrap_fzf_choice "$packaegs_item" || exit 37
 
                case "$packages_item" in
-                   count ) pkg_count="$(wc -l <<< "$(pacman -Q)")"
-                           echo "$pkg_count" && accomplished ;;
+                   count ) pkg_count="$(wc -l < <(pacman -Q))"
+                           printf '%s\n' "$pkg_count" && accomplished ;;
                    names ) pacman -Q | fzf --preview 'pacman -Si {1}' && accomplished ;;
-                   "AUR packages" ) pacman -Qem | fzf --preview 'yay -Si {1}' && accomplished ;;  ## also -Qqem and -Qqm
-                   "pacman tools" ) pacman -Ql pacman | \grep -E 'bin/.+' | fzf && accomplished ;;  ## Also: pacman -Ql pacman pacman-contrib | \grep -E 'bin/.+'
-                   "system stats (using yay)") yay -Ps && accomplished ;;
+                   'AUR packages' ) pacman -Qem | fzf --preview 'yay -Si {1}' && accomplished ;;  ## also -Qqem and -Qqm
+                   'pacman tools' ) pacman -Ql pacman | \grep -E 'bin/.+' | fzf && accomplished ;;  ## Also: pacman -Ql pacman pacman-contrib | \grep -E 'bin/.+'
+                   'system stats (using yay)') yay -Ps && accomplished ;;
                esac ;;
-    "clear cache and clipboard" ) action_now "clearing clipboard"
+    'clear cache and clipboard' ) action_now 'clearing clipboard'
                                   clear_clipboard
                                   action_now "cache size: $(du -sh /var/cache/pacman/pkg/)"  ## installed apps database dir: var/lib/pacman/
-                                  action_now "removing cache and database"
+                                  action_now 'removing cache and database'
                                   sudo pacman -Sc --noconfirm  ## cc will clean all the files (which is not a good idea)
-                                  action_now "removing orphans"
-                                  sudo pacman -Qtdq && sudo pacman -Rns "$(pacman -Qtdq)" --noconfirm || echo "  No orphans"
+                                  action_now 'removing orphans'
+                                  readarray -t os <<< "$(sudo pacman -Qtdq)"  ## is sudo needed?
+                                  if [ "$os" ]; then
+                                      get_single_input 'Orphans found but the uninstall command is not fully testde yet. Proceed?' && remove_orphans="$single_input"
+                                      case "$remove_orphans" in
+                                          y ) sudo pacman -Rns "${orphans[@]}" --noconfirm ;;
+                                          * ) yellow '  removing orphans skipped'
+                                      esac
+                                  else
+                                      printf '%s\n' '  no orphans'
+                                  fi
                                   action_now "removing \$HOME/.cache (size: "$(du -sh "$HOME"/.cache/ | awk '{print $1}')"):"
                                   rm -rf "$HOME"/.cache
                                   accomplished ;;
-    update ) update_items=( "pacman" "yay" "yay + torsocks" "sync repos" "available updates" "last update" )
+    update ) update_items=( 'pacman' 'yay' 'yay + torsocks' 'sync repos' 'available updates' 'last update' )
              update_item="$(pipe_to_fzf "${update_items[@]}")" && wrap_fzf_choice "$update_item" || exit 37
 
              case "$update_item" in
-                 pacman ) start="$(get_datetime "jseconds")"
+                 pacman ) SECONDS=0
                           sudo pacman -Syu
-                          end="$(get_datetime "jseconds")"
-                          diff="$(( "$end" - "$start" ))"
-                          dur="$(day_hour_min_sec "$diff")"
+                          dur="$(day_hour_min_sec "$SECONDS")"
                           accomplished "Total duration: $dur" ;;
-                 yay ) start="$(get_datetime "jseconds")"
+                 yay ) start="$(get_datetime 'jseconds')"
                        yay --answerdiff None --answerclean All --removemake -Syua
-                       end="$(get_datetime "jseconds")"
-                       diff="$(( "$end" - "$start" ))"
-                       dur="$(day_hour_min_sec "$diff")"
+                       end="$(get_datetime 'jseconds')"
+                       dur="$(day_hour_min_sec "$(( "$end" - "$start" ))")"
                        accomplished "Total duration: $dur" ;;
-                 "yay + torsocks" ) start="$(get_datetime "jseconds")"
+                 'yay + torsocks' ) SECONDS=0
                                     torsocks yay --answerdiff None --answerclean All --removemake -Syua
-                                    end="$(get_datetime "jseconds")"
-                                    diff="$(( "$end" - "$start" ))"
-                                    dur="$(day_hour_min_sec "$diff")"
+                                    dur="$(day_hour_min_sec "$SECONDS")"
                                     accomplished "Total duration: $dur" ;;
-                 "sync repos" ) sudo pacman -Sy && accomplished ;;
-                 "available updates" ) msgn "synchronizing repositories ..." "" "$HOME"/linux/themes/pacman-w.png
+                 'sync repos' ) sudo pacman -Sy && accomplished ;;
+                 'available updates' ) msgn 'synchronizing repositories ...' '' "$HOME"/linux/themes/pacman-w.png
                                        sudo pacman -Sy && \
-                                       ups="$(pacman -Qu | \grep -iv "IgnorePkg")"
-                                       ## "$(wc -l <<< "$(echo "$ups")")" returns 1 even if there are no ups
-                                       ## so, we have to do this:
-                                       [ "$ups" ] && ups_count="$(wc -l <<< "$(echo "$ups")")" || ups_count=0
+                                       ups_count="$(wc -l < <(pacman -Qu | \grep -iv 'IgnorePkg'))"
 
                                        sleep 0.1
 
                                        ## AUR updates
-                                       aur_ups="$(yay -Qua)"
-                                       ## "$(wc -l <<< "$(echo "$aur_ups")")" returns 1 even if there are no aur_ups
-                                       ## so, we have to do this:
-                                       [ "$aur_ups" ] && aur_ups_count="$(wc -l <<< "$(echo "$aur_ups")")" || aur_ups_count=0
+                                       aur_ups_count="$(wc -l < <(yay -Qua))"
 
                                        sleep 0.1
 
                                        if [ "$ups_count" -eq 0 ] && [ "$aur_ups_count" -eq 0 ]; then
-                                           msgn "available updates: <span color=\"${orange}\">none</span>"
+                                           msgn "no available updates"
                                        else
                                            msgn "available updates: <span color=\"${orange}\">${ups_count}</span> / <span color=\"${orange}\">${aur_ups_count}</span>"
                                        fi ;;
-                 "last update" ) last_update_date="$(egrep 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/g')"  ## 2021-04-15T11:10:03+0430
-                                 last_update_sec="$(date -d "$last_update_date" +%s)"  ## <--,  ## convert 2021-04-15T11:10:03+0430 to 1618468803
-                                 current_seconds="$(get_datetime "jseconds")"          ## <--'---  ## only +%s and jseconds (OR seconds) work
-                                 diff="$(( "$current_seconds" - "$last_update_sec" ))"
-                                 dur="$(day_hour_min_sec "$diff")"
-                                 echo "last update: "$dur" ago (on "$last_update_date")" ;;
+                 'last update' ) last_update_date="$(egrep 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/g')"  ## 2021-04-15T11:10:03+0430
+                                 last_update_sec="$(date -d "$last_update_date" +%s)"  ## <--,     ## convert 2021-04-15T11:10:03+0430 to 1618468803
+                                 current_seconds="$(get_datetime 'jseconds')"          ## <--'---  ## only +%s and jseconds (OR seconds) work
+                                 dur="$(day_hour_min_sec "$(( "$current_seconds" - "$last_update_sec" ))")"
+                                 printf 'last update: %s ago (on %s)\n' "$dur" "$last_update_date"
              esac ;;
-    "rank mirrors" ) red "Come back later!" ;;
-    "restore pacman database" ) get_single_input "You sure?" "red_blink" && restore_prompt="$single_input"
+    'restore pacman database' ) get_single_input 'You sure?' && restore_prompt="$single_input"
                                 case "$restore_prompt" in
                                     y ) cp "$HOME"/linux/cfg-pacman-database/pacman_database.tar.bz2 / && cd /
                                         sleep 0.5
                                         tar -xjvf pacman_database.tar.bz2 && accomplished ;;
                                 esac ;;
-    systemd ) systemd_items=( "systemd-analyze" "systemd-analyze blame" "reload systemd" "reload systemd units" )
+    systemd ) systemd_items=( 'systemd-analyze' 'systemd-analyze blame' 'reload systemd' 'reload systemd units' )
               systemd_item="$(pipe_to_fzf "${systemd_items[@]}")" && wrap_fzf_choice "$systemd_item" || exit 37
 
               case "$systemd_item" in
-                  "systemd-analyze" ) systemd-analyze && accomplished ;;
-                  "systemd-analyze blame" ) systemd-analyze blame && accomplished ;;
-                  "reload systemd" ) systemctl --system daemon-reload && accomplished ;;
-                  "reload systemd units" ) systemctl daemon-reload && accomplished ;;  ## a reboot might be required
+                  'systemd-analyze' ) systemd-analyze && accomplished ;;
+                  'systemd-analyze blame' ) systemd-analyze blame && accomplished ;;
+                  'reload systemd' ) systemctl --system daemon-reload && accomplished ;;
+                  'reload systemd units' ) systemctl daemon-reload && accomplished ;;  ## a reboot might be required
               esac ;;
-    systemctl ) systemctl_items=( "status" "services" "running units" "failed units" "start a unit" "stop a unit" "restart a unit" "unit status" "reload configuration" "check if enabled" "enable" "disable" "mask" "unmask" )
+    systemctl ) systemctl_items=( 'status' 'services' 'running units' 'failed units' 'start a unit' 'stop a unit' 'restart a unit' 'unit status' 'reload configuration' 'check if enabled' 'enable' 'disable' 'mask' 'unmask' )
                 systemctl_item="$(pipe_to_fzf "${systemctl_items[@]}")" && wrap_fzf_choice "$systemctl_item" || exit 37
 
                 case "$systemctl_item" in
                     status )                 systemctl status && accomplished ;;
                     services )               systemctl --type=service && accomplished ;;
-                    "running units" )        systemctl list-units && accomplished ;;
-                    "failed units" )         systemctl --failed && accomplished ;;
-                    "start a unit" )         prompt -u
+                    'running units' )        systemctl list-units && accomplished ;;
+                    'failed units' )         systemctl --failed && accomplished ;;
+                    'start a unit' )         prompt -u
                                              sudo systemctl start "$unit" && accomplished ;;
-                    "stop a unit" )          prompt -u
+                    'stop a unit' )          prompt -u
                                              sudo systemctl stop "$unit" && accomplished ;;
-                    "restart a unit" )       prompt -u
+                    'restart a unit' )       prompt -u
                                              sudo systemctl restart "$unit" && accomplished ;;
-                    "unit status" )          prompt -u
+                    'unit status' )          prompt -u
                                              systemctl status "$unit" && accomplished ;;
-                    "reload configuration" ) prompt -u
+                    'reload configuration' ) prompt -u
                                              sudo systemctl reload "$unit" && accomplished ;;
-                    "check if enabled" )     prompt -u
+                    'check if enabled' )     prompt -u
                                              systemctl is-enabled "$unit" && accomplished ;;
                     enable )                 prompt -u
                                              sudo systemctl enable "$unit" && accomplished ;;
@@ -185,7 +190,7 @@ case "$main_item" in
                     unmask )                 prompt -u
                                              sudo systemctl unmask "$unit" && accomplished ;;
                 esac ;;
-    help ) help ;;
+    help ) display_help ;;
 esac
 
 exit

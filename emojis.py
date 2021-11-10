@@ -6,19 +6,19 @@ from clipboard import copy as clipboard_copy
 from gp import Color, fzf, msgn
 
 title = path.basename(__file__).replace('.py', '')
-C = Color()
+Col = Color()
 
 chdir(f'{getenv("HOME")}/linux/emojis')
-print(C.heading(title))
+print(Col.heading(title))
 
 main_items = listdir()
 main_item = fzf(main_items)
 print(main_item)
 
-with open(main_item, 'r') as FILE:
-    all_content = FILE.read().strip().split('\n')
+with open(main_item, 'r') as opened_main_item:
+    all_content = opened_main_item.read().strip().split('\n')
 
-lines = list(filter(lambda line:not line.startswith('#'), all_content))  ## remove comments
+lines = list(filter(lambda line: not line.startswith('#'), all_content))  ## remove comments
 line = fzf(lines)
 
 emoji = line.split()[0]

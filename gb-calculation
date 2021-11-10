@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-function float_pad(){  ## {{{
-    local input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or "87*932/12" (no spaces allowd in expression)
+function float_pad {  ## {{{
+    local input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or '87*932/12' (no spaces allowd in expression)
     local desired_l_length="${2:-1}"  ## min   length for l, e.g. 1
     local desired_r_length="${3:-2}"  ## exact length for r, e.g. 2
 
@@ -18,20 +18,21 @@ function float_pad(){  ## {{{
     ## make r have the desired_r_length
     local r_length="${#r}"
     if [ "$desired_r_length" -gt "$r_length" ]; then  ## add trailing zeros to r if shorter than desired_r_length
-        local lacking_pad="$(( "$desired_r_length" - "$r_length" ))"
-        for ((i=0; i<"$lacking_pad"; i++)); do
+        local lacking_pad
+        let lacking_pad="$desired_r_length - $r_length"
+        for ((i=0; i<"$lacking_pad"; i++)); {
             local r="${r}0"
-        done
-    elif [ "$desired_r_length" -lt "$r_length" ]; then  ## cut r if longer than desired_r_length
+        }
+    elif [ "$desired_r_length" -lt "$r_length" ]; then  ## purge r if longer than desired_r_length
         r="${r::$desired_r_length}"
     fi
 
-    local converted="${l}.${r}"
-    echo -e "$converted" ;}
+    printf '%s.%s\n' "$l" "$r"
+}
 ## }}}
-function compare_floats(){  ## {{{
+function compare_floats {  ## {{{
     ## https://stackoverflow.com/questions/8654051/how-to-compare-two-floating-point-numbers-in-bash
-    ## usage: is_smaller="$(compare_floats "$old" "<" "$new")"  ## returns true or false
+    ## usage: is_smaller="$(compare_floats "$first" '<' "$second")"  ## returns true or false
 
     local float1="$1"
     local oper="$2"
@@ -43,14 +44,13 @@ function compare_floats(){  ## {{{
 
     ## compare
     case "$oper" in
-         "<" ) [ "$(awk '{printf($1 <  $2) ? 1 : 0}' <<< "$float1 $float2")" -eq 1 ] && local result="true" || local result="false" ;;
-         "=" ) [ "$(awk '{printf($1 == $2) ? 1 : 0}' <<< "$float1 $float2")" -eq 1 ] && local result="true" || local result="false" ;;
-         ">" ) [ "$(awk '{printf($1 >  $2) ? 1 : 0}' <<< "$float1 $float2")" -eq 1 ] && local result="true" || local result="false" ;;
+         '<' ) [ "$(awk '{printf($1 <  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf '%s\n' 'true' || printf '%s\n' 'false' ;;
+         '=' ) [ "$(awk '{printf($1 == $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf '%s\n' 'true' || printf '%s\n' 'false' ;;
+         '>' ) [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf '%s\n' 'true' || printf '%s\n' 'false' ;;
     esac
-
-    echo "$result" ;}
+}
 ## }}}
-function convert_byte(){  ## {{{
+function convert_byte {  ## {{{
     ## conversion table:
     ## bytes=2546790
     ## B  = "$bytes"               ## 2546790
@@ -61,20 +61,21 @@ function convert_byte(){  ## {{{
     local bytes="$1"
     if [ "$bytes" -eq 0 ]; then
         local number=0
-        local suffix="B"
+        local suffix='B'
     elif [ "$bytes" -gt 1024000000 ]; then
         local number="$(float_pad "${bytes}/1024000000" 1 2)"
-        local suffix="GB"
+        local suffix='GB'
     elif [ "$bytes" -gt 1024000 ]; then
         local number="$(float_pad "${bytes}/1024000" 1 2)"
-        local suffix="MB"
+        local suffix='MB'
     elif [ "$bytes" -gt 1024 ]; then
         local number="$(float_pad "${bytes}/1024" 1 2)"
-        local suffix="KB"
+        local suffix='KB'
     else
         local number="$bytes"
-        local suffix="B"
+        local suffix='B'
     fi
 
-    echo "${number}${suffix}" ;}
+    printf '%s%s\n' "$number" "$suffix"
+}
 ## }}}

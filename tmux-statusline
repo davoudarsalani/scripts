@@ -1,89 +1,65 @@
 #!/usr/bin/env bash
 
 case "$1" in
-    if_sony ) [ "$HOSTNAME" == "sony" ] && echo "SONY " ;;
-    if_ssh ) [ "$SSH_CONNECTION" ] && echo "SSH " ;;
-    pwd ) echo "${PWD//$HOME/\~}" ;;  ## keep \~ escaped
+    if_sony ) [ "$HOSTNAME" == 'sony' ] && printf '%s\n' 'SONY ' ;;
+    if_ssh ) [ "$SSH_CONNECTION" ] && printf '%s\n' 'SSH ' ;;
+    pwd ) printf '%s\n' "${PWD//$HOME/\~}" ;;  ## keep \~ escaped
     info ) source "$HOME"/scripts/gb-calculation
 
            size="$(du -bs | awk '{print $1}')"
            size="$(convert_byte "$size")"
 
-           directories="$(find . -mindepth 1 -maxdepth 1 -type d)"
-           ## "$(wc -l <<< "$(echo "$directories")")" returns 1 even if there are no directories
-           ## so, we have to do this:
-           [ "$directories" ] && directories_count="$(wc -l <<< "$(echo "$directories")")" || directories_count=0
+           directories_count="$(wc -l < <(find . -mindepth 1 -maxdepth 1 -type d))"
+           files_count="$(wc -l < <(find . -mindepth 1 -maxdepth 1 -type f))"
 
-           files="$(find . -mindepth 1 -maxdepth 1 -type f)"
-           ## "$(wc -l <<< "$(echo "$files")")" returns 1 even if there are no files
-           ## so, we have to do this:
-           [ "$files" ] && files_count="$(wc -l <<< "$(echo "$files")")" || files_count=0
-
-           echo "${size} ${directories_count} ${files_count}" ;;
-    git ) [ ! -d .git ] && echo "--" && exit
+           printf '%s %s %s\n' "$size" "$directories_count" "$files_count" ;;
+    git ) [ ! -d .git ] && printf '%s\n' '--' && exit
 
           commits="$(git rev-list HEAD --count)"
 
-          modified="$(git status -sb | \grep "^ M")"
-          ## "$(wc -l <<< "$(echo "$modified")")" returns 1 even if there are no modified
-          ## so, we have to do this:
-          [ "$modified" ] && modified_count="$(wc -l <<< "$(echo "$modified")")" || modified_count=0
-
-          deleted="$(git status -sb | \grep "^ D")"
-          ## "$(wc -l <<< "$(echo "$deleted")")" returns 1 even if there are no deleted
-          ## so, we have to do this:
-          [ "$deleted" ] && deleted_count="$(wc -l <<< "$(echo "$deleted")")" || deleted_count=0
-
-          idunno_A="$(git status -sb| \grep "^ A")"
-          ## "$(wc -l <<< "$(echo "$idunno_A")")" returns 1 even if there are no idunno_A
-          ## so, we have to do this:
-          [ "$idunno_A" ] && idunno_A_count="$(wc -l <<< "$(echo "$idunno_A")")" || idunno_A_count=0
-
-          idunno_R="$(git status -sb| \grep "^ R")"
-          ## "$(wc -l <<< "$(echo "$idunno_R")")" returns 1 even if there are no idunno_R
-          ## so, we have to do this:
-          [ "$idunno_R" ] && idunno_R_count="$(wc -l <<< "$(echo "$idunno_R")")" || idunno_R_count=0
-
-          staged="$(git status -sb | \grep "^[MDAR] ")"
-          ## "$(wc -l <<< "$(echo "$staged")")" returns 1 even if there are no staged
-          ## so, we have to do this:
-          [ "$staged" ] && staged_count="$(wc -l <<< "$(echo "$staged")")" || staged_count=0
-
-          staged_screwed="$(git status -sb | \grep "^[MDAR][MDAR]")"
-          ## "$(wc -l <<< "$(echo "$staged_screwed")")" returns 1 even if there are no staged_screwed
-          ## so, we have to do this:
-          [ "$staged_screwed" ] && staged_screwed_count="$(wc -l <<< "$(echo "$staged_screwed")")" || staged_screwed_count=0
-
-          untracked="$(git status -sb | \grep "??")"
-          ## "$(wc -l <<< "$(echo "$untracked")")" returns 1 even if there are no untracked
-          ## so, we have to do this:
-          [ "$untracked" ] && untracked_count="$(wc -l <<< "$(echo "$untracked")")" || untracked_count=0
+          modified_count="$(      wc -l < <(git status -s | \grep '^ M'))"
+          deleted_count="$(       wc -l < <(git status -s | \grep '^ D'))"
+          idunno_A_count="$(      wc -l < <(git status -s | \grep '^ A'))"
+          idunno_R_count="$(      wc -l < <(git status -s | \grep '^ R'))"
+          staged_count="$(        wc -l < <(git status -s | \grep '^[MDAR] '))"
+          staged_screwed_count="$(wc -l < <(git status -s | \grep '^[MDAR][MDAR]'))"
+          untracked_count="$(     wc -l < <(git status -s | \grep '??'))"
 
           commits_ahead="$(git branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
-          ## previously: commits_ahead="$(git status -sb | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g')"
+          ## previously: commits_ahead="$(git status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g')"
 
-          [ "$modified_count" -gt 0 ]       && modified_count="  $modified_count"             || modified_count=""
-          [ "$deleted_count " -gt 0 ]       && deleted_count="  $deleted_count"               || deleted_count=""
-          [ "$idunno_A_count" -gt 0 ]       && idunno_A_count="  $idunno_A_count"             || idunno_A_count=""
-          [ "$idunno_R_count" -gt 0 ]       && idunno_R_count="  $idunno_R_count"             || idunno_R_count=""
-          [ "$staged_count" -gt 0 ]         && staged_count="  $staged_count"                 || staged_count=""
-          [ "$staged_screwed_count" -gt 0 ] && staged_screwed_count="  $staged_screwed_count" || staged_screwed_count=""
-          [ "$untracked_count" -gt 0 ]      && untracked_count="  $untracked_count"           || untracked_count=""
-          [ "$commits_ahead " -gt 0 ]       && commits_ahead="  $commits_ahead"               || commits_ahead=""
+          [ "$modified_count"       -eq 0 ] && modified_count=''       || modified_count="  $modified_count"
+          [ "$deleted_count "       -eq 0 ] && deleted_count=''        || deleted_count="  $deleted_count"
+          [ "$idunno_A_count"       -eq 0 ] && idunno_A_count=''       || idunno_A_count="  $idunno_A_count"
+          [ "$idunno_R_count"       -eq 0 ] && idunno_R_count=''       || idunno_R_count="  $idunno_R_count"
+          [ "$staged_count"         -eq 0 ] && staged_count=''         || staged_count="  $staged_count"
+          [ "$staged_screwed_count" -eq 0 ] && staged_screwed_count='' || staged_screwed_count="  $staged_screwed_count"
+          [ "$untracked_count"      -eq 0 ] && untracked_count=''      || untracked_count="  $untracked_count"
+          [ ! "$commits_ahead"            ] && commits_ahead=''        || commits_ahead="  $commits_ahead"
 
-          [ "$(git remote -v | \grep -i "github")" ] && logo="  " || logo=""
-          [ "$(git remote -v)" ] && if_no_remote="" || if_no_remote=" (no-remote)"
+          [ "$(git remote -v | \grep -i 'github')" ] && logo='  ' || logo=''
+          [ "$(git remote -v)" ] && if_no_remote='' || if_no_remote=' (no-remote)'
 
-          branches="$(git branch --list)"
-          ## "$(wc -l <<< "$(echo "$branches")")" returns 1 even if there are no branches
-          ## so, we have to do this:
-          [ "$branches" ] && branches_count="$(wc -l <<< "$(echo "$branches")")" || branches_count=0  ## TODO should it be 0 or 1 ? h000301092211]
-          [ "$branches_count" -gt 1 ] && branches_count=" #BR=${branches_count}" || branches_count=""
+          branches_count="$(wc -l < <(git branch --list))"
+          [ "$branches_count" -gt 1 ] && branches_count=" #BR=${branches_count}" || branches_count=''
 
           cur_branch="$(git branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/')"
-          [ "$cur_branch" == "master" ] && cur_branch="" || cur_branch=" BR=${cur_branch}"
+          [ "$cur_branch" == 'master' ] && cur_branch='' || cur_branch=" BR=${cur_branch}"
 
-          echo "${commits}${modified_count}${deleted_count}${idunno_A_count}${idunno_R_count}${staged_count}${staged_screwed_count}${untracked_count}${commits_ahead}${logo}${if_no_remote}${branches_count}${cur_branch}" ;;
+          printf '%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "\
+${commits}\
+${modified_count}\
+${deleted_count}\
+${idunno_A_count}\
+${idunno_R_count}\
+${staged_count}\
+${staged_screwed_count}\
+${untracked_count}\
+${commits_ahead}\
+${logo}\
+${if_no_remote}\
+${branches_count}\
+${cur_branch}" ;;
 esac
 
 exit

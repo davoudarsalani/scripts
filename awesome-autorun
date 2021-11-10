@@ -5,8 +5,8 @@ autorun_file=/tmp/autorun
 [ -f "$autorun_file" ] && exit || touch "$autorun_file"
 
 ## tricks for the time when power saving screws audio
-# echo "0" | sudo tee /sys/module/snd_hda_intel/parameters/power_save
-# echo "N" | sudo tee /sys/module/snd_hda_intel/parameters/power_save_controller
+# printf '%s\n' '0' | sudo tee /sys/module/snd_hda_intel/parameters/power_save
+# printf '%s\n' 'N' | sudo tee /sys/module/snd_hda_intel/parameters/power_save_controller
 # sleep 2
 
 pulseaudio --start &
@@ -14,7 +14,7 @@ start-pulseaudio-x11
 
 source "$HOME"/scripts/gb-audio
 while [ "$vol_level" -ne 30 ]; do
-    echo "tried to set volume to 30 at $(get_datetime "jymdhms")" >> /tmp/vol_30  ## just to keep record of how many times the loop tried
+    printf 'tried to set volume to 30 at %s\n' "$(get_datetime 'jymdhms')" >> /tmp/vol_30  ## just to keep record of how many times the loop tried
     pactl set-sink-volume "$def_sink_index" 30%
     source "$HOME"/scripts/gb-audio
     sleep 1
@@ -32,27 +32,27 @@ nm-applet &
 greenclip daemon &
 picom -b &
 
-current_date="$(get_datetime "jymd")"
+current_date="$(get_datetime 'jymd')"
 "$HOME"/scripts/.venv_keylogger/bin/python3 "$HOME"/scripts/.venv_keylogger/bin/keylogger --log-file "$HOME"/linux/keylogs/keylog-"$current_date" &
 
 # source "$HOME"/scripts/gb-network
 # [ ! "$eth_ip" ] && add_desired_ip_to_ethernet && msgn "added <span color=\"${orange}\">${desired_eth_ip}</span> to <span color=\"${orange}\">${eth_devc}</span>"
 
 widgets=(
-    "audio"
-    "firewall"
-    "brightness"
-    "bluetooth"
-    "clipboard"
-    "klgr"  ## it is updated regularly with watch, but this had better be here too
-    "tor"
-    "turn_off_scr_3"
+    'audio'
+    'firewall'
+    'brightness'
+    'bluetooth'
+    'clipboard'
+    'klgr'  ## it is updated regularly with watch, but this had better be here too
+    'tor'
+    'turn_off_scr_3'
 )
 
-for widget in "${widgets[@]}"; do
+for widget in "${widgets[@]}"; {
     "$HOME"/scripts/awesome-widgets "$widget"
-done
+}
 
-msgn " " " " "$HOME"/linux/themes/ok-w.png
+msgn ' ' ' ' "$HOME"/linux/themes/ok-w.png
 
 exit

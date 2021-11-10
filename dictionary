@@ -2,15 +2,18 @@
 source "$HOME"/scripts/gb
 
 case "$1" in
-     goldendict ) words="$(cat "$HOME"/bgls/words)"
+     goldendict ) if [ ! "$2" ]; then
+                      gold_items=( 'open' )
+                  elif [ "$2" == 'words' ]; then
+                      readarray -t words < "$HOME"/bgls/words
+                      gold_items=( 'open' '' "${words[@]}" )
+                  fi
 
-                  gold_items=( "open" "" "$words" )
-                  gold_item="$(pipe_to_dmenu "${gold_items[@]}" "goldendict" "")" || exit 37
-
+                  gold_item="$(pipe_to_rofi "${gold_items[@]}" 'goldendict' '')" || exit 37
                   case "$gold_item" in
-                      open ) goldendict              1>/dev/null 2>&1 & ;;
-                      * )    goldendict "$gold_item" 1>/dev/null 2>&1 & ;;
-                  esac
+                      open ) goldendict              &>/dev/null & ;;
+                      * )    goldendict "$gold_item" &>/dev/null & ;;
+                  esac ;;
 esac
 
 exit

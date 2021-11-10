@@ -4,9 +4,10 @@ from os import path, getenv, symlink, rename, remove
 from shutil import rmtree
 from subprocess import run, check_output
 from sys import argv
+from time import sleep
 
 from magic import Magic
-from gp import (msgn, msgc, get_datetime, get_single_input, invalid, dorm, get_password, fzf,
+from gp import (msgn, msgc, get_datetime, get_single_input, invalid, get_password, fzf,
                 compress_tar, compress_zip, xtract_tar, xtract_zip, xtract_rar)
 
 script_args = argv[1:]
@@ -30,7 +31,7 @@ if   main_arg == 'chattr':  ## {{{
             else:
                 msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> mutable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
-            dorm(0.1)
+            sleep(0.1)
     elif main_item == 'immutable':
         for f in files:
             _, base = path.split(f)
@@ -45,7 +46,7 @@ if   main_arg == 'chattr':  ## {{{
             else:
                 msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> immutable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
-            dorm(0.1)
+            sleep(0.1)
     elif main_item == 'deletable':
         for f in files:
             _, base = path.split(f)
@@ -60,7 +61,7 @@ if   main_arg == 'chattr':  ## {{{
             else:
                 msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> deletable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
-            dorm(0.1)
+            sleep(0.1)
     elif main_item == 'undeletable':
         for f in files:
             _, base = path.split(f)
@@ -75,7 +76,7 @@ if   main_arg == 'chattr':  ## {{{
             else:
                 msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> undeletable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
-            dorm(0.1)
+            sleep(0.1)
     elif main_item == 'delete normal':
         for f in files:
             _, base = path.split(f)
@@ -90,7 +91,7 @@ if   main_arg == 'chattr':  ## {{{
             else:
                 msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> delete normal\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
-            dorm(0.1)
+            sleep(0.1)
     elif main_item == 'delete secure':
         for f in files:
             _, base = path.split(f)
@@ -105,7 +106,7 @@ if   main_arg == 'chattr':  ## {{{
             else:
                 msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> delete secure\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
-            dorm(0.1)
+            sleep(0.1)
     elif main_item == 'lsattr':
         for f in files:
             try:
@@ -117,7 +118,7 @@ if   main_arg == 'chattr':  ## {{{
                 msgn(f'<span color=\"{getenv("orange")}\">{base}</span>\n{attribution}')
             except Exception as exc:
                 msgc('ERROR', f'printing lsattr for <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-            dorm(0.1)
+            sleep(0.1)
 ## }}}
 elif main_arg == 'trash':  ## {{{
     for f in files:
@@ -128,7 +129,7 @@ elif main_arg == 'trash':  ## {{{
             msgn('trashed', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'trashing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'rm':  ## {{{
     for f in files:
@@ -141,7 +142,7 @@ elif main_arg == 'rm':  ## {{{
             msgn('removed', f'<span color=\r"{getenv("red")}\"><b>{base}</b></span>', icon=f'{getenv("HOME")}/linux/themes/delete-w.png')
         except Exception as exc:
             msgc('ERROR', f'removing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'mime_type':  ## {{{
     for f in files:
@@ -151,7 +152,7 @@ elif main_arg == 'mime_type':  ## {{{
             msgn('mimetype', f'<span color=\"{getenv("orange")}\">{base}</span> is <span color=\"{getenv("orange")}\">{mime}</span>')
         except Exception as exc:
             msgc('ERROR', f'showing mimetype of <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'softlink':  ## {{{
     for f in files:
@@ -161,7 +162,7 @@ elif main_arg == 'softlink':  ## {{{
             msgn('softlinekd', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'softlinking <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'tar':  ## {{{
     for f in files:
@@ -171,7 +172,7 @@ elif main_arg == 'tar':  ## {{{
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to tar')
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to tar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'untar':  ## {{{
     for f in files:
@@ -181,7 +182,7 @@ elif main_arg == 'untar':  ## {{{
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'zip':  ## {{{
     for f in files:
@@ -198,7 +199,7 @@ elif main_arg == 'zip':  ## {{{
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to zip')
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'unzip':  ## {{{
     for f in files:
@@ -215,7 +216,7 @@ elif main_arg == 'unzip':  ## {{{
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}
 elif main_arg == 'unrar':  ## {{{
     for f in files:
@@ -233,5 +234,5 @@ elif main_arg == 'unrar':  ## {{{
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-        dorm(0.1)
+        sleep(0.1)
 ## }}}

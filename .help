@@ -1,25 +1,30 @@
 #!/usr/bin/env bash
 
-function application_help(){  ## {{{
+function application_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
 $(purple -p) package
 $(purple -g) group
 $(purple -f) file
 $(purple -r) repository
-$(purple -u) unit"""
-exit ;}
+$(purple -u) unit"
+exit
+}
 ## }}}
-function checksum_help(){  ## {{{
+function checksum_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
 file   $(purple -i) input file
-string $(purple -s) string"""
-exit ;}
+string $(purple -s) string"
+exit
+}
 ## }}}
-function ffmpeg_help(){  ## {{{
+function ffmpeg_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
 embed subtitle         $(purple -i) input file $(purple -f) subtitle file $(purple -o) output file
 burn subtitle (increases size) $(purple -i) input file $(purple -f) subtitle file $(purple -o) output file
 burn embedded subtitle (increases size) $(purple -i) input file $(purple -d) subtitle index $(purple -o) output file
@@ -36,109 +41,105 @@ reverse                $(purple -i) input file $(purple -o) output file
 add 0.3 saturation     $(purple -i) input file $(purple -o) output file
 show streams           $(purple -i) input file
 audio stream to keep   $(purple -i) input file $(purple -k) audio stream to keep (e.g. 1) $(purple -o) output file
-live camera            $(purple -c) camera (e.g. /dev/video0)"""
-exit ;}
+live camera            $(purple -c) camera (e.g. /dev/video0)"
+exit
+}
 ## }}}
-function firewall_help(){  ## {{{
+function firewall_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-allow app    $(purple -a) app to allow"""
-exit ;}
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
+allow app    $(purple -a) app to allow"
+exit
+}
 ## }}}
-function ftp_upload_help(){  ## {{{
+function join_intro_outtro_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-single  $(purple -f) file (e.g. lucy.txt)
-bulk    $(purple -w) when: 1/2 $(purple -d) directory (e.g. lucy)"""
-exit ;}
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
+$(purple -d) directory (e.g. v-Lucy)"
+exit
+}
 ## }}}
-function if_running_help(){  ## {{{
+function mime_type_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -a) app"""
-exit ;}
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
+$(purple -f) file"
+exit
+}
 ## }}}
-function join_intro_outtro_help(){  ## {{{
+function mount_umount_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -d) directory (e.g. v-Lucy)"""
-exit ;}
-## }}}
-function kc_help(){  ## {{{
-clear
-echo -e """$(heading "$title") $(yellow "Help")
-ping + message  $(purple -m) message
-upload      $(purple -f) file
-semd sms    $(purple -m) message $(purple -n) mobile number"""
-exit ;}
-## }}}
-function mime_type_help(){  ## {{{
-clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -f) file"""
-exit ;}
-## }}}
-function mount_umount_help(){  ## {{{
-clear
-echo -e """$(heading "$title") $(yellow "Help")
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
 udisksctl mount -b  $(purple -d) device to mount (e.g. /dev/sdc)
 udisksctl umount -b $(purple -d) device to umount (e.g. /dev/sdc)
-format usb device   $(purple -d) device to format (e.g. /dev/sdc) $(purple -n) name (e.g. NINO)"""
-exit ;}
+format usb device   $(purple -d) device to format (e.g. /dev/sdc) $(purple -n) name (e.g. NNNN)"
+exit
+}
 ## }}}
-function network_help(){  ## {{{
+function network_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
 up ethernet/wifi connection $(purple -c) connection
 down ethernet/wifi connection   $(purple -c) connection
 add ip   $(purple -i) ip $(purple -d) device
 delete all ips   $(purple -d) device
-connect to a new wifi network   $(purple -s) ssid $(purple -p) password"""
-exit ;}
+connect to a new wifi network   $(purple -s) ssid $(purple -p) password"
+exit
+}
 ## }}}
-function pulseaudio_help(){  ## {{{
+function pulseaudio_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -d) default sink/source (index/name)"""
-exit ;}
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
+$(purple -d) default sink/source (index/name)"
+exit
+}
 ## }}}
-function sony_help(){  ## {{{
+function sony_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -n) directory/file name"""
-exit ;}
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
+$(purple -n) directory/file name"
+exit
+}
 ## }}}
-function summary_help(){  ## {{{
+function summary_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -n) directory/file name"""
-exit ;}
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
+$(purple -n) directory/file name"
+exit
+}
 ## }}}
-function typer_help(){  ## {{{
+function typer_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
 $(purple -f) file
-$(purple -s) sleep (e.g. 0.2, 1, random, etc)"""
-exit ;}
+$(purple -s) sleep (e.g. 0.2, 1, random, etc)"
+exit
+}
 ## }}}
-function user_help(){  ## {{{
+function user_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
 create group                $(purple -g) group
 add $USER to z group        $(purple -g) group
 remove $USER from a group   $(purple -g) group
-change user's login name    $(purple -o) old name $(purple -n) new name"""
-exit ;}
+change user's login name    $(purple -o) old name $(purple -n) new name"
+exit
+}
 ## }}}
-function video_subtitle_help(){  ## {{{
+function video_subtitle_help {  ## {{{
 clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -d) directory (e.g. lucy)"""
-exit ;}
-## }}}
-function zero_help(){  ## {{{
-clear
-echo -e """$(heading "$title") $(yellow "Help")
-$(purple -f) file"""
-exit ;}
+printf '%s\n' "\
+$(heading "$title") $(yellow "Help")
+$(purple -d) directory (e.g. lucy)"
+exit
+}
 ## }}}

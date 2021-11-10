@@ -10,17 +10,17 @@ from gp import Color, fzf, get_input, invalid, msgn, get_datetime
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
-C = Color()
+Col = Color()
 
-def help():  ## {{{
+def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
-{C.flag(f'-s --string=')}
-{C.flag(f'-f --file=')}
-{C.flag(f'-c --command=')}''')
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('Help')}
+{Col.flag('-s --string=')}
+{Col.flag('-f --file=')}
+{Col.flag('-c --command=')}''')
     exit()
 ## }}}
-def getopts():  ## {{{
+def getopts() -> None:  ## {{{
     global string, file, command
 
     try:
@@ -29,12 +29,12 @@ def getopts():  ## {{{
         invalid(f'{exc!r}')
 
     for opt, arg in duos:
-        if   opt in ('-h', '--help'):    help()
+        if   opt in ('-h', '--help'):    display_help()
         elif opt in ('-s', '--string'):  string = arg
         elif opt in ('-f', '--file'):    file = arg
         elif opt in ('-c', '--command'): command = arg
 ## }}}
-def prompt(*args: str):  ## {{{
+def prompt(*args: list[str]) -> None:  ## {{{
     global string, file, command
 
     for arg in args:
@@ -53,7 +53,7 @@ def prompt(*args: str):  ## {{{
 
 getopts()
 
-print(C.heading(title))
+print(Col.heading(title))
 
 main_items = ['string', 'file', 'command', 'datetime', 'jalali datetime', 'help']
 main_item = fzf(main_items)
@@ -64,8 +64,8 @@ if   main_item == 'string':
     msgn(f'copied\n<span color=\"{getenv("orange")}\">{string}</span>')
 elif main_item == 'file':
     prompt('-f')
-    with open(file, 'r') as F:
-        content = F.read().strip()
+    with open(file, 'r') as opened_file:
+        content = opened_file.read().strip()
     clipboard_copy(content)
     msgn(f'copied\n<span color=\"{getenv("orange")}\">{content}</span>')
 elif main_item == 'command':
@@ -83,4 +83,4 @@ elif main_item == 'jalali datetime':
     clipboard_copy(current_datetime)
     msgn(f'copied\n<span color=\"{getenv("orange")}\">{current_datetime}</span>')
 elif main_item == 'help':
-    help()
+    display_help()

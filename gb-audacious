@@ -6,21 +6,27 @@ length="$(audtool --current-song-length)"  ## 55:04
 current_position_in_seconds="$(audtool --current-song-output-length-seconds)"  ## 369
 current_position="$(audtool --current-song-output-length)"  ## 5:47
 
+left_in_seconds="$(( "$length_in_seconds" - "$current_position_in_seconds" ))"  ## 187
+
 position_in_playlist="$(audtool playlist-position)"  ## 3
 playlist_length="$(audtool --playlist-length)"  ## 5
 
 preamp="$(audtool equalizer-get-preamp | awk '{print $NF}')"  ## -2.10/0/etc
 
-current_songs="$(audtool --playlist-display)"  ## list of songs together with number of tracks at the top and "Total length" at the bottom
-current_song="$(audtool --current-song-filename)"  ## $HOME/music/a-secret-garden.mp3
+current_song="$(audtool --current-song-filename)"                   ## /home/nnnn/speech/pargar/007.mp3
+current_song_base="$(audtool --current-song-tuple-data file-name)"  ## 007
+current_song_dir="${current_song%/*}"                               ## /home/nnnn/speech/pargar
+# ^^ OR current_song_dir="$(audtool --current-song-tuple-data file-path)"  ## ~/speech/pargar  ## throws error when used
 
-title="$(audtool --current-song-tuple-data title)"
-album="$(audtool --current-song-tuple-data album)"
-artist="$(audtool --current-song-tuple-data artist)"
+formatted_title="$(audtool --current-song-tuple-data formatted-title)"  ## pargar - speech - 007
+title="$(audtool --current-song-tuple-data title)"                      ## 007
+album="$(audtool --current-song-tuple-data album)"                      ## speech
+artist="$(audtool --current-song-tuple-data artist)"                    ## pargar
+song_ext="$(audtool --current-song-tuple-data file-ext)"                ## mp3
 
 shuffle_status="$(audtool --playlist-shuffle-status)"  ## on/off
 play_status="$(audtool --playback-status)"  ## playing/paused
 
-bar_position="$(printf "%02d" "$(( "$current_position_in_seconds" * 100 / "$length_in_seconds" ))")"  ## <--,-- 19
-                                                                                                      ##    |-- do NOT remove printf "%02d"
-                                                                                                      ##    '-- otherwise bar will not display amounts properly
+bar_position="$(printf '%02d\n' "$(( "$current_position_in_seconds" * 100 / "$length_in_seconds" ))")"  ## <--,-- 19
+                                                                                                        ##    |-- NOTE do NOT remove printf '%02d\n'
+                                                                                                        ##    '-- otherwise bar will not display amounts properly

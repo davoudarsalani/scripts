@@ -2,10 +2,10 @@
 
 from os import getenv
 
-from gp import Audio, Record, get_datetime, dmenu, update_audio, record_icon, set_widget, duration
+from gp import Audio, Record, get_datetime, rofi, update_audio, record_icon, set_widget, duration
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
-length = dmenu(lengths, 'rec video')
+length = rofi(lengths, 'rec video')
 if   length == '30s': secs = 30
 elif length == '1m':  secs = 60
 elif length == '5m':  secs = 300
@@ -21,17 +21,19 @@ else: exit()
 dur = duration(secs)
 suffix = 'VID'
 output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
+Aud = Audio()
+Rec = Record()
 
 need_mics = ['no', 'yes']
-need_mic = dmenu(need_mics, 'need mic?')
+need_mic = rofi(need_mics, 'need mic?')
 if   need_mic == 'yes':
-    Audio().mic('unmute')
-    Audio().mic('25')
-    Audio().mon('unmute')
-    Audio().mon('100')
+    Aud.mic('unmute')
+    Aud.mic('25')
+    Aud.mon('unmute')
+    Aud.mon('100')
 elif need_mic == 'no':
-    Audio().mon('unmute')
-    Audio().mon('100')
+    Aud.mon('unmute')
+    Aud.mon('100')
 else:
     exit()
 
@@ -39,12 +41,12 @@ update_audio()
 
 set_widget('record', 'fg', getenv('red'))
 
-Record().video(dur, output, suffix, secs)
+Rec.video(dur, output, suffix, secs)
 
-Audio().mic('mute')
-Audio().mic('0')
-Audio().mon('mute')
-Audio().mon('0')
+Aud.mic('mute')
+Aud.mic('0')
+Aud.mon('mute')
+Aud.mon('0')
 
 update_audio()
 

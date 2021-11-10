@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-echo -e "Normal:\n"
+printf '%s\n\n' 'Normal:'
 curl ipinfo.io
-## also:
+## OR:
   # curl -s http://myip.enix.org/REMOTE_ADDR
-  # wget -qO - https://api.ipify.org (https://github.com/rkienjet/torscripts/blob/master/newcircuit)
-echo -e "\n\n----------------------\nTor:\n"
+  # wget -qO - https://api.ipify.org  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
+printf '%s\n' '----------------------'
+printf '%s\n\n' 'Tor:'
 torsocks curl ipinfo.io
-echo
+printf '\n'

@@ -2,728 +2,47 @@
 
 ## imports {{{
 from __future__ import unicode_literals
+from dataclasses import dataclass, field
+from datetime import timedelta, datetime as dt
+from functools import partial
 from getopt import getopt
-from math import floor, pow, log
+from glob import glob
+from inspect import stack
+from math import floor, log, pow as math_pow
 from os import path, mkdir, chdir, getenv
 from pathlib import Path
+from random import shuffle
 from re import sub, match
 from subprocess import run, check_output
 from sys import argv
-from typing import List
+from time import sleep
+from typing import Any, Type
+from urllib.request import urlopen, ProxyHandler, build_opener, install_opener
 
+from pycurl import Curl
 from requests import Session
 from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
-from gp import Color, dorm, duration, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, separator, get_headers, if_exists
+from gp import Color, duration, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
 ## }}}
-class File:  ## {{{
-    def __init__(self):  ## {{{
-        self.order, self.current_time, self.url, self.raw_size, self.size, self.content_type, self.last_modified, self.outputname, self.error = self.get_info()
-    ## }}}
-    def get_info(self):  ### {{{
-        global attempt, should_break, reason, outputname, url, order
+def separator() -> str:  ## {{{
+    width = int(get_width())
 
-        current_time = get_datetime('jhms')
-
-        ## get x-value
-        if x_value:
-            joined_x_value = f'{x_value:03}-RNMD-'
-        else:
-            joined_x_value = ''
-
-        ## get outputname
-        _, base = path.split(url)  ## 'https://www.davoudarsalani.ir/Files/Fun/', '001.jpg'
-        root_base, ext = path.splitext(base)  ## '001', '.jpg'
-        outputname = remove_special_characters(root_base)
-        outputname = f'{joined_x_value}{outputname}{ext}'
-
-        if torsocks:
-            s.proxies = {'http': tor_proxy, 'https': tor_proxy}
-
-        ## get size, type, last modified
-        if ignore_information:
-            info = order, current_time, url, 'IGNORED', 'IGNORED', 'IGNORED', 'IGNORED', outputname, {}
-        else:
-            for attempt in attempts:
-                should_break = False
-
-                try:
-                    response = s.head(url, headers=hdrs, timeout=20)
-                    # status_code = response.status_code  ## 200
-                    headers = response.headers
-
-                    content_type = headers.get('Content-Type', 'ERROR')    ## <--, <--,-- if url (domain part) is misspelled, file_type will be assigned 'ERROR'
-                    last_modified = headers.get('Last-Modified', 'ERROR')  ## <--|    |-- in except but if url (file name part) is misspelled, the file_type
-                    raw_size = int(headers.get('Content-Length', 0))       ## <--|    '-- will always be 'text/html; charset=UTF-8' regardless of the real file type
-                    error = {}                                             ##    |-- exceptionally used get because the key is not always there
-                                                                           ##    '-- ## TODO make these case insensitive, or are they already? [14000223000000]
-                    size = convert_byte(raw_size)
-
-                    info = order, current_time, url, raw_size, size, content_type, last_modified, outputname, error
-
-                    should_break = True
-
-                except Exception as exc:
-                    analyze(f'{exc!r}', caller='get_info')
-                    info = order, current_time, url, 'ERROR', 'ERROR', 'ERROR', 'ERROR', outputname, {'ERROR': reason}
-
-                if should_break:
-                    break
-
-        return info
-    ## }}}
-    @property
-    def info_dict(self):  ## {{{
-        allinfo = {**self.order, 'time': self.current_time, 'url': self.url, 'size': self.size, 'type': self.content_type, 'last modified': self.last_modified, 'outputname': self.outputname, **self.error}
-        return allinfo
-    ## }}}
-    @duration_wrapper()
-    def download(self, caller: str):  ## {{{
-        global should_break
-
-        def check_raw_size_validity():
-            global total_bytes
-
-            total_bytes = int(current.raw_size)  ## make sure current.raw_size is an int
-            _ = 1 / current.raw_size  ## make sure current.raw_size is not 0
-
-        def analyze_locally(local_cmd_stderr: str):
-            '''it is called "local" because it is meant for within download method in File class only'''
-
-            # global reason
-            if 'ERROR' in local_cmd_stderr:
-                reason = 'ERROR'
-            elif 'IGNORED' in local_cmd_stderr:
-                reason = 'IGNORED'
-            elif 'ZeroDivisionError' in local_cmd_stderr:
-                reason = '0 raw size'
-            else:
-                reason = f'UNKNOWN: {local_cmd_stderr}'
-
-            print(C.orange({'BAR ERROR': reason}))
-
-        try:
-            if downloader:
-                def wget_bar(downloaded, total_bytes, width=80):  ## https://www.itersdesktop.com/2020/09/06/downloading-files-in-python-using-wget-module/
-                    downloaded_perc = downloaded/total_bytes*100
-                    downloaded_conv = convert_byte(downloaded)
-                    total_conv = convert_byte(total_bytes)
-                    progress_info = {f'{downloaded_conv}/{total_conv}': f'%{downloaded_perc:.2f}'}
-                    print(C.purple_dim(progress_info), end=endpoint)
-
-                if torsocks:
-                    ## FIXME find how to set proxy for wget [14000314155813]
-                    ## FIXME it prompts for every url [14000425100624]
-                    continue_without_proxy = get_single_input('Setting torsocks for downloader for o is not possible at the moment. Continue without proxy?')
-                    if not continue_without_proxy == 'y':
-                        exit()
-
-                ## File.get_info() may send raw_size as IGNORED (if requested so), ERROR or 0, therefore try is needed here
-                ## wget is able to get downloaded and total_bytes on the go anyway, but it is better to respect the info already present
-                try:
-                    check_raw_size_validity()
-                    wget_download(url=url, out=outputname, bar=wget_bar)
-                except Exception as exc:
-                    analyze_locally(f'{exc!r}')
-                    wget_download(url=url, out=outputname) #, bar=wget_error_bar)
-
-            else:
-                if torsocks:
-                    s.proxies = {'http': tor_proxy, 'https': tor_proxy}
-
-                ## https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
-                with s.get(url, headers=hdrs, timeout=20, stream=True) as SESSION:
-                    SESSION.raise_for_status()
-
-                    with open(outputname, 'wb') as OUTPUTNAME:
-                        chunksize = 8192  ## 8192 is 8KB
-                        downloaded_bytes = 0
-
-                        ## File.get_info() may send raw_size as IGNORED (if requested so), ERROR or 0, therefore try is needed here
-                        try:
-                            check_raw_size_validity()
-                            total_conv = convert_byte(total_bytes)
-                            for chunk in SESSION.iter_content(chunk_size=chunksize):
-                                OUTPUTNAME.write(chunk)
-                                downloaded_bytes += chunksize
-                                downloaded_conv = convert_byte(downloaded_bytes)
-                                downloaded_percent = (downloaded_bytes * 100) / total_bytes  ## FIXME <--,-- exceeds 100 [14000223000000]
-                                                                                             ##          |-- on the other hand, adding if chunk:
-                                                                                             ##          |-- before OUTPUTNAME.write(chunk) and the lines after that
-                                                                                             ##          '-- prevents downloaded_percent from reaching 100
-
-                                progress_info = {f'{downloaded_conv}/{total_conv}': f'%{downloaded_percent:.2f}'}
-                                print(C.purple_dim(progress_info), end=endpoint)
-                        except Exception as exc:
-                            analyze_locally(f'{exc!r}')
-
-                            for chunk in SESSION.iter_content(chunk_size=chunksize):
-                                OUTPUTNAME.write(chunk)
-
-            print()  ## to prevent the removal of progress_info
-            should_break = True
-
-        except Exception as exc:
-            analyze(f'{exc!r}', caller=caller)
-    ## }}}
+    return Col.grey('-'*width)
 ## }}}
-class Video:  ## {{{
-    def __init__(self):  ## {{{
-        self.order, self.current_time, self.url, self.title, self.uploader, self.channel, self.dur, self.view_count, self.like_count, self.dislike_count, self.ext, self.outputname, self.error = self.get_info()
-    ## }}}
-    def get_info(self):  ## {{{
-        global x_value, attempt, should_break, url, order, outputname
-
-        current_time = get_datetime('jhms')
-
-        if x_value:
-            joined_x_value = f'{x_value:03}-RNMD-'
-        else:
-            joined_x_value = ''
-
-        video_id = url.split('=')[-1]  ## WpqCLcAXkJs
-
-        options = {
-            'proxy': tor_proxy,
-            'no_color': True,
-            'skip_download': True,
-            'logger': Ydl_Empty_Logger(),  ## because we don't need stdout/stderr when we are n get_info
-        }
-
-        if ignore_information:
-            outputname = f'{joined_x_value}{video_id}'  ## 081-RNMD-WpqCLcAXkJs or WpqCLcAXkJs
-            info = order, current_time, url, 'IGNORED', 'IGNORED', 'IGNORED', 'IGNORED', 'IGNORED', 'IGNORED', 'IGNORED', 'IGNORED', outputname, {}
-        else:
-            for attempt in attempts:
-                should_break = False
-
-                try:
-                    with YoutubeDL(options) as Y_DL:
-                        # Y_DL.cache.remove()
-                        obj = Y_DL.extract_info(url, download=False)
-
-                    title = obj['title']  ## '"Hide and Seek" l At Home With Olaf'
-                    uploader = obj['uploader']  ## 'Walt Disney Animation Studios'
-                    channel = obj['channel']  ## 'Walt Disney Animation Studios'
-                    dur = obj['duration']  ## 41
-                    dur = duration(dur)  ## 00:00:41
-                    view_count = f'{obj["view_count"]:,d}'  ## 1,362,401
-                    like_count = f'{obj["like_count"]:,d}'  ## 13,730
-                    dislike_count = f'{obj["dislike_count"]:,d}'  ## 2,416
-                    ext = obj['ext']  ## mp4
-
-                    outputname = remove_special_characters(title)
-                    outputname = f'{joined_x_value}{outputname}'
-
-                    error = {}
-
-                    info = order, current_time, url, title, uploader, channel, dur, view_count, like_count, dislike_count, ext, outputname, error
-
-                    should_break = True
-
-                except Exception as exc:
-                    outputname = f'{joined_x_value}{video_id}'  ## 081-RNMD-WpqCLcAXkJs or WpqCLcAXkJs
-
-                    analyze(f'{exc!r}', caller='get_info')
-                    info = order, current_time, url, 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', outputname, {'ERROR': reason}
-
-                if should_break:
-                    break
-
-        return info
-    ## }}}
-    @property
-    def info_dict(self):  ## {{{
-        allinfo = {**self.order, 'time': self.current_time, 'url': self.url, 'title': self.title, 'uploader': self.uploader, 'channel': self.channel, 'duration': self.dur, 'views': self.view_count, 'likes': self.like_count, 'dislikes': self.dislike_count, 'ext': self.ext, 'outputname': self.outputname, **self.error}
-        return allinfo
-    ## }}}
-    @duration_wrapper()
-    def download(self, caller: str):  ## {{{
-        global should_break
-
-        ## useful links {{{
-        ## https://stackoverflow.com/questions/18054500/how-to-use-youtube-dl-from-a-python-program
-        ## https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
-        ## https://github.com/ytdl-org/youtube-dl/blob/3e4cedf9e8cd3157df2457df7274d0c842421945/youtube_dl/YoutubeDL.py#L137-L312 (available options)
-        ## https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278 (available options)
-        ## https://www.programcreek.com/python/example/98358/youtube_dl.YoutubeDL
-        ## https://programtalk.com/python-examples/youtube_dl.YoutubeDL/
-        ## https://codingdict.com/sources/py/youtube_dl/16491.html
-        ## https://vimsky.com/zh-tw/examples/detail/python-method-youtube_dl.YoutubeDL.html
-        ## }}}
-
-        ## FIXME does not display for s and t [14000223000000]
-        def hook(response):  ## https://stackoverflow.com/questions/23727943/how-to-get-information-from-youtube-dl-in-python
-            status = response['status']
-            ## try is used just to make sure nothing goes wrong
-            try:
-                ## we have to use the if statement and drop else and finally
-                ## otherwise the progress_info will be screwed when the exception swoops in
-                ## with a message like {'ERROR': "KeyError('speed')"} when download is finished
-                if status == 'downloading':
-                    speed = response['speed']
-                    speed = convert_byte(speed)
-
-                    elapsed = response['elapsed']
-                    elapsed = duration(int(elapsed))
-
-                    eta = response['eta']
-                    eta = duration(int(eta))
-
-                    total_bytes = response['total_bytes']
-                    total_conv  = convert_byte(total_bytes)
-
-                    downloaded_bytes = response['downloaded_bytes']
-                    downloaded_conv  = convert_byte(downloaded_bytes)
-
-                    downloaded_percent = (downloaded_bytes*100)/total_bytes
-
-                    progress_info = {f'{downloaded_conv}/{total_conv}': f'%{downloaded_percent:.2f}', 'speed': speed, 'elapsed': elapsed, 'ETA': eta}
-                    print(C.purple_dim(progress_info), end=endpoint)
-            except Exception as exc:
-                ## TODO analyze erros locally, like the one we do for o down below. We just need more examples of exc to use in analyze [14000223000000]
-                progress_info = {'ERROR': f'{status} {exc!r}'}
-
-        options = {
-            # 'outtmpl': '%(title)s--%(width)sx%(height)s-f%(format_id)s.%(ext)s',
-            'outtmpl': f'{outputname}.%(ext)s',
-            'no_color': True,  ## better be uncommented, otherwise analyze can't display error messages properly
-            'proxy': tor_proxy,
-            'nooverwrites': True,
-            'progress_hooks': [hook],
-            'logger': Ydl_W_Logger(),
-        }
-
-        if downloader:
-            ## FIXME <--,-- currently wget and axel throw error and we're stuck with curl here
-            ##          |-- so we should find how to safely use wget as downloader
-            ##          |-- wget throws 'DownloadError('ERROR: wget exited with code 8')' for v, vs and a but works well for s and t
-            ##          '-- axel throws 'DownloadError('ERROR: axel exited with code 1')' for v, vs and a but works well for s and t [14000425150348]
-            options = {**options, 'external_downloader': 'curl'}
-
-        langs = ['en', 'en-AU', 'en-CA', 'en-GB', 'en-IE', 'en-NZ', 'en-US']
-        if   file_type == 'v':  options = {**options, 'format': video_quality}
-        elif file_type == 's':  options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'skip_download': True}
-        elif file_type == 'vs': options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'format': video_quality}
-        elif file_type == 'a':  options = {**options, 'format': 'bestaudio', 'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]}
-        elif file_type == 't':  options = {**options, 'write_all_thumbnails': True, 'writethumbnail': True, 'skip_download': True}
-
-        try:
-            with YoutubeDL(options) as Y_DL:
-                Y_DL.download([url])
-            print()  ## to prevent the removal of progress_info
-            should_break = True
-        except Exception as exc:
-            analyze(f'{exc!r}', caller=caller)
-    ## }}}
-    def available_formats(self, caller: str):  ## {{{
-        global should_break
-
-        options = {
-            'no_color': True,  ## better be uncommented, otherwise analyze can't read error messages properly
-            'proxy': tor_proxy,
-            'skip_download': True,
-            'listformats': True,
-            'logger': Ydl_DW_Logger(),
-        }
-
-        try:
-            with YoutubeDL(options) as Y_DL:
-                Y_DL.download([url])
-            should_break = True
-        except Exception as exc:
-            analyze(f'{exc!r}', caller=caller)
-    ## }}}
+def make_attempts() -> list[int]:  ## {{{
+    return [_ for _ in range(1, int(Ini.retries)+1)]
 ## }}}
-class Playlist:  ## {{{
-    def __init__(self):  ## {{{
-        self.current_time, self.pl_id, self.pl_title, self.pl_uploader, self.pl_count, self.error = self.get_info()
-    ## }}}
-    def get_info(self):  ## {{{
-        global attempt, should_break, reason, response
-
-        current_time = get_datetime('jhms')
-
-        options = {
-            'proxy': tor_proxy,
-            'skip_download': True,
-            'extract_flat': True,
-            'dump_single_json': True,  ## why was previously 'dumpjson'?
-            'logger': Ydl_W_Logger(),
-        }
-
-        ## ignore_information is not needed here because it will actually make the whole process meaningless!
-
-        for attempt in attempts:
-            should_break = False
-
-            try:
-                ## https://stackoverflow.com/questions/53288922/youtube-dl-dump-json-returning-different-extractor-output-for-playlist-when-ca
-                with YoutubeDL(options) as Y_DL:
-                    ## response contains info about both the playlist itself (which will be parsed a few lines down below)
-                    ## and its individual videos (which will be parsed in get_playlist_urls method)
-                    response = Y_DL.extract_info(playlist_url, download=False)  ## response is a dict
-
-                ## info about the playlist itself
-                pl_id = response['id']
-                pl_title = response['title']
-                pl_uploader = response['uploader']
-                pl_count = len(response['entries'])
-                error = {}
-
-                info = current_time, pl_id, pl_title, pl_uploader, pl_count, error
-
-                should_break = True
-
-            except Exception as exc:
-                analyze(f'{exc!r}', caller='get_info')
-                info = current_time, 'ERROR', 'ERROR', 'ERROR', 'ERROR', {'ERROR': reason}
-
-            if should_break:
-                break
-
-        return info
-    ## }}}
-    @property
-    def info_dict(self):  ## {{{
-        allinfo = {'time': self.current_time, 'id': self.pl_id, 'title': self.pl_title, 'uploader': self.pl_uploader, 'count': self.pl_count, **self.error}
-        return allinfo
-    ## }}}
-    def get_playlist_urls(self):  ## {{{
-        global should_break
-
-        ## when tor is off, response gets no value in get_info.
-        ## however script does not exit there (but enters except, and therefore analyze, instead) reaching here.
-        ## so we need try here otherwise it will end in the error: NameError: name 'response' is not defined [14000424195106]
-        try:
-            ## info about the individual videos
-            entries = response['entries']
-            count = len(entries)
-
-            for indx, entry in enumerate(entries, start=1):
-                video_id = entry['id']
-                video_title = entry['title']
-                video_dur = entry['duration']  ## 500.0
-                video_uploader = entry['uploader']
-                text = f'## {indx}/{count}   Duration: {duration(video_dur)}   Title: {video_title}   Uploader: {video_uploader}\nhttps://www.youtube.com/watch?v={video_id}'
-
-                with open(output_file, 'a') as OUTPUT_FILE:
-                    OUTPUT_FILE.write(f'{text}\n')
-
-            print('Done')
-
-        except Exception as exc:
-            ## we are here because response is not present, so there's nothing to do but exceptionally exit without even analyzing
-            invalid({'ERROR': f'{exc!r}'})
-
-        should_break = True
-    ## }}}
+def make_qualities() -> list[str]:  ## {{{
+    return ['18', '22', '133', '134', '135', '136', '137', '140', '160', '242', '243', '244', '247', '248', '249', '250', '251', '278', '394', '395', '396', '397', '398', '399', 'best']
 ## }}}
-class Ydl_W_Logger(object):  ## {{{
-    '''logger for youtube_dl displaying warning messages'''
+def make_errors() -> dict[str, str]:  ## {{{
+    '''possible errors (i.e. keys) and what we should do (i.e. values)'''
 
-    def debug(self, msg):
-        pass
-
-    def warning(self, msg):
-        ## we don't want to see warnings like 'en-AU subtitles not available for WpqCLcAXkJs' for s and vs
-        if 'subtitles not available for' not in msg:
-            append_to_log(str({'WARNING': msg})+'\n')
-            print(C.yellow_dim({'WARNING': msg}))
-
-    def error(self, msg):
-        pass
-## }}}
-class Ydl_DW_Logger(object):  ## {{{
-    '''logger for youtube_dl displaying debug and warning messages'''
-
-    def debug(self, msg):
-        append_to_log(f'{msg}\n')
-        print(msg)
-
-    def warning(self, msg):
-        ## we don't want to see warnings like 'en-AU subtitles not available for WpqCLcAXkJs' for s and vs
-        if 'subtitles not available for' not in msg:
-            append_to_log(str({'WARNING': msg})+'\n')
-            print(C.yellow_dim({'WARNING': msg}))
-
-    def error(self, msg):
-        pass
-## }}}
-class Ydl_Empty_Logger(object):  ## {{{
-    '''logger for youtube_dl displaying no messages'''
-
-    def debug(self, msg):
-        pass
-
-    def warning(self, msg):
-        pass
-
-    def error(self, msg):
-        pass
-
-## }}}
-def help():  ## {{{
-    run('clear', shell=True)
-    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
-download  {C.flag(f'-w --when=')}n/h
-          {C.flag(f'-f --file-type=')}v/s/vs/a/t/o
-          {C.flag(f'-v --video-quality=')}e.g. 22, best, etc
-          {C.flag(f'-s --source-file=')}e.g. $HOME/downloads/lucy, https://www.youtube.com/watch?v=WpqCLcAXkJs
-          {C.flag(f'-x --x-value=')}
-          {C.flag(f'-d --downloader')}
-          {C.flag(f'-t --torsocks')}
-          {C.flag(f'-i --ignore-information')}
-          {C.flag(f'-c --complete-error')}
-
-get playlist urls  {C.flag(f'-p --playlist-id=')}e.g. PL-osiE80TeTt2d9bfVyTiXJA-UTHn6WwU
-                   {C.flag(f'-o --output-file=')}
-                   {C.flag(f'-c --complete-error')}
-
-available formats  {C.flag(f'-u --url=')}
-                   {C.flag(f'-i --ignore-information')}
-                   {C.flag(f'-c --complete-error')}''')
-    exit()
-## }}}
-def getopts():  ## {{{
-    global main_args, x_value, downloader, torsocks, ignore_information, complete_error
-    main_args, x_value, downloader, torsocks, ignore_information, complete_error = ({},) + (None,) + (False,)*4
-
-    try:
-        duos, duos_long = getopt(
-                              script_args,
-                              'hw:f:v:u:s:x:p:o:dtic',
-                              ['help',
-                               'when=',
-                               'file-type=',
-                               'video-quality=',
-                               'url=',
-                               'source-file=',
-                               'x-value=',
-                               'playlist-id=',
-                               'output-file=',
-                               'downloader',
-                               'torsocks',
-                               'ignore-information',
-                               'complete-error']
-                          )
-        for opt, arg in duos:
-            if   opt in ('-h', '--help'):               help()
-            elif opt in ('-w', '--when'):               main_args['when'] = arg
-            elif opt in ('-f', '--file-type'):          main_args['file-type'] = arg
-            elif opt in ('-v', '--video-quality'):      main_args['video-quality'] = arg
-            elif opt in ('-u', '--url'):                main_args['url'] = arg
-            elif opt in ('-s', '--source-file'):        main_args['source-file'] = arg
-            elif opt in ('-p', '--playlist-id'):        main_args['playlist-id'] = arg
-            elif opt in ('-o', '--output-file'):        main_args['output-file'] = arg
-            elif opt in ('-x', '--x-value'):            main_args['x-value'] = arg
-            elif opt in ('-d', '--downloader'):         main_args['downloader'] = True
-            elif opt in ('-t', '--torsocks'):           main_args['torsocks'] = True
-            elif opt in ('-i', '--ignore-information'): main_args['ignore-information'] = True
-            elif opt in ('-c', '--complete-error'):     main_args['complete-error'] = True
-    except Exception as exc:
-        reason = f'{exc!r}'
-        invalid({'GETOPTS ERROR': reason})
-## }}}
-def prompt(*args: str):  ## {{{
-    global when, file_type, video_quality, url, source_file, playlist_id, output_file, x_value, downloader, torsocks, ignore_information, complete_error
-    global main_args, display_args, urls, dest_dir
-
-    for arg in args:
-        if arg == '-w':
-            when = main_args.get('when')
-            if not when: when = get_single_input('When (n/h)')
-            if when not in ['n', 'h']: invalid('Invalid time')
-            display_args['when'] = when
-
-        elif arg == '-f':
-            file_type = main_args.get('file-type')
-            if not file_type: file_type = get_input('File type (v/s/vs/a/t/o)')
-            if file_type not in ['v', 's', 'vs', 'a', 't', 'o']: invalid('Invalid file type')
-
-            if file_type in ['v', 'vs']: prompt('-v')
-            elif file_type == 'o': prompt('-t')
-
-            # ## we may need downloader only for youtube_dl
-            # if file_type in ['v', 's', 'vs', 'a', 't']:
-            #     prompt('-d')
-
-            display_args['file-type'] = file_type
-
-        elif arg == '-v':
-            video_quality = main_args.get('video-quality')
-            if not video_quality: video_quality = get_input('Video quality (e.g. 22, best, etc)')
-            display_args['video-quality'] = video_quality
-
-        elif arg == '-u':
-            url = main_args.get('url')
-            if not url: url = get_input('URL')
-            display_args['url'] = url
-
-        elif arg == '-s':
-            ## https://www.geeksforgeeks.org/python-check-url-string/
-            url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-
-            source_file = main_args.get('source-file')
-            if not source_file: source_file = get_input('Source file')
-
-            ## check if source_file exists
-            if path.exists(source_file):
-                ## make sure source_file is not a directory
-                if path.isdir(source_file):
-                    invalid('Source file cannot be a directory')
-
-                ## create urls list from source_file
-                with open(source_file, 'r') as SOURCE_FILE:
-                    lines = SOURCE_FILE.read().splitlines()
-                urls = list(filter(lambda line:not line.startswith('#'), lines))  ## OR: [line for line in lines if not line.startswith('#')]
-                if not urls:
-                    invalid('Source file contains no downloadable urls')
-
-                root_base, ext = path.splitext(source_file)
-                dest_dir = root_base
-                dest_dir = if_exists(dest_dir)
-
-            ## check if source_file is a url
-            elif match(url_regex, source_file):
-                urls = [source_file]
-
-                if 'youtube' in source_file:
-                    url_id = source_file.split('=')[-1]  ## WpqCLcAXkJs
-                    dest_dir = f'{hnd}/{url_id}'
-                else:
-                    _, source_file_base = path.split(source_file)  ## 'https://www.davoudarsalani.ir/Files/Fun/', '001.jpg'
-                    root_source_file_base, ext = path.splitext(source_file_base)  ## '001', '.jpg'
-                    dest_dir = f'{hnd}/{root_source_file_base}'
-
-                dest_dir = if_exists(dest_dir)
-            else:
-                invalid('Source file neither exists nor is a valid url')
-
-            display_args['source-file'] = sub(getenv('HOME'), '~', source_file)
-            display_args['destination-directory'] = sub(getenv('HOME'), '~', dest_dir)
-
-        elif arg == '-p':
-            playlist_id = main_args.get('playlist-id')
-            if not playlist_id: playlist_id = get_input('Playlist id (e.g. PL-osiE80TeTt2d9bfVyTiXJA-UTHn6WwU)')
-            display_args['playlist-id'] = playlist_id
-
-        elif arg == '-o':
-            output_file = main_args.get('output-file')
-            if not output_file: output_file = get_input('Output file')
-            output_file = if_exists(output_file)
-            display_args['output-file'] = sub(getenv('HOME'), '~', output_file)
-
-        elif arg == '-x':
-            x_value = main_args.get('x-value', None)
-            if x_value:
-                try:              x_value = int(x_value)
-                except Exception: invalid('x-value should be a number')
-                display_args['x-value'] = x_value
-
-        elif arg == '-d':
-            downloader = main_args.get('downloader', False)
-            if downloader: display_args['downloader'] = downloader
-
-        elif arg == '-t':
-            torsocks = main_args.get('torsocks', False)
-            if torsocks: display_args['torsocks'] = torsocks
-
-        elif arg == '-i':
-            ignore_information = main_args.get('ignore-information', False)
-            if ignore_information: display_args['ignore-information'] = ignore_information
-
-        elif arg == '-c':
-            complete_error = main_args.get('complete-error', False)
-            if complete_error: display_args['complete-error'] = complete_error
-## }}}
-def convert_byte(size_in_bytes):  ## {{{ https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
-    if size_in_bytes == 0:
-        return '00B'
-
-    suff = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
-    i = int(floor(log(size_in_bytes, 1024)))
-    p = pow(1024, i)
-    conv = f'{float(size_in_bytes / p):.2f}'
-
-    return f'{conv}{suff[i]}'
-## }}}
-def check_to_start():  ## {{{
-    current_time = int(get_datetime('jhms'))
-    start_permission = current_time > 21000 and current_time < 63000
-
-    return start_permission
-## }}}
-def check_to_exit():  ## {{{
-    current_time = int(get_datetime('jhms'))
-    exit_permission = current_time > 63000
-
-    return exit_permission
-## }}}
-def restart_tor():  ## {{{
-    ## restart tor only if it is already on
-    try:
-        tor_status = check_output('pgrep "tor"', shell=True, universal_newlines=True).strip()
-    except Exception:
-        tor_status = 'off'
-
-    if not tor_status == 'off':
-        if path.exists('/bin/pacman'):
-            run('sudo systemctl restart tor', shell=True)
-        elif path.exists('/bin/apt'):
-            run('sudo service tor restart', shell=True)
-        else:
-            print(C.red({'ERROR': 'TOR not restarted (unknown OS)'}))
-            return
-
-        dorm(15)
-## }}}
-def draw_table(rows: List[str], header: List[str]=[]):  ## {{{
-    table = tabulate(rows, headers=header, tablefmt='grid')
-
-    return table
-## }}}
-def dest_dir_size():  ## {{{
-    root_directory = Path(dest_dir)
-    dir_raw_size = sum(file.stat().st_size for file in root_directory.glob('**/*'))
-    return dir_raw_size
-## }}}
-def append_to_log(text: str):  ## {{{
-    ## some methods in Ydl_*_Logger classes are instructed to append_to_log
-    ## but log_file is present only when main_item is download, so we need try here
-    try:
-        log_file
-        with open(log_file, 'a') as LOG_FILE:
-            LOG_FILE.write(text)
-    except Exception:
-        pass
-## }}}
-def analyze(cmd_stderr: str, caller: str=''):  ## {{{
-    global reason, should_break, video_quality, failed_sites, order, url, attempt, downloader
-
-    should_restart_tor = False
-
-    conditions = [
-        'ERROR' not in cmd_stderr,
-        'Error' not in cmd_stderr,
-        'WARNING' not in cmd_stderr,
-        'Could not resolve host' not in cmd_stderr,
-        'Unable to connect to server' not in cmd_stderr,
-        'unable to resolve host address' not in cmd_stderr
-    ]
-    no_errors = all(conditions)
-
-    if no_errors:
-        should_break = True
-        return
-
-    ## possible errors (i.e. keys) and what we should do (i.e. values)
-    errors = {
-
-        ## <<< mainly happening in youtube-dl >>>
-
-        'No video formats found':            '',  ## 'break' not necessary because it was seen to be running ok in the next attempt
+    return {
+        ## [[ mainly happening in youtube-dl
+        'No video formats found':            '',  ## 'break' not necessary because it was seen to be running ok in the next Cur.attempt
         'Too Many Requests':                 'restart',
         'requested format not available':    'best',
         'PERROR torsocks':                   'break',
@@ -745,17 +64,16 @@ def analyze(cmd_stderr: str, caller: str=''):  ## {{{
         'unable to resolve host address':    'break',
         'Could not resolve host':            'break',
         'Unable to connect to server':       'break',
+        ## ]]
 
-
-        ## <<< mainly happening in youtube_dl and wget modules >>>
-
+        ## [[ mainly happening in youtube_dl and wget modules
         'Connection refused': 'break',
         ## happened when tor is off
         ## Full: Unable to download webpage: <urlopen error [Errno 111] Connection refused>
 
         'ConnectionError': 'break',
-        ## happened for o when url (domain part) is misspelled (e.g. https://www.davoni.ir/Files/Fun/002.jpg)
-        ## Full: ConnectionError(MaxRetryError("HTTPSConnectionPool(host=\'www.davoni.ir\', port=443): Max retries exceeded with url: /Files/Fun/002.jp
+        ## happened for o when url (domain part) is misspelled (e.g. https://www.davoni.ir/Files/Temp/002.jpg)
+        ## Full: ConnectionError(MaxRetryError("HTTPSConnectionPool(host=\'www.davoni.ir\', port=443): Max retries exceeded with url: /Files/Temp/002.jp
         ##       (Caused by NewConnectionError(\'<urllib3.connection.HTTPSConnection object at 0x7f3a26fcba60>:
         ##       Failed to establish a new connection: [Errno -2] Name or service not known\'))"))
 
@@ -777,25 +95,36 @@ def analyze(cmd_stderr: str, caller: str=''):  ## {{{
         ## Full: DownloadError("ERROR: Private video\\nSign in if you\'ve been granted access to this video")
 
         'HTTPError': 'break',
-        ## happened for o when url (file name part) is misspelled (e.g. https://www.davoudarsalani.ir/Files/Fun/002.jp)
-        ## Full: HTTPError('404 Client Error: Not Found for url: https://www.davoudarsalani.ir/Files/Fun/002.jp')
+        ## happened for o when url (file name part) is misspelled (e.g. https://www.davoudarsalani.ir/Files/Temp/002.jp)
+        ## Full: HTTPError('404 Client Error: Not Found for url: https://www.davoudarsalani.ir/Files/Temp/002.jp')
         ##
+        ## happened for o when url (file name part) is misspelled (e.g. https://raw.githubusercontent.com/ran.jpg)
+        ## Full: <HTTPError 400: 'Bad Request'>
+        ## Full: HTTPError('400 Client Error: Bad Request for url: https://raw.githubusercontent.com/ran.jpg')
+
         ## happened for o when url is censored
         ## Full: HTTPError('403 Client Error: Forbidden for url: http://open.live.bbc.co.uk/p09cn7sc.mp3')
+        ## Full: <HTTPError 403: 'Forbidden'
 
         'IndexError': 'break',
-        ## happened for Video.get_info() when url is misspelled (e.g. it's incomplete) private and can't get info, and therefore 'items' list is empty
+        ## happened for Youtube.get_info() when url is misspelled (e.g. it's incomplete) or private and can't get info, and therefore 'items' list is empty
         ## Full: IndexError('list index out of range')
 
         'URLError': 'break',
         ## happened for File.get_info() when url is censored
         ## Full: URLError(ConnectionResetError(104, 'Connection reset by peer'))
         ##
-        ## happened for File.get_info() with wget module when url (domain part) is missplelled (e.g. https://www.davoni.ir/Files/Fun/002.jpg)
+        ## happened for File.get_info() with wget module when url (domain part) is missplelled (e.g. https://www.davoni.ir/Files/Temp/002.jpg)
         ## Full: URLError(gaierror(-2, 'Name or service not known'))
+        ##
+        ## happened when url is censored
+        ## Full: URLError('unknown url type: socks5')
 
         'ExtractorError': 'break',
         ## Full: ExtractorError('No video formats found')
+
+        'RemoteDisconnected': 'break',
+        ## Full: RemoteDisconnected('Remote end closed connection without response')
 
         'RegexNotFoundError': 'break',
         ## Full: RegexNotFoundError('Unable to extract Initial JS player signature function name; please report this issue on https://yt-dl.org/bug .
@@ -803,230 +132,1060 @@ def analyze(cmd_stderr: str, caller: str=''):  ## {{{
         ##       and include its complete output.',)); please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version;
         ##       type  youtube-dl -U  to update. Be sure to call youtube-dl with the --verbose flag and include its complete output.
 
+        'MissingSchema': 'break',
+        ## Full: MissingSchema("Invalid URL \'\': No schema supplied. Perhaps you meant http://?")
 
-        ## <<< happening in error files (i.e. error files of bwu, weather, etc. in $HOME/scripts/.last directory) just to add more examples >>>
+        'NameError': 'break',
+        ## Full: NameError("name \'xxxxxxx\' is not defined")
 
-        'AttributeError':           'break',  ## Full: AttributeError("'NoneType' object has no attribute 'text'")
-        'OSError':                  'break',  ## Full: OSError(101, 'Network is unreachable')
-        'ReadTimeout':              'break',  ## Full: ReadTimeout(ReadTimeoutError("HTTPSConnectionPool(host='api.openweathermap.org', port=443): Read timed out. (read timeout=20)"))
-        'ServerNotFoundError':      'break',  ## Full: ServerNotFoundError('Unable to find the server at youtube.googleapis.com')
-        'SSLCertVerificationError': 'break',  ## Full: SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self signed certificate in certificate chain (_ssl.c:1123)')
-        'SSLEOFError':              'break',  ## Full: SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1123)')
-        'SSLError':                 'break',  ## Full: SSLError(MaxRetryError("HTTPSConnectionPool(host='<ADDR>', port=443): Max retries exceeded with url: <ADDR> (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self signed certificate in certificate chain (_ssl.c:1123)')))"))
-        'TypeError':                'break',  ## Full: TypeError('Missing required parameter "part"')
-        'TimeoutError':             'break',  ## Full: TimeoutError(110, 'Connection timed out')
-        'timeout':                  'break',  ## Full: <--,-- timeout('_ssl.c:1112: The handshake operation timed out')
-                                              ##          '-- timeout('timed out')
+        'ValueError': 'break',
+        ## Full: ValueError("unknown url type: \'\'")
+
+        ## error(28, 'Connection timed out after 20001 milliseconds')
+        ## error(23, 'Failure writing output to destination')
+        ## ]]
+
+        ## [[ happening in error files (i.e. error files of bwu, weather, etc. in $HOME/scripts/.last directory) just to add more examples
+        'AttributeError': 'break',
+        ## Full: AttributeError("'NoneType' object has no attribute 'text'")
+
+        'OSError': 'break',
+        ## Full: OSError(101, 'Network is unreachable')
+
+        'ReadTimeout': 'break',
+        ## Full: ReadTimeout(ReadTimeoutError("HTTPSConnectionPool(host='api.openweathermap.org', port=443): Read timed out. (read timeout=20)"))
+
+        'ServerNotFoundError':'break',
+        ## Full: ServerNotFoundError('Unable to find the server at youtube.googleapis.com')
+
+        'SSLCertVerificationError':'break',
+        ## Full: SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed:
+        ##       self signed certificate in certificate chain (_ssl.c:1123)')
+
+        'SSLEOFError': 'break',
+        ## Full: SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1123)')
+
+        'SSLError': 'break',
+        ## Full: SSLError(MaxRetryError("HTTPSConnectionPool(host='<ADDR>', port=443): Max retries exceeded with url: <ADDR>
+        ##       (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed:
+        ##       self signed certificate in certificate chain (_ssl.c:1123)')))"))
+
+        'TypeError': 'break',
+        ## Full: TypeError('Missing required parameter "part"')
+
+        'TimeoutError': 'break',
+        ## Full: TimeoutError(110, 'Connection timed out')
+
+        'timeout': 'break',
+        ## Full: timeout('_ssl.c:1112: The handshake operation timed out')
+        ## Full: timeout('timed out')
+
+        'HttpError': 'break',
+        ## Full: <HttpError 400 when requesting <ADDR> returned "API key not valid. Please pass a valid API key.".
+        ##       Details: "[{'message': 'API key not valid. Please pass a valid API key.', 'domain': 'global', 'reason': 'badRequest'}]">
+        ## Full: <HttpError 400 when requesting <ADDR> returned "No filter selected. Expected one of: id, managedByMe, forUsername, mine, mySubscribers, categoryId".
+        ##       Details: "[{'message': 'No filter selected. Expected one of: id, managedByMe, forUsername, mine, mySubscribers, categoryId',
+        ##       'domain': 'youtube.parameter', 'reason': 'missingRequiredParameter', 'location': 'parameters.', 'locationType': 'other'}]">
+
+        'abort': 'break',
+        ## Full: abort('command: STATUS => IMAP4rev1 Server logging out')
+        ## Full: abort('socket error: EOF')
+
+        'ConnectionError': 'break',
+        ## Full: ConnectionError(MaxRetryError("HTTPSConnectionPool(host='api.openweathermap.org', port=443):
+        ##       Max retries exceeded with url: /data/2.5/onecall?lang=en&lat=29.4519&lon=60.8842&units=metric&exclude=hourly,minutely&appid=5283a501dcfcf51f4cb59e29e1d70382
+        ##       (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7efc639130d0>:
+        ##       Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))"))
+        ## Full: ConnectionError(ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))
+        ## Full: ConnectionError(ProtocolError('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')))
+        ## Full: ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='stackoverflow.com', port=443): Read timed out."))
+
+        'ConnectionResetError': 'break',
+        ## Full: ConnectionResetError(104, 'Connection reset by peer')
+
+        'gaierror': 'break',
+        ## Full: gaierror(-3, 'Temporary failure in name resolution')
+        ## ]]
     }
+## }}}
+def convert_byte(size_in_bytes) -> str:  ## {{{ https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
+    if size_in_bytes == 0:
+        return '0B'
 
-    if attempt < len(attempts):
-        for err_key, err_value in errors.items():
-            if err_key in cmd_stderr:
-                if complete_error:
-                    reason = cmd_stderr
+    suff = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
+    i = int(floor(log(size_in_bytes, 1024)))
+    p = math_pow(1024, i)
+    conv = f'{float(size_in_bytes / p):.2f}'
+
+    return f'{conv}{suff[i]}'
+## }}}
+def restart_tor() -> None:  ## {{{
+    ## restart tor only if it is already on
+    try:
+        tor_status = check_output('pgrep "tor"', shell=True, universal_newlines=True).strip()
+    except Exception:
+        tor_status = 'off'
+
+    if not tor_status == 'off':
+        if path.exists('/bin/pacman'):
+            run('sudo systemctl restart tor', shell=True)
+        elif path.exists('/bin/apt'):
+            run('sudo service tor restart', shell=True)
+        else:
+            print(Col.red({'ERROR': 'TOR not restarted (unknown OS)'}))
+            return
+
+        sleep(15)
+## }}}
+def savelog_print(text: Any, fg: str='', prnt: bool=True) -> None:  ## {{{
+    text = str(text)
+
+    ## savelog
+    if Ini.log_file:
+        with open(Ini.log_file, 'a') as opened_log_file:
+            opened_log_file.write(f'{text}\n')
+
+    ## print
+    if prnt:
+        ## TODO get rid of multiple ifs
+        if not fg:              print(text)
+        elif fg == 'blue':      print(Col.blue(text))
+        elif fg == 'brown':     print(Col.brown(text))
+        elif fg == 'red':       print(Col.red(text))
+        elif fg == 'white_dim': print(Col.white_dim(text))
+        elif fg == 'white':     print(Col.white(text))
+        elif fg == 'yellow':    print(Col.yellow(text))
+## }}}
+def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str='') -> None:  ## {{{ TODO is Type correct?
+    class_ins.should_restart_tor = False  ## TODO is it needed here?
+
+    if nth_attempt < len(class_ins.attempts):
+        for error_k, error_v in class_ins.errors.items():
+            if error_k in stderr:
+                if Ini.verbose:
+                    class_ins.error_msg = stderr
                 else:
-                    reason = err_key
-                if err_value == 'break':
-                    should_break = True
-                elif err_value == 'restart':
-                    should_restart_tor = True
-                elif err_value == 'best':
-                    video_quality = 'best'
+                    class_ins.error_msg = error_k
+
+                if error_v == 'break':
+                    class_ins.should_break = True
+                elif error_v == 'restart':
+                    class_ins.should_restart_tor = True
+                elif error_v == 'best':
+                    Ini.quality = 'best'
+
                 break
-            else:
-                reason = f'UNKNOWN: {cmd_stderr}'
-                should_restart_tor = True
-    elif attempt == len(attempts):
-        reason = f'Failed after {attempt} attempts. Last error: {cmd_stderr}'
-        should_break = True  ## <--,-- this is the last attempt and the loop will automatically break anyawy,
-                             ##    '-- but it is needed here for the url to be added to failed_sites
+        else:
+            class_ins.error_msg = f'UNKNOWN: {stderr}'
+            class_ins.should_restart_tor = True
+    else:
+        class_ins.error_msg = f'Failed after {nth_attempt} attempts. Last error: {stderr}'
+        class_ins.should_break = True  ## <--,-- this is the last Cur.attempt and the loop will automatically break anyawy,
+                                       ##    '-- but it is needed here for the url to be added to failures
 
-    ## now let's see what we should do
     if caller == 'download':
-        append_to_log(str({'ERROR': reason})+'\n')
-        if should_break:
-            failed_sites.append({**order, 'url': url, 'ERROR': reason})
+        savelog_print(class_ins.error_dict, 'red')
+        if class_ins.should_break:
+            Ini.add_to_failures()
 
-    ## print error
-    if not caller == 'get_info':
-        print(C.red({'ERROR': reason}))
-
-    if should_restart_tor:
+    if class_ins.should_restart_tor:
         restart_tor()
 ## }}}
-def remove_special_characters(text: str):  ## {{{
-    edited_text = text.lower()
-    edited_text = sub(r' ', r'-', edited_text)
-    edited_text = sub(r'[!@#$%^&*()_+={}\[\]\|\\;\':\",.<>/?`~]', r'', edited_text)  ## <--,-- - is intentionally excluded.
-                                                                                     ##    '-- If you want to include -, you should do so as \-
-    edited_text = sub(r'---', r'-', edited_text)
-    edited_text = sub(r'--', r'-', edited_text)
+def normalize(text: str) -> str:  ## {{{
+    text = text.lower()
+    text = sub(r'[\s_]', r'-', text)  ##    ,-- \w does not include _
+    text = sub(r'[^\w-]', r'', text)  ## <--'-- that's why _ is included in the previous command
+    text = sub(r'-+', r'-', text)
 
-    return edited_text
+    return text
+## }}}
+def calculate_order() -> dict[str, str]:  ## {{{
+    perc = int((Cur.index * 100) / Ini.urls_length)
+
+    return {f'{Cur.index}/{Ini.urls_length}': f'%{perc}'}
 ## }}}
 @duration_wrapper()
-def main():  ## {{{
-    global dest_dir, log_file, outputname, failed_sites, order, should_break, attempt, urls, url, x_value, current, playlist_url
+def main() -> None:  ## {{{
+    print(Col.heading(title))
 
-    getopts()
+    Ini.getopts()
 
-    print(C.heading(title))
+    items = ['download', 'help']
+    item = fzf(items)
 
-    main_items = ['download', 'get playlist urls', 'available formats', 'help']
-    main_item = fzf(main_items)
+    if item == 'download':
 
-    if   main_item == 'download':  ## {{{
+        Ini.verify_args()
+        savelog_print(f'{Ini}\n', 'blue')
 
-        failed_sites = []
+        if Ini.is_playlist:
+            savelog_print(f'{Pla}\n', 'white')
 
-        prompt('-w', '-f', '-s', '-x', '-d', '-i', '-c')
+        while Ini.when == 'h' and not Ini.permission:
+            Ini.check_to_start()
+            sleep(60)
 
-        mkdir(dest_dir)
-        chdir(dest_dir)
+        for url in Ini.urls:
 
-        log_file = f'{dest_dir}/log'
+            Ini.create_current(url)
 
-        append_to_log(str(display_args)+'\n\n')
-        print(C.white_dim(display_args))
+            for Cur.attempt in Cur.attempts:
+                Cur.should_break = False
 
-        print()
+                Ini.check_to_exit()
 
-        while True:
-            permission = check_to_start()
-            if when == 'h' and not permission:
-                ## not yet
-                append_to_log(str({'time': get_datetime('jhms')})+'\n')
-                print(C.brown({'time': get_datetime('jhms')}))
-                dorm(60)
+                savelog_print(Cur.attempt_message, 'white_dim')
+                Cur.download_duration = Cur.download()
+
+                if Cur.should_break:
+                    break
+
+                ## TODO we can sleep between retries here
+            ## END Cur.attempts
+
+            if Ini.increment:
+                Ini.increment += 1
+
+            Cur.report()
+        ## END urls
+    elif item == 'help':
+        display_help()
+## }}}
+def display_help() -> None:  ## {{{
+    run('clear', shell=True)
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('Help')}
+{Col.flag('-s --source=')}a text file e.g. $HOME/downloads/lucy,
+            a url e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg,
+            a youtube playlist id e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu
+            or free
+{Col.flag('-f --file-type=')}{Col.default('[o]')}/v/s/vs/a/t
+{Col.flag('-d --downloader=')}{Col.default('[urlopen]')}/requests/wget/curl for o,
+                or {Col.default('[youtube_dl]')}/curl for v/s/vs/a/t
+{Col.flag('-q --quality=')}{Col.default('[22]')}/243/best/etc
+{Col.flag('-i --increment=')}{Col.default('[None]')}/1/24/etc
+{Col.flag('-r --retries=')}{Col.default('[5]')}/3/10/etc
+{Col.flag('-w --when=')}{Col.default('[n]')}/h
+{Col.flag('-t --tor')}
+{Col.flag('-n --no-information')}
+{Col.flag('-v --verbose')}
+{Col.flag('-p --purge')}''')  ## JUMP_1 whatever downloader you add/remove, update the allowed list of downloaders in Ini.verify_args()
+    exit()
+## }}}
+
+@dataclass
+class Initial:  ## {{{
+    ## {{{
+    time: int                   = field(repr=False, default=get_datetime('jhms'))
+    attrs: dict[str, str]       = field(repr=False, default_factory=dict)
+    urls: list[str]             = field(repr=False, default_factory=list)
+    failures: list[str]         = field(repr=False, default_factory=list)
+    failures_count: int         = field(repr=False, default=0)
+    failed_table: str           = field(repr=False, default=None)
+    table_header: list[str]     = field(repr=False, default_factory=list)
+    table_rows: list[str]       = field(repr=False, default_factory=list)
+    permission: bool            = field(repr=False, default=False)
+    total_duration: str         = field(repr=False, default=None)
+    total_downloaded_raw: int   = field(repr=False, default=None)
+    total_downloaded: str       = field(repr=False, default=None)
+    wait_duration: str          = field(repr=False, default=None)
+    happy_hours_start_time: int = field(repr=False, default=21000)
+    happy_hours_end_time: int   = field(repr=False, default=63000)
+    is_playlist: bool           = field(repr=False, default=False)
+    increment_prefix: str       = field(repr=False, default='')  ## NOTE do NOT replace '' with None
+    valid_qualities: list[str]  = field(repr=False, default_factory=make_qualities)
+    datetime: int               = get_datetime('jymdhms')
+    weekday: int                = get_datetime('jweekday').lower()
+    dest_dir: str               = None
+
+    source: str          = None
+    file_type: str       = 'o'
+    downloader: bool     = False
+    quality: str         = '22'
+    increment: int       = None
+    retries: int         = 5
+    when: str            = 'n'
+    tor: bool            = False
+    no_information: bool = False
+    verbose: bool        = False
+    purge : bool         = False
+    ## }}}
+    def getopts(self) -> None:  ## {{{
+        try:
+            duos, duos_long = getopt(
+                script_args,
+                'hs:f:d:q:i:r:w:tnvp',
+                ['help', 'source=', 'file-type=', 'downloader=', 'quality=', 'increment=', 'retries=', 'when=', 'tor', 'no-information', 'verbose', 'purge']
+            )
+            for opt, arg in duos:
+                if   opt in ('-h', '--help'):           display_help()
+                elif opt in ('-s', '--source'):         self.source         = arg
+                elif opt in ('-f', '--file-type'):      self.file_type      = arg
+                elif opt in ('-d', '--downloader'):     self.downloader     = arg
+                elif opt in ('-q', '--quality'):        self.quality        = arg
+                elif opt in ('-i', '--increment'):      self.increment      = arg
+                elif opt in ('-r', '--retries'):        self.retries        = arg
+                elif opt in ('-w', '--when'):           self.when           = arg
+                elif opt in ('-t', '--tor'):            self.tor            = True
+                elif opt in ('-n', '--no-information'): self.no_information = True
+                elif opt in ('-v', '--verbose'):        self.verbose        = True
+                elif opt in ('-p', '--purge'):          self.purge          = True
+        except Exception as exc:
+            getopts_error_msg = f'{exc!r}'
+            invalid({'GETOPTS ERROR': getopts_error_msg})
+    ## }}}
+    def verify_args(self) -> None:  ## {{{
+            ## {{{ self.source_file + self.urls, self.dest_dir & self.log_file
+            ## https://www.geeksforgeeks.org/python-check-url-string/
+            url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+            playlist_id_regex = '^PL'  ## TODO better regex (I don't think - is required after PL)
+
+            if not self.source:
+                self.source = get_input('Source')
+
+            ## check if self.source is a file
+            if path.isfile(self.source):
+
+                ## create self.urls list from self.source
+                with open(self.source, 'r') as opened_source:
+                    lines = opened_source.read().splitlines()  ## OR: opened_source.readlines()
+                self.urls = list(filter(lambda line: not line.startswith('#') and line, lines))
+                if not self.urls:
+                    invalid('Source contains no downloadable urls')
+
+                root_base, _ = path.splitext(self.source)  ## '$HOME/downloads/lucy', '.txt'
+                self.dest_dir = root_base
+
+            ## check if we should download videos from my website
+            ## better be placed before the statement that makes sure self.source is not a directory
+            elif self.source == 'free':
+                v_dirs = glob(f'{getenv("HOME")}/website/DL/Video/*')
+                for v_dir in v_dirs:
+                    v_count = len(list(glob(f'{v_dir}/*mp4')))
+                    if v_count:
+                        for number in range(1, v_count + 1):
+                            _, base = path.split(v_dir)  ## '$HOME/website/DL/Video', 'Sprouts'
+                            self.urls.append(f'https://www.dl.davoudarsalani.ir/DL/Video/{base}/{number:03}.mp4')
+
+                shuffle(self.urls)
+
+                self.dest_dir = f'{getenv("HOME")}/downloads/free'
+
+            ## make sure self.source is not a directory
+            elif path.isdir(self.source):
+                invalid('Source cannot be a directory')
+
+            ## check if self.source is a url
+            elif match(url_regex, self.source):
+                ## create self.urls list from self.source
+                self.urls = [self.source]
+
+                if 'youtube' in self.source:
+                    _, *url_id = self.source.split('=')  ## [WpqCLcAXkJs] or []
+                    url_id = ''.join(url_id)
+                    ## url_id may be left empty here due to bad self.source (e.g. https://www.youtube.com/watch?vWpqCLcAXkJs)
+                    ## if so, we have nothing else to do but exit
+                    if not url_id:
+                        invalid('url seems incorrect.')
+
+                    self.dest_dir = f'{getenv("HOME")}/downloads/{url_id}'
+                else:
+                    _, source_base = path.split(self.source)  ## 'https://www.davoudarsalani.ir/Files/Temp', '001.jpg'
+                    root_source_base, _ = path.splitext(source_base)  ## '001', '.jpg'
+                    self.dest_dir = f'{getenv("HOME")}/downloads/{root_source_base}'
+
+            ## check if self.source is a playlist id
+            elif match(playlist_id_regex, self.source):
+                global Pla
+
+                self.is_playlist = True
+                Pla = Playlist()
+                Pla.get_info()
+
+                ## create self.urls list from Pla.pl_urls which is s list
+                self.urls = list(filter(lambda line: not line.startswith('#') and line, Pla.pl_urls))
+                if not self.urls:
+                    invalid('No urls extracted from playlist id')
+                self.dest_dir = f'{getenv("HOME")}/downloads/{normalize(self.source)}'
+
             else:
-                for url in urls:
+                invalid('Source neither exists nor is a valid url')
 
-                    urls_length = len(urls)
-                    nth = urls.index(url)+1
-                    perc = int(nth*100/urls_length)
-                    order = {f'{nth}/{urls_length}': f'%{perc}'}
+            ## FIXME find how to remove trailing/leading space self.urls members
+            ## TODO remove repeated urls and print if so
 
-                    if   file_type in ['v', 's', 'vs', 'a', 't']:
-                        current = Video()
-                    elif file_type == 'o':
-                        current = File()
+            if self.purge:
+                self.dest_dir = f'/tmp/purge_{self.time}'
 
-                    outputname = f'{dest_dir}/{outputname}'
-                    current.outputname = sub(getenv('HOME'), '~', outputname)
+            self.dest_dir = if_exists(self.dest_dir)
+            mkdir(self.dest_dir)
+            chdir(self.dest_dir)
+            ## }}}
+            ## {{{ file_type
+            if self.file_type not in ['v', 's', 'vs', 'a', 't', 'o']:
+                invalid('Invalid file type')
+            ## }}}
+            ## downloader {{{ JUMP_1
+            if self.downloader and ((self.file_type in ['v', 's', 'vs', 't', 'a'] and not self.downloader == 'curl') or (self.file_type == 'o' and self.downloader not in ['requests', 'wget', 'curl'])):
+                invalid(f'invalid downloader for {self.file_type}')
+            ## }}}
+            ## quality {{{
+            if self.quality not in self.valid_qualities:
+                invalid(f'Invalid quality. It has to be one of these: {self.valid_qualities}')
+            ## }}}
+            ## increment {{{
+            if self.increment:
+                try:
+                    self.increment = int(self.increment)
+                except Exception:
+                    invalid('increment should be a number')
+            ## }}}
+            ## retries {{{
+            try:
+                self.retries = int(self.retries)  ## make sure self.retries is an int
+                _ = 1 / self.retries  ## make sure self.retries is not 0
+                self.retries = abs(self.retries)  ## make sure self.retries is greater than 0
+            except Exception:
+                invalid('retries should be a number and greater than zero')
+            ## }}}
+            ## when {{{
+            if self.when not in ['n', 'h']:
+                invalid('Invalid time')
+            ## }}}
+    ## }}}
+    def create_current(self, url) -> None:  ## {{{
+        global Cur
 
-                    for attempt in attempts:
-                        should_break = False
+        if self.file_type in ['v', 's', 'vs', 'a', 't']:
+            Cur = Youtube()
+        elif self.file_type == 'o':
+            Cur = File()
 
-                        should_exit = check_to_exit()
-                        if when == 'h' and should_exit:
-                            append_to_log('\nHappy hours over. Exit.\n')
-                            print('\nHappy hours over. Exit.')
-                            exit()
+        Cur.get_info(url)  ## TODO how can we pass url directly when creating the class above?
+    ## }}}
+    def calculate_total_downloaded(self) -> None:  ## {{{
+        ## FIXME <--,-- we are currently calculating dest_dir size after each download but this is not a reliable way
+        ##          |-- because new files may replace existing files that have the same name.
+        ##          |-- what's more, adding Cur.file_raw_size to Ini.total_downloaded_raw after each download is not reliable either
+        ##          |-- because 1: sometimes Cur.file_raw_size is either NOINFO (if requested so), ERROR or 0,
+        ##          '-- or 2: we dont't even have the file size for v, s, vs, a, and t
+        root_directory = Path(self.dest_dir)
+        self.total_downloaded_raw = sum(file.stat().st_size for file in root_directory.glob('**/*'))
+        self.total_downloaded = convert_byte(self.total_downloaded_raw)
+    ## }}}
+    def add_to_failures(self) -> None:  ## {{{
+        self.failures.append({**Cur.order, 'url': Cur.url, **Cur.error_dict})
+        self.failures_count += 1
+    ## }}}
+    def draw_failed_table(self) -> str:  ## {{{
+        if self.failures:
+            # self.table_header = ['count', 'more info']
+            self.table_rows = [[f'{fail_index}/{self.failures_count}', failure] for fail_index, failure in enumerate(self.failures, start=1)]
+            self.failed_table = tabulate(self.table_rows, headers=self.table_header, tablefmt='grid')
 
-                        if attempt == 1:
-                            attempt_message = current.info_dict
+            savelog_print(self.failed_table, 'red')
+    ## }}}
+    def update_time(self) -> None:  ## {{{
+        self.time = int(get_datetime('jhms'))
+    ## }}}
+    def check_to_start(self) -> None:  ## {{{
+        self.update_time()
+        self.calculate_wait_duration()
+
+        if self.happy_hours_end_time > self.time > self.happy_hours_start_time:
+            self.permission = True
+        else:
+            savelog_print({'time': self.time, 'wait': self.wait_duration}, 'brown')
+    ## }}}
+    def check_to_exit(self) -> None:  ## {{{
+        self.update_time()
+
+        if self.when == 'h' and self.time > self.happy_hours_end_time:
+            savelog_print('Happy hours over. Exit.', 'brown')
+            exit()
+    ## }}}
+    def calculate_wait_duration(self) -> None:  ## {{{ https://stackoverflow.com/questions/36810003/calculate-seconds-from-now-to-specified-time-today-or-tomorrow
+        hr = int(str(self.happy_hours_start_time)[:1])  ## 2
+        mins = int(str(self.happy_hours_start_time)[1:3])  ## 10
+        now = dt.now()  ## 2021-08-05 18:55:06.865231
+        secsleft = int((timedelta(hours=24) - (now - now.replace(hour=hr, minute=mins, second=0, microsecond=0))).total_seconds() % (24 * 3600))
+        self.wait_duration = duration(secsleft)
+    ## }}}
+    def report(self) -> None:  ## {{{
+        ## report failures if any
+        Ini.draw_failed_table()
+
+        self.update_time()
+        savelog_print({'time': self.time, 'took': self.total_duration}, 'brown')
+    ## }}}
+    @property
+    def urls_length(self) -> int:  ## {{{
+        return len(self.urls)
+    ## }}}
+    @property
+    def log_file(self) -> str:  ## {{{
+        return f'{self.dest_dir}/log'
+    ## }}}
+    @property
+    def total_downloaded_dict(self) -> dict[str, str]:  ## {{{
+        self.calculate_total_downloaded()
+        return {'total downloaded': self.total_downloaded}
+    ## }}}
+    @property
+    def failures_count_dict(self) -> dict[str, str]:  ## {{{
+        if self.failures_count:
+            return {'failures': self.failures_count}
+        return {}
+    ## }}}
+## }}}
+@dataclass
+class Profile:  ## {{{
+    ## {{{
+    errors: dict[str, str]   = field(repr=False, default_factory=make_errors)
+    attempts: list[int]      = field(repr=False, default_factory=make_attempts)
+    attempt: int             = field(repr=False, default=None)
+    get_info_attempt: int    = field(repr=False, default=None)
+    counter: int             = field(repr=False, default=0)
+    index: int               = field(repr=False, default=None)
+    should_break: bool       = field(repr=False, default=False)
+    should_restart_tor: bool = field(repr=False, default=False)
+    error_msg: str           = field(repr=False, default=None)
+    download_duration: str   = field(repr=False, default=None)
+
+    order: dict[str, str] = field(default_factory=dict)
+    time: int             = None
+    url: int              = None
+    outputname: str       = None
+    ## }}}
+    def report(self) -> None:  ## {{{
+        savelog_print({**self.download_duration_dict, **Ini.total_downloaded_dict, **Ini.failures_count_dict}, 'brown')
+        savelog_print(separator())
+    ## }}}
+    def index_up(self) -> None:  ## {{{
+        Profile.counter += 1
+        self.index = Profile.counter
+    ## }}}
+    @property
+    def download_duration_dict(self) -> dict[str, str]:  ## {{{
+        return {'took': self.download_duration}
+    ## }}}
+    @property
+    def error_dict(self) -> dict[str, str]:  ## {{{
+        return {'ERROR MSG': self.error_msg}
+    ## }}}
+    @property
+    def attempt_dict(self) -> dict[str, int]:  ## {{{
+        return {'attempt': self.attempt}
+    ## }}}
+    @property
+    def attempt_message(self) -> None:  ## {{{
+        if self.attempt == 1:
+            return self
+        return self.attempt_dict
+    ## }}}
+## }}}
+@dataclass
+class File(Profile):  ## {{{
+    ## {{{
+    progress_file_downloaded_raw: int  = field(repr=False, default=0)  ## NOTE do NOT replace 0 with None because it'll be later added to in JUMP_4
+    progress_file_downloaded: int      = field(repr=False, default=None)
+    progress_file_downloaded_perc: int = field(repr=False, default=None)
+    chunksize: int                     = field(repr=False, default=8192)  ## 8192 is 8KB
+    file_raw_size_validity: bool       = field(repr=False, default=False)
+    file_raw_size_invalidity_msg: str  = field(repr=False, default=None)
+
+    file_raw_size: int      = field(repr=False, default=None)
+    file_size: str          = None
+    file_content_type: str  = None
+    file_last_modified: str = None
+    ## }}}
+    def __post_init__(self):  ## {{{
+        super().__init__()
+        self.index_up()
+    ## }}}
+    def get_info(self, url) -> None:  ## {{{
+        if Ini.increment:
+            Ini.increment_prefix = f'{Ini.increment:03}-RNMD-'
+
+        time = get_datetime('jhms')
+        order = calculate_order()
+
+        ## get outputname
+        _, base = path.split(url)  ## 'https://www.davoudarsalani.ir/Files/Temp', '001.jpg'
+        root_base, ext = path.splitext(base)  ## '001', '.jpg'
+        outputname = normalize(root_base)
+        outputname = f'{Ini.increment_prefix}{outputname}{ext}'
+
+        ## not necessary because we use urlopen, and not requests, to get info
+        # if Ini.tor:
+        #     Ses.proxies = {'http': tor_proxy, 'https': tor_proxy}
+
+        ## get file_content_type, file_last_modified, file_raw_size, file_size
+        if Ini.no_information:
+            info = order, time, url, 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', outputname
+        else:
+            for self.get_info_attempt in self.attempts:
+                self.should_break = False
+
+                try:
+                    ## get headers (method 1: using urlopen) TODO make it less of a mess!
+                    ## https://stackoverflow.com/questions/22676/how-to-download-a-file-over-http
+                    headers = {}
+                    for h in str(urlopen(url).info()).strip().split('\n'):
+                        header_k, header_v = h.split(':', 1)
+                        headers[header_k] = header_v.strip()
+
+                    ## get headers (method 2: using requests)
+                    # get_info_requests_response = Ses.head(url, headers=hdrs, timeout=20)
+                    # headers = get_info_requests_response.headers
+                    # status_code = get_info_requests_response.status_code  ## 200
+
+                    file_content_type = headers.get('Content-Type', 'ERROR')    ## <--, <--,-- if url (domain part) is misspelled, file_content_type is assigned 'ERROR'
+                    file_last_modified = headers.get('Last-Modified', 'ERROR')  ## <--|    |-- in except, but if url (file name part) is misspelled, the file_content_type
+                    file_raw_size = int(headers.get('Content-Length', 0))       ## <--|    '-- is always 'text/html; charset=UTF-8' regardless of the real file type
+                    file_size = convert_byte(file_raw_size)                     ##    '-- exceptionally used get because the key is not always there
+
+                    info = order, time, url, file_raw_size, file_size, file_content_type, file_last_modified, outputname
+
+                    self.should_break = True
+
+                except Exception as exc:
+                    method_name = stack()[0][3]
+                    analyze(f'{exc!r}', nth_attempt=self.get_info_attempt, class_ins=Cur, caller=method_name)
+                    info = order, time, url, 'ERROR', 'ERROR', 'ERROR', 'ERROR', outputname
+
+                if self.should_break:
+                    break
+
+        self.order, self.time, self.url, self.file_raw_size, self.file_size, self.file_content_type, self.file_last_modified, self.outputname = info
+        self.check_raw_size_validity()  ## self.file_raw_size may be set as NOINFO (if requested so), ERROR or 0
+    ## }}}
+    def check_raw_size_validity(self) -> None:  ## {{{
+        '''helps decide which progress_info to display'''
+
+        try:
+            _ = int(self.file_raw_size)  ## make sure self.file_raw_size is an int
+            _ = 1 / self.file_raw_size  ## make sure self.file_raw_size is not 0
+            self.file_raw_size_validity = True
+        except Exception:
+            if 'ERROR' in str(self.file_raw_size):
+                self.file_raw_size_invalidity_msg = 'ERROR'
+            elif 'NOINFO' in str(self.file_raw_size):
+                self.file_raw_size_invalidity_msg = 'NOINFO'
+            elif 'ZeroDivisionError' in str(self.file_raw_size):
+                self.file_raw_size_invalidity_msg = '0 raw size'
+            else:
+                self.file_raw_size_invalidity_msg = f'UNKNOWN: {self.file_raw_size}'
+
+            self.file_raw_size_validity = False
+    ## }}}
+    def calculate_progress(self) -> None:  ## {{{
+            self.progress_file_downloaded_raw += self.chunksize  ## JUMP_4
+            self.progress_file_downloaded = convert_byte(self.progress_file_downloaded_raw)
+            self.progress_file_downloaded_perc = (self.progress_file_downloaded_raw * 100) / self.file_raw_size
+
+            ## FIXME <--,-- self.progress_file_downloaded_perc exceeds 100. what's more, adding if chunk:
+            ##          '-- at JUMP_2 prevents it from reaching 100, so here's a dirty trick:
+            if self.progress_file_downloaded_raw > self.file_raw_size:
+                self.progress_file_downloaded = self.file_size
+            if self.progress_file_downloaded_perc > 100:
+                self.progress_file_downloaded_perc = 100
+    ## }}}
+    @duration_wrapper()
+    def download(self) -> None:  ## {{{
+        try:
+            if not Ini.downloader:  ## {{{ uses urlopen
+
+                if Ini.tor:
+                    ## FIXME not tested if proxy really works for urlopen. Needs more tests.
+                    ## https://stackoverflow.com/questions/3168171/how-can-i-open-a-website-with-urllib-via-proxy-in-python
+                    ## https://stackoverflow.com/questions/34576665/setting-proxy-to-urllib-request-python3
+                    proxy_support = ProxyHandler({'http': tor_proxy, 'https': tor_proxy})
+                    proxy_opener = build_opener(proxy_support)
+                    # install_opener(proxy_opener)
+                    download_urlopen_response = proxy_opener.open(self.url)
+                else:
+                    download_urlopen_response = urlopen(self.url)
+
+                with open(self.outputname, 'wb') as opened_outputname:
+                    if self.file_raw_size_validity:
+                        for chunk in iter(partial(download_urlopen_response.read, self.chunksize), b''):
+                            ## JUMP_2
+                            opened_outputname.write(chunk)
+                            self.calculate_progress()
+                            print(Col.purple(self.progress_info_dict), end=endpoint)
+                    else:
+                        for chunk in iter(partial(download_urlopen_response.read, self.chunksize), b''):
+                            print(Col.orange(self.progress_info_error_dict), end=endpoint)
+                            opened_outputname.write(chunk)
+            ## }}}
+            elif Ini.downloader == 'requests':  ## {{{
+                if Ini.tor:
+                    Ses.proxies = {'http': tor_proxy, 'https': tor_proxy}
+
+                ## https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
+                with Ses.get(self.url, headers=hdrs, timeout=20, stream=True) as opened_session:
+                    opened_session.raise_for_status()
+
+                    with open(self.outputname, 'wb') as opened_outputname:
+
+                        if self.file_raw_size_validity:
+                            for chunk in opened_session.iter_content(chunk_size=self.chunksize):
+                                ## JUMP_2
+                                opened_outputname.write(chunk)
+                                self.calculate_progress()
+                                print(Col.purple(self.progress_info_dict), end=endpoint)
                         else:
-                            attempt_message = {'attempt': attempt}
-                        append_to_log(f'{attempt_message}\n')
-                        print(C.blue(attempt_message))
+                            for chunk in opened_session.iter_content(chunk_size=self.chunksize):
+                                print(Col.orange(self.progress_info_error_dict), end=endpoint)
+                                opened_outputname.write(chunk)
+            ## }}}
+            elif Ini.downloader == 'wget':  ## {{{
 
-                        url_duration = current.download(caller='download')
+                ## https://stackoverflow.com/questions/58125279/python-wget-module-doesnt-show-progress-bar
+                ## https://www.itersdesktop.com/2020/09/06/downloading-files-in-python-using-wget-module/
+                def wget_bar(progress_file_downloaded_raw, total=self.file_raw_size, width=80) -> None:  ## JUMP_5 FIXME can't use self.progress_file_downloaded_raw
+                    self.progress_file_downloaded = convert_byte(progress_file_downloaded_raw)
+                    self.progress_file_downloaded_perc = (progress_file_downloaded_raw /total) * 100
+                    print(Col.purple(self.progress_info_dict), end=endpoint)
 
-                        if should_break:
-                            break
-                    ## END attempt
+                ## FIXME doesn't show
+                def wget_bar_error(progress_file_downloaded_raw, total=self.file_raw_size, width=80) -> None:  ## JUMP_5 FIXME can't use self.progress_file_downloaded_raw
+                    print(Col.orange(self.progress_info_error_dict), end=endpoint)
 
-                    raw_dest_dir_size = dest_dir_size()
-                    converted_dest_dir_size = convert_byte(raw_dest_dir_size)
-                    append_to_log(str({'url duration': url_duration, 'dest dir size': converted_dest_dir_size})+'\n')
-                    print(C.brown({'url duration': url_duration, 'dest dir size': converted_dest_dir_size}))
+                if Ini.tor:
+                    ## FIXME find how to set proxy for wget
+                    ## JUMP_6 FIXME it prompts for every url
+                    continue_without_proxy = get_single_input('Setting tor for wget for o is not possible at the moment. Continue without proxy?')
+                    if not continue_without_proxy == 'y':
+                        exit()
 
-                    append_to_log('-'*60+'\n')
-                    print(separator())
+                ## wget is able to get progress_file_downloaded_raw and self.file_raw_size on the go anyway, but it is better to respect the info already present
+                if self.file_raw_size_validity:
+                    wget_download(url=self.url, out=self.outputname, bar=wget_bar)
+                else:
+                    wget_download(url=self.url, out=self.outputname, bar=wget_bar_error)
+            ## }}}
+            elif Ini.downloader == 'curl':  ## {{{ http://pycurl.io/docs/latest/index.html
+                ## examples: https://www.programcreek.com/python/example/1602/pycurl
+                cc = Curl()  ## curl connection
+                cc.setopt(cc.URL, self.url)
+                cc.setopt(cc.CONNECTTIMEOUT, 20)
+                cc.setopt(cc.USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0')  ## get_headers() or hdrs wouldn't work
+                # cc.setopt(cc.TIMEOUT, 120)
+                # cc.setopt(cc.FOLLOWLOCATION, True)  ## following redirects
 
-                    if x_value:
-                        x_value += 1
-                ## END urls
+                if Ini.tor:
+                    cc.setopt(cc.PROXY, '127.0.0.1')
+                    cc.setopt(cc.PROXYPORT, 9050)
+                    cc.setopt(cc.PROXYTYPE, cc.PROXYTYPE_SOCKS5_HOSTNAME)  ## https://stackoverflow.com/questions/32396115/access-denied-to-a-website-using-tor
+                    # cc.setopt(cc.PROXYTYPE, cc.PROXYTYPE_SOCKS5)  ## https://stackoverflow.com/questions/8252722/tor-with-pycurl-usage
 
-                ## fails report
-                if failed_sites:
-                    table_header = [f'{len(failed_sites)} fails']
-                    table_rows = [[failed_site] for failed_site in failed_sites]
-                    failed_table = draw_table(table_rows, table_header)
+                with open(self.outputname, 'wb') as opened_outputname:
+                    ## TODO show progress bar
+                    cc.setopt(cc.WRITEDATA, opened_outputname)
+                    cc.perform()
 
-                    append_to_log(f'{failed_table}\n')
-                    print(C.red(failed_table))
+                cc.close()
+            ## }}}
 
-                break
-            ## END if
-        ## END while
+            print()  ## to prevent the removal of progress_info
+            self.should_break = True
+
+        except Exception as exc:
+            method_name = stack()[0][3]
+            analyze(f'{exc!r}', nth_attempt=self.attempt, class_ins=Cur, caller=method_name)
     ## }}}
-    elif main_item == 'get playlist urls':  ## {{{
-
-        prompt('-p', '-o', '-c')
-
-        print(C.white_dim(display_args))
-        print()
-
-        playlist_url = f'https://www.youtube.com/playlist?list={playlist_id}'
-
-        current = Playlist()
-
-        for attempt in attempts:
-            should_break = False
-
-            if attempt == 1:
-                attempt_message = current.info_dict
-            else:
-                attempt_message = {'attempt': attempt}
-            print(C.blue(attempt_message))
-
-            current.get_playlist_urls()
-
-            if should_break:
-                break
+    @property
+    def progress_info_dict(self) -> dict[str, str]:  ## {{{
+        return {f'{self.progress_file_downloaded}/{self.file_size}': f'%{self.progress_file_downloaded_perc:.2f}'}
     ## }}}
-    elif main_item == 'available formats':  ## {{{
-        prompt('-u', '-i', '-c')
-
-        print(C.white_dim(display_args))
-        print()
-
-        order = {}
-        current = Video()
-
-        for attempt in attempts:
-            should_break = False
-
-            if attempt == 1:
-                attempt_message = current.info_dict
-            else:
-                attempt_message = {'attempt': attempt}
-            print(C.blue(attempt_message))
-
-            current.available_formats(caller='available_formats')
-
-            if should_break:
-                break
+    @property
+    def progress_info_error_dict(self) -> dict[str, str]:  ## {{{
+        return {'BAR ERROR MSG': self.file_raw_size_invalidity_msg}
     ## }}}
-    elif main_item == 'help':  ## {{{
-        help()
 ## }}}
+@dataclass
+class Youtube(Profile):  ## {{{
+    ## {{{
+    progress_status: str                = field(repr=False, default=None)
+    progress_speed_raw: int             = field(repr=False, default=None)
+    progress_speed: str                 = field(repr=False, default=None)
+    progress_elapsed: int               = field(repr=False, default=None)
+    progress_eta: int                   = field(repr=False, default=None)
+    progress_video_raw_size: int        = field(repr=False, default=None)
+    progress_video_size: str            = field(repr=False, default=None)
+    progress_video_downloaded_raw: int  = field(repr=False, default=None)
+    progress_video_downloaded: str      = field(repr=False, default=None)
+    progress_video_downloaded_perc: int = field(repr=False, default=None)
+    progress_info_error: str            = field(repr=False, default=None)
+
+    video_title: str         = None
+    video_uploader: str      = None
+    video_channel: str       = None
+    video_duration: int      = None
+    video_view_count: int    = None
+    video_like_count: int    = None
+    video_dislike_count: int = None
+    video_ext: str           = None
+    ## }}}
+    def __post_init__(self):  ## {{{
+        super().__init__()
+        self.index_up()
+    ## }}}
+    def get_info(self, url) -> None:  ## {{{
+        if Ini.increment:
+            Ini.increment_prefix = f'{Ini.increment:03}-RNMD-'
+
+        order = calculate_order()
+        time = get_datetime('jhms')
+        video_id = url.split('=')[1]  ## WpqCLcAXkJs
+
+        options = {
+            'proxy': tor_proxy,
+            'no_color': True,  ## better be uncommented, otherwise analyze can't display error messages properly
+            'skip_download': True,
+            'logger': YoutubedlLoggerEmpty(),  ## because we don't need stdout/stderr when we are in get_info
+        }
+
+        if Ini.no_information:
+            outputname = f'{Ini.increment_prefix}{video_id}'  ## 081-RNMD-WpqCLcAXkJs or WpqCLcAXkJs
+            info = order, time, url, 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', outputname
+        else:
+            for self.get_info_attempt in self.attempts:
+                self.should_break = False
+
+                try:
+                    with YoutubeDL(options) as opened_youtubedl:
+                        # opened_youtubedl.cache.remove()
+                        video_obj = opened_youtubedl.extract_info(url, download=False)
+
+                    video_title = video_obj['title']  ## '"Hide and Seek" l At Home With Olaf'
+                    video_uploader = video_obj['uploader']  ## 'Walt Disney Animation Studios'
+                    video_channel = video_obj['channel']  ## 'Walt Disney Animation Studios'
+                    video_duration = video_obj['duration']  ## 41
+                    video_duration = duration(video_duration)  ## 00:00:41
+                    video_view_count = f'{video_obj["view_count"]:,d}'  ## 1,362,401
+                    video_like_count = f'{video_obj["like_count"]:,d}'  ## 13,730
+                    video_dislike_count = f'{video_obj["dislike_count"]:,d}'  ## 2,416
+                    video_ext = video_obj['ext']  ## mp4
+
+                    outputname = normalize(video_title)
+                    outputname = f'{Ini.increment_prefix}{outputname}-{video_id}'
+
+                    info = order, time, url, video_title, video_uploader, video_channel, video_duration, video_view_count, video_like_count, video_dislike_count, video_ext, outputname
+
+                    self.should_break = True
+
+                except Exception as exc:
+                    outputname = f'{Ini.increment_prefix}{video_id}'  ## 081-RNMD-WpqCLcAXkJs or WpqCLcAXkJs
+
+                    method_name = stack()[0][3]
+                    analyze(f'{exc!r}', nth_attempt=self.get_info_attempt, class_ins=Cur, caller=method_name)
+                    info = order, time, url, 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', outputname
+
+                if self.should_break:
+                    break
+
+        self.order, self.time, self.url, self.video_title, self.video_uploader, self.video_channel, self.video_duration, self.video_view_count, self.video_like_count, self.video_dislike_count, self.video_ext, self.outputname = info
+    ## }}}
+    @duration_wrapper()
+    def download(self) -> None:  ## {{{
+        ## useful links {{{
+        ## https://stackoverflow.com/questions/18054500/how-to-use-youtube-dl-from-a-python-program
+        ## https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
+        ## https://github.com/ytdl-org/youtube-dl/blob/3e4cedf9e8cd3157df2457df7274d0c842421945/youtube_dl/YoutubeDL.py#L137-L312 (available options)
+        ## https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/YoutubeDL.py#L128-L278 (available options)
+        ## https://www.programcreek.com/python/example/98358/youtube_dl.YoutubeDL
+        ## https://programtalk.com/python-examples/youtube_dl.YoutubeDL/
+        ## https://codingdict.com/sources/py/youtube_dl/16491.html
+        ## https://vimsky.com/zh-tw/examples/detail/python-method-youtube_dl.YoutubeDL.html
+        ## }}}
+
+        ## FIXME does not display for s and t
+        ## https://stackoverflow.com/questions/23727943/how-to-get-information-from-youtube-dl-in-python
+        def progress_hook(progress_response) -> None:
+            self.progress_status = progress_response['status']
+            ## try is used just to make sure nothing goes wrong
+            try:
+                ## we have to use the if statement, otherwise the progress_info_dict will be screwed
+                ## when the exception swoops in with a message like {'ERROR MSG': "KeyError('speed')"}
+                ## when download is finished because it has jumped to except down below
+                if self.progress_status == 'downloading':
+                    self.progress_speed_raw = progress_response['speed']
+                    self.progress_speed = convert_byte(self.progress_speed_raw)
+
+                    self.progress_elapsed = int(progress_response['elapsed'])
+                    self.progress_elapsed = duration(self.progress_elapsed)
+
+                    self.progress_eta = int(progress_response['eta'])
+                    self.progress_eta = duration(self.progress_eta)
+
+                    self.progress_video_raw_size = progress_response['total_bytes']
+                    self.progress_video_size = convert_byte(self.progress_video_raw_size)
+
+                    self.progress_video_downloaded_raw = progress_response['downloaded_bytes']
+                    self.progress_video_downloaded = convert_byte(self.progress_video_downloaded_raw)
+
+                    self.video_downloaded_percent = (self.progress_video_downloaded_raw * 100) / self.progress_video_raw_size
+
+                    print(Col.purple(self.progress_info_dict), end=endpoint)
+            except Exception as exc:
+                self.progress_info_error = f'{exc!r}'
+                print(Col.orange(self.progress_info_error_dict), end=endpoint)
+
+        options = {
+            # 'outtmpl': '%(title)s--%(width)sx%(height)s-f%(format_id)s.%(ext)s',
+            'outtmpl': f'{self.outputname}.%(ext)s',
+            'no_color': True,  ## better be uncommented, otherwise analyze can't display error messages properly
+            'proxy': tor_proxy,
+            'nooverwrites': True,
+            'progress_hooks': [progress_hook],
+            'logger': YoutubedlLoggerW(),
+        }
+
+        if not Ini.downloader:  ## uses youtube_dl
+            pass
+        elif Ini.downloader == 'curl':
+            options = {**options, 'external_downloader': 'curl'}
+        elif Ini.downloader and not Ini.downloader == 'curl':
+            ## FIXME <--,-- currently wget and axel throw error and we're stuck with curl here
+            ##          |-- so we should find out how to safely use wget or axel as downloader
+            ##          |-- wget throws 'DownloadError('ERROR: wget exited with code 8')' for v, vs and a but works well for s and t
+            ##          '-- axel throws 'DownloadError('ERROR: axel exited with code 1')' for v, vs and a but works well for s and t
+            ## JUMP_6 FIXME it prompts for every url
+            continue_with_default_downloader = get_single_input('Setting downloader other than curl for v/s/vs/a/t is not possible at the moment. Continue with default downloader (i.e. youtube_dl)?')
+            if not continue_with_default_downloader == 'y':
+                exit()
+
+        langs = ['en', 'en-AU', 'en-CA', 'en-GB', 'en-IE', 'en-NZ', 'en-US']
+        if   Ini.file_type == 'v':  options = {**options, 'format': Ini.quality}
+        elif Ini.file_type == 's':  options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'skip_download': True}
+        elif Ini.file_type == 'vs': options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'format': Ini.quality}
+        elif Ini.file_type == 'a':  options = {**options, 'format': 'bestaudio', 'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]}
+        elif Ini.file_type == 't':  options = {**options, 'write_all_thumbnails': True, 'writethumbnail': True, 'skip_download': True}
+
+        try:
+            with YoutubeDL(options) as opened_youtubedl:
+                opened_youtubedl.download([self.url])
+            print()  ## to prevent the removal of progress_info
+            self.should_break = True
+        except Exception as exc:
+            method_name = stack()[0][3]
+            analyze(f'{exc!r}', nth_attempt=self.attempt, class_ins=Cur, caller=method_name)
+    ## }}}
+    @property
+    def progress_info_dict(self) -> dict[str, str]:  ## {{{
+        return {
+            f'{self.progress_video_downloaded}/{self.progress_video_size}': f'%{self.video_downloaded_percent:.2f}',
+            'speed': self.progress_speed,
+            'elapsed': self.progress_elapsed,
+            'eta': self.progress_eta,
+        }
+    ## }}}
+    @property
+    def progress_info_error_dict(self) -> dict[str, str]:  ## {{{
+        return {'BAR ERROR MSG': f'{self.progress_status} {self.progress_info_error}'}
+    ## }}}
 ## }}}
-## variables {{{
-title = path.basename(__file__).replace('.py', '')
-hnd = f'{getenv("HOME")}/downloads'
-s = Session()
-hdrs = get_headers()
-tor_proxy = 'socks5://127.0.0.1:9050'
-display_args = {'datetime': get_datetime('jymdhms')}
-script_args = argv[1:]
-C = Color()
-endpoint = '\r'
-attempts = [att for att in range(1, 6)]
+@dataclass
+class Playlist(Profile):  ## {{{
+    ## {{{
+    pl_fullinfo: dict[str, str] = field(repr=False, default_factory=dict)
+    pl_urls: list[str]          = field(repr=False, default_factory=list)
+
+    pl_title: str         = None
+    pl_uploader: str      = None
+    pl_entries: list[str] = field(repr=False, default_factory=list)
+    pl_entries_count: int = None
+    ## }}}
+    def __post_init__(self):  ## {{{
+        super().__init__()
+    ## }}}
+    def get_info(self) -> None:  ## {{{
+        options = {
+            'proxy': tor_proxy,
+            'skip_download': True,
+            'extract_flat': True,
+            'dump_single_json': True,  ## why was previously 'dumpjson'?
+            'logger': YoutubedlLoggerW(),
+        }
+
+        ## 'if Ini.no_information' is not needed here because it will actually make the whole process pointless!
+
+        for self.get_info_attempt in self.attempts:
+            self.should_break = False
+
+            try:
+                ## https://stackoverflow.com/questions/53288922/youtube-dl-dump-json-returning-different-extractor-output-for-playlist-when-ca
+                with YoutubeDL(options) as opened_youtubedl:
+                    self.pl_fullinfo = opened_youtubedl.extract_info(f'https://www.youtube.com/playlist?list={Ini.source}', download=False)  ## self.pl_fullinfo is a dict
+
+                pl_title = self.pl_fullinfo['title']
+                pl_uploader = self.pl_fullinfo['uploader']
+                pl_entries = self.pl_fullinfo['entries']
+                pl_entries_count = len(self.pl_fullinfo['entries'])
+
+                ## add each entry['id'] to self.pl_urls to be later added to Ini.source in Initial.verify_args()
+                for entry in pl_entries:
+                    self.pl_urls.append(f'https://www.youtube.com/watch?v={entry["id"]}')
+
+                info = pl_title, pl_uploader, pl_entries_count
+
+                self.should_break = True
+
+            except Exception as exc:
+                method_name = stack()[0][3]
+                analyze(f'{exc!r}', nth_attempt=self.get_info_attempt, class_ins=Pla, caller=method_name)
+                info = 'ERROR', 'ERROR', 'ERROR'
+
+            if self.should_break:
+                break
+
+        self.pl_title, self.pl_uploader, self.pl_entries_count = info
+        ## }}}
+## }}}
+class YoutubedlLoggerW:  ## {{{
+    '''logger for youtube_dl displaying warning messages'''
+
+    @staticmethod
+    def debug(log_msg) -> None:
+        pass
+
+    @staticmethod
+    def warning(log_msg) -> None:
+        ## we don't want to see warnings like 'en-AU subtitles not available for WpqCLcAXkJs' for s and vs
+        if 'subtitles not available for' not in log_msg:
+            savelog_print({'WARNING MSG': log_msg}, 'yellow')
+
+    @staticmethod
+    def error(log_msg) -> None:
+        pass
+## }}}
+class YoutubedlLoggerEmpty:  ## {{{
+    '''logger for youtube_dl displaying no messages'''
+
+    @staticmethod
+    def debug(log_msg) -> None:
+        pass
+
+    @staticmethod
+    def warning(log_msg) -> None:
+        pass
+
+    @staticmethod
+    def error(log_msg) -> None:
+        pass
 ## }}}
 
 if __name__ == '__main__':
-    total_duration = main()
-    append_to_log(str({'time': get_datetime('jhms'), 'total duration': total_duration})+'\n')
-    print(C.brown({'time': get_datetime('jhms'), 'total duration': total_duration}))
+    title = path.basename(__file__).replace('.py', '')
+    tor_proxy = 'socks5://127.0.0.1:9050'
+    script_args = argv[1:]
+    endpoint = '\r'
+    hdrs = get_headers()
+    Ses = Session()
+    Col = Color()
+    Ini = Initial()
+
+    Ini.total_duration = main()
+    Ini.report()

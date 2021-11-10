@@ -1,34 +1,42 @@
 #!/usr/bin/env bash
 source "$HOME"/scripts/gb
 
-function help(){ source "$HOME"/scripts/.help; mime_type_help ;}
+function display_help {
+    source "$HOME"/scripts/.help
+    mime_type_help
+}
 
-function prompt(){
-    for args in "$@"; do
+function prompt {
+    for args in "$@"; {
         case "$1" in
-            -f ) [ ! "$file" ] && get_input "File" && file="$input" ;;
+            -f ) [ ! "$file" ] && get_input 'File' && file="$input" ;;
         esac
         shift
-    done ;}
+    }
+}
 
-while getopts 'hf:' flag; do
-     case "$flag" in
-        h ) help; exit     ;;
-        f ) file="$OPTARG" ;;
-     esac
-done
+function get_opts {
+    while getopts 'hf:' flag; do
+         case "$flag" in
+            h ) display_help   ;;
+            f ) file="$OPTARG" ;;
+         esac
+    done
+}
+
+get_opts "$@"
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( "mime-type" "help" )
+main_items=( 'mime-type' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     mime-type ) prompt -f
                 file --mime-type "$file" -bL && accomplished
                 exit ;;
-    help ) help; exit ;;
+    help ) display_help ;;
     * ) exit ;;
 esac
 

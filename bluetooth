@@ -2,19 +2,21 @@
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-fir-blu-batt
 
-function update_bluetooth(){ "$HOME"/scripts/awesome-widgets bluetooth ;}
+function update_bluetooth {
+    "$HOME"/scripts/awesome-widgets bluetooth
+}
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( "status" "blueman-manager" "blueman-applet" "turn on" "turn off" "controllers" "controller information" "select default controller" "available/paired devices" "device information" "set pairable on/off" "set discoverable on/off" "pair with a device" "trust/untrust a device" "block/unblock a device" "remove a device" "connect/disconnect a device" "configuration path" "quit program" "disable auto turning on" "enable" "disable" )
+main_items=( 'status' 'blueman-manager' 'blueman-applet' 'turn on' 'turn off' 'controllers' 'controller information' 'select default controller' 'available/paired devices' 'device information' 'set pairable on/off' 'set discoverable on/off' 'pair with a device' 'trust/untrust a device' 'block/unblock a device' 'remove a device' 'connect/disconnect a device' 'configuration path' 'quit program' 'disable auto turning on' 'enable' 'disable' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    status ) if [ "$bluetooth_status" == "yes" ]; then
-                 echo "Bluetooth is off" && update_bluetooth && accomplished
+    status ) if [ "$bluetooth_status" == 'yes' ]; then
+                 printf '%s\n' 'Bluetooth is off' && update_bluetooth && accomplished
              else
-                 echo "Bluetooth is on"  && update_bluetooth && accomplished
+                 printf '%s\n' 'Bluetooth is on'  && update_bluetooth && accomplished
              fi ;;
     blueman-manager ) blueman-manager 1>/dev/null &
                       sleep 2
@@ -22,64 +24,64 @@ case "$main_item" in
     blueman-applet ) blueman-applet 1>/dev/null 2>&1 &
                      sleep 2
                      update_bluetooth && accomplished ;;
-    "turn on" ) sudo rfkill unblock bluetooth && update_bluetooth && accomplished ;;
-    "turn off" ) sudo rfkill block bluetooth && update_bluetooth && accomplished ;;
-    "available controllers" ) bluetoothctl list && accomplished ;;
-    "controller information" ) bluetoothctl show "$def_ctrlr_mac" && accomplished ;;
-    "select default controller" ) get_input "Mac address [!! or name]" && mac="$input"
+    'turn on' ) sudo rfkill unblock bluetooth && update_bluetooth && accomplished ;;
+    'turn off' ) sudo rfkill block bluetooth && update_bluetooth && accomplished ;;
+    'available controllers' ) bluetoothctl list && accomplished ;;
+    'controller information' ) bluetoothctl show "$def_ctrlr_mac" && accomplished ;;
+    'select default controller' ) get_input 'Mac address [!! or name]' && mac="$input"
                                   bluetoothctl select "$mac" && accomplished ;;
-    "available/paired devices" ) echo -e "available:\t$(bluetoothctl devices)"
-                                 echo -e "paired:\t\t$(bluetoothctl paired-devices)" && accomplished ;;
-    "device information" ) get_input "Device mac address" && mac="$input"
+    'available/paired devices' ) printf 'available:\t%s\n' "$(bluetoothctl devices)"
+                                 printf 'paired:\t\t%s\n' "$(bluetoothctl paired-devices)" && accomplished ;;
+    'device information' ) get_input 'Device mac address' && mac="$input"
                            bluetoothctl info "$mac" && accomplished ;;
-    "set pairable on/off" ) set_pairable_items=( "on" "off" )
+    'set pairable on/off' ) set_pairable_items=( 'on' 'off' )
                             set_pairable_item="$(pipe_to_fzf "${set_pairable_items[@]}")" && wrap_fzf_choice "$set_pairable_item" || exit 37
 
                             case "$set_pairable_item" in
                                 on )  bluetoothctl pairable on  && accomplished ;;
                                 off ) bluetoothctl pairable off && accomplished ;;
                             esac ;;
-    "set discoverable on/off" ) set_discoverable_items=( "on" "off" )
+    'set discoverable on/off' ) set_discoverable_items=( 'on' 'off' )
                                 set_discoverable_item="$(pipe_to_fzf "${set_discoverable_items[@]}")" && wrap_fzf_choice "$set_discoverable_item" || exit 37
 
                                 case "$set_discoverable_item" in
                                     on )  bluetoothctl discoverable on  && accomplished ;;
                                     off ) bluetoothctl discoverable off && accomplished ;;
                                 esac ;;
-    "pair with a device" ) get_input "Device mac address" && mac="$input"
+    'pair with a device' ) get_input 'Device mac address' && mac="$input"
                            bluetoothctl pair "$mac" && accomplished ;;
-    "trust/untrust a device" ) trust_items=( "trust" "nuntrust" )
+    'trust/untrust a device' ) trust_items=( 'trust' 'nuntrust' )
                                trust_item="$(pipe_to_fzf "${trust_items[@]}")" && wrap_fzf_choice "$trust_item" || exit 37
 
                                case "$trust_item" in
-                                   trust )   get_input "Device mac address" && mac="$input"
+                                   trust )   get_input 'Device mac address' && mac="$input"
                                              bluetoothctl trust "$mac" && accomplished ;;
-                                   untrust ) get_input "Device mac address" && mac="$input"
+                                   untrust ) get_input 'Device mac address' && mac="$input"
                                              bluetoothctl untrust "$mac" && accomplished ;;
                                esac ;;
-    "block/unblock a device" ) block_items=( "block" "unblock" )
+    'block/unblock a device' ) block_items=( 'block' 'unblock' )
                                block_item="$(pipe_to_fzf "${block_items[@]}")" && wrap_fzf_choice "$block_item" || exit 37
 
                                case "$block_item" in
-                                   block )   get_input "Device mac address" && mac="$input"
+                                   block )   get_input 'Device mac address' && mac="$input"
                                              bluetoothctl block "$mac" && accomplished ;;
-                                   unblock ) get_input "Device mac address" && mac="$input"
+                                   unblock ) get_input 'Device mac address' && mac="$input"
                                              bluetoothctl unblock "$mac" && accomplished ;;
                                esac ;;
-    "remove a device" ) get_input "Device mac address" && mac="$input"
+    'remove a device' ) get_input 'Device mac address' && mac="$input"
                         bluetoothctl remove "$mac" && accomplished ;;
-    "connect/disconnect a device" ) connect_items=( "connect" "disconnect" )
+    'connect/disconnect a device' ) connect_items=( 'connect' 'disconnect' )
                                     connect_item="$(pipe_to_fzf "${connect_items[@]}")" && wrap_fzf_choice "$connect_item" || exit 37
 
                                     case "$connect_item" in
-                                        connect )    get_input "Device mac address" && mac="$input"
+                                        connect )    get_input 'Device mac address' && mac="$input"
                                                      bluetoothctl connect "$mac" && accomplished ;;
-                                        disconnect ) get_input "Device mac address" && mac="$input"
+                                        disconnect ) get_input 'Device mac address' && mac="$input"
                                                      bluetoothctl connect "$mac" && accomplished ;;
                                     esac ;;
-    "configuration path" ) echo "/etc/bluetooth/main.conf" && accomplished ;;
-    "quit program" ) bluetoothctl quit && accomplished ;;
-    "disable auto turning on" ) gsettings set org.blueman.plugins.powermanager auto-power-on false && accomplished ;;
+    'configuration path' ) printf '%s\n' '/etc/bluetooth/main.conf' && accomplished ;;
+    'quit program' ) bluetoothctl quit && accomplished ;;
+    'disable auto turning on' ) gsettings set org.blueman.plugins.powermanager auto-power-on false && accomplished ;;
     enable ) sudo systemctl enable bluetooth && accomplished ;;
     disable ) sudo systemctl disable bluetooth && accomplished ;;
 esac

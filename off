@@ -1,89 +1,89 @@
 #!/usr/bin/env bash
 source "$HOME"/scripts/gb
 
-function shutdown_now(){
-    if_speech
+function shutdown_now {
     copy_pacman_log
     copy_random_wallpaper_for_startup
     play_shutdown_track
-    shutdown -h now ;}
+    shutdown -h now
+}
 
-function shutdown_later(){
-    shutdown_later_items=( "Usage: e.g. +10 [for 10 minutes] OR 14:31" )
-    shutdown_later_item="$(pipe_to_dmenu "${shutdown_later_items[@]}" "shutdown at:" "")" || exit 37
+function shutdown_later {
+    shutdown_later_items=( 'Usage: e.g. +10 [for 10 minutes] OR 14:31' )
+    shutdown_later_item="$(pipe_to_rofi "${shutdown_later_items[@]}" 'shutdown at:' '')" || exit 37
 
     sleep 0.1
-    if_speech
     copy_pacman_log
     copy_random_wallpaper_for_startup
     play_shutdown_track
     shutdown -h "$shutdown_later_item"
 
-    shutdown_later_confirm_items=( "ok" "cancel it" )
-    shutdown_later_confirm_item="$(pipe_to_dmenu "${shutdown_later_confirm_items[@]}" "will shutdown at $shutdown_later_confirm_item" "")" || exit 37
+    shutdown_later_confirm_items=( 'ok' 'cancel it' )
+    shutdown_later_confirm_item="$(pipe_to_rofi "${shutdown_later_confirm_items[@]}" "will shutdown at $shutdown_later_confirm_item" '')" || exit 37
 
     sleep 0.1
-    [ "$shutdown_later_confirm_item" == "cancel it" ] && shutdown -c && msgn "shutdown canceled" && exit ;}
+    [ "$shutdown_later_confirm_item" == 'cancel it' ] && shutdown -c && msgn 'shutdown canceled' && exit
+}
 
-function reboot_now(){
-    if_speech
+function reboot_now {
     copy_pacman_log
     copy_random_wallpaper_for_startup
     play_shutdown_track
-    shutdown -r now ;}
+    shutdown -r now
+}
 
-function quit_awesome_now(){
-    if_speech
+function quit_awesome_now {
     copy_pacman_log
     copy_random_wallpaper_for_startup
     play_shutdown_track
-    echo -e 'awesome.quit()' | awesome-client ;}
+    awesome-client 'awesome.quit()'
+}
 
-function restart_awesome_now(){
-    if_speech
+function restart_awesome_now {
     copy_pacman_log
     copy_random_wallpaper_for_startup
     play_shutdown_track
-    echo -e 'awesome.restart()' | awesome-client ;}  ## do NOT remove the (). Originally, () is not required in rc.lua
+    awesome-client 'awesome.restart()'  ## NOTE do NOT remove the () in restart. Originally, () is not required in rc.lua
+}
 
-main_items=( "shutdown" "reboot" "lock" "screen off" "quit awesome" "restart awesome" )
-main_item="$(pipe_to_dmenu "${main_items[@]}" "off" "")" || exit 37
+main_items=( 'shutdown' 'reboot' 'lock' 'screen off' 'quit awesome' 'restart awesome' )
+main_item="$(pipe_to_rofi "${main_items[@]}" 'off' '')" || exit 37
 
 case "$main_item" in
-    shutdown ) shutdown_items=( "now" "now + clear clipboard" "later" "later + clear clipboard" "cancel shutdown" )
-               shutdown_item="$(pipe_to_dmenu "${shutdown_items[@]}" "shutdown" "")" || exit 37
+    shutdown ) shutdown_items=( 'now' 'now + clear clipboard' 'later' 'later + clear clipboard' 'cancel shutdown' )
+               shutdown_item="$(pipe_to_rofi "${shutdown_items[@]}" 'shutdown' '')" || exit 37
 
                sleep 0.1
                case "$shutdown_item" in
                    now )                       shutdown_now ;;
-                   "now + clear clipboard" )   clear_clipboard
+                   'now + clear clipboard' )   clear_clipboard
                                                shutdown_now ;;
                    later )                     shutdown_later ;;
-                   "later + clear clipboard" ) shutdown_later
+                   'later + clear clipboard' ) shutdown_later
                                                clear_clipboard ;;
-                   "cancel shutdown" )         shutdown -c && msgn "shutdown canceled" ;;
+                   'cancel shutdown' )         shutdown -c && msgn 'shutdown canceled' ;;
                esac ;;
-    reboot ) reboot_items=( "now" "now + clear clipboard" )
-             reboot_item="$(pipe_to_dmenu "${reboot_items[@]}" "reboot" "")" || exit 37
+    reboot ) reboot_items=( 'now' 'now + clear clipboard' )
+             reboot_item="$(pipe_to_rofi "${reboot_items[@]}" 'reboot' '')" || exit 37
 
              sleep 0.1
              case "$reboot_item" in
                  now )                     reboot_now ;;
-                 "now + clear clipboard" ) clear_clipboard
+                 'now + clear clipboard' ) clear_clipboard
                                            reboot_now ;;
              esac ;;
     lock ) dm-tool lock ;;
-    "screen off" ) xset dpms force off ;;
-    "quit awesome" ) quit_awesome_items=( "now" "now + clear clipboard" )
-                     quit_awesome_item="$(pipe_to_dmenu "${quit_awesome_items[@]}" "quit awesome" "")" || exit 37
+    'screen off' ) xset dpms force off ;;
+    'quit awesome' ) quit_awesome_items=( 'now' 'now + clear clipboard' )
+                     quit_awesome_item="$(pipe_to_rofi "${quit_awesome_items[@]}" 'quit awesome' '')" || exit 37
 
                      sleep 0.1
                      case "$quit_awesome_item" in
                          now )                     quit_awesome_now ;;
-                         "now + clear clipboard" ) clear_clipboard
+                         'now + clear clipboard' ) clear_clipboard
                                                    quit_awesome_now ;;
                      esac ;;
-    "restart awesome" ) restart_awesome_now ;;
+    'restart awesome' ) restart_awesome_now ;;
 esac
 
 exit

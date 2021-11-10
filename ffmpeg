@@ -1,56 +1,64 @@
 #!/usr/bin/env bash
 source "$HOME"/scripts/gb
 
-function help(){ source "$HOME"/scripts/.help; ffmpeg_help ;}
+function display_help {
+    source "$HOME"/scripts/.help
+    ffmpeg_help
+}
 
-function prompt(){
-    for args in "$@"; do
+function prompt {
+    for args in "$@"; {
         case "$1" in
-            -i ) [ ! "$input_file"   ] && get_input "Input file"                      && input_file="$input"   ;;
-            -x ) [ ! "$offset"       ] && get_input "Offset (e.g. 1.2 or -0.8)"       && offset="$input"       ;;
-            -o ) [ ! "$output"       ] && get_input "Output file"                     && output="$input"       ;;
-            -s ) [ ! "$start"        ] && get_input "Start time (e.g. 00:00:09)"      && start="$input"        ;;
-            -e ) [ ! "$end"          ] && get_input "End time (e.g. 00:18:34)"        && end="$input"          ;;
-            -a ) [ ! "$audio_input"  ] && get_input "Audio input file"                && audio_input="$input"  ;;
-            -v ) [ ! "$video_input"  ] && get_input "Video input file"                && video_input="$input"  ;;
-            -t ) [ ! "$time"         ] && get_input "Time (e.g. 00:00:09)"            && time="$input"         ;;
-            -k ) [ ! "$audio_stream" ] && get_input "Audio stream to keep (e.g. 1)"   && audio_stream="$input" ;;
-            -c ) [ ! "$camera"       ] && get_input "Camera (e.g. /dev/video0)"       && camera="$input"       ;;
-            -f ) [ ! "$sub_file"     ] && get_input "Subtitle file"                   && sub_file="$input"     ;;
-            -d ) [ ! "$sub_index"    ] && get_input "Subtitle index (e.g. 0, 1, etc)" && sub_index="$input"    ;;
+            -i ) [ ! "$input_file"   ] && get_input 'Input file'                      && input_file="$input"   ;;
+            -x ) [ ! "$offset"       ] && get_input 'Offset (e.g. 1.2 or -0.8)'       && offset="$input"       ;;
+            -o ) [ ! "$output"       ] && get_input 'Output file'                     && output="$input"       ;;
+            -s ) [ ! "$start"        ] && get_input 'Start time (e.g. 00:00:09)'      && start="$input"        ;;
+            -e ) [ ! "$end"          ] && get_input 'End time (e.g. 00:18:34)'        && end="$input"          ;;
+            -a ) [ ! "$audio_input"  ] && get_input 'Audio input file'                && audio_input="$input"  ;;
+            -v ) [ ! "$video_input"  ] && get_input 'Video input file'                && video_input="$input"  ;;
+            -t ) [ ! "$time"         ] && get_input 'Time (e.g. 00:00:09)'            && time="$input"         ;;
+            -k ) [ ! "$audio_stream" ] && get_input 'Audio stream to keep (e.g. 1)'   && audio_stream="$input" ;;
+            -c ) [ ! "$camera"       ] && get_input 'Camera (e.g. /dev/video0)'       && camera="$input"       ;;
+            -f ) [ ! "$sub_file"     ] && get_input 'Subtitle file'                   && sub_file="$input"     ;;
+            -d ) [ ! "$sub_index"    ] && get_input 'Subtitle index (e.g. 0, 1, etc)' && sub_index="$input"    ;;
         esac
         shift
-    done ;}
+    }
+}
 
-while getopts 'hi:x:o:s:e:a:v:t:k:c:f:d:' flag; do
-     case "$flag" in
-        h ) help                   ;;
-        i ) input_file="$OPTARG"   ;;
-        x ) offset="$OPTARG"       ;;
-        o ) output="$OPTARG"       ;;
-        s ) start="$OPTARG"        ;;
-        e ) end="$OPTARG"          ;;
-        a ) audio_input="$OPTARG"  ;;
-        v ) video_input="$OPTARG"  ;;
-        t ) time="$OPTARG"         ;;
-        k ) audio_stream="$OPTARG" ;;
-        c ) camera="$OPTARG"       ;;
-        f ) sub_file="$OPTARG"     ;;
-        d ) sub_index="$OPTARG"    ;;
-     esac
-done
+function get_opts {
+    while getopts 'hi:x:o:s:e:a:v:t:k:c:f:d:' flag; do
+         case "$flag" in
+            h ) display_help           ;;
+            i ) input_file="$OPTARG"   ;;
+            x ) offset="$OPTARG"       ;;
+            o ) output="$OPTARG"       ;;
+            s ) start="$OPTARG"        ;;
+            e ) end="$OPTARG"          ;;
+            a ) audio_input="$OPTARG"  ;;
+            v ) video_input="$OPTARG"  ;;
+            t ) time="$OPTARG"         ;;
+            k ) audio_stream="$OPTARG" ;;
+            c ) camera="$OPTARG"       ;;
+            f ) sub_file="$OPTARG"     ;;
+            d ) sub_index="$OPTARG"    ;;
+         esac
+    done
+}
+
+get_opts "$@"
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( "embed subtitle" "burn subtitle (increases size)" "burn embedded subtitle (increases size)" "sync audio" "sync video" "trim" "convert" "remove audio" "replace audio" "screenshot" "extract frames" "negate" "reverse" "add 0.3 saturation" "show streams" "audio stream to keep" "available cameras" "live camera" "help" )
+main_items=( 'embed subtitle' 'burn subtitle (increases size)' 'burn embedded subtitle (increases size)' 'sync audio' 'sync video' 'trim' 'convert' 'remove audio' 'replace audio' 'screenshot' 'negate' 'reverse' 'add 0.3 saturation' 'show streams' 'audio stream to keep' 'available cameras' 'live camera' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    "embed subtitle" )  ## https://stackoverflow.com/questions/8672809/use-ffmpeg-to-add-text-subtitles
+    'embed subtitle' )  ## https://stackoverflow.com/questions/8672809/use-ffmpeg-to-add-text-subtitles
                        prompt -i -f -o
                        ffmpeg -i "$input_file" -i "$sub_file" -c:v copy -c:a copy -c:s mov_text "$output" 2>/dev/null && accomplished ;;
-    "burn subtitle (increases size)" )  ## https://stackoverflow.com/questions/8672809/use-ffmpeg-to-add-text-subtitles
+    'burn subtitle (increases size)' )  ## https://stackoverflow.com/questions/8672809/use-ffmpeg-to-add-text-subtitles
                                        prompt -i -f -o
                                        ffmpeg -i "$input_file" -vf "subtitles=${sub_file}:force_style='FontSize=24,PrimaryColour=&H00f3f3&'" -c:a copy "$output" 2>/dev/null && accomplished ;;
 
@@ -58,7 +66,7 @@ case "$main_item" in
                                        ## "subtitles=${sub_file}:force_style='OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=20,Borderstyle=4,BackColour=&H80000000,FontName=DejaVu Serif,FontSize=24,PrimaryColour=&H00f3f3&'"  ## here it should be 00f3f3 instead of f3f300 (why??)
                                        ## Format: Name,   Fontname    Fontsize    PrimaryColour   SecondaryColour OutlineColour   BackColour  Bold    Italic  Underline   StrikeOut   ScaleX  ScaleY    Spacing Angle   BorderStyle Outline Shadow  Alignment   MarginL MarginR MarginV Encoding
                                        ## Style:  Default Arial       20          &H00FFFFFF      &H000000FF      &H00000000      &H00000000  0       0       0           0           100     100       0       0       1           2       2       2           10      10      10      1
-    "burn embedded subtitle (increases size)" )  ## https://trac.ffmpeg.org/wiki/HowToBurnSubtitlesIntoVideo
+    'burn embedded subtitle (increases size)' )  ## https://trac.ffmpeg.org/wiki/HowToBurnSubtitlesIntoVideo
                                        prompt -i -d -o
                                        ffmpeg -i "$input_file" -vf "subtitles=${input_file}:stream_index=${sub_index}:force_style='FontSize=24,PrimaryColour=&H00f3f3&'" -c:a copy "$output" 2>/dev/null && accomplished ;;
 
@@ -66,38 +74,36 @@ case "$main_item" in
                                        ## "subtitles=${sub_file}:force_style='OutlineColour=&H80000000,BorderStyle=3,Outline=1,Shadow=0,MarginV=20,Borderstyle=4,BackColour=&H80000000,FontName=DejaVu Serif,FontSize=24,PrimaryColour=&H00f3f3&'"  ## here it should be 00f3f3 instead of f3f300 (why??)
                                        ## Format: Name,   Fontname    Fontsize    PrimaryColour   SecondaryColour OutlineColour   BackColour  Bold    Italic  Underline   StrikeOut   ScaleX  ScaleY    Spacing Angle   BorderStyle Outline Shadow  Alignment   MarginL MarginR MarginV Encoding
                                        ## Style:  Default Arial       20          &H00FFFFFF      &H000000FF      &H00000000      &H00000000  0       0       0           0           100     100       0       0       1           2       2       2           10      10      10      1
-    "sync audio" )           prompt -i -x -o
+    'sync audio' )           prompt -i -x -o
                              ffmpeg -i "$input_file" -itsoffset "$offset" -i "$input_file" -map 0:v -map 1:a -c copy -y "$output" 2>/dev/null && accomplished ;;
-    "sync video" )           prompt -i -x -o
+    'sync video' )           prompt -i -x -o
                              ffmpeg -i "$input_file" -itsoffset "$offset" -i "$input_file" -map 1:v -map 0:a -c copy -y "$output" 2>/dev/null && accomplished ;;
     trim )                   prompt -i -s -e -o
                              ffmpeg -ss "$start" -i "$input_file" -to "$end" -c copy -y "$output" 2>/dev/null && accomplished ;;
     convert )                prompt -i -o
                              ffmpeg -i "$input_file" -q:a 1 -y "$output" 2>/dev/null && accomplished ;;
-    "remove audio" )         prompt -i -o
+    'remove audio' )         prompt -i -o
                              ffmpeg -i "$input_file" -an -vcodec copy -y "$output" 2>/dev/null && accomplished ;;
-    "replace audio" )        prompt -a -v -o
+    'replace audio' )        prompt -a -v -o
                              ffmpeg -i "$audio_input" -i "$video_input" -vcodec copy -acodec libmp3lame -y "$output" 2>/dev/null && accomplished ;;
     screenshot )             prompt -i -t -o
                              ffmpeg -ss "$time" -i "$input_file" -frames:v 1 -y "$output" 2>/dev/null && accomplished ;;
-    "extract frames" )       prompt -i -s -e
-                             ffmpeg -ss "$start" -i "$input_file" -to "$end" -y "Sinput"_%4d.png 2>/dev/null && accomplished ;;
     negate )                 prompt -i -o
                              ffmpeg -i "$input_file" -vf negate "$output" 2>/dev/null && accomplished ;;
     reverse )                prompt -i -o
                              ffmpeg -i "$input_file" -vf reverse "$output" 2>/dev/null && accomplished ;;
-    "add 0.3 saturation" )   prompt -i -o
+    'add 0.3 saturation' )   prompt -i -o
                              ffmpeg -i "$input_file" -vf eq=saturation=1.3 -c:a copy "$output" 2>/dev/null && accomplished ;;
-    "show streams" )         prompt -i
-                             echo "Streams for ${input_file}:"
-                             ffmpeg -i "$input_file" 2>&1 | \grep -i "Stream \#" | sed 's/^    //' 2>/dev/null && accomplished ;;
-    "audio stream to keep" ) prompt -i -k -o
+    'show streams' )         prompt -i
+                             printf 'Streams for %s:\n' "$input_file"
+                             ffmpeg -i "$input_file" 2>&1 | \grep -i 'Stream \#' | sed 's/^    //' 2>/dev/null && accomplished ;;
+    'audio stream to keep' ) prompt -i -k -o
                              ffmpeg -i "$input_file" -map 0:0 -map 0:"$audio_stream" -c copy "$output" 2>/dev/null && accomplished ;;
-    "available cameras" )    available_cameras="$(find /dev/ -mindepth 1 -maxdepth 1 -iname "*video*" | sort)"
-                             echo "$available_cameras" ;;
-    "live camera" )          prompt -c
+    'available cameras' )    available_cameras="$(find /dev/ -mindepth 1 -maxdepth 1 -iname '*video*' | sort)"
+                             printf '%s\n' "$available_cameras" ;;
+    'live camera' )          prompt -c
                              ffplay "$camera" ;;
-    help )                   help ;;
+    help )                   display_help ;;
 esac
 
 exit
@@ -105,7 +111,7 @@ exit
 ## notes {{{
 
 ## Add title:
-# -metadata title="my title"
+# -metadata title='my title'
 
 ## Burn sub into a video
 # ffmpeg -i <input> -vf subtitles=<subtitle> <output>

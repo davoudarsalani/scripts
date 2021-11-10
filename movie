@@ -2,23 +2,46 @@
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
 
-function no_such_dir(){ msgc "ERROR" "no such directory as <span color=\"${orange}\">\$HOME/speech/${directory}</span>" "$HOME"/linux/themes/delete-w.png && exit ;}
+function no_such_file {
+    msgc 'ERROR' "no such file as <span color=\"${orange}\">\$HOME/movie/${directory}/${movie}</span>" "$HOME"/linux/themes/alert-w.png
+    exit
+}
 
-[ "$play_status" == "playing" ] && continue_playing="True" || continue_playing="False"
+function no_such_dir {
+    msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/movie/${directory}/${movie}</span>" "$HOME"/linux/themes/alert-w.png
+    exit
+}
+
+function success_moving {
+    local text="$(printf "moved to <span color=\"%s\">WATCHED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$base")"
+    msgn "$text" '' "$HOME"/linux/themes/delete-w.png
+}
+
+function error_moving {
+    msgc 'ERROR' "moving <span color=\"${orange}\">${base}</span> to <span color=\"${blue}\">WATCHED</span>$1" "$HOME"/linux/themes/alert-w.png
+    # exit  ## exceptionally commented
+}
+
+function success_removing {
+    msgn 'removed' "<span color=\"${red}\"><b>${base}</b></span>" "$HOME"/linux/themes/delete-w.png
+}
+
+function error_removing {
+    msgc 'ERROR' "removing <span color=\"${orange}\">${base}</span>$1" "$HOME"/linux/themes/alert-w.png
+}
+
+[ "$play_status" == 'playing' ] && continue_playing='true' || continue_playing='false'
 
 [ ! "$1" ] && exit
-[ "$1" == "random" ] && title="random movie" || title="select movie"
+[ "$1" == 'random' ] && title='random movie' || title='select movie'
 
-cd "$HOME"/movie
-directories=( $(find . -mindepth 1 -maxdepth 1 -type d | cut -c 3- | sort) )
+readarray -t directories <<< "$(find "$HOME"/movie -mindepth 1 -maxdepth 1 -type d | sort)"
 
 ## get movie count in each directory and prepend it to the directory name
-directories_plus_count=()
-for tmp_directory in "${directories[@]}"; do
-    tmp_movies="$(find "$tmp_directory" -mindepth 1 -maxdepth 1 -type f ! -iname "*.srt" | cut -c 3- | sort)"
-    ## "$(wc -l <<< "$(echo "$tmp_movies")")" returns 1 even if there are no tmp_movies
-    ## so, we have to do this:
-    [ "$tmp_movies" ] && movies_count="$(wc -l <<< "$(echo "$tmp_movies")")" || movies_count=0
+declare -a directories_plus_count=()
+for tmp_directory in "${directories[@]}"; {
+    movies_count="$(wc -l < <(find "$tmp_directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
+
     ## decide how many spaces to add
     if [ "$movies_count" -lt 10 ]; then
         spaces="       "
@@ -27,47 +50,43 @@ for tmp_directory in "${directories[@]}"; do
     else
         spaces="   "
     fi
-    directories_plus_count+=( "${movies_count}${spaces}${tmp_directory}" )
-done
+    directories_plus_count+=( "${movies_count}${spaces}${tmp_directory##*/}" )
+}
 
-directory="$(pipe_to_dmenu "${directories_plus_count[@]}" "$title" "")" || exit 37
+directory="$(pipe_to_rofi "${directories_plus_count[@]}" "$title" '')" || exit 37
 
-directory="${directory##*" "}"  ## remove count
+directory="${directory##*' '}"  ## remove count
 
 ## pick
-[ ! -d "$HOME"/movie/"$directory" ] && no_such_dir || cd "$HOME"/movie/"$directory"
+[ ! -d "$HOME"/movie/"$directory" ] && no_such_dir
+
 case "$1" in
-    random ) movie="$(shuf -n 1 <<< "$(find . -mindepth 1 -maxdepth 1 -type f ! -iname "*.srt" | cut -c 3-)")" ;;
-    select ) movies=( $(find . -mindepth 1 -maxdepth 1 -type f ! -iname "*.srt" | cut -c 3- | sort) )
-             movie="$(pipe_to_dmenu "${movies[@]}" "$directory" "")" || exit 37 ;;
-    * ) exit ;;  ## do NOT remove
+    random ) movie="$(shuf -n 1 < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
+             movie="${movie##*/}" ;;
+    select ) readarray -t movies <<< "$(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt' | sort)"
+             movie="$(pipe_to_rofi "${movies[@]##*/}" "$directory" '')" || exit 37 ;;
+    * ) exit ;;  ## NOTE do NOT remove
 esac
 
 ## play
-base="${movie##*/}"
-base="${base%.*}"
-msgn "playing" "<span color=\"${orange}\">${base}</span>" "$HOME"/linux/themes/filmroll-w.png
-vlc -f --play-and-exit -- "$movie" 2>/dev/null
+base="${movie%.*}"
+msgn 'playing' "<span color=\"${orange}\">${base}</span>" "$HOME"/linux/themes/filmroll-w.png
+[ ! -f "$HOME"/movie/"$directory"/"$movie" ] && no_such_file
+vlc -f --play-and-exit -- "$HOME"/movie/"$directory"/"$movie" 2>/dev/null
 
 ## move to WATCHED or remove
-what_to_dos=( "" "mv to WATCHED" "remove" )
-what_to_do="$(pipe_to_dmenu "${what_to_dos[@]}" "$movie" "red")" # || exit 37  ## the exit is exceptionally commented
+what_to_dos=( '' 'mv to WATCHED' 'remove' )
+what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "$movie" 'red')" # || exit 37  ## the exit is exceptionally commented
 
 case "$what_to_do" in
-    "mv to WATCHED" ) function success_moving(){ msgn "moved to <span color=\"${blue}\">WATCHED</span>" "<span color=\"${orange}\">${base}</span>" ;}
-                      function error_moving(){ msgc "ERROR" "moving <span color=\"${orange}\">${base}</span> to <span color=\"${blue}\">WATCHED</span>$1" "$HOME"/linux/themes/alert-w.png ;}
+    'mv to WATCHED' ) [ -d "$HOME"/movie/"$directory"/WATCHED ] || mkdir "$HOME"/movie/"$directory"/WATCHED
+                      mv "$HOME"/movie/"$directory"/"$movie" "$HOME"/movie/"$directory"/WATCHED && success_moving || error_moving ;;
 
-                      [ -d "WATCHED" ] || mkdir WATCHED
-                      mv "$movie" WATCHED && success_moving || error_moving ;;
-
-    remove ) function success_removing(){ msgn "removed" "<span color=\"${red}\"><b>${base}</b></span>" "$HOME"/linux/themes/delete-w.png ;}
-             function error_removing(){ msgc "ERROR" "removing <span color=\"${orange}\">${base}</span>$1" "$HOME"/linux/themes/alert-w.png ;}
-
-             rm "$movie" && success_removing || error_removing ;;
-    # * ) : ;;  ## do NOT uncomment
+    remove ) rm "$HOME"/movie/"$directory"/"$movie" && success_removing || error_removing ;;
+    # * ) : ;;  ## NOTE do NOT uncomment
 esac
 
 ## play audacious if it was playing before the video
-[ "$continue_playing" == "True" ] && "$HOME"/scripts/awesome-widgets audacious play_pause
+[ "$continue_playing" == 'true' ] && "$HOME"/scripts/awesome-widgets audacious play_pause
 
 exit

@@ -1,455 +1,338 @@
 #!/usr/bin/env bash
 
-function get_datetime(){  ## {{{
+function get_datetime {  ## {{{
     case "$1" in
-            ymdhms )   local output="$(date +%Y%m%d%H%M%S)"  ;;
-            ymd )      local output="$(date +%Y%m%d)"        ;;
-            hms )      local output="$(date +%H%M%S)"        ;;
-            seconds )  local output="$(date +%s)"            ;;
-            weekday )  local output="$(date +%A)"            ;;
-            jymdhms )  local output="$(jdate +%Y%m%d%H%M%S)" ;;
-            jymd )     local output="$(jdate +%Y%m%d)"       ;;
-            jhms )     local output="$(jdate +%H%M%S)"       ;;
-            jseconds ) local output="$(jdate +%s)"           ;;
-            jweekday ) local output="$(jdate +%A)"           ;;
+            ymdhms )   printf '%(%Y%m%d%H%M%S)T\n'            ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d%H%M%S)"
+            ymd )      printf '%(%Y%m%d)T\n'                  ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d)"
+            hms )      printf '%(%H%M%S)T\n'                  ;; ## PREVIOUSLY: printf '%s\n' "$(date +%H%M%S)"
+            seconds )  printf '%(%s)T\n'                      ;; ## PREVIOUSLY: printf '%s\n' "$(date +%s)"
+            weekday )  printf '%(%A)T\n'                      ;; ## PREVIOUSLY: printf '%s\n' "$(date +%A)"
+            jymdhms )  printf '%s\n' "$(jdate +%Y%m%d%H%M%S)" ;;
+            jymd )     printf '%s\n' "$(jdate +%Y%m%d)"       ;;
+            jhms )     printf '%s\n' "$(jdate +%H%M%S)"       ;;
+            jseconds ) printf '%s\n' "$(jdate +%s)"           ;;
+            jweekday ) printf '%s\n' "$(jdate +%A)"           ;;
     esac
-    echo "$output" ;}
+}
 ## }}}
-function get_mountable_umountable(){  ## {{{
-    mountable="$( \lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE "part $|rom $")"
-    umountable="$(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i "/tmp/")" ;}
+function heading {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    echo -e "$(purple "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
+}
 ## }}}
-function action_now(){  ## {{{
-    echo -e "$(green "→") $(grey "$@")" ;}
+function action_now {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    echo -e "$(green '→') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
+}
 ## }}}
-function accomplished(){  ## {{{
-    echo -e "$(green "✔") $(grey "$@")" ;}
+function accomplished {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    echo -e "$(green '✔') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
+}
 ## }}}
-function wrap_fzf_choice(){  ## {{{
-    echo -e "$(brown "--=[") "$@" $(brown "]=--")" ;}
+function wrap_fzf_choice {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
+}
 ## }}}
-function pipe_to_fzf(){  ## {{{
-    local fzf_choice="$(printf "%s\n" "$@" | fzf)"
-    [ "$fzf_choice" ] && echo "$fzf_choice" || return 37 ;}
+function pipe_to_fzf {  ## {{{
+    ## usage: this function expects 1 arg, for example:
+    ##     item="$(pipe_to_fzf "${items[@]}")"
+
+    local received
+    readarray -t received <<< "$(printf '%s\n' "$@")"
+
+    local fzf_choice="$(printf '%s\n' "${received[@]}" | fzf)"
+    [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
+}
 ## }}}
-function pipe_to_dmenu(){  ## {{{
+function pipe_to_dmenu {  ## {{{
     ## usage: this function expects 3 args, for example:
-    ##     item="$(pipe_to_dmenu "${items[@]}")" "<title>" ""
-    ##     item="$(pipe_to_dmenu "${items[@]}")" ""        ""     ## <--,-- last arg can only be either "red" or ""
-    ##     item="$(pipe_to_dmenu "${items[@]}")" "<title>" "red"  ## <--'
-    ##     item="$(pipe_to_dmenu "${items[@]}")" ""        "red"
+    ##     item="$(pipe_to_dmenu "${items[@]}")" 'TITLE' ''
+    ##     item="$(pipe_to_dmenu "${items[@]}")" ''      ''     ## <--,-- last arg can only be either 'red' or ''
+    ##     item="$(pipe_to_dmenu "${items[@]}")" 'TITLE' 'red'  ## <--'
+    ##     item="$(pipe_to_dmenu "${items[@]}")" ''      'red'
 
-    local received=( "$@" )
-    local title="${received[-2]}"
-    local fg="${received[-1]}"
-    unset "received[-2]"
-    unset "received[-1]"
-    [ "$fg" == "red" ] && local dmenusf="$dmenusf2"
+    local received
+    readarray -t received <<< "$(printf '%s\n' "$@")"
 
-    local dmenu_choice="$(printf "%s\n" "${received[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$title")"
-    [ "$dmenu_choice" ] && echo "$dmenu_choice" || return 37 ;}
+    local last="${received[-1]}"
+    if [ "$last" == 'red' ]; then
+        local fg="${received[-1]}"
+        local title="${received[-2]}"
+
+        unset 'received[-2]'
+        unset 'received[-1]'
+    else
+        local fg=''
+        local title="${received[-1]}"
+
+        unset 'received[-1]'
+    fi
+
+    [ "$fg" == 'red' ] && {
+        local dmenusb="$red_dark"
+        local dmenusb="$red_dark"
+    }
+
+    local dmenu_choice="$(printf '%s\n' "${received[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$title")"
+    [ "$dmenu_choice" ] && printf '%s\n' "$dmenu_choice" || return 37
+}
 ## }}}
-function lsblk_full(){  ## {{{
-    \lsblk -o NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT,OWNER,GROUP,MODE,MAJ:MIN,RM,RO ;}
+function pipe_to_rofi {  ## {{{
+    ## usage: this function expects 3 args, for example:
+    ##     item="$(pipe_to_rofi "${items[@]}")" 'TITLE' ''
+    ##     item="$(pipe_to_rofi "${items[@]}")" ''      ''     ## <--,-- last arg can only be either 'red' or ''
+    ##     item="$(pipe_to_rofi "${items[@]}")" 'TITLE' 'red'  ## <--'
+    ##     item="$(pipe_to_rofi "${items[@]}")" ''      'red'
+
+##################################################################
+    local received
+    readarray -t received <<< "$(printf '%s\n' "$@")"
+
+    local last="${received[-1]}"
+    if [ "$last" == 'red' ]; then
+        local fg="${received[-1]}"
+        local title="${received[-2]}"
+
+        unset 'received[-2]'
+        unset 'received[-1]'
+    else
+        local fg=''
+        local title="${received[-1]}"
+
+        unset 'received[-1]'
+    fi
+###############################################################
+
+    [ ! "$fg" == 'red' ] && local theme="$HOME"/.config/rofi/onedark.rasi || local theme="$HOME"/.config/rofi/onedark-red.rasi
+
+    local rofi_choice="$(printf '%s\n' "${received[@]}" | rofi -theme "$theme" -dmenu -i -p "$title")"
+    [ "$rofi_choice" ] && printf '%s\n' "$rofi_choice" || return 37
+}
 ## }}}
-function copy_pacman_log(){  ## {{{
+function lsblk_full {  ## {{{
+    \lsblk -o NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT,OWNER,GROUP,MODE,MAJ:MIN,RM,RO
+}
+## }}}
+function mounted_drives {  ## {{{
+    if [ "$1" ]; then
+        printf '%s\n' "$(df -hT)"
+    else
+        printf '%s\n' "$(df -T -x devtmpfs -x tmpfs -x usbfs -x loop)"  ## -x ARG instances help get rid of unnecessary drives
+    fi
+}
+## }}}
+function get_mountable_umountable {  ## {{{
+    local m="$(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE 'part $|rom $')"
+    local u="$(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i '/tmp/')"
+    [ "$m" ] && mountable="$m"
+    [ "$u" ] && umountable="$u"
+}
+## }}}
+function msgn {  ## {{{
+    notify-send -u normal "$1" "$2" -i "$3" -t 10000
+}
+## }}}
+function msgc {  ## {{{
+    notify-send -u critical "$1" "$2" -i "$3"
+}
+## }}}
+function copy_pacman_log {  ## {{{
+    source "$HOME"/scripts/gb-color
+
     cp /var/log/pacman.log "$HOME"/linux/pacman.log
-    msgn "<span color=\"${orange}\">/var/log/pacman.log</span> copied" ;}
+    msgn "<span color=\"${orange}\">/var/log/pacman.log</span> copied"
+}
 ## }}}
-function msgn(){  ## {{{
-    notify-send -u normal "${1}" "${2}" -i "${3}" -t 10000 ;}
+function clear_playlist {  ## {{{
+    audtool --playlist-clear
+}
 ## }}}
-function msgc(){  ## {{{
-    notify-send -u critical "${1}" "${2}" -i "${3}" ;}
-## }}}
-function clear_playlist(){  ## {{{
-    audtool --playlist-clear ;}
-## }}}
-function if_speech(){  ## {{{
+function turn_off_shuffle {  ## {{{
     source "$HOME"/scripts/gb-audacious
-    case "$play_status" in
-        playing|paused ) case "$album" in
-                             speech ) local current_position="$(audtool --current-song-output-length)"
-                                      local current_position_in_seconds="$(audtool --current-song-output-length-seconds)"
-                                      echo "$current_position_in_seconds" > "$HOME"/speech/csols
-                                      msgn "sent to csol" "<span color=\"${orange}\">${current_position}</span>" ;;
-                             # * )    exit ;;  ## ◄─╮
-                         esac ;;               ##   ├── do NOT uncomment
-        # * ) exit ;;                          ## ◄─╯
-    esac ;}
+    [ "$shuffle_status" == 'on'  ] && audtool --playlist-shuffle-toggle
+}
 ## }}}
-function turn_off_shuffle(){  ## {{{
+function turn_on_shuffle {  ## {{{
     source "$HOME"/scripts/gb-audacious
-    [ "$shuffle_status" == "on"  ] && audtool --playlist-shuffle-toggle ;}
+    [ "$shuffle_status" == 'off' ] && audtool --playlist-shuffle-toggle
+}
 ## }}}
-function turn_on_shuffle(){  ## {{{
-    source "$HOME"/scripts/gb-audacious
-    [ "$shuffle_status" == "off" ] && audtool --playlist-shuffle-toggle ;}
-## }}}
-function play_shutdown_track(){  ## {{{
+function play_shutdown_track {  ## {{{
     source "$HOME"/scripts/gb-audio
-    pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index" ;}
+    pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
+}
 ## }}}
-function day_hour_min_sec(){  ## {{{
+function day_hour_min_sec {  ## {{{
     local seconds="${1%.*}"  ## remove decimal in case arg is a float
     local sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
     local min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
-    local hour="$(printf "%02d" "$(( "$seconds" / 60 / 60 % 24 ))")"
-    local day="$(printf  "%02d" "$(( "$seconds" / 60 / 60 / 24 ))")"
-    [ "$day" -eq 0 ] && local dur="${hour}:${min}:${sec}" || local dur="${day}:${hour}:${min}:${sec}"
-    echo "$dur" ;}
+    local hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
+    local day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 ))")"
+    [ "$day" -eq 0 ] && printf '%s\n' "${hour}:${min}:${sec}" || printf '%s\n' "${day}:${hour}:${min}:${sec}"
+}
 ## }}}
-function clear_clipboard(){  ## {{{
+function clear_clipboard {  ## {{{
     greenclip clear
-    msgn "cleared" "" "$HOME"/linux/themes/greenclip.png ;}
+    msgn 'cleared' '' "$HOME"/linux/themes/greenclip.png
+}
 ## }}}
-function random_wallpaper(){  ## {{{
-    source "$HOME"/scripts/gb-screen
-
-    local file=/tmp/current_wallpapers
-    cd "$HOME"/wallpapers/
-
+function random_wallpaper {  ## {{{
+    local current_wallpaper_file=/tmp/current_wallpaper
     ## same wallpaper for both screens
-    local rand_wall="$(shuf -n 1 <<< "$(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort)")"
-    echo "${rand_wall}" > "$file"
-    feh --bg-fill "$rand_wall"
-
-    ## different wallpaper for each screen {{{
-    ## two random wallpapers:
-    # local rand_walls=( $(shuf -n 2 <<< "$(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort)") )
-    # echo "${rand_walls[@]}" > "$file"
-
-    # for ((i=0; i<"$screens_count"; i++)); do
-    #     echo "local gears = require('gears'); gears.wallpaper.maximized('$HOME/wallpapers/${rand_walls[$i]}', $(( "$i" + 1 )), true)" | awesome-client  ## do NOT quote $(( "$i" + 1 ))
-    #     sleep .1
-    # done
-    ## }}}
-    }
+    local rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
+    printf '%s\n' "${rand_wall##*/}" > "$current_wallpaper_file"
+    feh --bg-scale "$rand_wall"
+}
 ## }}}
-function copy_random_wallpaper_for_startup(){  ## {{{
-    cd "$HOME"/wallpapers/
-    local rand_wall="$(shuf -n 1 <<< "$(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort)")"
+function copy_random_wallpaper_for_startup {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    local rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
     sudo cp "$rand_wall" /usr/share/wallpapers/startup_background.jpg
-    msgn "<span color=\"${orange}\">${rand_wall}</span> copied" ;}
+    msgn "<span color=\"${orange}\">${rand_wall##*/}</span> copied"
+}
 ## }}}
-function set_widget(){  ## {{{
+function set_widget {  ## {{{
     ## only the awesome-widgets use this function but it'd better be here (rather than the script itself)
     ## because sometimes it's needed by 0-test
     local widget="$1"
     local attr="$2"
     local value="$3"
-    echo "${widget}:set_${attr}('${value}')" | awesome-client ;}
-## }}}
-## colors {{{ 40 for black, 49 for transparent, ∅  for no background
-## {{{
-function red(){  ## {{{
-    echo -e "\033[0;49;31m$@\033[0m" ;}
-## }}}
-function green(){  ## {{{
-    echo -e "\033[0;49;32m$@\033[0m" ;}
-## }}}
-function yellow(){  ## {{{
-    echo -e "\033[0;49;33m$@\033[0m" ;}
-## }}}
-function blue(){  ## {{{
-    echo -e "\033[0;49;34m$@\033[0m" ;}
-## }}}
-function purple(){  ## {{{
-    echo -e "\033[0;49;35m$@\033[0m" ;}
-## }}}
-function cyan(){  ## {{{
-    echo -e "\033[0;49;36m$@\033[0m" ;}
-## }}}
-function white(){  ## {{{
-    echo -e "\033[0;49;37m$@\033[0m" ;}
-## }}}
-function grey(){  ## {{{
-    echo -e "\033[0;49;90m$@\033[0m" ;}
-## }}}
-function brown(){  ## {{{
-    echo -e "\033[38;5;94m$@\033[0m" ;}
-## }}}
-function orange(){  ## {{{
-    echo -e "\033[38;5;202m$@\033[0m" ;}
-## }}}
-function olive(){  ## {{{
-    echo -e "\033[38;5;64m$@\033[0m" ;}
-## }}}
-## }}}
-## bold {{{
-function red_bold(){  ## {{{
-    echo -e "\033[1;49;31m$@\033[0m" ;}
-## }}}
-function green_bold(){  ## {{{
-    echo -e "\033[1;49;32m$@\033[0m" ;}
-## }}}
-function yellow_bold(){  ## {{{
-    echo -e "\033[1;49;33m$@\033[0m" ;}
-## }}}
-function blue_bold(){  ## {{{
-    echo -e "\033[1;49;34m$@\033[0m" ;}
-## }}}
-function purple_bold(){  ## {{{
-    echo -e "\033[1;49;35m$@\033[0m" ;}
-## }}}
-function cyan_bold(){  ## {{{
-    echo -e "\033[1;49;36m$@\033[0m" ;}
-## }}}
-function white_bold(){  ## {{{
-    echo -e "\033[1;49;37m$@\033[0m" ;}
-## }}}
-function grey_bold(){  ## {{{
-    echo -e "\033[1;49;90m$@\033[0m" ;}
-## }}}
-## }}}
-## dim {{{
-function red_dim(){  ## {{{
-    echo -e "\033[2;49;31m$@\033[0m" ;}
-## }}}
-function green_dim(){  ## {{{
-    echo -e "\033[2;49;32m$@\033[0m" ;}
-## }}}
-function yellow_dim(){  ## {{{
-    echo -e "\033[2;49;33m$@\033[0m" ;}
-## }}}
-function blue_dim(){  ## {{{
-    echo -e "\033[2;49;34m$@\033[0m" ;}
-## }}}
-function purple_dim(){  ## {{{
-    echo -e "\033[2;49;35m$@\033[0m" ;}
-## }}}
-function cyan_dim(){  ## {{{
-    echo -e "\033[2;49;36m$@\033[0m" ;}
-## }}}
-function white_dim(){  ## {{{
-    echo -e "\033[2;49;37m$@\033[0m" ;}
-## }}}
-function grey_dim(){  ## {{{
-    echo -e "\033[2;49;90m$@\033[0m" ;}
-## }}}
-## }}}
-## italiac {{{
-function red_italic(){  ## {{{
-    echo -e "\033[3;49;31m$@\033[0m" ;}
-## }}}
-function green_italic(){  ## {{{
-    echo -e "\033[3;49;32m$@\033[0m" ;}
-## }}}
-function yellow_italic(){  ## {{{
-    echo -e "\033[3;49;33m$@\033[0m" ;}
-## }}}
-function blue_italic(){  ## {{{
-    echo -e "\033[3;49;34m$@\033[0m" ;}
-## }}}
-function purple_italic(){  ## {{{
-    echo -e "\033[3;49;35m$@\033[0m" ;}
-## }}}
-function cyan_italic(){  ## {{{
-    echo -e "\033[3;49;36m$@\033[0m" ;}
-## }}}
-function white_italic(){  ## {{{
-    echo -e "\033[3;49;37m$@\033[0m" ;}
-## }}}
-function grey_italic(){  ## {{{
-    echo -e "\033[3;49;90m$@\033[0m" ;}
-## }}}
-## }}}
-## underline {{{
-function red_underline(){  ## {{{
-    echo -e "\033[4;49;31m$@\033[0m" ;}
-## }}}
-function green_underline(){  ## {{{
-    echo -e "\033[4;49;32m$@\033[0m" ;}
-## }}}
-function yellow_underline(){  ## {{{
-    echo -e "\033[4;49;33m$@\033[0m" ;}
-## }}}
-function blue_underline(){  ## {{{
-    echo -e "\033[4;49;34m$@\033[0m" ;}
-## }}}
-function purple_underline(){  ## {{{
-    echo -e "\033[4;49;35m$@\033[0m" ;}
-## }}}
-function cyan_underline(){  ## {{{
-    echo -e "\033[4;49;36m$@\033[0m" ;}
-## }}}
-function white_underline(){  ## {{{
-    echo -e "\033[4;49;37m$@\033[0m" ;}
-## }}}
-function grey_underline(){  ## {{{
-    echo -e "\033[4;49;90m$@\033[0m" ;}
-## }}}
-## }}}
-## blink {{{
-function red_blink(){  ## {{{
-    echo -e "\033[5;49;31m$@\033[0m" ;}
-## }}}
-function green_blink(){  ## {{{
-    echo -e "\033[5;49;32m$@\033[0m" ;}
-## }}}
-function yellow_blink(){  ## {{{
-    echo -e "\033[5;49;33m$@\033[0m" ;}
-## }}}
-function blue_blink(){  ## {{{
-    echo -e "\033[5;49;34m$@\033[0m" ;}
-## }}}
-function purple_blink(){  ## {{{
-    echo -e "\033[5;49;35m$@\033[0m" ;}
-## }}}
-function cyan_blink(){  ## {{{
-    echo -e "\033[5;49;36m$@\033[0m" ;}
-## }}}
-function white_blink(){  ## {{{
-    echo -e "\033[5;49;37m$@\033[0m" ;}
-## }}}
-function grey_blink(){  ## {{{
-    echo -e "\033[5;49;90m$@\033[0m" ;}
-## }}}
-## }}}
-## bg {{{
-function red_bg(){  ## {{{
-    echo -e "\033[7;49;31m$@\033[0m" ;}
-## }}}
-function green_bg(){  ## {{{
-    echo -e "\033[7;49;32m$@\033[0m" ;}
-## }}}
-function yellow_bg(){  ## {{{
-    echo -e "\033[7;49;33m$@\033[0m" ;}
-## }}}
-function blue_bg(){  ## {{{
-    echo -e "\033[7;49;34m$@\033[0m" ;}
-## }}}
-function purple_bg(){  ## {{{
-    echo -e "\033[7;49;35m$@\033[0m" ;}
-## }}}
-function cyan_bg(){  ## {{{
-    echo -e "\033[7;49;36m$@\033[0m" ;}
-## }}}
-function white_bg(){  ## {{{
-    echo -e "\033[7;49;37m$@\033[0m" ;}
-## }}}
-function grey_bg(){  ## {{{
-    echo -e "\033[7;49;90m$@\033[0m" ;}
-## }}}
-function brown_bg(){  ## {{{
-    echo -e "\033[48;5;94m$@\033[0m" ;}
-## }}}
-function orange_bg(){  ## {{{
-    echo -e "\033[48;5;202m$@\033[0m" ;}
-## }}}
-function olive_bg(){  ## {{{
-    echo -e "\033[48;5;64m$@\033[0m" ;}
-## }}}
-## }}}
-## strikethrough {{{
-function red_strikethrough(){  ## {{{
-    echo -e "\033[9;49;31m$@\033[0m" ;}
-## }}}
-function green_strikethrough(){  ## {{{
-    echo -e "\033[9;49;32m$@\033[0m" ;}
-## }}}
-function yellow_strikethrough(){  ## {{{
-    echo -e "\033[9;49;33m$@\033[0m" ;}
-## }}}
-function blue_strikethrough(){  ## {{{
-    echo -e "\033[9;49;34m$@\033[0m" ;}
-## }}}
-function purple_strikethrough(){  ## {{{
-    echo -e "\033[9;49;35m$@\033[0m" ;}
-## }}}
-function cyan_strikethrough(){  ## {{{
-    echo -e "\033[9;49;36m$@\033[0m" ;}
-## }}}
-function white_strikethrough(){  ## {{{
-    echo -e "\033[9;49;37m$@\033[0m" ;}
-## }}}
-function grey_strikethrough(){  ## {{{
-    echo -e "\033[9;49;90m$@\033[0m" ;}
-## }}}
-## }}}
-## }}}
-function heading(){  ## {{{
-    echo -e "$(purple "$@")" ;}
-## }}}
-function get_input(){  ## {{{
+    awesome-client "${widget}.${attr} = '${value}'"
+}  ## NOTE do NOT change quotes
+## }}}
+function get_input {  ## {{{
+    source "$HOME"/scripts/gb-color
+
     unset input
-    while [ ! "$input" ]; do read -p "$(olive "$@") " input; printf "\33[A"; done && echo ;}
-## }}}
-function get_single_input(){  ## {{{
-    unset single_input
-    while [ ! "$single_input" ]; do read -p "$(olive "$@") " -n 1 single_input; printf "\33[A"; done && echo && echo ;}
-## }}}
-
-function find_duplicate_images(){  ## {{{
-    [ ! "$1" ] && red "arg needed" && exit
-    [ ! -d "$1" ] && { red "no such dir" && exit ;} || cd "$1"
-
-    pics=( $(find . -mindepth 1 -maxdepth 1 -type f -iname "*.jpg" | cut -c 3- | sort) )
-    dups=""
-    start="$(get_datetime "jseconds")"
-
-    for ((i=0; i<"${#pics[@]}"; i++)); do
-        p1="${pics[$i]}"
-
-        ## start comparing only if p1 is not already in dups
-        if_p1_in_dups="$(echo "$dups" | \grep "$p1")"  ## I quoted $p1 and didn't check if it still works
-        if [ ! "$if_p1_in_dups" ]; then
-            echo "$p1"
-            for p2 in "${pics[@]:$i}"; do
-                ## prevent comparing with itself
-                if [ ! "$p1" == "$p2" ]; then
-                    difference="$(diff "$p1" "$p2")"
-                    [ ! "$(echo "$difference" | \grep 'differ$')" ] && dups+="${p1} = ${p2}, "
-                fi
-            done
-
-            ## write dups already found if any
-            [ "$dups" ] && green "dups: $dups"
-
-            grey "-------------------------"
-
-        fi
+    while [ ! "$input" ]; do
+        read -p "$(olive "$@") " input
+        printf '\33[A'
     done
-
-    green "\ndups: $dups"
-
-    end="$(get_datetime "jseconds")"
-    diff="$(( "$end" - "$start" ))"
-    dur="$(day_hour_min_sec "$diff")"
-    echo "Total duration: $dur" ;}
+    printf '\n'
+}
 ## }}}
+function get_single_input {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    unset single_input
+    while [ ! "$single_input" ]; do read -p "$(olive "$@") " -n 1 single_input; printf '\33[A'; done && printf '\n\n'
+}
+## }}}
+function line {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    grey "$(printf "%$(tput cols)s\n" | sed "s/ /▬/g")"
+}
+## }}}
+
+ # function find_duplicate_images {  ## {{{
+ #     source "$HOME"/scripts/gb-color
+
+ #     [ ! "$1" ] && red 'arg needed' && exit
+ #     dest_dir="$1"
+ #     [ ! -d "$dest_dir" ] && {
+ #         red 'no such dir' && exit
+ #     }
+
+ #     SECONDS=0
+
+ #     readarray -t pics <<< "$(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)"
+ #     dups=''
+
+ #     for ((i=0; i<"${#pics[@]}"; i++)); {
+ #         p1="${pics[$i]}"
+
+ #         ## start comparing only if p1 is not already in dups
+ #         if_p1_in_dups="$(printf '%s\n' "$dups" | \grep "$p1")"  ## I quoted $p1 and didn't check if it still works
+ #         if [ ! "$if_p1_in_dups" ]; then
+ #             printf '%s\n' "$p1"
+ #             for p2 in "${pics[@]:$i}"; {
+ #                 ## prevent comparing with itself
+ #                 if [ ! "$p1" == "$p2" ]; then
+ #                     difference="$(diff "$p1" "$p2")"
+ #                     [ ! "$(printf '%s\n' "$difference" | \grep 'differ$')" ] && dups+="${p1} = ${p2}, "
+ #                 fi
+ #             }
+
+ #             ## write dups already found if any
+ #             [ "$dups" ] && green "dups: $dups"
+
+ #             grey '-------------------------'
+
+ #         fi
+ #     }
+
+ #     green "dups: $dups"
+ #     printf '\n'
+
+ #     dur="$(day_hour_min_sec "$SECONDS")"
+ #     printf 'Total duration: %s\n' "$dur"
+ # }
+## }}}
+# function convert_Fun_to_lower_size {  ## {{{
+#     old_fun="$HOME"/website/Files/Fun
+#     new_fun="$HOME"/downloads/New_Fun
+#     if [ -d "$new_fun" ]; then
+#         rm "$new_fun"/*
+#     else
+#         mkdir "$new_fun"
+#     fi
+
+#     readarray -t pics <<< "$(find "$old_fun" -mindepth 1 -maxdepth 1 -type f -iname '*jpg' | sort)"
+
+#     for p in "${pics[@]##*/}"; {
+#         printf '%s\n' "$p"
+#         orig_p="$old_fun"/"$p"
+#         new_p="$new_fun"/"$p"
+#         ffmpeg -i "$orig_p" -q:a 1 -y "$new_p" 2>/dev/null
+#     }
+# }
 # timer and record_* {{{
-# function timer(){  ## {{{
-#    source "$HOME"/scripts/gb-screen
-#    source "$HOME"/scripts/gb-audio
-#    start="$(get_datetime "jhms")"
-#    for ((i=1; i<="$1"; i++)); do
-#        current="$(get_datetime "jhms")"
-#        seconds="$(( "$current" - "$start" ))"
-#        echo -en "\r  \r"
-#        w="$(printf "$2 %02d:%02d:%02d" "$(( "$seconds" / 3600 % 24 ))" "$(( "$seconds" / 60 % 60 ))" "$(( "$seconds" % 60 ))")"
-#        set_widget "record" "markup" "<span color=\"${red}\">${record_icon} <b>${w}</b></span>"
-#        sleep 1
-#    done ;}
+# function timer {  ## {{{
+#     source "$HOME"/scripts/gb-color
+#     source "$HOME"/scripts/gb-screen
+#     source "$HOME"/scripts/gb-audio
+#     start="$(get_datetime 'jhms')"
+#     for ((i=1; i<="$1"; i++)); {
+#         current="$(get_datetime 'jhms')"
+#         let seconds="$current - $start"
+#         echo -en '\r  \r'
+#         let h="$seconds / 3600 % 24"
+#         let m="$seconds / 60 % 60"
+#         let s="$seconds % 60"
+#         w="$(printf "$2 %02d:%02d:%02d" "$h" "$m" "$s"  ## NOTE no \n ??
+#         set_widget 'record' 'markup' "<span color=\"${red}\">${record_icon} <b>${w}</b></span>"
+#         sleep 1
+#     }
+# }
 ## }}}
-# function record_audio(){  ## {{{
+# function record_audio {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     timer "$3" "$4" &
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default                \
 #            -filter_complex amix=inputs=2      \
-#            -t "$1" "$2" 2>/dev/null ;}
+#            -t "$1" "$2" 2>/dev/null
+# }
 ## }}}
-# function record_audio_ul(){  ## {{{
+# function record_audio_ul {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
 #            -filter_complex amix=inputs=2 \
-#            "$1" 2>/dev/null ;}
+#            "$1" 2>/dev/null
+# }
 ## }}}
-# function record_screen(){  ## {{{
+# function record_screen {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     timer "$3" "$6" &
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
@@ -457,9 +340,10 @@ function find_duplicate_images(){  ## {{{
 #            -filter_complex amix=inputs=2 \
 #            -f x11grab -r 30 -s "$4" -i :0.0+"$5",0 \
 #            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
-#            -t "$1" "$2" 2>/dev/null ;}
+#            -t "$1" "$2" 2>/dev/null
+# }
 ## }}}
-# function record_screen_ul(){  ## {{{
+# function record_screen_ul {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
@@ -467,9 +351,10 @@ function find_duplicate_images(){  ## {{{
 #            -filter_complex amix=inputs=2 \
 #            -f x11grab -r 30 -s "$2" -i :0.0+"$3",0 \
 #            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
-#            "$1" 2>/dev/null ;}
+#            "$1" 2>/dev/null
+# }
 ## }}}
-# function record_video(){  ## {{{
+# function record_video {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     timer "$3" "$4" &
@@ -477,35 +362,39 @@ function find_duplicate_images(){  ## {{{
 #            -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
 #            -filter_complex amix=inputs=2 \
-#            -t "$1" "$2" 2>/dev/null ;}
+#            -t "$1" "$2" 2>/dev/null
+# }
 ## }}}
-# function record_video_ul(){  ## {{{
+# function record_video_ul {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
 #            -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
 #            -filter_complex amix=inputs=2 \
-#            "$1" 2>/dev/null ;}
+#            "$1" 2>/dev/null
+# }
 ## }}}
-# function record_mic_mon_on(){  ## {{{
+# function record_mic_mon_on {  ## {{{
 #     source "$HOME"/scripts/gb-audio
 #     unmute_mic
 #     mic_25
 #     unmute_mon
-#     mon_100 ;}
+#     mon_100
+# }
 ## }}}
-# function record_mon_on(){  ## {{{
+# function record_mon_on {  ## {{{
 #     source "$HOME"/scripts/gb-audio
 #     unmute_mon
-#     mon_100 ;}
+#     mon_100
+# }
 ## }}}
-# function record_mic_mon_off(){  ## {{{
+# function record_mic_mon_off {  ## {{{
 #     source "$HOME"/scripts/gb-audio
 #     mute_mic
 #     mic_0
 #     mute_mon
-#     mon_0 ;}
+#     mon_0
+# }
 ## }}}
 ## }}}
-

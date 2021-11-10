@@ -9,16 +9,16 @@ from gp import Color, fzf, invalid, get_input, get_single_input, get_password, c
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
-C = Color()
+Col = Color()
 
-def help():  ## {{{
+def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
-{C.flag(f'-i --input=')}
-{C.flag(f'-p --password=')}''')
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('Help')}
+{Col.flag('-i --input=')}
+{Col.flag('-p --password=')}''')
     exit()
 ## }}}
-def getopts():  ## {{{
+def getopts() -> None:  ## {{{
     global inpt, password
 
     try:
@@ -27,11 +27,11 @@ def getopts():  ## {{{
         invalid(f'{exc!r}')
 
     for opt, arg in duos:
-        if   opt in ('-h', '--help'):     help()
+        if   opt in ('-h', '--help'):     display_help()
         elif opt in ('-i', '--input'):    inpt = arg
         elif opt in ('-p', '--password'): password = arg
 ## }}}
-def prompt(*args: str):  ## {{{
+def prompt(*args: list[str]) -> None:  ## {{{
     global inpt, password
 
     for arg in args:
@@ -46,7 +46,7 @@ def prompt(*args: str):  ## {{{
 
 getopts()
 
-print(C.heading(title))
+print(Col.heading(title))
 
 main_items = ['tar', 'untar', 'zip', 'unzip', 'unrar', 'help']
 main_item = fzf(main_items)
@@ -88,4 +88,4 @@ elif main_item == 'unrar':
     else:
         invalid('Wrong choice')
 elif main_item == 'help':
-    help()
+    display_help()

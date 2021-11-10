@@ -2,30 +2,30 @@
 source "$HOME"/scripts/gb
 
 file="$HOME"/todo/todo
-content="$(cat "$file")"
+readarray -t content < "$file"
 
-main_items=( "ADD" "REMOVE" "EMPTY" "" "$content" )
-main_item="$(pipe_to_dmenu "${main_items[@]}" "todo" "")" || exit 37
+main_items=( 'ADD' 'REMOVE' 'EMPTY' '' "${content[@]}" )
+main_item="$(pipe_to_rofi "${main_items[@]}" 'todo' '')" || exit 37
 
 case "$main_item" in
-    ADD ) add_items=()  ## no members needed here
-          add_item="$(pipe_to_dmenu "${add_items[@]}" "add" "")" || exit 37
+    ADD ) declare -a add_items=()  ## no members needed here
+          add_item="$(pipe_to_rofi "${add_items[@]}" 'add' '')" || exit 37
 
           ## exit if it already exists
-          [ "$(\grep -w "$add_item" "$file")" ] && msgc "ERROR" "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/linux/themes/alert-w.png && exit
+          [ "$(\grep -w "$add_item" "$file")" ] && msgc 'ERROR' "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/linux/themes/alert-w.png && exit
 
-          echo "$add_item" >> "$file" && msgn "added <span color=\"${orange}\">${add_item}</span>" ;;
-    REMOVE ) [ ! "$content" ] && msgc "ERROR" "todo is empty" "$HOME"/linux/themes/alert-w.png && exit
+          printf '%s\n' "$add_item" >> "$file" && msgn "added <span color=\"${orange}\">${add_item}</span>" ;;
+    REMOVE ) [ ! "$content" ] && msgc 'ERROR' 'todo is empty' "$HOME"/linux/themes/alert-w.png && exit
 
-             remove_items=( "$content" )
-             remove_item="$(pipe_to_dmenu "${remove_items[@]}" "remove" "red")" || exit 37
+             # remove_items=  ## exceptionally skipped this line because we already have the content in the form of an array an can use it below
+             remove_item="$(pipe_to_rofi "${content[@]}" 'remove' 'red')" || exit 37
 
-             sed -i "/^$remove_item$/d" "$file" && msgn "removed <span color=\"${red}\">${remove_item}</span>" ;;  ## do NOT replace " with ' in sed
-    EMPTY ) empty_items=( "no" "yes" )
-            empty_item="$(pipe_to_dmenu "${empty_items[@]}" "you sure?" "red")" || exit 37
+             sed -i "/^$remove_item$/d" "$file" && msgn "removed <span color=\"${red}\">${remove_item}</span>" ;;  ## NOTE do NOT replace " with ' in sed
+    EMPTY ) empty_items=( 'no' 'yes' )
+            empty_item="$(pipe_to_rofi "${empty_items[@]}" 'you sure?' '')" || exit 37
 
             case "$empty_item" in
-                yes ) > "$file" && msgn "emptied" ;;
+                yes ) > "$file" && msgn 'emptied' ;;
             esac ;;
 esac
 

@@ -10,15 +10,15 @@ from gp import Color, invalid, fzf, get_input
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
-C = Color()
+Col = Color()
 
-def help():  ## {{{
+def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{C.heading(f'{title}')} {C.yellow('Help')}
-{C.flag(f'-l --length=')}''')
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('Help')}
+{Col.flag('-l --length=')}''')
     exit()
 ## }}}
-def getopts():  ## {{{
+def getopts() -> None:  ## {{{
     global length
 
     try:
@@ -27,10 +27,10 @@ def getopts():  ## {{{
         invalid(f'{exc!r}')
 
     for opt, arg in duos:
-        if   opt in ('-h', '--help'):   help()
+        if   opt in ('-h', '--help'):   display_help()
         elif opt in ('-l', '--length'): length = int(arg)
 ## }}}
-def prompt(*args: str):  ## {{{
+def prompt(*args: list[str]) -> None:  ## {{{
     global length
 
     for arg in args:
@@ -41,11 +41,11 @@ def prompt(*args: str):  ## {{{
                 except: invalid('Length should be a number')
 
 ## }}}
-def generate():  ## {{{
+def generate() -> None:  ## {{{
     u = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     l = u.lower()
     d = '0123456789'
-    s = '!@#$%^-*()_+={}\[\]\|\\;\':\",.<>/?`~'  ## & intentionally exclided to prevent possible shell errors/problems
+    s = '!@#$%^-*()_+={}\[\]\|\\;\':\",.<>/?`~'  ## & intentionally excluded to prevent possible shell errors/problems
 
     ## with all the characters
     print('all characters:')
@@ -58,7 +58,7 @@ def generate():  ## {{{
 
     global length
     if length > len(letters):
-        print(C.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
+        print(Col.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
         length = len(letters)
 
     for x in range(5):
@@ -77,7 +77,7 @@ def generate():  ## {{{
     if sy: letters += s
 
     if length > len(letters):
-        print(C.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
+        print(Col.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
         length = len(letters)
 
     for x in range(5):
@@ -87,7 +87,7 @@ def generate():  ## {{{
 
 getopts()
 
-print(C.heading(title))
+print(Col.heading(title))
 
 main_items = ['password', 'help']
 main_item = fzf(main_items)
@@ -96,4 +96,4 @@ if   main_item == 'password':
     prompt('-l')
     generate()
 elif main_item == 'help':
-    help()
+    display_help()
