@@ -74,10 +74,7 @@ function pipe_to_dmenu {  ## {{{
         unset 'received[-1]'
     fi
 
-    [ "$fg" == 'red' ] && {
-        local dmenusb="$red_dark"
-        local dmenusb="$red_dark"
-    }
+    [ "$fg" == 'red' ] && local dmenusb="$red_dark"
 
     local dmenu_choice="$(printf '%s\n' "${received[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$title")"
     [ "$dmenu_choice" ] && printf '%s\n' "$dmenu_choice" || return 37
