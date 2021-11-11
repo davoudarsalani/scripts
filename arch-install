@@ -1,0 +1,335 @@
+#!/usr/bin/env bash
+
+function display_help {
+    colored 'help:
+    -h|--help    help
+    -l|--legacy  legacy
+    -u|--uefi    uefi (Ermanno Ferrari)'  ## https://ermannoferrari.net/arch-linux-full-install-on-uefi-from-the-terminal-to-productivity
+    exit
+}
+
+function colored {  ## white dim
+    printf '\e[2;49;37m%s\e[0m\n' "$@" | sed 's/^ *//g'
+}
+
+function legacy_fg {
+    printf '\e[2;49;34m%s\e[0m\n' "$@"
+}
+
+function uefi_fg {
+    printf '\e[38;5;64m%s\e[0m\n' "$@"
+}
+
+function display_steps {
+    [ "$mode" == 'LEGACY' ] && index_fg='legacy_fg' || index_fg='uefi_fg'
+
+    for ((i=0; i<"${#main_items[@]}"; i++)); {
+        printf '%s\t%s\n' "$("$index_fg" "$i")" "${main_items[$i]}" | sed 's/\t/  /g'
+    }
+}
+
+[ ! "$1" ] || [ "$1" == '-h' ] || [ "$1" == '--help' ] && display_help
+
+case "$1" in
+    -l|--legacy ) mode='LEGACY'
+        legacy_fg "$mode"
+        declare -a main_items=(
+            'find fastest mirrorlist'
+            'partitioning'
+            'pacstrap'
+            'genfstab'
+            'chroot'
+            'locale'
+            'timedatectl'
+            'host/hosts'
+            'multilib'
+            'sync repos'
+            'add user'
+            'password'
+            'bash* grub networkmanager dhcpcd'
+            'reboot'
+            'xorg* lightdm*'
+            'reboot'
+        )
+
+        display_steps
+        read -p '> ' choice
+
+        case "$choice" in
+            0 ) colored "
+                pacman -Syy
+                pacman -S reflector
+                reflector -c Iran -a 6 --sort rate --save /etc/pacman.d/mirrorlist
+                pacman -Syy"
+                ;;
+            1 ) colored "
+                lsblk
+                cfdisk /dev/sd_ [choose 'dos']
+
+                sd_1 for /       bootable
+                sd_2 for home
+                sd_3 for swap
+
+                mkfs.ext4 /dev/sd_1
+                mount /dev/sd_1 /mnt
+
+                mkfs.ext4 /dev/sd_2
+                mkdir /mnt/home
+                mount /dev/sd_2 /mnt/home
+
+                mkswap /dev/sd_3
+                swapon /dev/sd_3"
+                ;;
+            2 ) colored "
+                pacstrap -i /mnt base base-devel
+
+                (to be installed manually: cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils jfsutils less linux linux-firmware logrotate lvm2 man-db man-pages mdadm nano netctl perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs)"
+                ;;
+            3 ) colored "
+                genfstab -U /mnt >> /mnt/etc/fstab"
+                ;;
+            4 ) colored "
+                arch-chroot /mnt /bin/bash"
+                ;;
+            5 ) colored "
+                vim /etc/locale.gen
+                ## uncomment these:
+                en_US.UTF-8 UTF-8
+                fa_IR UTF-8
+
+                locale-gen
+                printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf
+                export LANG=en_US.UTF-8"
+                ;;
+            6 ) colored "
+                ## list time zones:
+                timedatectl list-timezones
+
+                ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
+                hwclock --systohc --utc
+                timedatectl set-ntp true"
+                ;;
+            7 ) colored "
+                printf '%s\n' 'acer' > /etc/hostname
+
+                vim /etc/hosts
+                ## write these lines in it:
+                127.0.0.1   localhost
+                ::1         localhost
+                127.0.1.1   acer.localdomain    acer"
+                ;;
+            8 ) colored "
+                vim /etc/pacman.conf
+                ## uncomment these lines:
+                #[multilib]
+                #Include = /etc/pacman.d/mirrorlist"
+                ;;
+            9 ) colored "
+                pacman -Sy"
+                ;;
+            10 ) colored "
+                 >>> method 1 (recommended) <<<
+                 useradd -mG wheel -s /bin/bash nino
+                 ## uncomment this line:
+                 # %wheel ALL=(ALL) NOPASSWD: ALL
+
+                 >>> method 2 <<<
+                 useradd -m -g users -G lp -s /bin/bash nino # also -G lp,autologin,storage,wheel,power
+                 EDITOR=vim visudo
+                 ## add 'nino ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
+
+                 >>> method 3 <<< (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw)
+                 useradd -m -g wheel nino
+                 EDITOR=vim visudo
+                 # add this line:
+                 %wheel ALL=(ALL) NOPASSWD: ALL
+                 # alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
+                 %wheel ALL=(ALL) ALL
+                 %wheel ALL=(ALL) NOPASSWD: <command1>, <command2>, <command3>"
+                 ;;
+            11 ) colored "
+                 passwd
+                 passwd nino"
+                 ;;
+            12 ) colored "
+                 pacman -S bash bash-completion grub os-prober[only when dual-booting]
+                 grub-install --recheck --debug --force /dev/sd_
+                 grub-mkconfig -o /boot/grub/grub.cfg
+
+                 pacman -S networkmanager network-manager-applet
+                 sudo systemctl enable NetworkManager
+
+                 systemctl enable dhcpcd
+                 ip a
+                 systemctl enable dhcpcd@enp4s0f1"
+                 ;;
+            13 ) colored "
+                 reboot"
+                 ;;
+            14 ) colored "
+                 sudo pacman -S xorg xorg-xinit xorg-server xorg-apps
+                 sudo pacman -S lightdm
+                 sudo pacman -S lightdm-gtk-greeter lightdm-gtk-greeter-settings
+                 sudo systemctl enable lightdm.service"
+                 ;;
+            15 ) colored "
+                 reboot"
+                 ;;
+            * ) printf '%s is out of range\n' "$choice"
+                ;;
+        esac
+        ;;
+    -u|--uefi )  mode='UEFI (Ermanno Ferrari)'
+        uefi_fg "$mode"
+        declare -a main_items=(
+            'timedatectl'
+            'partitioning'
+            'pacstrap'
+            'genfstab'
+            'chroot'
+            'swap'
+            'time zone / clock'
+            'locale'
+            'hosts / hosts'
+            'root password'
+            'grub efibootmgr networkmanager network-manager-applet wireless_tools etc.'
+            'grub'
+            'enable NetworkManager,bluetooth'
+            'add user'
+            'user password'
+            'umount and reboot'
+            'nmtui'
+            'xorg nvidia*'
+        )
+
+        display_steps
+        read -p '> ' choice
+
+        case "$choice" in
+            0 ) colored "
+                timedatectl set-ntp true
+
+                pacman -Syy
+                pacman -S reflector
+                reflector -c Iran -a 6 --sort rate --save /etc/pacman.d/mirrorlist
+                pacman -Syy"
+                ;;
+            1 ) colored "
+                lsblk OR lsblk -f
+                fdisk /dev/sd_
+
+                ## first, type g to create gpt table
+                ## then go on to create partitions
+                ## +200M for the size of uefi partition
+
+                g for create gpt table
+                o for create dos/mbr table
+                n for new partition
+                d for delete partition
+                p for print status
+                t for change type (1 for efi, 19 for swap [or 82 !], 83 for linux)
+                w for write
+                a for bootable flag
+                m for help
+
+                sd_1 for uefi
+                sd_2 for /
+                sd_3 for home
+
+                mkfs.fat -F32 /dev/sd_1
+                mkfs.ext4 /dev/sd_2
+                mkfs.ext4 /dev/sd_3
+
+                mkdir /mnt/boot
+                mount /dev/sd_1 /mnt/boot
+
+                ## mount root
+                mount /dev/sd_2 /mnt
+
+                mkdir /mnt/home
+                mount /dev/sd_3 /mnt/home"
+                ;;
+            2 ) colored "
+                pacstrap /mnt base linux linux-firmware vim"
+                ;;
+            3 ) colored "
+                genfstab -U /mnt >> /mnt/etc/fstab"
+                ;;
+            4 ) colored "
+                arch-chroot /mnt"
+                ;;
+            5 ) colored "
+                fallocate -l 4GB /swapfile
+                chmod 600 /swapfile
+                mkswap /swapfile
+                swapon /swapfile
+                vim /etc/fstab
+                ## append this line:
+                /swapfile none swap defaults 0 0"
+                ;;
+            6 ) colored "
+                ## list time zones:
+                timedatectl list-timezones
+
+                ln -sf /usr/share/zoneinfo/Asia/Tehran /etc/localtime
+                hwclock --systohc"
+                ;;
+            7 ) colored "
+                vim /etc/locale.gen
+                ## uncomment these:
+                en_US.UTF-8 UTF-8
+                fa_IR UTF-8
+
+                locale-gen
+                printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf"
+                ;;
+            8 ) colored "
+                printf '%s\n' 'acer' > /etc/hostname
+
+                vim /etc/hosts
+                ## write these lines in it:
+                127.0.0.1   localhost
+                ::1         localhost
+                127.0.1.1   acer.localdomain    acer"
+                ;;
+            9 ) colored "
+                passwd"
+                ;;
+            10 ) colored "
+                 pacman -S grub efibootmgr networkmanager network-manager-applet wireless_tools wpa_supplicant base-devel linux-headers reflector git bluez bluez-utils xdg-utils xdg-user-dirs pulseaudio-bluetooth mtools dosfstools"
+                 ;;
+            11 ) colored "
+                 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+                 grub-mkconfig -o /boot/grub/grub.cfg"
+                 ;;
+            12 ) colored "
+                 systemctl enable NetworkManager
+                 systemctl enable bluetooth"
+                 ;;
+            13 ) colored "
+                 useradd -mG wheel nino"
+                 ;;
+            14 ) colored "
+                 passwd nino
+                 EDITOR=vim visudo
+                 ## the same as LEGACY"
+                 ;;
+            15 ) colored "
+                 exit
+                 umount -a
+                 reboot"
+                 ;;
+            16 ) colored "
+                 ip a
+                 nmtui"
+                 ;;
+            17 ) colored "
+                 sudo pacman -S xorg nvidia nividia-utils"
+                 ;;
+            * ) printf '%s is out of range\n' "$choice"
+        esac
+        ;;
+    * ) display_help ;;
+esac
+
+exit
