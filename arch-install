@@ -48,7 +48,7 @@ case "$1" in
             'password'
             'bash* grub networkmanager dhcpcd'
             'reboot'
-            'xorg* lightdm*'
+            'xorg* lightdm* awesome'
             'reboot'
         )
 
@@ -129,17 +129,17 @@ case "$1" in
                 ;;
             10 ) colored "
                  >>> method 1 (recommended) <<<
-                 useradd -mG wheel -s /bin/bash nino
+                 useradd -mG wheel -s /bin/bash nnnn
                  ## uncomment this line:
                  # %wheel ALL=(ALL) NOPASSWD: ALL
 
                  >>> method 2 <<<
-                 useradd -m -g users -G lp -s /bin/bash nino # also -G lp,autologin,storage,wheel,power
+                 useradd -m -g users -G lp -s /bin/bash nnnn # also -G lp,autologin,storage,wheel,power
                  EDITOR=vim visudo
-                 ## add 'nino ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
+                 ## add 'nnnn ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
 
                  >>> method 3 <<< (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw)
-                 useradd -m -g wheel nino
+                 useradd -m -g wheel nnnn
                  EDITOR=vim visudo
                  # add this line:
                  %wheel ALL=(ALL) NOPASSWD: ALL
@@ -149,7 +149,7 @@ case "$1" in
                  ;;
             11 ) colored "
                  passwd
-                 passwd nino"
+                 passwd nnnn"
                  ;;
             12 ) colored "
                  pacman -S bash bash-completion grub os-prober[only when dual-booting]
@@ -168,6 +168,7 @@ case "$1" in
                  ;;
             14 ) colored "
                  sudo pacman -S xorg xorg-xinit xorg-server xorg-apps
+                 sudo pacman -S awesome
                  sudo pacman -S lightdm
                  sudo pacman -S lightdm-gtk-greeter lightdm-gtk-greeter-settings
                  sudo systemctl enable lightdm.service"
@@ -187,19 +188,17 @@ case "$1" in
             'pacstrap'
             'genfstab'
             'chroot'
-            'swap'
             'time zone / clock'
             'locale'
             'hosts / hosts'
             'root password'
-            'grub efibootmgr networkmanager network-manager-applet wireless_tools etc.'
+            'grub xorg nvidia nividia-utils efibootmgr networkmanager etc'
             'grub'
             'enable NetworkManager,bluetooth'
             'add user'
             'user password'
             'umount and reboot'
             'nmtui'
-            'xorg nvidia*'
         )
 
         display_steps
@@ -216,41 +215,56 @@ case "$1" in
                 ;;
             1 ) colored "
                 lsblk OR lsblk -f
-                fdisk /dev/sd_
+                gdisk /dev/sd_
 
                 ## first, type g to create gpt table
                 ## then go on to create partitions
-                ## +200M for the size of uefi partition
 
-                g for create gpt table
-                o for create dos/mbr table
-                n for new partition
-                d for delete partition
-                p for print status
-                t for change type (1 for efi, 19 for swap [or 82 !], 83 for linux)
-                w for write
-                a for bootable flag
-                m for help
+                g  create gpt table
+                o  create dos/mbr table
+                n  new partition
+                d  delete partition
+                p  print status
+                t  change type (1 for efi, 19 for swap [or 82 !], 83 for linux)
+                w  write
+                a  bootable flag
+                m  help
+
+                ## uefi
+                ## +250M for size
+                ## ef00 for Hex[!]
+
+                ## swap
+                ## 8200 is Hex[!]
+
+                ## root
+                ## leave Hex/GUID line blank as is
+
+                ## home
+                ## leave Hex/GUID line blank as is
 
                 sd_1 for uefi
-                sd_2 for /
-                sd_3 for home
+                sd_2 for swap
+                sd_3 for /
+                sd_4 for home
 
-                mkfs.fat -F32 /dev/sd_1
-                mkfs.ext4 /dev/sd_2
+                mkfs.vfat /dev/sd_1
+                mkswap    /dev/sd_2
+                swapon    /dev/sd_2
                 mkfs.ext4 /dev/sd_3
+                mkfs.ext4 /dev/sd_4
 
-                mkdir /mnt/boot
-                mount /dev/sd_1 /mnt/boot
+                mkdir -p /mnt/boot/efi
+                mount /dev/sd_1 /mnt/boot/efi
 
                 ## mount root
-                mount /dev/sd_2 /mnt
+                mount /dev/sd_3 /mnt
 
                 mkdir /mnt/home
-                mount /dev/sd_3 /mnt/home"
+                mount /dev/sd_4 /mnt/home"
                 ;;
             2 ) colored "
-                pacstrap /mnt base linux linux-firmware vim"
+                pacstrap /mnt base linux-lts linux-firmware vim intelucode[!]"
                 ;;
             3 ) colored "
                 genfstab -U /mnt >> /mnt/etc/fstab"
@@ -259,22 +273,13 @@ case "$1" in
                 arch-chroot /mnt"
                 ;;
             5 ) colored "
-                fallocate -l 4GB /swapfile
-                chmod 600 /swapfile
-                mkswap /swapfile
-                swapon /swapfile
-                vim /etc/fstab
-                ## append this line:
-                /swapfile none swap defaults 0 0"
-                ;;
-            6 ) colored "
                 ## list time zones:
                 timedatectl list-timezones
 
                 ln -sf /usr/share/zoneinfo/Asia/Tehran /etc/localtime
                 hwclock --systohc"
                 ;;
-            7 ) colored "
+            6 ) colored "
                 vim /etc/locale.gen
                 ## uncomment these:
                 en_US.UTF-8 UTF-8
@@ -283,7 +288,7 @@ case "$1" in
                 locale-gen
                 printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf"
                 ;;
-            8 ) colored "
+            7 ) colored "
                 printf '%s\n' 'acer' > /etc/hostname
 
                 vim /etc/hosts
@@ -292,39 +297,37 @@ case "$1" in
                 ::1         localhost
                 127.0.1.1   acer.localdomain    acer"
                 ;;
-            9 ) colored "
+            8 ) colored "
                 passwd"
                 ;;
-            10 ) colored "
-                 pacman -S grub efibootmgr networkmanager network-manager-applet wireless_tools wpa_supplicant base-devel linux-headers reflector git bluez bluez-utils xdg-utils xdg-user-dirs pulseaudio-bluetooth mtools dosfstools"
+            9 ) colored "
+                 pacman -S grub xorg nvidia nividia-utils efibootmgr networkmanager network-manager-applet wireless_tools wpa_supplicant base-devel linux-headers reflector git bluez bluez-utils xdg-utils xdg-user-dirs pulseaudio-bluetooth mtools dosfstools [more in video]
+                 pacman -S awesome"
                  ;;
-            11 ) colored "
-                 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+            10 ) colored "
+                 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
                  grub-mkconfig -o /boot/grub/grub.cfg"
                  ;;
-            12 ) colored "
+            11 ) colored "
                  systemctl enable NetworkManager
                  systemctl enable bluetooth"
                  ;;
-            13 ) colored "
-                 useradd -mG wheel nino"
+            12 ) colored "
+                 useradd -mG wheel nnnn"
                  ;;
-            14 ) colored "
-                 passwd nino
+            13 ) colored "
+                 passwd nnnn
                  EDITOR=vim visudo
                  ## the same as LEGACY"
                  ;;
-            15 ) colored "
+            14 ) colored "
                  exit
                  umount -a
                  reboot"
                  ;;
-            16 ) colored "
+            15 ) colored "
                  ip a
                  nmtui"
-                 ;;
-            17 ) colored "
-                 sudo pacman -S xorg nvidia nividia-utils"
                  ;;
             * ) printf '%s is out of range\n' "$choice"
         esac
