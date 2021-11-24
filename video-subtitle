@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-03 23:09:05 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -46,8 +46,7 @@ main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" ||
 case "$main_item" in
     "replace ' ', ---, -_-, !, %, & and ," ) get_single_input ' Have you replaced .en.vtt with .vtt?' && rep_en="$single_input"
                                              case "$rep_en" in
-                                                 y ) : ;;
-                                                 * ) exit ;;  ## NOTE do NOT remove
+                                                 [^y] ) exit ;;  ## NOTE do NOT remove
                                              esac
 
                                              prompt -d

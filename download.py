@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-03 10:05:46 Wednesday
+## last modified: 1400-09-03 23:25:08 Wednesday
 
 ## imports {{{
 from __future__ import unicode_literals
@@ -436,7 +436,7 @@ class Initial:  ## {{{
             invalid({'GETOPTS ERROR': getopts_error_msg})
     ## }}}
     def verify_args(self) -> None:  ## {{{
-            ## {{{ self.source_file + self.urls, self.dest_dir & self.log_file
+            ## {{{ self.source + self.urls, self.dest_dir & self.log_file
             ## https://www.geeksforgeeks.org/python-check-url-string/
             url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
             playlist_id_regex = '^PL'  ## TODO better regex (I don't think - is required after PL)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 16:13:28 Wednesday
+## last modified: 1400-09-03 23:05:01 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -131,6 +131,7 @@ arrays ---> ARRAY=()             create an empty array
             STRING="$(ls)"       save ls output as a string
             ARRAY=( $(ls) )      save ls output as an array of files
             "${ARRAY[@]:x:n}"    retrieve n elements starting at index x
+            unset 'ARRAY[@]'     empty an array
 associative array ---> declare -A vids=(['key one']='value one' ['key two']='value two')
                        printf '%s\n' "${!vids[@]}"         ## keys
                        printf '%s\n' "${vids[@]}"          ## values
@@ -163,7 +164,7 @@ in terminal [vii] ---> Alt + Shift + 3  comment the command and run it
 http torsocks ---> http_proxy=socks5://127.0.0.1:9050 torsocks
 toggle keyboard layout ---> setxkbmap -layout us,ir -option grp:caps_toggle
 show swap files ---> swapon --show
-delete duplicate, nonconsecutive and nonempty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq FILE
+delete duplicate, nonconsecutive and non-empty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq FILE
 open multiple files in vim tabs ---> vim -p FILE1 FILE2 FILE3
 dd pattern ---> sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
 turn off screensaver ---> xset s 0 0 && xset -dpms
