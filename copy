@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-03 17:41:12 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -11,7 +11,7 @@ function cd_and_rm_all_except_path {
     [ ! -d "$HOME"/linux/"$cfg_dir" ] && red 'No such cfg-dir' && exit
 
     readarray -t files < <(find "$HOME"/linux/"$cfg_dir" -mindepth 1 -maxdepth 1 ! -iname '0-path.txt' | sort)
-    yellow_dim "${files[@]##*/}"
+    printf '%s\n' "${files[@]##*/}" | column
 
     get_single_input 'Remove these?' && propmt="$single_input"
     case "$propmt" in

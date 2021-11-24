@@ -65,4 +65,3 @@ update_audio()
 
 set_widget('record', 'fg', 'reset')
 set_widget('record', 'markup', record_icon())
-

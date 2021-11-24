@@ -99,4 +99,3 @@ if   main_item == 'password':
     generate()
 elif main_item == 'help':
     display_help()
-

@@ -87,4 +87,3 @@ elif main_item == 'video':
     output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.video_ul(output)
-

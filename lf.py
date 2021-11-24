@@ -238,4 +238,3 @@ elif main_arg == 'unrar':  ## {{{
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
-

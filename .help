@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-03 21:52:15 Wednesday
 
 source "$HOME"/scripts/gb-color
 
@@ -124,6 +124,17 @@ clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-d --directory=') directory"
+exit
+}
+## }}}
+function website_create_audio_template_help {  ## {{{
+clear
+printf '%s\n' "\
+$(heading "$title") $(yellow "help")
+$(flag '-l --length=')
+$(flag '-d --directory=') (e.g. TOEIC/Level-1 or 6-Minute-English)
+$(flag '-p --per-page=')
+$(flag '-f --destination-file=')"
 exit
 }
 ## }}}

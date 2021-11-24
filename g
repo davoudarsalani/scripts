@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 13:52:03 Wednesday
+## last modified: 1400-09-03 16:09:09 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -119,9 +119,9 @@ case "$main_item" in
           ## }}}
     commit )  ## {{{
              if_changes
-             [ ! "${std_s}" ] && red 'no staged files' && exit  ## <--,-- "${std_s[@]}" throws error:
-                                                                ##    |-- line 107: [:  zero: unary operator expected
-                                                                ##    '-- so we have to use either "${std_s}" or "${std_s[@]}" 2>/dev/null
+             [ ! "$sta" ] && red 'no staged files' && exit  ## <--,-- "${sta[@]}" throws error:
+                                                            ##    |-- line 107: [:  zero: unary operator expected
+                                                            ##    '-- so we have to use either "$sta" or "${sta[@]}" 2>/dev/null
 
              preview_setting='hidden'
              commit_items=( "open $editor" 'write here' )
@@ -181,9 +181,9 @@ case "$main_item" in
            ## }}}
     unstage )  ## {{{
               if_changes
-              [ ! "${std_s}" ] && red 'no staged files' && exit  ## <--,-- "${std_s[@]}" throws error:
-                                                                 ##    |-- line 107: [:  zero: unary operator expected
-                                                                 ##    '-- so we have to use either "${std_s}" or "${std_s[@]}" 2>/dev/null
+              [ ! "$sta" ] && red 'no staged files' && exit  ## <--,-- "${sta[@]}" throws error:
+                                                             ##    |-- line 107: [:  zero: unary operator expected
+                                                             ##    '-- so we have to use either "$sta" or "${sta[@]}" 2>/dev/null
 
               preview_setting='hidden'
               instage_items=( 'all' 'file/pattern' )

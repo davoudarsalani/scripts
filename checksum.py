@@ -64,4 +64,3 @@ elif main_item == 'file':
     print(hashed)
 elif main_item == 'help':
     display_help()
-

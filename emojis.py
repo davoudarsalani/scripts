@@ -26,4 +26,3 @@ line = fzf(lines)
 emoji = line.split()[0]
 clipboard_copy(emoji)
 msgn(f'copied <span color=\"{getenv("orange")}\">{emoji}</span>')
-

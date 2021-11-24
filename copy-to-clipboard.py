@@ -86,4 +86,3 @@ elif main_item == 'jalali datetime':
     msgn(f'copied\n<span color=\"{getenv("orange")}\">{current_datetime}</span>')
 elif main_item == 'help':
     display_help()
-

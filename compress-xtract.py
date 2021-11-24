@@ -91,4 +91,3 @@ elif main_item == 'unrar':
         invalid('Wrong choice')
 elif main_item == 'help':
     display_help()
-

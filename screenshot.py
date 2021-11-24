@@ -125,4 +125,3 @@ elif main_item == 'selected area':  ## {{{
 else:  ## {{{
     exit()
 ## }}}
-

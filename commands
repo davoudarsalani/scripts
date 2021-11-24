@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 15:48:18 Wednesday
+## last modified: 1400-09-03 16:13:28 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -51,6 +51,7 @@ replacing the line matching the pattern        ---> sed '/PATTERN/c THIS STRING 
 insert string before 3rd line ---> sed '3i\STRING'
 insert string after 3rd line ---> sed '3a\STRING'
 remove from pattern to the end of file (inclusive) ---> sed '/PATTERN/,$d'
+remove trailing empty lines from file ---> sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba'
 
 remove prefix       ---> "${VAR#PREFIX}"   ## "${x#*/}"  turns a/b/c/d  to  b/c/d
 remove long prefix  ---> "${VAR##PREFIX}"  ## "${x##*/}" turns a/b/c/d  to  d      ## JUMP_1

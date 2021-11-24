@@ -39,4 +39,3 @@ elif 'specific' in mode:
             msgc('Reminder', message)
             break
         sleep(30)
-
