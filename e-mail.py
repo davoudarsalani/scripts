@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 ## https://stackoverflow.com/questions/953561/check-unread-count-of-gmail-messages-with-python
 
 from imaplib import IMAP4_SSL

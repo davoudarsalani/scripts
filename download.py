@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-03 10:05:46 Wednesday
+
 ## imports {{{
 from __future__ import unicode_literals
 from dataclasses import dataclass, field
@@ -353,7 +355,7 @@ def main() -> None:  ## {{{
 ## }}}
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('Help')}
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-s --source=')}a text file e.g. $HOME/downloads/lucy,
             a url e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg,
             a youtube playlist id e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu
@@ -925,7 +927,6 @@ class Youtube(Profile):  ## {{{
     video_duration: int      = None
     video_view_count: int    = None
     video_like_count: int    = None
-    video_dislike_count: int = None
     video_ext: str           = None
     ## }}}
     def __post_init__(self):  ## {{{
@@ -966,13 +967,12 @@ class Youtube(Profile):  ## {{{
                     video_duration = duration(video_duration)  ## 00:00:41
                     video_view_count = f'{video_obj["view_count"]:,d}'  ## 1,362,401
                     video_like_count = f'{video_obj["like_count"]:,d}'  ## 13,730
-                    video_dislike_count = f'{video_obj["dislike_count"]:,d}'  ## 2,416
                     video_ext = video_obj['ext']  ## mp4
 
                     outputname = normalize(video_title)
                     outputname = f'{Ini.increment_prefix}{outputname}-{video_id}'
 
-                    info = order, time, url, video_title, video_uploader, video_channel, video_duration, video_view_count, video_like_count, video_dislike_count, video_ext, outputname
+                    info = order, time, url, video_title, video_uploader, video_channel, video_duration, video_view_count, video_like_count, video_ext, outputname
 
                     self.should_break = True
 
@@ -986,7 +986,7 @@ class Youtube(Profile):  ## {{{
                 if self.should_break:
                     break
 
-        self.order, self.time, self.url, self.video_title, self.video_uploader, self.video_channel, self.video_duration, self.video_view_count, self.video_like_count, self.video_dislike_count, self.video_ext, self.outputname = info
+        self.order, self.time, self.url, self.video_title, self.video_uploader, self.video_channel, self.video_duration, self.video_view_count, self.video_like_count, self.video_ext, self.outputname = info
     ## }}}
     @duration_wrapper()
     def download(self) -> None:  ## {{{
@@ -1189,3 +1189,16 @@ if __name__ == '__main__':
 
     Ini.total_duration = main()
     Ini.report()
+
+## we can use these to analyze warnings in warning methods in YoutubedlLogger* classes {{{
+# warnings = [
+#     'Unable to download thumbnail "https://i.ytimg.com/vi_webp/f_bml-MILAs/maxresdefault.webp": <urlopen error EOF occurred in violation of protocol (_ssl.c:1129)>',
+#     'Could not send HEAD request to https://www.youtube.com/watch?=vglU: <urlopen error [Errno 111] Connection refused>',
+#     'Could not send HEAD request to https://www.youtube.com/watch?=vglU: HTTP Error 429: Too Many Requests',
+#     'Unable to download webpage: <urlopen error [Errno 111] Connection refused>',
+#     'Unable to download webpage: Remote end closed connection without response',
+#     'Unable to download webpage: HTTP Error 429: Too Many Requests',
+#     'Falling back on generic information extractor.',
+# ]
+## }}}
+

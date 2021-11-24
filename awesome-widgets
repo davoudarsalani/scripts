@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-03 12:47:52 Wednesday
+
 threshhold=70
 
 case "$1" in
@@ -171,14 +173,14 @@ msgn "$text" ;;
 
             update_variables
 
-            [ "$vol_mute_status" == 'yes' ] && vol_on_off="<span color=\"${red}\">:OF</span>" || vol_on_off=''
+            [ "$vol_mute_status" == 'yes' ] && vol_on_off="<span color=\"${red}\">:OF</span>"
             [ "$vol_level" -eq 0 ] && vol_level="<span color=\"${red}\">${vol_level}</span>"  || vol_level="$vol_level"
 
-            [ "$mic_mute_status" == 'no' ] && mic_on_off="<span color=\"${red}\">:ON</span>" || mic_on_off=''
+            [ "$mic_mute_status" == 'no' ] && mic_on_off="<span color=\"${red}\">:ON</span>"
             [ "$mic_level" -ne 0 ] && mic_level="<span color=\"${red}\">${mic_level}</span>" || mic_level="$mic_level"
 
 
-            [ "$mon_mute_status" == 'no' ] && mon_on_off="<span color=\"${red}\">:ON</span>" || mon_on_off=''
+            [ "$mon_mute_status" == 'no' ] && mon_on_off="<span color=\"${red}\">:ON</span>"
             [ "$mon_level" -ne 0 ] && mon_level="<span color=\"${red}\">${mon_level}</span>" || mon_level="$mon_level"
 
             states_initials="${vol_state::1}${mic_state::1}${mon_state::1}"  ## RSI
@@ -201,8 +203,8 @@ msgn "$text" ;;
               fi
 
               case "$battery_status" in
-                  Full )        ac_or_dc='' ;;
-                  Discharging ) ac_or_dc='' ;;
+                  Full )        : ;;
+                  Discharging ) : ;;
                   Charging )    ac_or_dc="<span color=\"${red}\">CH </span>" ;;
                   * )           ac_or_dc="<span color=\"${red}\">?? </span>" ;;
               esac
@@ -213,16 +215,14 @@ msgn "$text" ;;
               ## save battery_temp as last for our next read
               printf '%s\n' "$battery_temp" > "$battery_temp_last_file"
               let diff="$battery_temp - $battery_temp_last"
-              if [ "$diff" -eq 0 ]; then
-                  pref=''
-              elif [ "$diff" -gt 0 ]; then
+              if [ "$diff" -gt 0 ]; then
                   pref="+${diff} "
-              else
+              elif [ "$diff" -lt 0 ]; then
                   pref="${diff} "
               fi
 
-              [ "$battery_level" ] && battery_level="$battery_level " || battery_level=''
-              [ "$battery_rem" ] && battery_rem="$battery_rem " || battery_rem=''
+              [ "$battery_level" ] && battery_level="$battery_level "
+              [ "$battery_rem" ] && battery_rem="$battery_rem "
               [ "$battery_temp" -gt "$threshhold" ] && battery_temp="<span color=\"${red}\">${battery_temp}</span>"
 
               set_widget 'battery' 'markup' "${ac_or_dc}${battery_level}${battery_rem}${pref}${battery_temp}°" ;;
@@ -250,7 +250,7 @@ msgn "$text" ;;
                     ## get new usage
                     read -a cpu_now < /proc/stat                 ## get the first line with aggregate of all cpus
                     cpu_sum="${cpu_now[@]:1}"                    ## get all columns but skip the first (which is the 'cpu' string)
-                    let cpu_sum="${cpu_sum// /+}"                ## replace the column seperator (space) with +  ## oddly no need to [@]
+                    let cpu_sum="${cpu_sum// /+}"                ## replace the column seperator (space) with +  ## no need to [@]
                     let cpu_delta="$cpu_sum - $cpu_sum_last"   ## get the delta between two reads
                     let cpu_idle="${cpu_now[4]} - ${cpu_last[4]}"  ## get the idle time delta
                     let cpu_used="$cpu_delta - $cpu_idle"      ## calc time spent working
@@ -268,23 +268,20 @@ msgn "$text" ;;
                     ## save cpu_temp as last for our next read
                     printf '%s\n' "$cpu_temp" > "$cpu_temp_last_file"
                     let diff="$cpu_temp - $cpu_temp_last"
-                    if [ "$diff" -eq 0 ]; then
-                        pref=''
-                    elif [ "$diff" -gt 0 ]; then
+                    if [ "$diff" -gt 0 ]; then
                         pref="+${diff} "
-                    else
+                    elif [ "$diff" -lt 0 ]; then
                         pref="${diff} "
                     fi
                     cpu_temp_greater="$(compare_floats "$cpu_temp" '>' "$threshhold")"
                     [ "$cpu_temp_greater" == 'true' ] && cpu_temp="<span color=\"${red}\">${cpu_temp}</span>"
 
                     ## cpu governor
-                    readarray -t cpu_governor <<< "$(for file in /sys/devices/system/cpu/cpu{0..3}/cpufreq/scaling_governor; {
+                    readarray -t cpu_governor < <(for file in /sys/devices/system/cpu/cpu{0..3}/cpufreq/scaling_governor; {
                         [ -f "$file" -a -r "$file" ] || continue
                         cat "$file"
-                    } | sort -u)"
-
-                    [ "$(printf '%s\n' "${cpu_governor[@]}" | \grep -i 'powersave')" ] && cpu_gov='' || cpu_gov=" <span color=\"${red}\">${cpu_governor[@]^^}</span>"
+                    } | sort --unique)
+                    [ "$(printf '%s\n' "${cpu_governor[@]}" | \grep -i 'powersave')" ] || cpu_gov=" <span color=\"${red}\">${cpu_governor[@]^^}</span>"
 
                     ## cpu governors (https://wiki.archlinux.org/title/CPU_frequency_scaling):
                     ## performance   Run the CPU at the maximum frequency.
@@ -350,11 +347,9 @@ msgn "$text" ;;
                     ## save hdd_temp as last for our next read
                     printf '%s\n' "$hdd_temp" > "$hdd_temp_last_file"
                     let diff="$hdd_temp - $hdd_temp_last"
-                    if [ "$diff" -eq 0 ]; then
-                        pref=''
-                    elif [ "$diff" -gt 0 ]; then
+                    if [ "$diff" -gt 0 ]; then
                         pref="+${diff} "
-                    else
+                    elif [ "$diff" -lt 0 ]; then
                         pref="${diff} "
                     fi
 
@@ -391,11 +386,9 @@ msgn "$text" ;;
 
                 ## compare
                 let diff="$processes_count - $processes_count_last"
-                if [ "$diff" -eq 0 ]; then
-                    pref=''
-                elif [ "$diff" -gt 0 ]; then
+                if [ "$diff" -gt 0 ]; then
                     pref="+${diff} "
-                else
+                elif [ "$diff" -lt 0 ]; then
                     pref="${diff} "
                 fi
 
@@ -450,13 +443,9 @@ msgn "$text" ;;
                m_count="$(wc -l < <(printf '%s\n' "${mountable:?'NONE'}"))"   ## --,--> JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
                u_count="$(wc -l < <(printf '%s\n' "${umountable:?'NONE'}"))"  ## --'             '--> throws non-skippable error when mountable/umountable nat available
 
-               [ "$m_count" -gt 0 ] && M="M:${m_count}" || M=''
-               [ "$u_count" -gt 0 ] && U="U:${u_count}" || U=''
-               if [ "$m_count" -gt 0 ] && [ "$u_count" -gt 0 ]; then
-                   seperator=','
-               else
-                   seperator=''
-               fi
+               [ "$m_count" -gt 0 ] && M="M:${m_count}"
+               [ "$u_count" -gt 0 ] && U="U:${u_count}"
+               [ "$m_count" -gt 0 ] && [ "$u_count" -gt 0 ] && seperator=','
                if [ "$m_count" -gt 0 ] || [ "$u_count" -gt 0 ]; then
                    text="<span color=\"${red}\">${M}${seperator}${U}</span>"
                else
@@ -529,7 +518,7 @@ msgn "$text" ;;
 
           set_widget 'git' 'markup' "$refresh_icon"
           modified_repos=''
-          readarray -t repos <<< "$(find "$HOME" -iname '.git' ! -path '*.venv*' ! -path '*.cache*' ! -path '*git-fdpo*' ! -path '*.config*' ! -path '*.vim*' ! -path '*go*' | sort)"
+          readarray -t repos < <(find "$HOME" -iname '.git' ! -path '*.venv*' ! -path '*.cache*' ! -path '*git-fdpo*' ! -path '*.config*' ! -path '*.vim*' ! -path '*go*' | sort)
           for repo in "${repos[@]}"; {
               repo="${repo%/*}"  ## remove /.git from the end
 
@@ -575,7 +564,7 @@ msgn "$text" ;;
                   source "$HOME"/scripts/gb
 
                   ## we can add sudo in this case to get instances other than the user-related ones:
-                  estab="$(sudo lsof -i -P -n | \grep 'ESTABLISHED' | awk '{print $1}' | sort -u)"  ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
+                  estab="$(sudo lsof -i -P -n | \grep 'ESTABLISHED' | awk '{print $1}' | sort --unique)"  ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
                   estab_count="$(wc -l < <(printf '%s\n' "${estab:?'NONE'}"))"  ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
                                                                                 ##          '--> throws non-skippable error when estab nat available
 
@@ -625,9 +614,9 @@ msgn "$text" ;;
         case "$2" in
             usage )
                     # connections {{{
-                    [ "$vpn_info" ] && vpn_conn="[${vpn_conn}] " || vpn_conn=''
-                    [ "$wf_conn" == 'MCI' ] && if_simcard=' SIM' || if_simcard=''
-                    [ "$wf_state" == 'connected' ] && if_wf_down='' || if_wf_down=' DOWN'
+                    [ "$vpn_info" ] && vpn_conn="[${vpn_conn}] "
+                    [ "$wf_conn" == 'MCI' ] && if_simcard=' SIM'
+                    [ "$wf_state" == 'connected' ] || if_wf_down=' DOWN'
 
                     ## set wf_conn_color based on wf_strength
                     wf_strength="$(tail -n 1 /proc/net/wireless | awk '{print $4}' | tr -d '.')"
@@ -756,7 +745,7 @@ msgn "$text" ;;
                     +60 )         audtool --playback-seek-relative +60 ;;
                     -60 )         audtool --playback-seek-relative -60 ;;
                     songs )       IFS=$'\n'
-                                  readarray -t current_songs <<< "$(audtool --playlist-display)"
+                                  readarray -t current_songs < <(audtool --playlist-display)
                                   selected_song="$(pipe_to_rofi "${current_songs[@]}" 'songs' '')" || exit 37
 
                                   selected_song_index="$(printf '%s\n' "$selected_song" | awk '{print $1}')"
@@ -772,10 +761,10 @@ msgn "$text" ;;
                     # msgn 'saved csol' "<span color=\"${orange}\">${current_position}</span>"
                 }
 
-                [ "$play_status" == 'playing' ] && pause_text='' || pause_text='PAUSED '
+                [ "$play_status" == 'playing' ] || pause_text='PAUSED '
                 preamp_iz_zero="$(compare_floats "$preamp" '=' 0)"
-                [ "$preamp_iz_zero" == 'false' ] && equalizer='EQ ' || equalizer=''
-                [ "$shuffle_status" == 'on' ] && shuffle_text='SH ' || shuffle_text=''
+                [ "$preamp_iz_zero" == 'false' ] && equalizer='EQ '
+                [ "$shuffle_status" == 'on' ] && shuffle_text='SH '
                 order="${position_in_playlist}/${playlist_length}"  ## 1/5
                 [ ! "$length" ] && time='0:00/0:00' || time="${current_position}/${length}"  ## 2:24/18:54
                 [ "$bar_position" -gt 99 ] && bar_position=1 || bar_position=0.${bar_position}

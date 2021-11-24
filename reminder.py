@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from time import sleep
 
 from gp import rofi, msgn, msgc, remove_leading_zeros, get_datetime
@@ -37,3 +39,4 @@ elif 'specific' in mode:
             msgc('Reminder', message)
             break
         sleep(30)
+

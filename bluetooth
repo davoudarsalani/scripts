@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-fir-blu-batt
+
+title="${0##*/}"
 
 function update_bluetooth {
     "$HOME"/scripts/awesome-widgets bluetooth
 }
 
-title="${0##*/}"
 heading "$title"
 
 main_items=( 'status' 'blueman-manager' 'blueman-applet' 'turn on' 'turn off' 'controllers' 'controller information' 'select default controller' 'available/paired devices' 'device information' 'set pairable on/off' 'set discoverable on/off' 'pair with a device' 'trust/untrust a device' 'block/unblock a device' 'remove a device' 'connect/disconnect a device' 'configuration path' 'quit program' 'disable auto turning on' 'enable' 'disable' )

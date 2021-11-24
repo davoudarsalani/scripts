@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from getopt import getopt
 from os import path
 from subprocess import run
@@ -13,7 +15,7 @@ Col = Color()
 
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('Help')}
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-i --input=')}
 {Col.flag('-p --password=')}''')
     exit()
@@ -89,3 +91,4 @@ elif main_item == 'unrar':
         invalid('Wrong choice')
 elif main_item == 'help':
     display_help()
+

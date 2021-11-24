@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 
 ## https://misc.flogisoft.com/bash/tip_colors_and_formatting

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 printf '%s\n\n' 'Normal:'
 curl ipinfo.io
 ## OR:

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from os import getenv
 from sys import argv
 
@@ -8,8 +10,8 @@ from requests import Session
 from gp import get_headers, msgc, msgn, set_widget, refresh_icon, last_file_exists, save_as_last, save_error, get_last
 
 lang = 'en'
-lat = 29.4519  ## zahedan latitude
-lon = 60.8842  ## zahedan longitude
+lat = 29.4519  ## city latitude
+lon = 60.8842  ## city longitude
 appid = getenv('api_weather')
 url = f'https://api.openweathermap.org/data/2.5/onecall?lang={lang}&lat={lat}&lon={lon}&units=metric&exclude=hourly,minutely&appid={appid}'
 Ses = Session()
@@ -24,7 +26,7 @@ def get_info() -> dict[str, str]:  ## {{{
 
     return resp
 ## }}}
-def get_current() -> tuple[str, int, str]:  ### {{{
+def get_current() -> tuple[str, int, str]:  ## {{{
     current     = resp['current']  ## dict
     dt          = current['dt']  ## int
     weekday     = jdt.fromtimestamp(dt).strftime('%A')[:3]

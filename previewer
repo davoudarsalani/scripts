@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 function hi_li {
     eval "$HIGHLIGHT" "$1" 2>/dev/null  ## NOTE do not replace 2 with &
 }

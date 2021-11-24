@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from os import path, remove, getenv
 from gi import require_version
 require_version('Gdk', '3.0')
@@ -123,3 +125,4 @@ elif main_item == 'selected area':  ## {{{
 else:  ## {{{
     exit()
 ## }}}
+

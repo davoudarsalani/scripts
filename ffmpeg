@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -17,7 +22,7 @@ function prompt {
             -a ) [ ! "$audio_input"  ] && get_input 'Audio input file'                && audio_input="$input"  ;;
             -v ) [ ! "$video_input"  ] && get_input 'Video input file'                && video_input="$input"  ;;
             -t ) [ ! "$time"         ] && get_input 'Time (e.g. 00:00:09)'            && time="$input"         ;;
-            -k ) [ ! "$audio_stream" ] && get_input 'Audio stream to keep (e.g. 1)'   && audio_stream="$input" ;;
+            -u ) [ ! "$audio_stream" ] && get_input 'Audio stream to keep (e.g. 1)'   && audio_stream="$input" ;;
             -c ) [ ! "$camera"       ] && get_input 'Camera (e.g. /dev/video0)'       && camera="$input"       ;;
             -f ) [ ! "$sub_file"     ] && get_input 'Subtitle file'                   && sub_file="$input"     ;;
             -d ) [ ! "$sub_index"    ] && get_input 'Subtitle index (e.g. 0, 1, etc)' && sub_index="$input"    ;;
@@ -26,29 +31,31 @@ function prompt {
     }
 }
 
-function get_opts {
-    while getopts 'hi:x:o:s:e:a:v:t:k:c:f:d:' flag; do
-         case "$flag" in
-            h ) display_help           ;;
-            i ) input_file="$OPTARG"   ;;
-            x ) offset="$OPTARG"       ;;
-            o ) output="$OPTARG"       ;;
-            s ) start="$OPTARG"        ;;
-            e ) end="$OPTARG"          ;;
-            a ) audio_input="$OPTARG"  ;;
-            v ) video_input="$OPTARG"  ;;
-            t ) time="$OPTARG"         ;;
-            k ) audio_stream="$OPTARG" ;;
-            c ) camera="$OPTARG"       ;;
-            f ) sub_file="$OPTARG"     ;;
-            d ) sub_index="$OPTARG"    ;;
-         esac
+function get_opt {
+    local options="$(getopt -l 'help,input-file:,offset:,output:,start:,end:,audio-input:,video-input:,time:,audio-stream:,camera:,subtitle-file:,subtitle-index:' -o 'hi:x:o:s:e:a:v:t:u:c:f:d:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )           display_help             ;;
+            -i|--input-file )     shift; input_file="$1"   ;;
+            -x|--offset )         shift; offset="$1"       ;;
+            -o|--output )         shift; output="$1"       ;;
+            -s|--start )          shift; start="$1"        ;;
+            -e|--end )            shift; end="$1"          ;;
+            -a|--audio-input )    shift; audio_input="$1"  ;;
+            -v|--video-input )    shift; video_input="$1"  ;;
+            -t|--time )           shift; time="$1"         ;;
+            -u|--audio-stream )   shift; audio_stream="$1" ;;
+            -c|--camera )         shift; camera="$1"       ;;
+            -f|--subtitle-file )  shift; sub_file="$1"     ;;
+            -d|--subtitle-index ) shift; sub_index="$1"    ;;
+            -- )                  break                    ;;
+        esac
+        shift
     done
 }
 
-get_opts "$@"
-
-title="${0##*/}"
+get_opt "$@"
 heading "$title"
 
 main_items=( 'embed subtitle' 'burn subtitle (increases size)' 'burn embedded subtitle (increases size)' 'sync audio' 'sync video' 'trim' 'convert' 'remove audio' 'replace audio' 'screenshot' 'negate' 'reverse' 'add 0.3 saturation' 'show streams' 'audio stream to keep' 'available cameras' 'live camera' 'help' )
@@ -97,7 +104,7 @@ case "$main_item" in
     'show streams' )         prompt -i
                              printf 'Streams for %s:\n' "$input_file"
                              ffmpeg -i "$input_file" 2>&1 | \grep -i 'Stream \#' | sed 's/^    //' 2>/dev/null && accomplished ;;
-    'audio stream to keep' ) prompt -i -k -o
+    'audio stream to keep' ) prompt -i -u -o
                              ffmpeg -i "$input_file" -map 0:0 -map 0:"$audio_stream" -c copy "$output" 2>/dev/null && accomplished ;;
     'available cameras' )    available_cameras="$(find /dev/ -mindepth 1 -maxdepth 1 -iname '*video*' | sort)"
                              printf '%s\n' "$available_cameras" ;;

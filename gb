@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 function get_datetime {  ## {{{
     case "$1" in
             ymdhms )   printf '%(%Y%m%d%H%M%S)T\n'            ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d%H%M%S)"
@@ -16,6 +18,12 @@ function get_datetime {  ## {{{
 }
 ## }}}
 function heading {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    echo -e "$(green "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
+}
+## }}}
+function flag {  ## {{{
     source "$HOME"/scripts/gb-color
 
     echo -e "$(purple "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
@@ -44,7 +52,7 @@ function pipe_to_fzf {  ## {{{
     ##     item="$(pipe_to_fzf "${items[@]}")"
 
     local received
-    readarray -t received <<< "$(printf '%s\n' "$@")"
+    readarray -t received < <(printf '%s\n' "$@")
 
     local fzf_choice="$(printf '%s\n' "${received[@]}" | fzf)"
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
@@ -58,21 +66,13 @@ function pipe_to_dmenu {  ## {{{
     ##     item="$(pipe_to_dmenu "${items[@]}")" ''      'red'
 
     local received
-    readarray -t received <<< "$(printf '%s\n' "$@")"
+    readarray -t received < <(printf '%s\n' "$@")
 
-    local last="${received[-1]}"
-    if [ "$last" == 'red' ]; then
-        local fg="${received[-1]}"
-        local title="${received[-2]}"
+    local fg="${received[-1]}"
+    local title="${received[-2]}"
 
-        unset 'received[-2]'
-        unset 'received[-1]'
-    else
-        local fg=''
-        local title="${received[-1]}"
-
-        unset 'received[-1]'
-    fi
+    unset 'received[-2]'
+    unset 'received[-1]'
 
     [ "$fg" == 'red' ] && local dmenusb="$red_dark"
 
@@ -87,24 +87,14 @@ function pipe_to_rofi {  ## {{{
     ##     item="$(pipe_to_rofi "${items[@]}")" 'TITLE' 'red'  ## <--'
     ##     item="$(pipe_to_rofi "${items[@]}")" ''      'red'
 
-##################################################################
     local received
-    readarray -t received <<< "$(printf '%s\n' "$@")"
+    readarray -t received < <(printf '%s\n' "$@")
 
-    local last="${received[-1]}"
-    if [ "$last" == 'red' ]; then
-        local fg="${received[-1]}"
-        local title="${received[-2]}"
+    local fg="${received[-1]}"
+    local title="${received[-2]}"
 
-        unset 'received[-2]'
-        unset 'received[-1]'
-    else
-        local fg=''
-        local title="${received[-1]}"
-
-        unset 'received[-1]'
-    fi
-###############################################################
+    unset 'received[-2]'
+    unset 'received[-1]'
 
     [ ! "$fg" == 'red' ] && local theme="$HOME"/.config/rofi/onedark.rasi || local theme="$HOME"/.config/rofi/onedark-red.rasi
 
@@ -132,11 +122,11 @@ function get_mountable_umountable {  ## {{{
 }
 ## }}}
 function msgn {  ## {{{
-    notify-send -u normal "$1" "$2" -i "$3" -t 10000
+    notify-send --urgency=normal "$1" "$2" -i "$3" -t 10000
 }
 ## }}}
 function msgc {  ## {{{
-    notify-send -u critical "$1" "$2" -i "$3"
+    notify-send --urgency=critical "$1" "$2" -i "$3"
 }
 ## }}}
 function copy_pacman_log {  ## {{{
@@ -228,6 +218,12 @@ function line {  ## {{{
     grey "$(printf "%$(tput cols)s\n" | sed "s/ /▬/g")"
 }
 ## }}}
+function rand_str {  ## {{{
+    printf '%s\n' "$(mktemp --dry-run | sed 's/.*\.//g')"  ## returns e.g. leQPAUyfZP
+
+    # sed 's/-//g' < /proc/sys/kernel/random/uuid  ## returns e.g. a8a29c0d109a40468051bcbaf70af17e
+}
+## }}}
 
  # function find_duplicate_images {  ## {{{
  #     source "$HOME"/scripts/gb-color
@@ -240,7 +236,7 @@ function line {  ## {{{
 
  #     SECONDS=0
 
- #     readarray -t pics <<< "$(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)"
+ #     readarray -t pics < <(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
  #     dups=''
 
  #     for ((i=0; i<"${#pics[@]}"; i++)); {
@@ -282,7 +278,7 @@ function line {  ## {{{
 #         mkdir "$new_fun"
 #     fi
 
-#     readarray -t pics <<< "$(find "$old_fun" -mindepth 1 -maxdepth 1 -type f -iname '*jpg' | sort)"
+#     readarray -t pics < <(find "$old_fun" -mindepth 1 -maxdepth 1 -type f -iname '*jpg' | sort)
 
 #     for p in "${pics[@]##*/}"; {
 #         printf '%s\n' "$p"

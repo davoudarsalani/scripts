@@ -1,38 +1,55 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 function display_help {
-    colored 'help:
-    -h|--help    help
-    -l|--legacy  legacy
-    -u|--uefi    uefi (Ermanno Ferrari)'  ## https://ermannoferrari.net/arch-linux-full-install-on-uefi-from-the-terminal-to-productivity
+    cmd="
+    -h|--help     help
+    -c|--connect  connect to wifi
+    -v|--verify   verify if in uefi mode
+
+    -l|--legacy   legacy
+    -u|--uefi     uefi (Ermanno Ferrari)"  ## https://ermannoferrari.net/arch-linux-full-install-on-uefi-from-the-terminal-to-productivity
+    display_cmd "$cmd"
     exit
 }
 
-function colored {  ## white dim
-    printf '\e[2;49;37m%s\e[0m\n' "$@" | sed 's/^ *//g'
+function display_cmd {
+    printf '\e[0;49;90m%s\e[0m\n' "$@" | sed 's/^ *//g'
 }
 
 function legacy_fg {
-    printf '\e[2;49;34m%s\e[0m\n' "$@"
+    printf '\e[0;49;34m%s\e[0m\n' "$@"
 }
 
 function uefi_fg {
     printf '\e[38;5;64m%s\e[0m\n' "$@"
 }
 
-function display_steps {
-    [ "$mode" == 'LEGACY' ] && index_fg='legacy_fg' || index_fg='uefi_fg'
-
-    for ((i=0; i<"${#main_items[@]}"; i++)); {
-        printf '%s\t%s\n' "$("$index_fg" "$i")" "${main_items[$i]}" | sed 's/\t/  /g'
-    }
+function display_mode {
+    "$fg_color" "$mode"
 }
 
-[ ! "$1" ] || [ "$1" == '-h' ] || [ "$1" == '--help' ] && display_help
+function not_valid {
+    [ "$choice" -eq "$choice" ] 2>/dev/null && local msg='out of range' || local msg='not valid'
+    printf '%s is %s\n' "$("$fg_color" "$choice")" "$msg"
+}
+
+function read_user_choice {
+    for ((i=0; i<"${#main_items[@]}"; i++)); {
+        [ "$i" -lt 10 ] && local space='  ' || local space=' '
+        printf '%s%s%s\n' "$("$fg_color" "$i")" "$space" "${main_items[$i]}" | sed 's/\t/  /g'
+    }
+
+    read -p ">>${space}" choice
+}
+
+runnable='false'
 
 case "$1" in
-    -l|--legacy ) mode='LEGACY'
-        legacy_fg "$mode"
+    -l|--legacy ) mode='LEGACY'  ## {{{
+        fg_color='legacy_fg'
+        display_mode
         declare -a main_items=(
             'find fastest mirrorlist'
             'partitioning'
@@ -46,27 +63,32 @@ case "$1" in
             'sync repos'
             'add user'
             'password'
-            'bash* grub networkmanager dhcpcd'
+            'bash* grub'
+            'network*'
             'reboot'
-            'xorg* lightdm* awesome'
+            'xorg* awesome lightdm*'
             'reboot'
         )
 
-        display_steps
-        read -p '> ' choice
+        read_user_choice
 
         case "$choice" in
-            0 ) colored "
+            0 ) runnable='true'
+                cmd="
+                ## reflector:  ## JUMP_1
                 pacman -Syy
                 pacman -S reflector
-                reflector -c Iran -a 6 --sort rate --save /etc/pacman.d/mirrorlist
+                cp /etc/pacman.d/{mirrorlist,mirrorlist.bak}
+                ## ignore the errors in case it fails to rate some mirrors:
+                reflector --country Iran --age 6 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
                 pacman -Syy"
+                display_cmd "$cmd"
                 ;;
-            1 ) colored "
+            1 ) cmd="
                 lsblk
                 cfdisk /dev/sd_ [choose 'dos']
 
-                sd_1 for /       bootable
+                sd_1 for /      bootable
                 sd_2 for home
                 sd_3 for swap
 
@@ -79,146 +101,172 @@ case "$1" in
 
                 mkswap /dev/sd_3
                 swapon /dev/sd_3"
+                display_cmd "$cmd"
                 ;;
-            2 ) colored "
-                pacstrap -i /mnt base base-devel
+            2 ) ## JUMP_2
+                runnable='true'
+                cmd="
+                pacstrap /mnt base base-devel linux-lts linux-firmware
 
-                (to be installed manually: cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils jfsutils less linux linux-firmware logrotate lvm2 man-db man-pages mdadm nano netctl perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs)"
+                ## to be installed manually:
+                ## cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils jfsutils less linux linux-firmware logrotate
+                ## lvm2 man-db man-pages mdadm nano netctl perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs"
+                display_cmd "$cmd"
                 ;;
-            3 ) colored "
+            3 ) runnable='true'
+                cmd="
                 genfstab -U /mnt >> /mnt/etc/fstab"
+                display_cmd "$cmd"
                 ;;
-            4 ) colored "
+            4 ) runnable='true'
+                cmd="
                 arch-chroot /mnt /bin/bash"
+                display_cmd "$cmd"
                 ;;
-            5 ) colored "
-                vim /etc/locale.gen
-                ## uncomment these:
-                en_US.UTF-8 UTF-8
-                fa_IR UTF-8
-
+            5 ) ## JUMP_4
+                runnable='true'
+                cmd="
+                sed -i 's/^#en_US\./en_US\./;s/^#fa_IR /fa_IR /' /etc/locale.gen
                 locale-gen
                 printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf
                 export LANG=en_US.UTF-8"
+                display_cmd "$cmd"
                 ;;
-            6 ) colored "
+            6 ) runnable='true'
+                cmd="
                 ## list time zones:
-                timedatectl list-timezones
+                # timedatectl list-timezones  ## JUMP_3
 
                 ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
                 hwclock --systohc --utc
                 timedatectl set-ntp true"
+                display_cmd "$cmd"
                 ;;
-            7 ) colored "
+            7 ) ## JUMP_5
+                runnable='true'
+                cmd="
                 printf '%s\n' 'acer' > /etc/hostname
-
-                vim /etc/hosts
-                ## write these lines in it:
-                127.0.0.1   localhost
-                ::1         localhost
-                127.0.1.1   acer.localdomain    acer"
+                printf '%s\n%s\n%s\n' '127.0.0.1  localhost' '::1  localhost' '127.0.1.1  acer.localdomain  acer' > /etc/hosts"
+                display_cmd "$cmd"
                 ;;
-            8 ) colored "
-                vim /etc/pacman.conf
-                ## uncomment these lines:
-                #[multilib]
-                #Include = /etc/pacman.d/mirrorlist"
+            8 ) runnable='true'
+                ## edit next line after pattern using sed (https://unix.stackexchange.com/questions/285160/how-to-edit-next-line-after-pattern-using-sed)
+                cmd="
+                sed -i '$!N;s/^#\(\[multilib\]\n\)#\(Include\)/\1\2/;P;D' /etc/pacman.conf"
+                display_cmd "$cmd"
                 ;;
-            9 ) colored "
+            9 ) runnable='true'
+                cmd="
                 pacman -Sy"
+                display_cmd "$cmd"
                 ;;
-            10 ) colored "
-                 >>> method 1 (recommended) <<<
+            10 ) ## JUMP_6
+                 cmd="
+                 ## method 1 (recommended):
                  useradd -mG wheel -s /bin/bash nnnn
-                 ## uncomment this line:
+                 EDITOR=vim visudo
+                 ## uncomment/add this line:
                  # %wheel ALL=(ALL) NOPASSWD: ALL
 
-                 >>> method 2 <<<
+                 ## method 2:
                  useradd -m -g users -G lp -s /bin/bash nnnn # also -G lp,autologin,storage,wheel,power
                  EDITOR=vim visudo
                  ## add 'nnnn ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
 
-                 >>> method 3 <<< (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw)
+                 ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
                  useradd -m -g wheel nnnn
                  EDITOR=vim visudo
-                 # add this line:
+                 ## add this line:
                  %wheel ALL=(ALL) NOPASSWD: ALL
-                 # alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
+                 ## alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
                  %wheel ALL=(ALL) ALL
-                 %wheel ALL=(ALL) NOPASSWD: <command1>, <command2>, <command3>"
+                 %wheel ALL=(ALL) NOPASSWD: COMMAND_1, COMMAND_2, COMMAND_3"
+                 display_cmd "$cmd"
                  ;;
-            11 ) colored "
+            11 ) cmd="
                  passwd
                  passwd nnnn"
+                 display_cmd "$cmd"
                  ;;
-            12 ) colored "
-                 pacman -S bash bash-completion grub os-prober[only when dual-booting]
+            12 ) cmd="
+                 pacman -S bash bash-completion grub
                  grub-install --recheck --debug --force /dev/sd_
-                 grub-mkconfig -o /boot/grub/grub.cfg
-
+                 grub-mkconfig -o /boot/grub/grub.cfg"
+                 display_cmd "$cmd"
+                 ;;
+            13 ) cmd="
                  pacman -S networkmanager network-manager-applet
                  sudo systemctl enable NetworkManager
 
-                 systemctl enable dhcpcd
-                 ip a
-                 systemctl enable dhcpcd@enp4s0f1"
+                 ## enable ethernet:
+                 sudo systemctl enable dhcpcd
+                 # ip a
+                 sudo systemctl enable dhcpcd@enp4s0f1"
+                 display_cmd "$cmd"
                  ;;
-            13 ) colored "
+            14 ) cmd="
+                 reboot"
+                 display_cmd "$cmd"
+                 ;;
+            15 ) runnable='true'
+                 cmd="
+                 sudo pacman -S xorg xorg-xinit xorg-server xorg-apps xorg-drivers xorg-xkill awesome
+                 # sudo pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
+                 # sudo systemctl enable lightdm.service"
+                 display_cmd "$cmd"
+                 ;;
+            16 ) cmd="
                  reboot"
                  ;;
-            14 ) colored "
-                 sudo pacman -S xorg xorg-xinit xorg-server xorg-apps
-                 sudo pacman -S awesome
-                 sudo pacman -S lightdm
-                 sudo pacman -S lightdm-gtk-greeter lightdm-gtk-greeter-settings
-                 sudo systemctl enable lightdm.service"
-                 ;;
-            15 ) colored "
-                 reboot"
-                 ;;
-            * ) printf '%s is out of range\n' "$choice"
+            * ) not_valid
                 ;;
         esac
         ;;
-    -u|--uefi )  mode='UEFI (Ermanno Ferrari)'
-        uefi_fg "$mode"
+        ## }}}
+    -u|--uefi )  mode='UEFI (Ermanno Ferrari)'  ## {{{
+        fg_color='uefi_fg'
+        display_mode
         declare -a main_items=(
-            'timedatectl'
+            'timedatectl and find fastest mirrorlist'
             'partitioning'
             'pacstrap'
             'genfstab'
             'chroot'
             'time zone / clock'
             'locale'
-            'hosts / hosts'
+            'host/hosts'
             'root password'
-            'grub xorg nvidia nividia-utils efibootmgr networkmanager etc'
+            'generate initramfs'
+            'grub xorg* awesome bash* efibootmgr networkmanager etc.'
             'grub'
-            'enable NetworkManager,bluetooth'
+            'enable NetworkManager'
             'add user'
             'user password'
             'umount and reboot'
             'nmtui'
         )
 
-        display_steps
-        read -p '> ' choice
+        read_user_choice
 
         case "$choice" in
-            0 ) colored "
+            0 ) runnable='true'
+                cmd="
                 timedatectl set-ntp true
 
+                ## reflector:  ## JUMP_1
                 pacman -Syy
                 pacman -S reflector
-                reflector -c Iran -a 6 --sort rate --save /etc/pacman.d/mirrorlist
+                cp /etc/pacman.d/{mirrorlist,mirrorlist.bak}
+                ## ignore the errors in case it fails to rate some mirrors:
+                reflector --country Iran --age 6 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
                 pacman -Syy"
+                display_cmd "$cmd"
                 ;;
-            1 ) colored "
+            1 ) cmd="
                 lsblk OR lsblk -f
-                gdisk /dev/sd_
+                gdisk /dev/sd_  <<< NOTE do NOT confuse 'gdisk' with 'fdisk'
 
-                ## first, type g to create gpt table
-                ## then go on to create partitions
+                ## first, type g to create gpt table, then go on to create partitions
 
                 g  create gpt table
                 o  create dos/mbr table
@@ -230,17 +278,17 @@ case "$1" in
                 a  bootable flag
                 m  help
 
-                ## uefi
-                ## +250M for size
+                ## uefi:
+                ## +512M for size
                 ## ef00 for Hex[!]
 
-                ## swap
-                ## 8200 is Hex[!]
+                ## swap:
+                ## 8200 for Hex[!]
 
-                ## root
+                ## root:
                 ## leave Hex/GUID line blank as is
 
-                ## home
+                ## home:
                 ## leave Hex/GUID line blank as is
 
                 sd_1 for uefi
@@ -257,82 +305,161 @@ case "$1" in
                 mkdir -p /mnt/boot/efi
                 mount /dev/sd_1 /mnt/boot/efi
 
-                ## mount root
+                ## mount root:
                 mount /dev/sd_3 /mnt
 
                 mkdir /mnt/home
                 mount /dev/sd_4 /mnt/home"
+                display_cmd "$cmd"
                 ;;
-            2 ) colored "
-                pacstrap /mnt base linux-lts linux-firmware vim intelucode[!]"
+            2 ) ## JUMP_2
+                runnable='true'
+                cmd="
+                pacstrap /mnt base base-devel linux-lts linux-firmware
+
+                ## to be installed manually:
+                ## cryptsetup device-mapper dhcpcd diffutils e2fsprogs inetutils jfsutils less linux linux-firmware logrotate
+                ## lvm2 man-db man-pages mdadm nano netctl perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs"
+                display_cmd "$cmd"
                 ;;
-            3 ) colored "
+            3 ) runnable='true'
+                cmd="
                 genfstab -U /mnt >> /mnt/etc/fstab"
+                display_cmd "$cmd"
                 ;;
-            4 ) colored "
+            4 ) runnable='true'
+                cmd="
                 arch-chroot /mnt"
+                display_cmd "$cmd"
                 ;;
-            5 ) colored "
+            5 ) runnable='true'
+                cmd="
                 ## list time zones:
-                timedatectl list-timezones
+                # timedatectl list-timezones  ## JUMP_3
 
-                ln -sf /usr/share/zoneinfo/Asia/Tehran /etc/localtime
+                ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
                 hwclock --systohc"
+                display_cmd "$cmd"
                 ;;
-            6 ) colored "
-                vim /etc/locale.gen
-                ## uncomment these:
-                en_US.UTF-8 UTF-8
-                fa_IR UTF-8
-
+            6 ) ## JUMP_4
+                runnable='true'
+                cmd="
+                sed -i 's/^#en_US\./en_US\./;s/^#fa_IR /fa_IR /' /etc/locale.gen
                 locale-gen
-                printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf"
+                printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf
+                export LANG=en_US.UTF-8"
+                display_cmd "$cmd"
                 ;;
-            7 ) colored "
+            7 ) ## JUMP_5
+                runnable='true'
+                cmd="
                 printf '%s\n' 'acer' > /etc/hostname
-
-                vim /etc/hosts
-                ## write these lines in it:
-                127.0.0.1   localhost
-                ::1         localhost
-                127.0.1.1   acer.localdomain    acer"
+                printf '%s\n%s\n%s\n' '127.0.0.1  localhost' '::1  localhost' '127.0.1.1  acer.localdomain  acer' > /etc/hosts"
+                display_cmd "$cmd"
                 ;;
-            8 ) colored "
+            8 ) cmd="
                 passwd"
+                display_cmd "$cmd"
                 ;;
-            9 ) colored "
-                 pacman -S grub xorg nvidia nividia-utils efibootmgr networkmanager network-manager-applet wireless_tools wpa_supplicant base-devel linux-headers reflector git bluez bluez-utils xdg-utils xdg-user-dirs pulseaudio-bluetooth mtools dosfstools [more in video]
-                 pacman -S awesome"
+            9 ) cmd="
+                ## NOTE this was NOT mentioned by Ermanno
+                ## Arch Wiki: Creating a new initramfs is usually not required, because mkinitcpio was run on installation of the kernel package with pacstrap.
+                mkinitcpio -P OR mkinitcpio -p linux-lts"
+                display_cmd "$cmd"
+                ;;
+            10 ) runnable='true'
+                 cmd="
+                 pacman -S grub xorg xorg-xinit xorg-server xorg-apps xorg-drivers xorg-xkill awesome bash bash-completion efibootmgr linux-headers
+                 pacman -S networkmanager network-manager-applet nm-connection-editor wireless_tools wpa_supplicant
+                 # pacman -S xdg-utils xdg-user-dirs mtools dosfstools"
+                 display_cmd "$cmd"
                  ;;
-            10 ) colored "
+            11 ) runnable='true'
+                 cmd="
                  grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+                   ## also (by Stephen): the same as above, only with GRUB replaced with ArchLinux
+                   ## also (by Dwix):    grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
                  grub-mkconfig -o /boot/grub/grub.cfg"
+                 display_cmd "$cmd"
                  ;;
-            11 ) colored "
-                 systemctl enable NetworkManager
-                 systemctl enable bluetooth"
+            12 ) runnable='true'
+                 cmd="
+                 systemctl enable NetworkManager"
+                 display_cmd "$cmd"
                  ;;
-            12 ) colored "
-                 useradd -mG wheel nnnn"
-                 ;;
-            13 ) colored "
-                 passwd nnnn
+            13 ) ## JUMP_6
+                 cmd="
+                 ## method 1 (recommended):
+                 useradd -mG wheel -s /bin/bash nnnn
                  EDITOR=vim visudo
-                 ## the same as LEGACY"
+                 ## uncomment/add this line:
+                 # %wheel ALL=(ALL) NOPASSWD: ALL
+
+                 ## method 2:
+                 useradd -m -g users -G lp -s /bin/bash nnnn # also -G lp,autologin,storage,wheel,power
+                 EDITOR=vim visudo
+                 ## add 'nnnn ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
+
+                 ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
+                 useradd -m -g wheel nnnn
+                 EDITOR=vim visudo
+                 ## add this line:
+                 %wheel ALL=(ALL) NOPASSWD: ALL
+                 ## alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
+                 %wheel ALL=(ALL) ALL
+                 %wheel ALL=(ALL) NOPASSWD: COMMAND_1, COMMAND_2, COMMAND_3"
+                 display_cmd "$cmd"
                  ;;
-            14 ) colored "
+            14 ) cmd="
+                 passwd nnnn"
+                 display_cmd "$cmd"
+                 ;;
+            15 ) cmd="
                  exit
                  umount -a
                  reboot"
+                 display_cmd "$cmd"
                  ;;
-            15 ) colored "
+            16 ) cmd="
                  ip a
                  nmtui"
+                 display_cmd "$cmd"
                  ;;
-            * ) printf '%s is out of range\n' "$choice"
+            * ) not_valid
+                ;;
         esac
         ;;
-    * ) display_help ;;
+    ## }}}
+    -c|--connect )  ## {{{
+    cmd="
+    iwctl
+    ## list of devices:
+    device list OR station list
+    ## get available networks:
+    station <DEVCICE> get-networks
+    ## connect:
+    station <DEVCICE> connect <SSID>
+    ## enter password and exit
+    exit"
+    display_cmd "$cmd"
+    ;;
+    ## }}}
+    -v|--verify )  ## {{{
+        runnable='true'
+        cmd="
+        ls /sys/firmware/efi/efivars 2>/dev/null && printf '%s\n' 'UEFI mode verified: YES' || printf '%s\n' 'UEFI mode verified: NO'"
+        display_cmd "$cmd"
+        ;;
+        ## }}}
+    * ) display_help
+        ;;
 esac
 
-exit
+[ "$runnable" == 'true' ] && {
+    printf '\n'
+
+    read -p "Run [N/y]? " run_prompt
+    [ "${run_prompt,}" == 'y' ] && eval "$cmd"
+}
+
+exit 0

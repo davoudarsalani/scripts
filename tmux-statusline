@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-03 13:32:51 Wednesday
+
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf '%s\n' 'SONY ' ;;
     if_ssh ) [ "$SSH_CONNECTION" ] && printf '%s\n' 'SSH ' ;;
@@ -13,48 +15,49 @@ case "$1" in
            files_count="$(wc -l < <(find . -mindepth 1 -maxdepth 1 -type f))"
 
            printf '%s %s %s\n' "$size" "$directories_count" "$files_count" ;;
-    git ) [ ! -d .git ] && printf '%s\n' '--' && exit
+    git ) [ ! "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ] && printf '%s\n' '--' && exit
 
-          commits="$(git rev-list HEAD --count)"
+          commits_count="$(git rev-list HEAD --count)"
 
-          modified_count="$(      wc -l < <(git status -s | \grep '^ M'))"
-          deleted_count="$(       wc -l < <(git status -s | \grep '^ D'))"
-          idunno_A_count="$(      wc -l < <(git status -s | \grep '^ A'))"
-          idunno_R_count="$(      wc -l < <(git status -s | \grep '^ R'))"
-          staged_count="$(        wc -l < <(git status -s | \grep '^[MDAR] '))"
-          staged_screwed_count="$(wc -l < <(git status -s | \grep '^[MDAR][MDAR]'))"
-          untracked_count="$(     wc -l < <(git status -s | \grep '??'))"
+          stts="$(git status -s)"
+          mod_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ M'))"
+          del_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ D'))"
+          ren_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ R'))"
+          add_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ A'))"
+          unt_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '??'))"
+          sta_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^[MDAR] '))"
+          sta_m_count="$(wc -l < <(printf '%s\n' "$stts" | \grep '^[MDAR][MDAR]'))"
+
+          [ "$mod_count"   -eq 0 ] || mod="  $mod_count"
+          [ "$del_count "  -eq 0 ] || del="  $del_count"
+          [ "$ren_count"   -eq 0 ] || ren=" Ⓡ $ren_count"
+          [ "$add_count"   -eq 0 ] || add="  $add_count"
+          [ "$unt_count"   -eq 0 ] || unt="  $unt_count"
+          [ "$sta_count"   -eq 0 ] || sta="  $sta_count"
+          [ "$sta_m_count" -eq 0 ] || sta_m="  $sta_m_count"
 
           commits_ahead="$(git branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
           ## previously: commits_ahead="$(git status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g')"
+          [ "$commits_ahead" ] && commits_ahead="  $commits_ahead"
 
-          [ "$modified_count"       -eq 0 ] && modified_count=''       || modified_count="  $modified_count"
-          [ "$deleted_count "       -eq 0 ] && deleted_count=''        || deleted_count="  $deleted_count"
-          [ "$idunno_A_count"       -eq 0 ] && idunno_A_count=''       || idunno_A_count="  $idunno_A_count"
-          [ "$idunno_R_count"       -eq 0 ] && idunno_R_count=''       || idunno_R_count="  $idunno_R_count"
-          [ "$staged_count"         -eq 0 ] && staged_count=''         || staged_count="  $staged_count"
-          [ "$staged_screwed_count" -eq 0 ] && staged_screwed_count='' || staged_screwed_count="  $staged_screwed_count"
-          [ "$untracked_count"      -eq 0 ] && untracked_count=''      || untracked_count="  $untracked_count"
-          [ ! "$commits_ahead"            ] && commits_ahead=''        || commits_ahead="  $commits_ahead"
-
-          [ "$(git remote -v | \grep -i 'github')" ] && logo='  ' || logo=''
-          [ "$(git remote -v)" ] && if_no_remote='' || if_no_remote=' (no-remote)'
+          [ "$(git remote -v | \grep -i 'github')" ] && logo='  '
+          [ "$(git remote -v)" ] || if_no_remote=' (no-remote)'
 
           branches_count="$(wc -l < <(git branch --list))"
           [ "$branches_count" -gt 1 ] && branches_count=" #BR=${branches_count}" || branches_count=''
 
-          cur_branch="$(git branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/')"
+          cur_branch="$(git rev-parse --abbrev-ref HEAD)"  ## previously: git branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/'
           [ "$cur_branch" == 'master' ] && cur_branch='' || cur_branch=" BR=${cur_branch}"
 
           printf '%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "\
-${commits}\
-${modified_count}\
-${deleted_count}\
-${idunno_A_count}\
-${idunno_R_count}\
-${staged_count}\
-${staged_screwed_count}\
-${untracked_count}\
+${commits_count}\
+${mod}\
+${del}\
+${ren}\
+${add}\
+${unt}\
+${sta}\
+${sta_m}\
 ${commits_ahead}\
 ${logo}\
 ${if_no_remote}\

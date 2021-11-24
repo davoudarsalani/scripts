@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 
 trap 'width="$(tput cols)"' SIGWINCH
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -12,25 +17,27 @@ function display_help {
 function prompt {
     for args in "$@"; {
         case "$1" in
-            -d ) [ ! "$dir" ] && get_input 'Dir' && dir="$input"
+            -d ) [ ! "$dir" ] && get_input 'Directory' && dir="$input"
                  [ ! -d "$dir" ] && red ' No such dir' && exit
         esac
         shift
     }
 }
 
-function get_opts {
-    while getopts 'hd:' flag; do
-        case "$flag" in
-            h ) display_help  ;;
-            d ) dir="$OPTARG" ;;
+function get_opt {
+    local options="$(getopt -l 'help,directory:' -o 'hd:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )      display_help    ;;
+            -d|--directory ) shift; dir="$1" ;;
+            -- )             break           ;;
         esac
+        shift
     done
 }
 
-get_opts "$@"
-
-title="${0##*/}"
+get_opt "$@"
 heading "$title"
 
 main_items=( "replace ' ', ---, -_-, !, %, & and ," 'convert vtt to srt' 'change srt color to #f3f300' 'burn' 'remove COMMMMMA and ----BURN' 'remove youtube ID' 'prepend random numbers' 'create 0-list' 'help' )
@@ -48,7 +55,7 @@ case "$main_item" in
                                              printf '\n'
 
                                              replaced_count=0
-                                             readarray -t files <<< "$(find "$dir" -mindepth 1 -maxdepth 1 | sort)"
+                                             readarray -t files < <(find "$dir" -mindepth 1 -maxdepth 1 | sort)
                                              for file in "${files[@]}"; {
                                                  brown "→ $file"
                                                  new_name="$(printf '%s\n' "$file" | \
@@ -63,7 +70,7 @@ case "$main_item" in
 
                            printf '\n'
                            vtt_count=0
-                           readarray -t vtts <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.vtt' | sort)"
+                           readarray -t vtts < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.vtt' | sort)
                            for vtt in "${vtts[@]}"; {
                                brown "→ $vtt"
                                ffmpeg -i "$vtt" "${vtt%.vtt}".srt 2>/dev/null && accomplished
@@ -76,7 +83,7 @@ case "$main_item" in
 
                                     printf '\n'
                                     srt_count=0
-                                    readarray -t srts <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.srt' | sort)"
+                                    readarray -t srts < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.srt' | sort)
                                     for srt in "${srts[@]}"; {
                                         brown "→ $srt"
                                         sed -Ei '/(-->|^$|^[0-9][0-9]*$)/!s/^/<font color="#f3f300">/g' "$srt" && accomplished
@@ -90,7 +97,7 @@ case "$main_item" in
 
            printf '\n'
            vid_count=0
-           readarray -t vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+           readarray -t vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
            for vid in "${vids[@]}"; {
                SECONDS=0
                already_burnt_count="$(wc -l < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*----BURN.mp4' | sort))"
@@ -113,7 +120,7 @@ case "$main_item" in
 
                                      printf '\n'
                                      vids_count=0
-                                     readarray -t rename_vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+                                     readarray -t rename_vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
                                      for rename_vid in "${rename_vids[@]}"; {
                                          brown "→ $rename_vid"
                                          new_name="$(printf '%s\n' "$rename_vid" | sed -e 's/COMMMMMA/,/g;s/----BURN//g')"
@@ -127,7 +134,7 @@ case "$main_item" in
 
                           printf '\n'
                           burned_vid_count=0
-                          readarray -t burned_vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+                          readarray -t burned_vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
                           for burned_vid in "${burned_vids[@]}"; {
                               brown "→ $burned_vid"
                               new_name="$(printf '%s\n' "$burned_vid" | sed -e 's/.\{13\}mp4$/.mp4/')"
@@ -140,11 +147,11 @@ case "$main_item" in
     'prepend random numbers' ) prompt -d
 
                                printf '\n'
-                               readarray -t rename_vids <<< "$(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)"
+                               readarray -t rename_vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
                                number_of_vids="${#rename_vids[@]}"
 
                                ## create list and rand_list
-                               readarray -t list <<< "$(seq "$number_of_vids")"
+                               readarray -t list < <(seq "$number_of_vids")
 
                                list_length="${#list[@]}"
                                declare -a rand_list=()
@@ -154,7 +161,7 @@ case "$main_item" in
                                    rand_member="${list[$rand_index]}"
                                    rand_list+=( "$rand_member" )
                                    unset "list[$rand_index]"
-                                   readarray -t list <<< "$(printf '%s\n' "${list[@]}")"
+                                   readarray -t list < <(printf '%s\n' "${list[@]}")
                                    list_length="${#list[@]}"
                                done
 

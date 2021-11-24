@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-03 13:52:03 Wednesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
+
+title="${0##*/}"
 
 function if_git {  ## {{{
     [ "$1" ] && {
@@ -12,7 +17,7 @@ function if_git {  ## {{{
         #     red 'Wrong arg' && exit
         fi
     }
-    [ ! -d .git ] && red 'No ' && exit
+    [ ! "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ] && red 'no git' && exit
 }
 ## }}}
 if_git "$1"
@@ -26,7 +31,7 @@ if_lock_file
 
 function check_pattern {  ## {{{
     matches="$(find . -mindepth 1 -iname "$pattern")"   ## -maxdepth 1 is not needed here
-    [ ! "$matches" ] && red 'No such pattern' && exit
+    [ ! "$matches" ] && red 'no such pattern' && exit
 }
 ## }}}
 function if_amend_allowed {  ## {{{
@@ -35,35 +40,29 @@ function if_amend_allowed {  ## {{{
     [ ! "$commits_ahead" ] && red 'Amend not allowed' && exit
 }
 ## }}}
-function if_changes {  ## {{{
-    readarray -t mod_s <<< "$(git status -s | \grep '^ M'           | awk '{print $2}' | sed 's/\/$//')"; mod_s=(   "${mod_s[@]}" )
-    readarray -t del_s <<< "$(git status -s | \grep '^ D'           | awk '{print $2}' | sed 's/\/$//')"; del_s=(   "${del_s[@]}" )
-    readarray -t idA_s <<< "$(git status -s | \grep '^ A'           | awk '{print $2}' | sed 's/\/$//')"; idA_s=(   "${idA_s[@]}" )
-    readarray -t idR_s <<< "$(git status -s | \grep '^ R'           | awk '{print $2}' | sed 's/\/$//')"; idR_s=(   "${idR_s[@]}" )
-    readarray -t std_s <<< "$(git status -s | \grep '^[MDAR] '      | awk '{print $2}' | sed 's/\/$//')"; std_s=(   "${std_s[@]}" )
-    readarray -t sts_s <<< "$(git status -s | \grep '^[MDAR][MDAR]' | awk '{print $2}' | sed 's/\/$//')"; sts_s=(   "${sts_s[@]}" )
-    readarray -t unt_s <<< "$(git status -s | \grep '??'            | awk '{print $2}' | sed 's/\/$//')"; unt_s=(   "${unt_s[@]}" )
+function add_to_changes {  ## {{{
+    declare -a received=( "$@" )
 
-    ## deconstruction (https://unix.stackexchange.com/questions/166217/using-a-for-loop-to-loop-over-multiple-arrays-in-bash)
-    mod_s=${mod_s[@]}  ## <--,
-    del_s=${del_s[@]}  ## <--|
-    idA_s=${idA_s[@]}  ## <--|
-    idR_s=${idR_s[@]}  ## <--|-- not sure if we can quote them
-    std_s=${std_s[@]}  ## <--|
-    sts_s=${sts_s[@]}  ## <--|
-    unt_s=${unt_s[@]}  ## <--'
+    local icon="${received[0]}"
+    unset 'received[0]'
 
-    master=()  ## NOTE do NOT use declare -a since declare makes master a local variable
-    for array in "$mod_s" "$del_s" "$idA_s" "$idR_s" "$std_s" "$sts_s" "$unt_s"; {
-        read -a array <<< "$(printf '%s\n' "$array")"
-        icon="${array[0]}"
-        trimmed_array="${array[@]:1}"
-        for member in ${trimmed_array[@]}; {  ## NOTE do NOT change quotes
-            master+=( "${icon}---${member}" )
-        }
+    for member in "${received[@]}"; {
+        changes+=( "${icon}---${member}" )
     }
+}
+## }}}
+function if_changes {  ## {{{
+    changes=()  ## NOTE do NOT use declare -a changes since declare makes changes a local variable
+    stts="$(git status -s)"
+    readarray -t mod   < <(printf '%s\n' "$stts" | \grep '^ M'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${mod[@]}"
+    readarray -t del   < <(printf '%s\n' "$stts" | \grep '^ D'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${del[@]}"
+    readarray -t ren   < <(printf '%s\n' "$stts" | \grep '^ R'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes 'Ⓡ' "${ren[@]}"
+    readarray -t add   < <(printf '%s\n' "$stts" | \grep '^ A'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${add[@]}"
+    readarray -t unt   < <(printf '%s\n' "$stts" | \grep '??'            | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${unt[@]}"
+    readarray -t sta   < <(printf '%s\n' "$stts" | \grep '^[MDRA] '      | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta[@]}"
+    readarray -t sta_m < <(printf '%s\n' "$stts" | \grep '^[MDRA][MDRA]' | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta_m[@]}"
 
-    [ ! "$master" ] && green 'Sleeping ...' && exit  ## checking if array is empty. no need to [@]
+    [ ! "$changes" ] && green 'sleeping ...' && exit  ## checking if array is empty. no need to [@]
 }
 ## }}}
 function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
@@ -85,26 +84,25 @@ function get_branch {  ## {{{ https://revelry.co/terminal-workflow-fzf/
 }
 ## }}}
 function branches_array {  ## {{{
-    readarray -t branches_list <<< "$(git branch -a --color=always | \grep -v '/HEAD\s' | sort)"  ## branches
+    readarray -t branches_list < <(git branch -a --color=always | \grep -v '/HEAD\s' | sort)  ## branches
     printf '%s\n' "${branches_list[@]}"
 }
 ## }}}
 
-title="${0##*/}"
 heading "$title"
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'revert' )
+main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'revert' 'touched' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     status )  ## {{{
              if_changes
-             readarray -t status_items <<< "$(printf '%s\n' "${master[@]/---/' '}")"
+             readarray -t status_items < <(printf '%s\n' "${changes[@]/---/' '}")  ## JUMP_2 for some reason, printf only takes one %s\n no matter how many args are passed to it
              status_item="$(pipe_to_fzf_locally "${status_items[@]}")" && wrap_fzf_choice "$status_item" || exit 37 ;;
              ## }}}
     add )  ## {{{
           if_changes
-          readarray -t add_items <<< "$(printf '%s\n%s\n%s\n' "${master[@]/---/' '}" 'pattern' 'all')"
+          readarray -t add_items < <(printf '%s\n' "${changes[@]/---/' '}" 'pattern' 'all')   ## JUMP_2 for some reason, printf only takes one %s\n no matter how many args are passed to it
           add_item="$(pipe_to_fzf_locally "${add_items[@]}")" && wrap_fzf_choice "$add_item" || exit 37
 
           case "$add_item" in
@@ -121,7 +119,7 @@ case "$main_item" in
           ## }}}
     commit )  ## {{{
              if_changes
-             [ ! "${std_s}" ] && red 'No staged files' && exit  ## <--,-- "${std_s[@]}" throws error:
+             [ ! "${std_s}" ] && red 'no staged files' && exit  ## <--,-- "${std_s[@]}" throws error:
                                                                 ##    |-- line 107: [:  zero: unary operator expected
                                                                 ##    '-- so we have to use either "${std_s}" or "${std_s[@]}" 2>/dev/null
 
@@ -139,7 +137,7 @@ case "$main_item" in
              ## }}}
     add_commit ) ## {{{
                  if_changes
-                 readarray -t add_commit_items <<< "$(printf '%s\n%s\n%s\n%s\n' "${master[@]/---/' '}" 'pattern' 'all' 'all + amend')"
+                 readarray -t add_commit_items < <(printf '%s\n' "${changes[@]/---/' '}" 'pattern' 'all' 'all + amend')  ## JUMP_2 for some reason, printf only takes one %s\n no matter how many args are passed to it
                  add_commit_item="$(pipe_to_fzf_locally "${add_commit_items[@]}")" && wrap_fzf_choice "$add_commit_item" || exit 37
 
                  case "$add_commit_item" in
@@ -153,7 +151,7 @@ case "$main_item" in
                            git add -A && git commit -m "MANY: $message" && accomplished "all added, message: MANY: $message" ;;
                      'all + amend' ) if_amend_allowed
                                      if_lock_file
-                                     git add -A && git commit --amend && accomplished "all added, commit amended in $editor" ;;  ## -v is optional, but it shows a lot of helpful information about the changes
+                                     git add -A && git commit --amend && accomplished "all added, commit amended in $editor" ;;
                      * ) get_input 'Message' && message="$input"
                          if_lock_file
                          add_commit_item="${add_commit_item:2}"  ## JUMP_1 remove '[] ' from the beginning
@@ -168,10 +166,10 @@ case "$main_item" in
 
                    case "$commit_amend_item" in
                        "open $editor" ) if_lock_file
-                                        git commit --amend && accomplished "commit amended in $editor" ;;  ## -v is optional, but it shows a lot of helpful information about the changes
+                                        git commit --amend && accomplished "commit amended in $editor" ;;
                        'write here' ) get_input 'New message' && new_message="$input"
                                       if_lock_file
-                                      git commit --amend -m "$new_message" && accomplished "commit amended, message: $message" ;;  ## -v is optional, but it shows a lot of helpful information about the changes
+                                      git commit --amend -m "$new_message" && accomplished "commit amended, message: $message" ;;
                    esac ;;
                    ## }}}
     undo )  ## {{{
@@ -183,7 +181,7 @@ case "$main_item" in
            ## }}}
     unstage )  ## {{{
               if_changes
-              [ ! "${std_s}" ] && red 'No staged files' && exit  ## <--,-- "${std_s[@]}" throws error:
+              [ ! "${std_s}" ] && red 'no staged files' && exit  ## <--,-- "${std_s[@]}" throws error:
                                                                  ##    |-- line 107: [:  zero: unary operator expected
                                                                  ##    '-- so we have to use either "${std_s}" or "${std_s[@]}" 2>/dev/null
 
@@ -204,12 +202,12 @@ case "$main_item" in
           IFS=$'\n'
           if_lock_file
           preview_setting='hidden'
-          readarray -t log_items <<< "$(git log --graph --full-history --all --color --abbrev-commit --date=relative --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
+          readarray -t log_items < <(git log --graph --full-history --all --color --abbrev-commit --date=relative --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')
           log_item="$(pipe_to_fzf_locally "${log_items[@]}")" && wrap_fzf_choice "$log_item" || exit 37 ;;
           ## }}}
     push )  ## {{{
            if [ ! "$(git remote -v)" ]; then
-               red 'No remote'
+               red 'no remote'
            else
                if_lock_file
                torsocks git push -u origin master && accomplished 'pushed'
@@ -246,14 +244,14 @@ case "$main_item" in
              case "$branch_item" in
                  'show branches' ) if_lock_file
                                    IFS=$'\n'
-                                   readarray -t show_branches_items <<< "$(branches_array)"
+                                   readarray -t show_branches_items < <(branches_array)
                                    show_branches_item="$(get_branch "${show_branches_items[@]}")" && wrap_fzf_choice "$show_branches_item" && accomplished || exit 37 ;;
                  'create branch' ) get_input 'Branch to create' && new_branch="$input"
                                    if_lock_file
                                    git branch "$new_branch" && accomplished "$new_branch branch created" ;;
                  'checkout to a branch' ) if_lock_file
                                           IFS=$'\n'
-                                          readarray -t cd_to_branch_items <<< "$(branches_array)"
+                                          readarray -t cd_to_branch_items < <(branches_array)
                                           cd_to_branch_item="$(get_branch "${cd_to_branch_items[@]}")" && wrap_fzf_choice "$cd_to_branch_item" || exit 37
 
                                           git checkout "$cd_to_branch_item" && accomplished "$cd_to_branch_item branch checkedout to" ;;
@@ -263,13 +261,13 @@ case "$main_item" in
                                                git branch | \grep -v 'master' | xargs git branch -D && accomplished 'all branches force deleted' ;;
                  'delete a specific branch' ) if_lock_file
                                               IFS=$'\n'
-                                              readarray -t delete_branch_items <<< "$(branches_array)"
+                                              readarray -t delete_branch_items < <(branches_array)
                                               delete_branch_item="$(get_branch "${delete_branch_items[@]}")" && wrap_fzf_choice "$delete_branch_item" || exit 37
 
                                               git branch -d "$delete_branch_item" && accomplished "$delete_branch_item branch deleted" ;;
                  'force delete a specific branch' ) if_lock_file
                                                     IFS=$'\n'
-                                                    readarray -t force_delete_branch_items <<< "$(branches_array)"
+                                                    readarray -t force_delete_branch_items < <(branches_array)
                                                     force_delete_branch_item="$(get_branch "${force_delete_branch_items[@]}")" && wrap_fzf_choice "$force_delete_branch_item" || exit 37
 
                                                     git branch -D "$force_delete_branch_item" && accomplished "$force_delete_branch_item branch force deleted" ;;
@@ -312,7 +310,7 @@ case "$main_item" in
              IFS=$'\n'
              if_lock_file
              preview_setting='hidden'
-             readarray -t revert_items <<< "$(git log --pretty=oneline --color --abbrev-commit --date=relative --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
+             readarray -t revert_items < <(git log --pretty=oneline --color --abbrev-commit --date=relative --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')
              revert_item="$(pipe_to_fzf_locally "${revert_items[@]}")" && wrap_fzf_choice "$revert_item" || exit 37
 
              revert_item="$(printf '%s\n' "$revert_item" | sed 's/ .*//g')"
@@ -322,6 +320,13 @@ case "$main_item" in
                  y ) git checkout "$revert_item" && accomplished "$revert_item reverted to" ;;
              esac ;;
              ## }}}
+    touched )  ## {{{ tell how many commits have touched dirs/files (https://github.com/terminalforlife/BashConfig/blob/master/source/.bash_functions)
+               readarray -t all < <(find -mindepth 1 -maxdepth 1 ! -iname '.git' | cut -c 3- | sort)
+               for a in "${all[@]}"; {
+                   printf '%s %s\n' "$(wc -l < <(git rev-list HEAD "$a"))" "$a"
+               } | sort --numeric-sort --reverse | column  ## --numeric-sort is for comparing according to string numerical value
+               ;;
+               ## }}}
 esac
 
 exit

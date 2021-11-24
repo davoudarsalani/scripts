@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
-trap 'exit 0' INT
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -32,19 +36,20 @@ function connect_plus_x2x {
     ssh -Y "$USER"@sony-"$bed" 'x2x -west -to :0'
 }
 
-
-function get_opts {
-    while getopts 'hn:' flag; do
-        case "$flag" in
-            h ) display_help   ;;
-            n ) name="$OPTARG" ;;
+function get_opt {
+    local options="$(getopt -l 'help,name:' -o 'hn:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help ) display_help     ;;
+            -n|--name ) shift; name="$1" ;;
+            -- )        break            ;;
         esac
+        shift
     done
 }
 
-get_opts "$@"
-
-title="${0##*/}"
+get_opt "$@"
 heading "$title"
 
 main_items=( 'ethernet connect + x2x' 'ethernet connect' 'ethernet download' 'ethernet upload' 'wifi connect + x2x' 'wifi connect' 'wifi download' 'wifi upload' 'help' )

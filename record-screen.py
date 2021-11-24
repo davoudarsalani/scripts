@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from os import getenv
 
 from gp import Screen, Record, Audio, get_datetime, rofi, update_audio, record_icon, set_widget, duration
@@ -63,3 +65,4 @@ update_audio()
 
 set_widget('record', 'fg', 'reset')
 set_widget('record', 'markup', record_icon())
+

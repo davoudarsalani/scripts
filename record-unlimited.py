@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from os import getenv, path
 from signal import signal, SIGINT
 
@@ -85,3 +87,4 @@ elif main_item == 'video':
     output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.video_ul(output)
+

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -10,28 +15,26 @@ function display_help {
 function prompt {
     for args in "$@"; {
         case "$1" in
-            -g ) [ ! "$group"    ] && get_input 'Group'    && group="$input" ;;
-            -o ) [ ! "$old_name" ] && get_input 'Old name' && old_name="$input" ;;
-            -n ) [ ! "$new_name" ] && get_input 'New name' && new_name="$input" ;;
+            -g ) [ ! "$group" ] && get_input 'Group' && group="$input" ;;
         esac
         shift
     }
 }
 
-function get_opts {
-    while getopts 'hg:o:n:' flag; do
-        case "$flag" in
-            h ) display_help       ;;
-            g ) group="$OPTARG"    ;;
-            o ) old_name="$OPTARG" ;;
-            n ) new_name="$OPTARG" ;;
+function get_opt {
+    local options="$(getopt -l 'help,group:' -o 'hg:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )  display_help      ;;
+            -g|--group ) shift; group="$1" ;;
+            -- )         break             ;;
         esac
+        shift
     done
 }
 
-get_opts "$@"
-
-title="${0##*/}"
+get_opt "$@"
 heading "$title"
 
 main_items=( 'info' 'create group' "add $USER to a group" "remove $USER from a group" 'change login name' 'how to useradd' 'help' )
@@ -48,9 +51,8 @@ case "$main_item" in
                             sudo gpasswd -a "$USER" "$group" && accomplished ;;
     "remove $USER from a group" ) prompt -g
                                  sudo gpasswd -d "$USER" "$group" && accomplished ;;
-    'change login name' ) red_blink " Use tty logged in as root"
-                          prompt -o -n
-                          usermod -l "$new_name" "$old_name" && accomplished ;;
+    'change login name' ) red_blink 'Use tty logged in as root'
+                          printf '%s\n' 'Syntax: usermod -l NEWNAME OLDNAME' ;;
     'how to useradd' ) printf '%s\t\t%s\n' "$(yellow 'Syntax:')" 'useradd -m -g <initial_group> -G <additional_groups> -s <login_shell> <username> (-m creates the user home directory as /home/<username>)'
                        printf '%s\t\t%s\n' "$(yellow 'e.g.:')" 'useradd -m -g users -G wheel,data,autologin -s /bin/bash/ jack' && accomplished ;;
     help ) display_help ;;

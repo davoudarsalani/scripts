@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
+
+title="${0##*/}"
 
 function cd_and_rm_all_except_path {
     [ ! -d "$HOME"/linux/"$cfg_dir" ] && red 'No such cfg-dir' && exit
 
-    readarray -t files <<< "$(find "$HOME"/linux/"$cfg_dir" -mindepth 1 -maxdepth 1 ! -iname '0-path.txt' | sort)"
+    readarray -t files < <(find "$HOME"/linux/"$cfg_dir" -mindepth 1 -maxdepth 1 ! -iname '0-path.txt' | sort)
     yellow_dim "${files[@]##*/}"
 
     get_single_input 'Remove these?' && propmt="$single_input"
@@ -15,7 +20,6 @@ function cd_and_rm_all_except_path {
     esac
 }
 
-title="${0##*/}"
 heading "$title"
 
 main_items=( 'vim' 'awesome' 'bash' 'tmux' 'fzf' 'lf' 'ranger' 'xfce4-terminal' 'cava' 'keepass' 'netrc' 'pacman.conf' 'gtk-2.0' 'gtk-3.0' 'fstab' 'mkinitcpio' '99-sysctl (for swappiness)' 'pacman database' 'dhcpcd' 'xorg.conf' 'xinitrc' 'mirrorlist' '/var/cache/pacman/pkg' 'rofi' 'greenclip' 'grub' 'uget' 'kdenlive' 'mutt' 'lightdm' 'highlight' 'picom' 'kid3' 'audacious' 'vlc' 'irssi' 'git' 'tor' 'kdeconnect' 'torsocks' 'handbrake' 'vsftpd' 'ssh' 'aria2' 'mpv' 'vifm' 'gpicview' 'htop' 'qutebrowser' 'optimus-manager' 'wget' 'firefox')

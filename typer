@@ -1,7 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+## last modified: 1400-09-03 15:02:17 Wednesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
 source "$HOME"/scripts/gb-calculation
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -72,17 +77,21 @@ function prompt {
     }
 }
 
-function get_opts {
-    while getopts 'hf:s:' flag; do
-        case "$flag" in
-            h ) display_help   ;;
-            f ) file="$OPTARG" ;;
-            s ) slp="$OPTARG"  ;;
+function get_opt {
+    local options="$(getopt -l 'help,file:,sleep:' -o 'hf:s:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )  display_help     ;;
+            -f|--file )  shift; file="$1" ;;
+            -s|--sleep ) shift; slp="$1"  ;;
+            -- )         break            ;;
         esac
+        shift
     done
 }
 
-get_opts "$@"
+get_opt "$@"
 
 IFS=   ## prevent leading spaces from being ignored (https://stackoverflow.com/questions/29689172/bash-read-ignores-leading-spaces)
 intervals=(
@@ -106,7 +115,6 @@ key_sounds=(
 )
 key_sounds_length="${#key_sounds[@]}"
 
-title="${0##*/}"
 heading "$title"
 
 main_items=( 'in vim' 'in terminal' 'help' )

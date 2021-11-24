@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
 
@@ -35,7 +38,7 @@ function error_removing {
 [ ! "$1" ] && exit
 [ "$1" == 'random' ] && title='random movie' || title='select movie'
 
-readarray -t directories <<< "$(find "$HOME"/movie -mindepth 1 -maxdepth 1 -type d | sort)"
+readarray -t directories < <(find "$HOME"/movie -mindepth 1 -maxdepth 1 -type d | sort)
 
 ## get movie count in each directory and prepend it to the directory name
 declare -a directories_plus_count=()
@@ -63,7 +66,7 @@ directory="${directory##*' '}"  ## remove count
 case "$1" in
     random ) movie="$(shuf -n 1 < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
              movie="${movie##*/}" ;;
-    select ) readarray -t movies <<< "$(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt' | sort)"
+    select ) readarray -t movies < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt' | sort)
              movie="$(pipe_to_rofi "${movies[@]##*/}" "$directory" '')" || exit 37 ;;
     * ) exit ;;  ## NOTE do NOT remove
 esac

@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 
 ## https://github.com/junegunn/fzf/wiki/Examples
+
+title="${0##*/}"
 
 [ "$1" ] && {
     if [ "$1" == 's' ]; then
@@ -13,6 +18,8 @@ source "$HOME"/scripts/gb-color
     #     red 'Wrong arg' && exit
     fi
 }
+
+heading "$title"
 
 main_items=( 'all' 'bash' 'python' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37

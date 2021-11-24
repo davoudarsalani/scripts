@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 ## firewall
 firewall_status="$(sudo ufw status | \grep -i status | awk '{print $NF}')"
 
@@ -9,7 +11,7 @@ def_ctrlr_mac="$(bluetoothctl list | \grep -i default | awk '{print $2}')"
 headset_mac="$(bluetoothctl devices | \grep 'Headset$' | awk '{print $2}')"
 
 ## battery
-read -a batt_info <<< "$(acpi)"  ## Battery 0: Charging, 1%, charging at zero rate - will never fully charge.
+read -a batt_info < <(acpi)  ## Battery 0: Charging, 1%, charging at zero rate - will never fully charge.
 [ "$batt_info" ] && {  ## checking if array is full. no need to [@]
     battery_status="${batt_info[2]//,/}"  ## Charging  ## OR cat /sys/class/power_supply/BAT1/status
     battery_level="${batt_info[3]//%,/}"  ## 28        ## OR cat /sys/class/power_supply/BAT1/capacity

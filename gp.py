@@ -1,3 +1,5 @@
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 # {{{ requirements
 ## for .venv_keylogger: keylogger
 ## for .venv: (
@@ -187,7 +189,7 @@ class Color:  ## {{{
     @staticmethod
     def grey_strikethrough(text: str) -> str:   return f'\033[09;49;090m{text}\033[0m'
     ## }}}
-    def heading(self, text: str) -> str: return self.purple(text)
+    def heading(self, text: str) -> str: return self.green(text)
     def ask(self, text: str) -> str:     return self.olive(text)
     def flag(self, text: str) -> str:    return self.purple(text)
     def default(self, text: str) -> str: return self.white_dim(text)

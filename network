@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-network
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -25,25 +30,27 @@ function add_desired_ip_to_ethernet {
     sudo ip address add "$desired_eth_ip" broadcast + dev "$eth_devc"
 }
 
-function get_opts {
-    while getopts 'hi:d:c:s:p:' flag; do
-         case "$flag" in
-            h ) display_help         ;;
-            i ) ip="$OPTARG"         ;;
-            d ) device="$OPTARG"     ;;
-            c ) connection="$OPTARG" ;;
-            s ) ssid="$OPTARG"       ;;
-            p ) password="$OPTARG"   ;;
+function get_opt {
+    local options="$(getopt -l 'help,ip:,device:,connection:,ssid:,password:' -o 'hi:d:c:s:p:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )       display_help           ;;
+            -i|--ip )         shift; ip="$1"         ;;
+            -d|--device )     shift; device="$1"     ;;
+            -c|--connection ) shift; connection="$1" ;;
+            -s|--ssid )       shift; ssid="$1"       ;;
+            -p|--password )   shift; password="$1"   ;;
+            -- )              break                  ;;
         esac
+        shift
     done
 }
 
-get_opts "$@"
-
-title="${0##*/}"
+get_opt "$@"
 heading "$title"
 
-main_items=( 'all' 'status + ip + mac address' 'available wifi access points' "sconnect $eth_devc" "disconnect $eth_devc" "connect $wf_devc" "disconnect $wf_devc" 'up ethernet/wifi connection' 'down ethernet/wifi connection' 'turn wifi on' 'turn wifi off' 'network controllers' 'stored passwords (root only)' 'nearby wifi networks' 'add ip to a device' "add "$desired_eth_ip" to $eth_devc" 'delete all ips' 'enable NetworkManager' 'disable NetworkManager' 'connect to a new wifi network' 'help' )
+main_items=( 'all' 'status + ip + mac address' 'available wifi access points' "connect $eth_devc" "disconnect $eth_devc" "connect $wf_devc" "disconnect $wf_devc" 'up ethernet/wifi connection' 'down ethernet/wifi connection' 'turn wifi on' 'turn wifi off' 'network controllers' 'stored passwords (root only)' 'nearby wifi networks' 'add ip to a device' "add "$desired_eth_ip" to $eth_devc" 'delete all ips' 'enable NetworkManager' 'disable NetworkManager' 'connect to a new wifi network' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb-color
 
-readarray -t files <<< "$(find -mindepth 1 -maxdepth 1 -type f | cut -c 3- | sort)"
+readarray -t files < <(find -mindepth 1 -maxdepth 1 -type f | cut -c 3- | sort)
 declare -i total=0
 
 for file in "${files[@]}"; {

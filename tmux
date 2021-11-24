@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 
 title="${0##*/}"
@@ -12,7 +15,7 @@ function choose_session {  ## NOTE do NOT use local for variables
 main_items=( 'list sessions' 'attch to the last session' 'attach to s specific session' 'kill a specific session' 'kill tmux' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
-readarray -t sessions <<< "$(tmux list-sessions)"
+readarray -t sessions < <(tmux list-sessions)
 
 case "$main_item" in
     'list sessions' ) printf '%s\n' "${sessions[@]}" ;;

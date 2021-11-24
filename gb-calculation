@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 function float_pad {  ## {{{
     local input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or '87*932/12' (no spaces allowd in expression)
     local desired_l_length="${2:-1}"  ## min   length for l, e.g. 1

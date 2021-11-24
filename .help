@@ -1,145 +1,129 @@
 #!/usr/bin/env bash
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
+source "$HOME"/scripts/gb-color
+
 function application_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -p) package
-$(purple -g) group
-$(purple -f) file
-$(purple -r) repository
-$(purple -u) unit"
+$(heading "$title") $(yellow "help")
+$(flag '-p --package=') package
+$(flag '-u --unit=')    unit"
 exit
 }
 ## }}}
 function checksum_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-file   $(purple -i) input file
-string $(purple -s) string"
+$(heading "$title") $(yellow "help")
+file   $(flag -i) input file
+string $(flag -s) string"
 exit
 }
 ## }}}
 function ffmpeg_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-embed subtitle         $(purple -i) input file $(purple -f) subtitle file $(purple -o) output file
-burn subtitle (increases size) $(purple -i) input file $(purple -f) subtitle file $(purple -o) output file
-burn embedded subtitle (increases size) $(purple -i) input file $(purple -d) subtitle index $(purple -o) output file
-sunc audio             $(purple -i) input file $(purple -x) offset (e.g. 1.2 or -0.8) $(purple -o) output file
-sync video             $(purple -i) input file $(purple -x) offset (e.g. 1.2 or -0.8) $(purple -o) output file
-trim                   $(purple -i) input file $(purple -s) start time (e.g. 00:00:09) $(purple -e) end time (e.g. 00:18:34) $(purple -o) output file
-convert                $(purple -i) input file $(purple -o) output file
-remove audio           $(purple -i) input file $(purple -o) output file
-replace audio          $(purple -a) audio input file $(purple -v) video input file $(purple -o) output file
-screenshot             $(purple -i) input file $(purple -t) time (e.g. 00:00:09) $(purple -o) output file
-extract frames         $(purple -i) input file $(purple -s) start time (e.g. 00:00:09) $(purple -e) end time (e.g. 00:18:34)
-negate                 $(purple -i) input file $(purple -o) output file
-reverse                $(purple -i) input file $(purple -o) output file
-add 0.3 saturation     $(purple -i) input file $(purple -o) output file
-show streams           $(purple -i) input file
-audio stream to keep   $(purple -i) input file $(purple -k) audio stream to keep (e.g. 1) $(purple -o) output file
-live camera            $(purple -c) camera (e.g. /dev/video0)"
+$(heading "$title") $(yellow "help")
+embed subtitle         $(flag '-i --input-file=') input file $(flag '-f --subtitle-file=') subtitle file $(flag '-o --output=') output file
+burn subtitle (increases size) $(flag '-i --input-file=') input file $(flag '-f --subtitle-file=') subtitle file $(flag '-o --output=') output file
+burn embedded subtitle (increases size) $(flag '-i --input-file=') input file $(flag '-d --subtitle-index=') subtitle index $(flag '-o --output=') output file
+sunc audio             $(flag '-i --input-file=') input file $(flag '-x --offset=') offset (e.g. 1.2 or -0.8) $(flag '-o --output=') output file
+sync video             $(flag '-i --input-file=') input file $(flag '-x --offset=') offset (e.g. 1.2 or -0.8) $(flag '-o --output=') output file
+trim                   $(flag '-i --input-file=') input file $(flag '-s --start=') start time (e.g. 00:00:09) $(flag '-e --end=') end time (e.g. 00:18:34) $(flag '-o --output=') output file
+convert                $(flag '-i --input-file=') input file $(flag '-o --output=') output file
+remove audio           $(flag '-i --input-file=') input file $(flag '-o --output=') output file
+replace audio          $(flag '-a --audio-input=') audio input file $(flag '-v --video-input=') video input file $(flag '-o --output=') output file
+screenshot             $(flag '-i --input-file=') input file $(flag '-t --time=') time (e.g. 00:00:09) $(flag '-o --output=') output file
+extract frames         $(flag '-i --input-file=') input file $(flag '-s --start=') start time (e.g. 00:00:09) $(flag '-e --end=') end time (e.g. 00:18:34)
+negate                 $(flag '-i --input-file=') input file $(flag '-o --output=') output file
+reverse                $(flag '-i --input-file=') input file $(flag '-o --output=') output file
+add 0.3 saturation     $(flag '-i --input-file=') input file $(flag '-o --output=') output file
+show streams           $(flag '-i --input-file=') input file
+audio stream to keep   $(flag '-i --input-file=') input file $(flag '-u --audio-stream=') audio stream to keep (e.g. 1) $(flag '-o --output=') output file
+live camera            $(flag '-c --camera=') camera (e.g. /dev/video0)"
 exit
 }
 ## }}}
 function firewall_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-allow app    $(purple -a) app to allow"
-exit
-}
-## }}}
-function join_intro_outtro_help {  ## {{{
-clear
-printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -d) directory (e.g. v-Lucy)"
+$(heading "$title") $(yellow "help")
+allow app    $(flag '-a --application=') application to allow"
 exit
 }
 ## }}}
 function mime_type_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -f) file"
+$(heading "$title") $(yellow "help")
+$(flag '-n --name=') dir/file name"
 exit
 }
 ## }}}
 function mount_umount_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-udisksctl mount -b  $(purple -d) device to mount (e.g. /dev/sdc)
-udisksctl umount -b $(purple -d) device to umount (e.g. /dev/sdc)
-format usb device   $(purple -d) device to format (e.g. /dev/sdc) $(purple -n) name (e.g. NNNN)"
+$(heading "$title") $(yellow "help")
+udisksctl mount -b  $(flag '-d --device=') device (e.g. /dev/sdc)
+udisksctl umount -b $(flag '-d --device=') device (e.g. /dev/sdc)
+format usb device   $(flag '-d --device=') device (e.g. /dev/sdc) $(flag '-n --name=') name (e.g. nnnn)"
 exit
 }
 ## }}}
 function network_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-up ethernet/wifi connection $(purple -c) connection
-down ethernet/wifi connection   $(purple -c) connection
-add ip   $(purple -i) ip $(purple -d) device
-delete all ips   $(purple -d) device
-connect to a new wifi network   $(purple -s) ssid $(purple -p) password"
+$(heading "$title") $(yellow "help")
+up ethernet/wifi connection     $(flag '-c --connection=') connection
+down ethernet/wifi connection   $(flag '-c --connection=') connection
+add ip                          $(flag '-i --ip=') ip $(flag '-d --device=') device
+delete all ips                  $(flag '-d --device=') device
+connect to a new wifi network   $(flag '-s --ssid=') ssid $(flag '-p --password=') password"
 exit
 }
 ## }}}
 function pulseaudio_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -d) default sink/source (index/name)"
+$(heading "$title") $(yellow "help")
+$(flag '-d --default=') default sink/source index/name"
 exit
 }
 ## }}}
 function sony_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -n) directory/file name"
-exit
-}
-## }}}
-function summary_help {  ## {{{
-clear
-printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -n) directory/file name"
+$(heading "$title") $(yellow "help")
+$(flag '-n --name=') dir/file name"
 exit
 }
 ## }}}
 function typer_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -f) file
-$(purple -s) sleep (e.g. 0.2, 1, random, etc)"
+$(heading "$title") $(yellow "help")
+$(flag '-f --file=')  file
+$(flag '-s --sleep=') sleep (e.g. random, 0.2, 1, etc)"
 exit
 }
 ## }}}
 function user_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-create group                $(purple -g) group
-add $USER to z group        $(purple -g) group
-remove $USER from a group   $(purple -g) group
-change user's login name    $(purple -o) old name $(purple -n) new name"
+$(heading "$title") $(yellow "help")
+create group               $(flag '-g --group=') group
+add $USER to a group        $(flag '-g --group=') group
+remove $USER from a group   $(flag '-g --group=') group"
 exit
 }
 ## }}}
 function video_subtitle_help {  ## {{{
 clear
 printf '%s\n' "\
-$(heading "$title") $(yellow "Help")
-$(purple -d) directory (e.g. lucy)"
+$(heading "$title") $(yellow "help")
+$(flag '-d --directory=') directory"
 exit
 }
 ## }}}

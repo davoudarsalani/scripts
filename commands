@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-03 15:48:18 Wednesday
+
 source "$HOME"/scripts/gb
+
+title="${0##*/}"
 
 function ctc_msg {
     local trimmed="$(printf '%s\n' "$@" | tr -d \<,\&)"
@@ -8,10 +13,9 @@ function ctc_msg {
 
 IFS=$'\n'
 
-title="${0##*/}"
 heading "$title"
 
-readarray -t main_items <<< "$(sed -n '/^\[COMMANDS START\]/,//p' "$0" | sed '1d')"
+readarray -t main_items < <(sed -n '/^\[::START::\]/,//p' "$0" | sed '1d')
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 main_item="${main_item##*---> }"
@@ -20,7 +24,7 @@ printf '%s\n' "$main_item" | tr -d '\n' | xclip -selection clipboard
 ctc_msg "$main_item" && accomplished
 exit
 
-[COMMANDS START]
+[::START::]
 print line 5 [i]  ---> sed '5q;d'
 print line 5 [ii] ---> awk NR==5
 print last line ---> sed -e '$!d'
@@ -39,6 +43,14 @@ remove empty lines [i]  ---> sed '/^$/d'
 remove empty lines [ii] ---> awk NF
 remove one line before a string ---> sed -ni '/STRING/{x;d;};1h;1!{x;p;};${x;p;}'
 remove one line after  a string ---> sed -i '/STRING/{N;s/\n.*//;}'
+cat file until pattern (inclusive) ---> sed '/PATTERN/q'
+print line matching the pattern (the same as grep) ---> sed -n '/PATTERN/p'
+add string above the line matching the pattern ---> sed '/PATTERN/i THIS STRING WILL BE INSERTED BEFORE PATTERN'
+add string below the line matching the pattern ---> sed '/PATTERN/a THIS STRING WILL BE INSERTED AFTER PATTERN'
+replacing the line matching the pattern        ---> sed '/PATTERN/c THIS STRING WILL REPLACE PATTERN'
+insert string before 3rd line ---> sed '3i\STRING'
+insert string after 3rd line ---> sed '3a\STRING'
+remove from pattern to the end of file (inclusive) ---> sed '/PATTERN/,$d'
 
 remove prefix       ---> "${VAR#PREFIX}"   ## "${x#*/}"  turns a/b/c/d  to  b/c/d
 remove long prefix  ---> "${VAR##PREFIX}"  ## "${x##*/}" turns a/b/c/d  to  d      ## JUMP_1
@@ -65,7 +77,7 @@ add word to the nth column in every line ---> awk '$1=$1"-word"'  ## NOTE do NOT
 replace lowercase with uppercase ---> sed 's/[a-z]/\U&/g'
 replace uppercase with lowercase ---> sed 's/[A-Z]/\L&/g'
 print number of lines ---> sed -n '$='
-set delimiter X and print column 2 [i]  ---> awk -F 'DELIMITER' '{print $2}'
+set delimiter X and print column 2 [i]  ---> awk -F 'DELIMITER' '{print $2}'  ## DELIMITER can be more than one character
 set delimiter X and print column 2 [ii] ---> cut -d 'DELIMITER' -f 2
 make first letter capital ---> sed 's/.*/\u&/'
 sort alphabetically ---> sort
@@ -91,6 +103,7 @@ lowercase variable's first letter ---> printf '%s\n' "${VAR,}"
 lowercase variable's all letters  ---> printf '%s\n' "${VAR,,}"
 print 1-2-3-4-5-6-7-8-9-10 ---> seq -s - 10
 add column from another file ---> paste -d' ' <FILE1> <FILE2>
+calculate using awk ---> function awk_calc { awk -SP "BEGIN {print($@)}" 2>/dev/null ;}; awk_calc '12*34/100'  ## # https://github.com/terminalforlife/BashConfig/blob/master/source/.bash_functions
 clears the line ---> printf '\33[A'
 print function name ---> function myfunction { printf 'This function is %s\n' "$FUNCNAME" ;} ; myfunction
 print lines with whose length are between 10 to 20 ---> grep -x '.\{10,20\}'
@@ -106,17 +119,21 @@ print variable length [i]   ---> printf '%s\n' "${#VAR}"
 print variable length [ii]  ---> printf '%s' "$VAR" | wc -c  ## NOTE no \n
 print variable length [iii] ---> echo -n "$VAR" | wc -c
 arrays ---> ARRAY=()             create an empty array
-arrays ---> declare -a ARRAY=()  create an empty array (local)
-arrays ---> ARRAY=(1 2 3)        initialize array
-arrays ---> "${ARRAY[2]}"        retrieve third element
-arrays ---> "${ARRAY[@]}"        retrieve all elements
-arrays ---> "${!ARRAY[@]}"       retrieve array indices
-arrays ---> "${#ARRAY[@]}"       calculate array size
-arrays ---> ARRAY[0]=3           overwrite 1st element
-arrays ---> ARRAY+=(4)           append value(s)
-arrays ---> STRING="$(ls)"       save ls output as a string
-arrays ---> ARRAY=( $(ls) )      save ls output as an array of files
-arrays ---> "${ARRAY[@]:x:n}"    retrieve n elements starting at index x
+            declare -a ARRAY=()  create an empty array (local)
+            ARRAY=(1 2 3)        initialize array
+            "${ARRAY[2]}"        retrieve third element
+            "${ARRAY[@]}"        retrieve all elements
+            "${!ARRAY[@]}"       retrieve array indices
+            "${#ARRAY[@]}"       calculate array size
+            ARRAY[0]=3           overwrite 1st element
+            ARRAY+=(4)           append value(s)
+            STRING="$(ls)"       save ls output as a string
+            ARRAY=( $(ls) )      save ls output as an array of files
+            "${ARRAY[@]:x:n}"    retrieve n elements starting at index x
+associative array ---> declare -A vids=(['key one']='value one' ['key two']='value two')
+                       printf '%s\n' "${!vids[@]}"         ## keys
+                       printf '%s\n' "${vids[@]}"          ## values
+                       printf '%s\n' "${vids['key one']}"  ## specific
 remove first element of array ($ and {} NOT needed) ---> unset 'ARRAY[0]'
 remove last element of array ($ and {} NOT needed) ---> unset 'ARRAY[-1]'
 assign a member of array to a variable ($ and {} needed) ---> VAR="${ARRAY[-2]}"
@@ -146,7 +163,8 @@ http torsocks ---> http_proxy=socks5://127.0.0.1:9050 torsocks
 toggle keyboard layout ---> setxkbmap -layout us,ir -option grp:caps_toggle
 show swap files ---> swapon --show
 delete duplicate, nonconsecutive and nonempty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq FILE
-ddpattern ---> sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
+open multiple files in vim tabs ---> vim -p FILE1 FILE2 FILE3
+dd pattern ---> sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
 turn off screensaver ---> xset s 0 0 && xset -dpms
 expand alias in script: ---> shopt -s expand_aliases (put it at the top of script)
 stop pop sound ---> add 'options snd-hda-intel power_save=0 power_save_controller=N' to the end of /etc/modprobe.d/alsa-base.conf
@@ -162,6 +180,8 @@ send both stdout and stderr to null ---> &>/dev/null OR >&/dev/null
 include stderr as well when piping ---> |& grep something
 get service status ---> systemctl --property=Result show tor  ## returns Result=success
 reolution of first framebuffer ---> cat /sys/class/graphics/fb0/virtual_size  ## returns 1366,768
+dpi ---> xdpyinfo | \grep 'resolution:' | awk '{print $2}'
+convert dos to unix using vim ---> :setlocal ff=unix
 
 truncate [i]   ---> > FILE
 truncate [ii]  ---> : > FILE
@@ -171,11 +191,11 @@ truncate [v]   ---> cp /dev/null FILE
 truncate [vi]  ---> truncate -s 0 FILE
 truncate [vii] ---> dd if=/dev/null of=FILE
 
-weather [i]   ---> curl -s wttr.in/zahedan?format=1  ## or wget -qO-
+weather [i]   ---> curl -s wttr.in/city?format=1  ## or wget -qO-
 weather [ii]  --->   format=1  >> ☀️ +24°C
 weather [iii] --->   format=2  >> ☀️ 🌡️e+24°C 🌬️+↓7km/h
-weather [iv]  --->   format=3  >> zahedan: ☀️ +24°C
-weather [v]   --->   format=4  >> zahedan: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
+weather [iv]  --->   format=3  >> city: ☀️ +24°C
+weather [v]   --->   format=4  >> city: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
 weather [vi]  --->   format=j1 >> in json format
                       for parsing the json: format=j1 | jq -rM ."current_condition[0]|(.temp_C)"  ## <--,-- will single quote work too?
                                                                                                   ##    |-- (https://www.youtube.com/watch?v=_Xm3HYGW3lg)
@@ -183,23 +203,20 @@ weather [vi]  --->   format=j1 >> in json format
                                                                                                   ##    |-- -r removes quotes, -M gives monochrome output
                                                                                                   ##    |-- also: (.weatherDesc[0].value)
                                                                                                   ##    \-- to combine: (.temp_C,.humidity)
-weather [vii] ---> curl -s wttr.in/zahedan?format=%t+%h+%p >> +10°C 54% 0.0mm
+weather [vii] ---> curl -s wttr.in/city?format=%t+%h+%p >> +10°C 54% 0.0mm
 
 print lines between two phrases ---> sed -n '/PHRASE1/,/PHRASE2/p' PATH
 get installation date ---> stat / | grep 'Birth'
 get signal names and integers ---> kill -l
-insert string before 3rd line ---> sed '3i\STRING'
-insert string after 3rd line ---> sed '3a\STRING'
-insert string before lines containing pattern (e.g. book) ---> sed '/PATTERN/i\STRING'
-insert string after lines containing pattern (e.g. book) ---> sed '/PATTERN/a\STRING'
 check if array is full  ---> [ "$ARRAY" ] && MYCOMMAND  ## no need to [@]
 check if array is empty ---> [ ! "$ARRAY" ] && MYCOMMAND  ## no need to [@]
 create var using printf ---> printf -v VAR 'STRING'/NUMBER
 insert commas into number ---> printf "%'d\n" NUMBER  ## returns 5,364,536  ## NOTE do NOT change quotes
 turn seconds (obtained with $(date +%s) or printf '%(%s)T\n') into a date format ---> printf '%(%F %X)T\n' SECONDS  ## returns 1971-09-14 12:59:24 AM
-uniq lines [i]  ---> | sort -u
+uniq lines [i]  ---> | sort --unique
 uniq lines [ii] ---> | sort | uniq
 list fonts ---> fc-list -f '%{file}\n'
+check if .git exists in pwd ---> [ ! "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ] && printf '%s\n' 'no git'
 
 baskreference ---> [[ 'this is a random string' =~ ^this\ is\ (.*)\ st(ri)ng$ ]]
                    printf '%s\n' "${BASH_REMATCH[0]}"  ## returns this is a random string
@@ -213,8 +230,9 @@ cat <<-'EOF' > FILE
 EOF
 
 join multiple videos ---> ## https://askubuntu.com/questions/637074/how-to-merge-multiple-more-than-two-videos-on-ubuntu
-VID_1="PATH_1"; VID_1_TS="${VID_1}.ts"; ffmpeg -i "$VID_1" -c copy -f mpegts "$VID_1_TS" 2>/dev/null
-VID_2="PATH_2"; VID_2_TS="${VID_2}.ts"; ffmpeg -i "$VID_2" -c copy -f mpegts "$VID_2_TS" 2>/dev/null
-VID_3="PATH_3"; VID_3_TS="${VID_3}.ts"; ffmpeg -i "$VID_3" -c copy -f mpegts "$VID_3_TS" 2>/dev/null
-output="PATH_4"; ffmpeg -i "concat:${VID_1_TS}|${VID_2_TS}|${VID_3_TS}" "$output" 2>/dev/null
+                          VID_1="PATH_1"; VID_1_TS="${VID_1}.ts"; ffmpeg -i "$VID_1" -c copy -f mpegts "$VID_1_TS" 2>/dev/null
+                          VID_2="PATH_2"; VID_2_TS="${VID_2}.ts"; ffmpeg -i "$VID_2" -c copy -f mpegts "$VID_2_TS" 2>/dev/null
+                          VID_3="PATH_3"; VID_3_TS="${VID_3}.ts"; ffmpeg -i "$VID_3" -c copy -f mpegts "$VID_3_TS" 2>/dev/null
+                          output="PATH_4"; ffmpeg -i "concat:${VID_1_TS}|${VID_2_TS}|${VID_3_TS}" "$output" 2>/dev/null
+
 

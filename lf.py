@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from os import path, getenv, symlink, rename, remove
 from shutil import rmtree
 from subprocess import run, check_output
@@ -236,3 +238,4 @@ elif main_arg == 'unrar':  ## {{{
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
+

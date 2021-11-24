@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from os import path, listdir, getenv, chdir
 
 from clipboard import copy as clipboard_copy
@@ -24,3 +26,4 @@ line = fzf(lines)
 emoji = line.split()[0]
 clipboard_copy(emoji)
 msgn(f'copied <span color=\"{getenv("orange")}\">{emoji}</span>')
+

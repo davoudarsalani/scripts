@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 from getopt import getopt
 from os import path
 from random import sample
@@ -14,7 +16,7 @@ Col = Color()
 
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('Help')}
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-l --length=')}''')
     exit()
 ## }}}
@@ -97,3 +99,4 @@ if   main_item == 'password':
     generate()
 elif main_item == 'help':
     display_help()
+

@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 shopt -s globstar  ## is it needed?
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -18,19 +23,21 @@ function prompt {
     }
 }
 
-function get_opts {
-    while getopts 'hp:u:' flag; do
-        case "$flag" in
-            h ) display_help      ;;
-            p ) package="$OPTARG" ;;
-            u ) unit="$OPTARG"    ;;
+function get_opt {
+    local options="$(getopt -l 'help,package:,unit:' -o 'hp:u:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )    display_help        ;;
+            -p|--package ) shift; package="$1" ;;
+            -u|--unit )    shift; unit="$1"    ;;
+            -- )           break               ;;
         esac
+        shift
     done
 }
 
-get_opts "$@"
-
-title="${0##*/}"
+get_opt "$@"
 heading "$title"
 
 main_items=( 'install' 'remove' 'packages' 'clear cache and clipboard' 'update' 'restore pacman database' 'systemd' 'systemctl' 'help' )
@@ -93,7 +100,7 @@ case "$main_item" in
                                   action_now 'removing cache and database'
                                   sudo pacman -Sc --noconfirm  ## cc will clean all the files (which is not a good idea)
                                   action_now 'removing orphans'
-                                  readarray -t os <<< "$(sudo pacman -Qtdq)"  ## is sudo needed?
+                                  readarray -t os < <(sudo pacman -Qtdq)  ## is sudo needed?
                                   if [ "$os" ]; then
                                       get_single_input 'Orphans found but the uninstall command is not fully testde yet. Proceed?' && remove_orphans="$single_input"
                                       case "$remove_orphans" in

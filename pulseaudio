@@ -1,24 +1,40 @@
 #!/usr/bin/env bash
+
+## last modified: 1400-09-02 23:12:01 Tuesday
+
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
+
+title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
     pulseaudio_help
 }
 
-function get_opts {
-    while getopts 'hd:' flag; do
-        case "$flag" in
-            h ) display_help      ;;
-            d ) default="$OPTARG" ;;
+function prompt {
+    for args in "$@"; {
+        case "$1" in
+            -d ) [ ! "$default" ] && get_input 'Default sink/source index/name' && default="$input"
         esac
+        shift
+    }
+}
+
+function get_opt {
+    local options="$(getopt -l 'help,default:' -o 'hd:' -a -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )    display_help        ;;
+            -d|--default ) shift; default="$1" ;;
+            -- )           break               ;;
+        esac
+        shift
     done
 }
 
-get_opts "$@"
-
-title="${0##*/}"
+get_opt "$@"
 heading "$title"
 
 main_items=( 'cards' 'sinks/sources' 'default sink/source/mon' 'all levels + mute status' 'active sink/source port' 'app responsible for sound card' 'apps using sink/source' 'set default sink/source' 'restart' 'help' )
@@ -73,9 +89,9 @@ source: ${active_source_port}"
                                 default="$(pipe_to_fzf "${defaults[@]}")" && wrap_fzf_choice "$default" || exit 37
 
                                 case "$default" in
-                                    'set default sink' ) [ ! "$default" ] && get_input 'Default sink (index or name)' && default="$input"
+                                    'set default sink' ) prompt -d
                                                          pacmd set-default-sink "$default" && accomplished ;;
-                                    'set default source' ) [ ! "$default" ] && get_input 'Default source (index or name)' && default="$input"
+                                    'set default source' ) prompt -d
                                                            pacmd set-default-source "$default" && accomplished ;;
                                 esac ;;
     restart ) get_single_input 'You sure?' && restart_prompt="$single_input"
