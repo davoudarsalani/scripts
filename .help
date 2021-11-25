@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 21:52:15 Wednesday
+## last modified: 1400-09-04 15:18:22 Thursday
 
 source "$HOME"/scripts/gb-color
 
@@ -68,7 +68,7 @@ printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 udisksctl mount -b  $(flag '-d --device=') device (e.g. /dev/sdc)
 udisksctl umount -b $(flag '-d --device=') device (e.g. /dev/sdc)
-format usb device   $(flag '-d --device=') device (e.g. /dev/sdc) $(flag '-n --name=') name (e.g. nnnn)"
+format usb device   $(flag '-d --device=') device (e.g. /dev/sdc) $(flag '-n --name=') name (e.g. ${USER^^})"
 exit
 }
 ## }}}

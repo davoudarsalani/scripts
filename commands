@@ -196,11 +196,11 @@ truncate [v]   ---> cp /dev/null FILE
 truncate [vi]  ---> truncate -s 0 FILE
 truncate [vii] ---> dd if=/dev/null of=FILE
 
-weather [i]   ---> curl -s wttr.in/city?format=1  ## or wget -qO-
+weather [i]   ---> curl -s wttr.in/zzzz?format=1  ## or wget -qO-
 weather [ii]  --->   format=1  >> ☀️ +24°C
 weather [iii] --->   format=2  >> ☀️ 🌡️e+24°C 🌬️+↓7km/h
-weather [iv]  --->   format=3  >> city: ☀️ +24°C
-weather [v]   --->   format=4  >> city: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
+weather [iv]  --->   format=3  >> zzzz: ☀️ +24°C
+weather [v]   --->   format=4  >> zzzz: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
 weather [vi]  --->   format=j1 >> in json format
                       for parsing the json: format=j1 | jq -rM ."current_condition[0]|(.temp_C)"  ## <--,-- will single quote work too?
                                                                                                   ##    |-- (https://www.youtube.com/watch?v=_Xm3HYGW3lg)
@@ -208,7 +208,7 @@ weather [vi]  --->   format=j1 >> in json format
                                                                                                   ##    |-- -r removes quotes, -M gives monochrome output
                                                                                                   ##    |-- also: (.weatherDesc[0].value)
                                                                                                   ##    \-- to combine: (.temp_C,.humidity)
-weather [vii] ---> curl -s wttr.in/city?format=%t+%h+%p >> +10°C 54% 0.0mm
+weather [vii] ---> curl -s wttr.in/zzzz?format=%t+%h+%p >> +10°C 54% 0.0mm
 
 print lines between two phrases ---> sed -n '/PHRASE1/,/PHRASE2/p' PATH
 get installation date ---> stat / | grep 'Birth'

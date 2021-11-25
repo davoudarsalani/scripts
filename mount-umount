@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 15:27:37 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -15,7 +15,7 @@ function prompt {
     for args in "$@"; {
         case "$1" in
             -d ) [ ! "$device" ] && get_input 'Device (e.g. /dev/sdc)' && device="$input" ;;
-            -n ) [ ! "$name"   ] && get_input 'Name (e.g. nnnn)'       && name="$input"   ;;
+            -n ) [ ! "$name"   ] && get_input "Name (e.g. ${USER^^})"  && name="$input"   ;;
         esac
         shift
     }

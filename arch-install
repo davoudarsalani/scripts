@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 15:43:49 Thursday
 
 function display_help {
     cmd="
@@ -44,6 +44,7 @@ function read_user_choice {
     read -p ">>${space}" choice
 }
 
+u="${USER:-nnnn}"
 runnable='false'
 
 case "$1" in
@@ -163,18 +164,18 @@ case "$1" in
             10 ) ## JUMP_6
                  cmd="
                  ## method 1 (recommended):
-                 useradd -mG wheel -s /bin/bash nnnn
+                 useradd -mG wheel -s /bin/bash $u
                  EDITOR=vim visudo
                  ## uncomment/add this line:
                  # %wheel ALL=(ALL) NOPASSWD: ALL
 
                  ## method 2:
-                 useradd -m -g users -G lp -s /bin/bash nnnn # also -G lp,autologin,storage,wheel,power
+                 useradd -m -g users -G lp -s /bin/bash $u # also -G lp,autologin,storage,wheel,power
                  EDITOR=vim visudo
-                 ## add 'nnnn ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
+                 ## add '$u ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
 
                  ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
-                 useradd -m -g wheel nnnn
+                 useradd -m -g wheel $u
                  EDITOR=vim visudo
                  ## add this line:
                  %wheel ALL=(ALL) NOPASSWD: ALL
@@ -185,7 +186,7 @@ case "$1" in
                  ;;
             11 ) cmd="
                  passwd
-                 passwd nnnn"
+                 passwd $u"
                  display_cmd "$cmd"
                  ;;
             12 ) cmd="
@@ -390,18 +391,18 @@ case "$1" in
             13 ) ## JUMP_6
                  cmd="
                  ## method 1 (recommended):
-                 useradd -mG wheel -s /bin/bash nnnn
+                 useradd -mG wheel -s /bin/bash $u
                  EDITOR=vim visudo
                  ## uncomment/add this line:
                  # %wheel ALL=(ALL) NOPASSWD: ALL
 
                  ## method 2:
-                 useradd -m -g users -G lp -s /bin/bash nnnn # also -G lp,autologin,storage,wheel,power
+                 useradd -m -g users -G lp -s /bin/bash $u # also -G lp,autologin,storage,wheel,power
                  EDITOR=vim visudo
-                 ## add 'nnnn ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
+                 ## add '$u ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
 
                  ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
-                 useradd -m -g wheel nnnn
+                 useradd -m -g wheel $u
                  EDITOR=vim visudo
                  ## add this line:
                  %wheel ALL=(ALL) NOPASSWD: ALL
@@ -411,7 +412,7 @@ case "$1" in
                  display_cmd "$cmd"
                  ;;
             14 ) cmd="
-                 passwd nnnn"
+                 passwd $u"
                  display_cmd "$cmd"
                  ;;
             15 ) cmd="

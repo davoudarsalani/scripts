@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 15:50:39 Thursday
 
 length_in_seconds="$(audtool --current-song-length-seconds)"  ## 3304
 length="$(audtool --current-song-length)"  ## 55:04
@@ -15,9 +15,9 @@ playlist_length="$(audtool --playlist-length)"  ## 5
 
 preamp="$(audtool equalizer-get-preamp | awk '{print $NF}')"  ## -2.10/0/etc
 
-current_song="$(audtool --current-song-filename)"                   ## /home/nnnn/speech/pargar/007.mp3
+current_song="$(audtool --current-song-filename)"                   ## /home/${USER}/speech/pargar/007.mp3
 current_song_base="$(audtool --current-song-tuple-data file-name)"  ## 007
-current_song_dir="${current_song%/*}"                               ## /home/nnnn/speech/pargar
+current_song_dir="${current_song%/*}"                               ## /home/${USER}/speech/pargar
 # ^^ OR current_song_dir="$(audtool --current-song-tuple-data file-path)"  ## ~/speech/pargar  ## throws error when used
 
 formatted_title="$(audtool --current-song-tuple-data formatted-title)"  ## pargar - speech - 007

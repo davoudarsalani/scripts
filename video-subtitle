@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 23:09:05 Wednesday
+## last modified: 1400-09-04 15:58:35 Thursday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -40,7 +40,7 @@ function get_opt {
 get_opt "$@"
 heading "$title"
 
-main_items=( "replace ' ', ---, -_-, !, %, & and ," 'convert vtt to srt' 'change srt color to #f3f300' 'burn' 'remove COMMMMMA and ----BURN' 'remove youtube ID' 'prepend random numbers' 'create 0-list' 'help' )
+main_items=( "replace ' ', ---, -_-, !, %, & and ," 'convert vtt to srt' 'change srt color to #f3f300' 'burn' 'remove TMPCOMMA and ----BURN' 'remove youtube ID' 'prepend random numbers' 'create 0-list' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -58,7 +58,7 @@ case "$main_item" in
                                              for file in "${files[@]}"; {
                                                  brown "→ $file"
                                                  new_name="$(printf '%s\n' "$file" | \
-                                                             sed -e 's/ /-/g' -e 's/\(---\|-_-\|-–-\|\%\|\!\)//g' -e 's/\&/and/g' -e 's/,/COMMMMMA/g')"
+                                                             sed -e 's/ /-/g' -e 's/\(---\|-_-\|-–-\|\%\|\!\)//g' -e 's/\&/and/g' -e 's/,/TMPCOMMA/g')"
                                                  mv -nv "$file" "$new_name" && accomplished
                                                  let replaced_count++
                                                  line
@@ -115,20 +115,20 @@ case "$main_item" in
            }
            printf '\n'
            blue "$vid_count videos burned" ;;
-    'remove COMMMMMA and ----BURN' ) prompt -d
+    'remove TMPCOMMA and ----BURN' ) prompt -d
 
                                      printf '\n'
                                      vids_count=0
                                      readarray -t rename_vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
                                      for rename_vid in "${rename_vids[@]}"; {
                                          brown "→ $rename_vid"
-                                         new_name="$(printf '%s\n' "$rename_vid" | sed -e 's/COMMMMMA/,/g;s/----BURN//g')"
+                                         new_name="$(printf '%s\n' "$rename_vid" | sed -e 's/TMPCOMMA/,/g;s/----BURN//g')"
                                          purple "$(mv -nv "$rename_vid" "$new_name")" && accomplished
                                          let vids_count++
                                          line
                                      }
                                      printf '\n'
-                                     blue "$vids_count videos removed COMMMMMA and ----BURN" ;;
+                                     blue "$vids_count videos removed TMPCOMMA and ----BURN" ;;
     'remove youtube ID' ) prompt -d
 
                           printf '\n'
@@ -178,7 +178,7 @@ case "$main_item" in
                                blue "$i videos renamed randomly" ;;
     'create 0-list' ) prompt -d
                       find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort | \
-                      sed -e 's/---/zzzzz/g;s/--/zzzzz/g;s/-/ /g;s/zzzzz/ - /g' -e 's/\.mp4$//g' -e 's/^.\+\///g' > "$dir"/0-list.txt && accomplished ;;
+                      sed -e 's/---/TMPPATTERN/g;s/--/TMPPATTERN/g;s/-/ /g;s/TMPPATTERN/ - /g' -e 's/\.mp4$//g' -e 's/^.\+\///g' > "$dir"/0-list.txt && accomplished ;;
     help ) display_help ;;
 esac
 

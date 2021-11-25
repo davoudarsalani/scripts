@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 15:51:13 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -21,19 +21,19 @@ function prompt {
 }
 
 function upload {
-    scp -r "$@" "$USER"@sony-"$bed":"$HOME"/downloads && accomplished
+    scp -r "$@" "${USER}"@sony-"$bed":"$HOME"/downloads && accomplished
 }
 
 function download {
-    scp -r "$USER"@sony-"$bed":"$@" "$HOME"/downloads && accomplished
+    scp -r "${USER}"@sony-"$bed":"$@" "$HOME"/downloads && accomplished
 }
 
 function connect {
-    ssh -Y "$USER"@sony-"$bed" && accomplished
+    ssh -Y "${USER}"@sony-"$bed" && accomplished
 }
 
 function connect_plus_x2x {
-    ssh -Y "$USER"@sony-"$bed" 'x2x -west -to :0'
+    ssh -Y "${USER}"@sony-"$bed" 'x2x -west -to :0'
 }
 
 function get_opt {
