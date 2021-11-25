@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 11:44:22 Thursday
 
 source "$HOME"/scripts/gb
 
-readarray -t bookmarks < <(\grep 'HREF=' < "$HOME"/linux/cfg-firefox/bookmarks.html | \grep -vE 'place:parent|place:type' | sed 's/" .*//;s/^.*"//g;s/\/$//g' | sort)
+readarray -t bookmarks < <(\grep 'HREF=' "$HOME"/linux/cfg-firefox/bookmarks.html | \grep -vE 'place:parent|place:type' | sed 's/" .*//;s/^.*"//g;s/\/$//g' | sort)
 
 case "$1" in
     firefox ) ff_items=( 'new page' 'new tab' 'private' 'safe mode' 'preferences' 'tor' "${bookmarks[@]}" )

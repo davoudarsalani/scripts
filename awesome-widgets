@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 12:47:52 Wednesday
+## last modified: 1400-09-04 11:44:07 Thursday
 
 threshhold=70
 
@@ -645,7 +645,7 @@ msgn "$text" ;;
                         up_last="$(< "$up_last_file")" || up_last=0        ## 19410508  ## NOTE do NOT add 2>/dev/null
 
                         ## get new down/up
-                        down_up="$(\grep "$cur_interface" < /proc/net/dev | awk '{print "down="$2, "up="$10}')"  ## <-- NOTE do NOT replace " with ' in awk
+                        down_up="$(\grep "$cur_interface" /proc/net/dev | awk '{print "down="$2, "up="$10}')"  ## <-- NOTE do NOT replace " with ' in awk
                         eval "$down_up"  ## 19410509 789384
 
                         ## save new down/up as last (in bytes, before converting them) for our next read

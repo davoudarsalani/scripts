@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 23:05:01 Wednesday
+## last modified: 1400-09-04 13:45:35 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -15,16 +15,17 @@ IFS=$'\n'
 
 heading "$title"
 
-readarray -t main_items < <(sed -n '/^\[::START::\]/,//p' "$0" | sed '1d')
+readarray -t main_items < <(sed -n '/^COMMANDS:START$/,//p' "$0" | sed '1d')
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 main_item="${main_item##*---> }"
 
 printf '%s\n' "$main_item" | tr -d '\n' | xclip -selection clipboard
 ctc_msg "$main_item" && accomplished
+
 exit
 
-[::START::]
+COMMANDS:START
 print line 5 [i]  ---> sed '5q;d'
 print line 5 [ii] ---> awk NR==5
 print last line ---> sed -e '$!d'
@@ -136,6 +137,8 @@ associative array ---> declare -A vids=(['key one']='value one' ['key two']='val
                        printf '%s\n' "${!vids[@]}"         ## keys
                        printf '%s\n' "${vids[@]}"          ## values
                        printf '%s\n' "${vids['key one']}"  ## specific
+create readonly variable         [i]  ---> readonly var=67
+create readonly variable (local) [ii] ---> declare -r var=67
 remove first element of array ($ and {} NOT needed) ---> unset 'ARRAY[0]'
 remove last element of array ($ and {} NOT needed) ---> unset 'ARRAY[-1]'
 assign a member of array to a variable ($ and {} needed) ---> VAR="${ARRAY[-2]}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 13:47:26 Thursday
 
 function get_datetime {  ## {{{
     case "$1" in
@@ -268,6 +268,70 @@ function rand_str {  ## {{{
  #     dur="$(day_hour_min_sec "$SECONDS")"
  #     printf 'Total duration: %s\n' "$dur"
  # }
+## }}}
+ # function compare_network_speed {  ## {{{
+ #    ## this function takes only one arg which can only be either old or new
+
+ #    source "$HOME"/scripts/gb-calculation
+ #    source "$HOME"/scripts/gb-color
+
+ #    durs_file=/tmp/0-durs
+ #    totals_file=/tmp/0-totals
+ #    loops_count=10
+ #    position="$1"
+
+ #    [ ! "$position" == 'old' ] && [ ! "$position" == 'new' ] && {
+ #        printf '%s\n' "$(red "arg can only be either old or new")"
+ #        exit
+ #    }
+
+ #    ## if position is old it means we want to have a fresh start
+ #    ## so let's empty totals_file first
+ #    [ "$position" == "old" ] && > "$totals_file"
+
+ #    for ((i=1; i<="$loops_count"; i++)); {
+ #        printf 'loop %s\n' "$i"
+ #        > "$durs_file"
+ #        for ((j=1; j<="$loops_count"; j++)); {
+ #            { time -p "$HOME"/scripts/awesome-widgets network ;} &>>"$durs_file"
+ #            printf '\n' >> "$durs_file"
+ #            sleep 1
+ #        }
+
+ #        loop_dur=0
+ #        readarray -t loop_durs < <(\grep 'real' "$durs_file" | awk '{print $NF}')
+ #        for a_sm in "${loop_durs[@]}"; {
+ #            loop_dur="$(float_pad "${loop_dur}+${a_sm}" 1 2)"
+ #        }
+ #        printf '%s %s\n' "$position" "$loop_dur" >> "$totals_file"
+ #    }
+
+ #    loops_dur=0
+ #    readarray -t loops_durs < <(\grep "$position" "$totals_file" | awk '{print $NF}')
+ #    for a_big in "${loops_durs[@]}"; {
+ #        loops_dur="$(float_pad "${loops_dur}+${a_big}" 1 2)"
+ #    }
+ #    printf '%s = %s\n\n' "$position" "$loops_dur" >> "$totals_file"
+
+ #    ## compare
+ #    old_loops_total="$(\grep 'old =' "$totals_file" | awk '{print $NF}' 2>/dev/null)"
+ #    new_loops_total="$(\grep 'new =' "$totals_file" | awk '{print $NF}' 2>/dev/null)"
+
+ #    [ "$new_loops_total" ] && [ "$old_loops_total" ] && {
+ #        is_faster="$(compare_floats "$new_loops_total" '<' "$old_loops_total")"
+ #        is_slower="$(compare_floats "$new_loops_total" '>' "$old_loops_total")"
+ #        if [ "$is_faster" == 'true' ]; then
+ #            diff="$(float_pad "${old_loops_total}-${new_loops_total}")"
+ #            msg="$diff faster"
+ #        elif [ "$is_slower" == 'true' ]; then
+ #            diff="$(float_pad "${new_loops_total}-${old_loops_total}")"
+ #            msg="$diff slower"
+ #        else
+ #            msg="$old_loops_total = $new_loops_total"
+ #        fi
+ #        printf 'compare\n%s\n' "$msg" >> "$totals_file"
+ #    }
+# }
 ## }}}
 # function convert_Fun_to_lower_size {  ## {{{
 #     old_fun="$HOME"/website/Files/Fun

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 11:45:17 Thursday
 
 screens_count="$(wc -l < <(xrandr | \grep -iw connected | \grep '[0-9]\{3,4\}x[0-9]\{3,4\}'))"
 ## OR <--,-- xrandr --listmonitors | sed '1q;d' | awk '{print $NF}'
@@ -27,6 +27,6 @@ scr_3_res="$(xrandr  | \grep "^$scr_3_name" | awk '{print $3}'  | awk -F '+' '{p
 scr_3_x="$(xrandr    | \grep "^$scr_3_name" | awk '{print $3}'  | awk -F '+' '{print $1}' | awk -F 'x' '{print $1}')"
 scr_3_y="$(xrandr    | \grep "^$scr_3_name" | awk '{print $3}'  | awk -F '+' '{print $1}' | awk -F 'x' '{print $2}')"
 
-scr_all_res="$(xrandr | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',')"                    ## <--,
+scr_all_res="$(xrandr | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',')"                            ## <--,
 scr_all_x="$(xrandr   | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',' | awk -F 'x' '{print $1}')"  ## <--|-- NOTE do NOT replace " with ' in awk
 scr_all_y="$(xrandr   | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',' | awk -F 'x' '{print $2}')"  ## <--'

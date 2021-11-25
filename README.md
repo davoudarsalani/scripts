@@ -1,1 +1,1 @@
-# A number of scripts optimized for everyday use in Arch Linux
+# A number of bash/python scripts optimized for everyday use on Arch Linux
