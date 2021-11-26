@@ -1,9 +1,9 @@
 # A small collection of bash/python scripts for everyday use on Arch Linux
 
 ![thumbnail](./thumbnail.jpg?raw=true)
-+ **Last updated:** 2021-11-26 10:33:27 +0330
-+ **Number of commits:** 18
-+ **Size:** 2.00MB
++ **Last updated:** 2021-11-26 11:22:18 +0330
++ **Number of commits:** 19
++ **Size:** 2.01MB
 ### 51 Bash Scripts:
 
 ||lines|size|last commited|commits|
@@ -24,7 +24,7 @@
 |[ffmpeg](https://github.com/davoudarsalani/scripts/blob/master/ffmpeg)|155|11.43KB|2021-11-24 16:02:46 +0330|4|
 |[fingil](https://github.com/davoudarsalani/scripts/blob/master/fingil)|351|11.29KB|2021-11-24 16:02:46 +0330|4|
 |[firewall](https://github.com/davoudarsalani/scripts/blob/master/firewall)|73|2.59KB|2021-11-24 16:02:46 +0330|4|
-|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|346|20.01KB|2021-11-26 09:08:50 +0330|6|
+|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|346|20.01KB|2021-11-26 11:22:18 +0330|7|
 |[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|457|15.42KB|2021-11-25 14:45:26 +0330|6|
 |[gb-audacious](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious)|34|1.96KB|2021-11-25 16:09:10 +0330|5|
 |[gb-audio](https://github.com/davoudarsalani/scripts/blob/master/gb-audio)|40|2.43KB|2021-11-24 16:02:46 +0330|3|
