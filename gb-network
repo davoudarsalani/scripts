@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-02 23:12:01 +0330 Tuesday
 
 ## also have a look at --,--> nmcli -c no --terse --fields DEVICE,CONNECTION,STATE dev status
 ##                       '--> nmcli -c no -t device

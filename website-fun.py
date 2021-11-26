@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-03 22:25:32 Wednesday
+## last modified: 1400-09-03 22:25:32 +0330 Wednesday
 
 from getopt import getopt
 from os import path

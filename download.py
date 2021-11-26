@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-03 23:25:08 Wednesday
+## last modified: 1400-09-03 23:25:08 +0330 Wednesday
 
 ## imports {{{
 from __future__ import unicode_literals

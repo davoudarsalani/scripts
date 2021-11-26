@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-05 08:49:16 Friday
+## last modified: 1400-09-05 22:31:13 +0330 Friday
 
 source "$HOME"/scripts/gb-color
 
@@ -107,6 +107,15 @@ $(heading "$title") $(yellow "help")
 create group               $(flag '-g --group=') group
 add $USER to a group        $(flag '-g --group=') group
 remove $USER from a group   $(flag '-g --group=') group"
+exit
+}
+## }}}
+
+function update_fdpo_help {  ## {{{
+clear
+printf '%s\n' "\
+$(heading "$title") $(yellow "help")
+$(flag '-r --repository=') linux/scripts"
 exit
 }
 ## }}}

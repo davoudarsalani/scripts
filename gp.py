@@ -1,4 +1,4 @@
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-02 23:12:01 +0330 Tuesday
 
 # {{{ requirements
 ## for .venv_keylogger: keylogger
