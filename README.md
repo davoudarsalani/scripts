@@ -1,9 +1,9 @@
 # A small collection of bash/python scripts for everyday use on Arch Linux
 
 ![thumbnail](./thumbnail.jpg?raw=true)
-+ **Last updated:** 2021-11-26 11:22:18 +0330
-+ **Number of commits:** 19
-+ **Size:** 2.01MB
++ **Last updated:** 2021-11-26 11:49:22 +0330
++ **Number of commits:** 20
++ **Size:** 2.02MB
 ### 51 Bash Scripts:
 
 ||lines|size|last commited|commits|
