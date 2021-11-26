@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 20:35:47 Thursday
+## last modified: 1400-09-05 10:51:20 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -91,7 +91,7 @@ function branches_array {  ## {{{
 
 heading "$title"
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'revert' 'touched' )
+main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'revert' 'commits' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -330,7 +330,7 @@ case "$main_item" in
                  y ) git checkout "$revert_item" && accomplished "$revert_item reverted to" ;;
              esac ;;
              ## }}}
-    touched )  ## {{{ tell how many commits have touched dirs/files (https://github.com/terminalforlife/BashConfig/blob/master/source/.bash_functions)
+    commits )  ## {{{ tell how many times dirs/files have been commited (https://github.com/terminalforlife/BashConfig/blob/master/source/.bash_functions)
                readarray -t all < <(find -mindepth 1 -maxdepth 1 ! -iname '.git' | cut -c 3- | sort)
                for a in "${all[@]}"; {
                    printf '%s %s\n' "$(wc -l < <(git rev-list HEAD "$a"))" "$a"
