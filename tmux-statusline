@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 14:11:36 Thursday
+## last modified: 1400-09-04 20:31:40 Thursday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf '%s\n' 'SONY ' ;;
@@ -34,13 +34,13 @@ case "$1" in
           [ "$del_count "  -eq 0 ] || del="  $del_count"
           [ "$ren_count"   -eq 0 ] || ren=" Ⓡ $ren_count"
           [ "$add_count"   -eq 0 ] || add="  $add_count"
-          [ "$unt_count"   -eq 0 ] || unt="  $unt_count"
+          [ "$unt_count"   -eq 0 ] || unt="  $unt_count"
           [ "$sta_count"   -eq 0 ] || sta="  $sta_count"
           [ "$sta_m_count" -eq 0 ] || sta_m="  $sta_m_count"
 
           commits_ahead="$(git branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
-          ## previously: commits_ahead="$(git status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g')"
-          [ "$commits_ahead" ] && commits_ahead="  $commits_ahead"
+          ## ^^ previously: git status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g'
+          [ "$commits_ahead" ] && commits_ahead=" Ⓐ $commits_ahead"  ## 
 
           [ "$(git remote -v | \grep -i 'github')" ] && logo='  '
           [ "$(git remote -v)" ] || if_no_remote=' (no-remote)'

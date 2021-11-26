@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 Tuesday
+## last modified: 1400-09-04 19:15:06 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -48,7 +48,7 @@ case "$main_item" in
                    }
                    color {232..255}
                    printf '\n'
-                   printf '%s %s\n' "$(yellow Pattern:)" '(tput setaf 0) TEXT (tput sgr 0)' ;;
+                   printf '%s %s\n' "$(yellow Pattern:)" '$(tput bold)$(tput setaf 1) TEXT $(tput sgr 0)' ;;
 esac
 
 exit
