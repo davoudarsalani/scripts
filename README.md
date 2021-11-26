@@ -1,11 +1,11 @@
-# A small collection of bash/python scripts for everyday use on Arch Linux
+# 69 bash/python scripts for everyday use on Arch Linux
 
 ![thumbnail](./thumbnail.jpg?raw=true)
-+ **Last updated:** 2021-11-26 11:58:01 +0330
-+ **Lines:** 10004
-+ **Size:** 2.02MB
-+ **Commits:** 22
-### 51 Bash Scripts:
++ **Last updated:** 2021-11-26 13:24:39 +0330
++ **Lines:** 9821
++ **Size:** 2.03MB
++ **Commits:** 23
+### 50 Bash Scripts:
 
 ||lines|size|last commited|commits|
 |--|--|--|--|--|
@@ -51,7 +51,6 @@
 |[rg](https://github.com/davoudarsalani/scripts/blob/master/rg)|41|1.41KB|2021-11-24 16:02:46 +0330|4|
 |[sony](https://github.com/davoudarsalani/scripts/blob/master/sony)|83|2.10KB|2021-11-25 16:09:10 +0330|5|
 |[speech](https://github.com/davoudarsalani/scripts/blob/master/speech)|130|5.03KB|2021-11-25 16:09:10 +0330|3|
-|[thumbnail.jpg](https://github.com/davoudarsalani/scripts/blob/master/thumbnail.jpg)|183|50.34KB|2021-11-26 10:33:27 +0330|1|
 |[tmux](https://github.com/davoudarsalani/scripts/blob/master/tmux)|30|1.02KB|2021-11-24 16:02:46 +0330|4|
 |[tmux-statusline](https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline)|70|2.96KB|2021-11-26 09:08:50 +0330|6|
 |[todo](https://github.com/davoudarsalani/scripts/blob/master/todo)|35|1.45KB|2021-11-24 16:02:46 +0330|4|
