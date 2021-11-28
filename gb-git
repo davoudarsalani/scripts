@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+## last modified: 1400-09-07 10:41:34 +0330 Sunday
+
+# dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work, not here nor in "$HOME"/scripts/g
+
+function if_git {
+    git -C "${1:-.}" rev-parse --is-inside-work-tree 2>/dev/null && printf 'true\n' || printf 'false\n'
+}
+
+
+function if_remote {
+    local rmt="$(git -C "${1:-.}" remote -v)"
+    [ "$rmt" ] && printf '%s\n' "$rmt"
+}
+
+function get_commits_count {
+    printf '%s\n' "$(git -C "${1:-.}" rev-list HEAD --count)"
+}
+
+
+function get_commits_ahead {
+    local commits_ahead="$(git -C "${1:-.}" branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
+    ## ^^ previously: git -C "${1:-.}" status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g'
+    [ "$commits_ahead" ] && printf '%s\n' "$commits_ahead" || printf '0\n'
+}
+
+
+function get_status {
+    local stts="$(git -C "${1:-.}" status -s)"
+    [ "$stts" ] && printf '%s\n' "$stts"
+}
+
+
+function get_branches_exclude_remote {
+    printf '%s\n' "$(git -C "${1:-.}" branch --list)"
+}
+
+
+function get_branches {
+    printf '%s\n' "$(git -C "${1:-.}" branch -a --color=always | \grep -v '/HEAD\s' | sort)"
+}
+
+
+function get_current_branch {
+    printf '%s\n' "$(git -C "${1:-.}" rev-parse --abbrev-ref HEAD)"  ## FIXME if reverted (=checked out) to a commit, it only returns HEAD instead of (HEAD detached at 56bb92a)
+    ## ^^ previously: git -C "${1:-.}" branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/'
+}
