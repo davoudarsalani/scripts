@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 13:47:26 +0330 Thursday
+## last modified: 1400-09-06 16:03:27 +0330 Saturday
 
 function get_datetime {  ## {{{
     case "$1" in
@@ -51,7 +51,7 @@ function pipe_to_fzf {  ## {{{
     ## usage: this function expects 1 arg, for example:
     ##     item="$(pipe_to_fzf "${items[@]}")"
 
-    local received
+    declare -a received
     readarray -t received < <(printf '%s\n' "$@")
 
     local fzf_choice="$(printf '%s\n' "${received[@]}" | fzf)"
@@ -65,7 +65,7 @@ function pipe_to_dmenu {  ## {{{
     ##     item="$(pipe_to_dmenu "${items[@]}")" 'TITLE' 'red'  ## <--'
     ##     item="$(pipe_to_dmenu "${items[@]}")" ''      'red'
 
-    local received
+    declare -a received
     readarray -t received < <(printf '%s\n' "$@")
 
     local fg="${received[-1]}"
@@ -87,7 +87,7 @@ function pipe_to_rofi {  ## {{{
     ##     item="$(pipe_to_rofi "${items[@]}")" 'TITLE' 'red'  ## <--'
     ##     item="$(pipe_to_rofi "${items[@]}")" ''      'red'
 
-    local received
+    declare -a received
     readarray -t received < <(printf '%s\n' "$@")
 
     local fg="${received[-1]}"
@@ -115,10 +115,8 @@ function mounted_drives {  ## {{{
 }
 ## }}}
 function get_mountable_umountable {  ## {{{
-    local m="$(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE 'part $|rom $')"
-    local u="$(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i '/tmp/')"
-    [ "$m" ] && mountable="$m"
-    [ "$u" ] && umountable="$u"
+    readarray -t mountable  < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE 'part $|rom $')
+    readarray -t umountable < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i '/tmp/')
 }
 ## }}}
 function msgn {  ## {{{
@@ -161,7 +159,7 @@ function day_hour_min_sec {  ## {{{
     local min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
     local hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
     local day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 ))")"
-    [ "$day" -eq 0 ] && printf '%s\n' "${hour}:${min}:${sec}" || printf '%s\n' "${day}:${hour}:${min}:${sec}"
+    (( day == 0 )) && printf '%s\n' "${hour}:${min}:${sec}" || printf '%s\n' "${day}:${hour}:${min}:${sec}"
 }
 ## }}}
 function clear_clipboard {  ## {{{
@@ -191,8 +189,8 @@ function set_widget {  ## {{{
     local widget="$1"
     local attr="$2"
     local value="$3"
-    awesome-client "${widget}.${attr} = '${value}'"
-}  ## NOTE do NOT change quotes
+    awesome-client "${widget}.${attr} = '${value}'"  ## NOTE do NOT change quotes
+}
 ## }}}
 function get_input {  ## {{{
     source "$HOME"/scripts/gb-color
@@ -342,7 +340,7 @@ function rand_str {  ## {{{
 #         mkdir "$new_fun"
 #     fi
 
-#     readarray -t pics < <(find "$old_fun" -mindepth 1 -maxdepth 1 -type f -iname '*jpg' | sort)
+#     readarray -t pics < <(find "$old_fun" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
 
 #     for p in "${pics[@]##*/}"; {
 #         printf '%s\n' "$p"
@@ -359,11 +357,11 @@ function rand_str {  ## {{{
 #     start="$(get_datetime 'jhms')"
 #     for ((i=1; i<="$1"; i++)); {
 #         current="$(get_datetime 'jhms')"
-#         let seconds="$current - $start"
+#         (( seconds="current - start" ))
 #         echo -en '\r  \r'
-#         let h="$seconds / 3600 % 24"
-#         let m="$seconds / 60 % 60"
-#         let s="$seconds % 60"
+#         (( h="seconds / 3600 % 24" ))
+#         (( m="seconds / 60 % 60" ))
+#         (( s="seconds % 60" ))
 #         w="$(printf "$2 %02d:%02d:%02d" "$h" "$m" "$s"  ## NOTE no \n ??
 #         set_widget 'record' 'markup' "<span color=\"${red}\">${record_icon} <b>${w}</b></span>"
 #         sleep 1

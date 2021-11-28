@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 17:41:12 +0330 Wednesday
+## last modified: 1400-09-06 11:41:17 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -10,7 +10,7 @@ title="${0##*/}"
 function cd_and_rm_all_except_path {
     [ ! -d "$HOME"/linux/"$cfg_dir" ] && red 'No such cfg-dir' && exit
 
-    readarray -t files < <(find "$HOME"/linux/"$cfg_dir" -mindepth 1 -maxdepth 1 ! -iname '0-path.txt' | sort)
+    readarray -t files < <(find "$HOME"/linux/"$cfg_dir" -mindepth 1 -maxdepth 1 ! -iname '*0-path.txt' | sort)
     printf '%s\n' "${files[@]##*/}" | column
 
     get_single_input 'Remove these?' && propmt="$single_input"
@@ -112,7 +112,7 @@ case "$main_item" in
                             action_now 'removing'; cd_and_rm_all_except_path
                             action_now 'copying';  cp -r /etc/pacman.d/mirrorlist "$HOME"/linux/"$cfg_dir" && accomplished ;;
     /var/cache/pacman/pkg ) pkgs_count="$(wc -l < <(find /var/cache/pacman/pkg/ -mindepth 1 -maxdepth 1 -type f))"
-                            [ "$pkgs_count" -gt 0 ] && {
+                            (( pkgs_count > 0 )) && {
                                 action_now 'copying';  cp   -r /var/cache/pacman/pkg/* "$HOME"/linux-pkg
                                 action_now 'removing'; sudo rm /var/cache/pacman/pkg/* && accomplished
                             } || red 'Nothing to copy' ;;

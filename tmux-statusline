@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 20:31:40 +0330 Thursday
+## last modified: 1400-09-07 10:37:10 +0330 Sunday
 
 case "$1" in
-    if_sony ) [ "$HOSTNAME" == 'sony' ] && printf '%s\n' 'SONY ' ;;
-    if_ssh ) [ "$SSH_CONNECTION" ] && printf '%s\n' 'SSH ' ;;
+    if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
+    if_ssh ) [ "$SSH_CONNECTION" ] && printf 'SSH \n' ;;
     pwd ) printf '%s\n' "${PWD//$HOME/\~}" ;;  ## keep \~ escaped
     info ) source "$HOME"/scripts/gb-calculation
 
@@ -14,14 +14,16 @@ case "$1" in
            directories_count="$(wc -l < <(find -mindepth 1 -maxdepth 1 -type d))"
            files_count="$(wc -l < <(find -mindepth 1 -maxdepth 1 -type f))"
            links_count="$(wc -l < <(find -mindepth 1 -maxdepth 1 -type l))"
-           [ "$links_count" -eq 0 ] && links_count='' || links_count=" l:${links_count}"
+           (( links_count == 0 )) && links_count='' || links_count=" L:${links_count}"
 
            printf '%s %s %s%s\n' "$size" "$directories_count" "$files_count" "$links_count" ;;
-    git ) [ ! "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ] && printf '%s\n' '--' && exit
+    git ) source "$HOME"/scripts/gb-git
 
-          commits_count="$(git rev-list HEAD --count)"
+          [ "$(if_git)" == 'false' ] && printf '..\n' && exit
 
-          stts="$(git status -s)"
+          commits_count="$(get_commits_count)"
+
+          stts="$(get_status)"
           mod_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ M'))"
           del_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ D'))"
           ren_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ R'))"
@@ -30,26 +32,26 @@ case "$1" in
           sta_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^[MDAR] '))"
           sta_m_count="$(wc -l < <(printf '%s\n' "$stts" | \grep '^[MDAR][MDAR]'))"
 
-          [ "$mod_count"   -eq 0 ] || mod="  $mod_count"
-          [ "$del_count "  -eq 0 ] || del="  $del_count"
-          [ "$ren_count"   -eq 0 ] || ren=" Ⓡ $ren_count"
-          [ "$add_count"   -eq 0 ] || add="  $add_count"
-          [ "$unt_count"   -eq 0 ] || unt="  $unt_count"
-          [ "$sta_count"   -eq 0 ] || sta="  $sta_count"
-          [ "$sta_m_count" -eq 0 ] || sta_m="  $sta_m_count"
+          (( mod_count   == 0 )) || mod="  $mod_count"
+          (( del_count   == 0 )) || del="  $del_count"
+          (( ren_count   == 0 )) || ren=" Ⓡ $ren_count"
+          (( add_count   == 0 )) || add="  $add_count"
+          (( unt_count   == 0 )) || unt="  $unt_count"
+          (( sta_count   == 0 )) || sta="  $sta_count"
+          (( sta_m_count == 0 )) || sta_m="  $sta_m_count"
 
-          commits_ahead="$(git branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
-          ## ^^ previously: git status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g'
-          [ "$commits_ahead" ] && commits_ahead=" Ⓐ $commits_ahead"  ## 
+          commits_ahead="$(get_commits_ahead)"
+          (( commits_ahead > 0 )) && commits_ahead=" Ⓐ $commits_ahead" || commits_ahead=''  ## 
 
-          [ "$(git remote -v | \grep -i 'github')" ] && logo='  '
-          [ "$(git remote -v)" ] || if_no_remote=' (no-remote)'
+          if_rmt="$(if_remote)"
+          [ "$(printf '%s\n' "$if_rmt" | \grep -i 'github')" ] && logo='  '
+          [ "$if_rmt" ] || is_local=' LOCAL'
 
-          branches_count="$(wc -l < <(git branch --list))"
-          [ "$branches_count" -gt 1 ] && branches_count=" #BR=${branches_count}" || branches_count=''
+          branches_count="$(wc -l < <(get_branches_exclude_remote))"
+          (( branches_count > 1 )) && branches_count=" #BR:${branches_count}" || branches_count=''
 
-          cur_branch="$(git rev-parse --abbrev-ref HEAD)"  ## previously: git branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/'
-          [ "$cur_branch" == 'master' ] && cur_branch='' || cur_branch=" BR=${cur_branch}"
+          current_branch="$(get_current_branch)"
+          [ "$current_branch" == 'master' ] && current_branch='' || current_branch=" BR:${current_branch}"
 
           printf '%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "\
 ${commits_count}\
@@ -62,9 +64,9 @@ ${sta}\
 ${sta_m}\
 ${commits_ahead}\
 ${logo}\
-${if_no_remote}\
+${is_local}\
 ${branches_count}\
-${cur_branch}" ;;
+${current_branch}" ;;
 esac
 
 exit

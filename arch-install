@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 15:43:49 +0330 Thursday
+## last modified: 1400-09-06 13:04:52 +0330 Saturday
 
 function display_help {
     cmd="
@@ -31,13 +31,14 @@ function display_mode {
 }
 
 function not_valid {
+    ## NOTE do NOT use (( choice == choice )) for checking if choice is a number:
     [ "$choice" -eq "$choice" ] 2>/dev/null && local msg='out of range' || local msg='not valid'
     printf '%s is %s\n' "$("$fg_color" "$choice")" "$msg"
 }
 
 function read_user_choice {
     for ((i=0; i<"${#main_items[@]}"; i++)); {
-        [ "$i" -lt 10 ] && local space='  ' || local space=' '
+        (( i < 10 )) && local space='  ' || local space=' '
         printf '%s%s%s\n' "$("$fg_color" "$i")" "$space" "${main_items[$i]}" | sed 's/\t/  /g'
     }
 
@@ -129,7 +130,7 @@ case "$1" in
                 cmd="
                 sed -i 's/^#en_US\./en_US\./;s/^#fa_IR /fa_IR /' /etc/locale.gen
                 locale-gen
-                printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf
+                printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
                 export LANG=en_US.UTF-8"
                 display_cmd "$cmd"
                 ;;
@@ -146,8 +147,8 @@ case "$1" in
             7 ) ## JUMP_5
                 runnable='true'
                 cmd="
-                printf '%s\n' 'acer' > /etc/hostname
-                printf '%s\n%s\n%s\n' '127.0.0.1  localhost' '::1  localhost' '127.0.1.1  acer.localdomain  acer' > /etc/hosts"
+                printf 'acer\n' > /etc/hostname
+                printf '127.0.0.1  localhost\n::1  localhost\n127.0.1.1  acer.localdomain  acer\n' > /etc/hosts"
                 display_cmd "$cmd"
                 ;;
             8 ) runnable='true'
@@ -347,15 +348,15 @@ case "$1" in
                 cmd="
                 sed -i 's/^#en_US\./en_US\./;s/^#fa_IR /fa_IR /' /etc/locale.gen
                 locale-gen
-                printf '%s\n' 'LANG=en_US.UTF-8' > /etc/locale.conf
+                printf 'LANG=en_US.UTF-8\n' > /etc/locale.conf
                 export LANG=en_US.UTF-8"
                 display_cmd "$cmd"
                 ;;
             7 ) ## JUMP_5
                 runnable='true'
                 cmd="
-                printf '%s\n' 'acer' > /etc/hostname
-                printf '%s\n%s\n%s\n' '127.0.0.1  localhost' '::1  localhost' '127.0.1.1  acer.localdomain  acer' > /etc/hosts"
+                printf 'acer\n' > /etc/hostname
+                printf '127.0.0.1  localhost\n::1  localhost\n127.0.1.1  acer.localdomain  acer\n' > /etc/hosts"
                 display_cmd "$cmd"
                 ;;
             8 ) cmd="
@@ -448,7 +449,7 @@ case "$1" in
     -v|--verify )  ## {{{
         runnable='true'
         cmd="
-        ls /sys/firmware/efi/efivars 2>/dev/null && printf '%s\n' 'UEFI mode verified: YES' || printf '%s\n' 'UEFI mode verified: NO'"
+        ls /sys/firmware/efi/efivars 2>/dev/null && printf 'UEFI mode verified: YES\n' || printf 'UEFI mode verified: NO\n'"
         display_cmd "$cmd"
         ;;
         ## }}}

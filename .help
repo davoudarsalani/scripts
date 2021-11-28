@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-05 22:31:13 +0330 Friday
+## last modified: 1400-09-05 22:40:47 +0330 Friday
 
 source "$HOME"/scripts/gb-color
 
@@ -110,7 +110,6 @@ remove $USER from a group   $(flag '-g --group=') group"
 exit
 }
 ## }}}
-
 function update_fdpo_help {  ## {{{
 clear
 printf '%s\n' "\

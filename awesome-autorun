@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 13:05:31 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -8,15 +8,15 @@ autorun_file=/tmp/autorun
 [ -f "$autorun_file" ] && exit || touch "$autorun_file"
 
 ## tricks for the time when power saving screws audio
-# printf '%s\n' '0' | sudo tee /sys/module/snd_hda_intel/parameters/power_save
-# printf '%s\n' 'N' | sudo tee /sys/module/snd_hda_intel/parameters/power_save_controller
+# printf '0\n' | sudo tee /sys/module/snd_hda_intel/parameters/power_save
+# printf 'N\n' | sudo tee /sys/module/snd_hda_intel/parameters/power_save_controller
 # sleep 2
 
 pulseaudio --start &
 start-pulseaudio-x11
 
 source "$HOME"/scripts/gb-audio
-while [ "$vol_level" -ne 30 ]; do
+while (( vol_level != 30 )); do
     printf 'tried to set volume to 30 at %s\n' "$(get_datetime 'jymdhms')" >> /tmp/vol_30  ## just to keep record of how many times the loop tried
     pactl set-sink-volume "$def_sink_index" 30%
     source "$HOME"/scripts/gb-audio

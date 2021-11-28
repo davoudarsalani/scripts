@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 11:10:18 +0330 Thursday
+## last modified: 1400-09-06 13:22:51 +0330 Saturday
 
 function float_pad {  ## {{{
     local input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or "${var}*932/12" (no spaces allowd in expression)
@@ -19,13 +19,13 @@ function float_pad {  ## {{{
 
     ## make r have the desired_r_length
     local r_length="${#r}"
-    if [ "$desired_r_length" -gt "$r_length" ]; then  ## add trailing zeros to r if shorter than desired_r_length
+    if (( desired_r_length > r_length )); then  ## add trailing zeros to r if shorter than desired_r_length
         local lacking_pad
-        let lacking_pad="$desired_r_length - $r_length"
+        (( lacking_pad="desired_r_length - r_length" ))
         for ((i=0; i<"$lacking_pad"; i++)); {
             local r="${r}0"
         }
-    elif [ "$desired_r_length" -lt "$r_length" ]; then  ## purge r if longer than desired_r_length
+    elif (( desired_r_length < r_length )); then  ## purge r if longer than desired_r_length
         r="${r::$desired_r_length}"
     fi
 
@@ -46,9 +46,9 @@ function compare_floats {  ## {{{
 
     ## compare
     case "$oper" in
-         '<' ) [ "$(awk '{printf($1 <  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf '%s\n' 'true' || printf '%s\n' 'false' ;;
-         '=' ) [ "$(awk '{printf($1 == $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf '%s\n' 'true' || printf '%s\n' 'false' ;;
-         '>' ) [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf '%s\n' 'true' || printf '%s\n' 'false' ;;
+         '<' ) [ "$(awk '{printf($1 <  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
+         '=' ) [ "$(awk '{printf($1 == $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
+         '>' ) [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
     esac
 }
 ## }}}
@@ -61,16 +61,16 @@ function convert_byte {  ## {{{
     ## GB = "$bytes" / 1024000000  ## 00.25GB
 
     local bytes="$1"
-    if [ "$bytes" -eq 0 ]; then
+    if (( bytes == 0 )); then
         local number=0
         local suffix='B'
-    elif [ "$bytes" -gt 1024000000 ]; then
+    elif (( bytes > 1024000000 )); then
         local number="$(float_pad "${bytes}/1024000000" 1 2)"
         local suffix='GB'
-    elif [ "$bytes" -gt 1024000 ]; then
+    elif (( bytes > 1024000 )); then
         local number="$(float_pad "${bytes}/1024000" 1 2)"
         local suffix='MB'
-    elif [ "$bytes" -gt 1024 ]; then
+    elif (( bytes > 1024 )); then
         local number="$(float_pad "${bytes}/1024" 1 2)"
         local suffix='KB'
     else

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 15:02:17 +0330 Wednesday
+## last modified: 1400-09-06 11:07:38 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -33,15 +33,15 @@ function play_random_key_sound {
 }
 
 function type_in_vim {
-    let chars_count="$(wc -c < "$file")"
-    # let chars_count+=100  ## add 100 just in case
+    chars_count="$(wc -c < "$file")"
+    # (( chars_count+=100 ))  ## add 100 just in case
 
     countdown
 
     ## strike keys
     for ((i=1; i<="$chars_count"; i++)); {
-        let perc="$i * 100 / $chars_count"
-        let remaining_chars="$chars_count - $i"
+        (( perc="i * 100 / chars_count" ))
+        (( remaining_chars="chars_count - i" ))
         eta_mid="$(float_pad "${remaining_chars}*${intervals_middle_member}")"
         eta_mid_conv="$(day_hour_min_sec "$eta_mid")"
 

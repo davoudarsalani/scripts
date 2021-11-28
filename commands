@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 13:45:35 +0330 Thursday
+## last modified: 1400-09-07 12:46:10 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -79,8 +79,8 @@ add word to the nth column in every line ---> awk '$1=$1"-word"'  ## NOTE do NOT
 replace lowercase with uppercase ---> sed 's/[a-z]/\U&/g'
 replace uppercase with lowercase ---> sed 's/[A-Z]/\L&/g'
 print number of lines ---> sed -n '$='
-set delimiter X and print column 2 [i]  ---> awk -F 'DELIMITER' '{print $2}'  ## DELIMITER can be more than one character
-set delimiter X and print column 2 [ii] ---> cut -d 'DELIMITER' -f 2
+set delimiter X and print column 2 [i]  ---> cut -d 'DELIMITER' -f 2          ## (recommended) DELIMITER must be a single character
+set delimiter X and print column 2 [ii] ---> awk -F 'DELIMITER' '{print $2}'  ##               DELIMITER can be more than one character
 make first letter capital ---> sed 's/.*/\u&/'
 sort alphabetically ---> sort
 replace the first occurrence ---> sed -e '0,/STRING/ s/STRING/SUBSTITUTE/'
@@ -109,11 +109,11 @@ calculate using awk ---> function awk_calc { awk -SP "BEGIN {print($@)}" 2>/dev/
 clears the line ---> printf '\33[A'
 print function name ---> function myfunction { printf 'This function is %s\n' "$FUNCNAME" ;} ; myfunction
 print lines with whose length are between 10 to 20 ---> grep -x '.\{10,20\}'
-generate random number ---> let var="$RANDOM % 1000"
+generate random number ---> (( var="RANDOM % 1000" ))
 sequence [i]   ---> for i in `seq 1 10`; { MYCOMMAND ;}
 sequence [ii]  ---> for i in {1..10}   ; { MYCOMMAND ;}
 sequence [iii] ---> for i in $(seq 10) ; { MYCOMMAND ;}
-mutt pattern ---> printf '%s\n' 'MESSAGEBODY' | mutt -s 'SUBJECT' RECEPIENTEMAIL -a FILE
+mutt pattern ---> printf 'MESSAGEBODY\n' | mutt -s 'SUBJECT' RECEPIENTEMAIL -a FILE
 type unicode characters ---> crl + shift + u + HEXADECIMALDIGITS
 close terminal without terminating tasks ---> disown -a && exit
 system clock ---> timedatectl status
@@ -123,25 +123,30 @@ print variable length [iii] ---> echo -n "$VAR" | wc -c
 arrays ---> ARRAY=()             create an empty array
             declare -a ARRAY=()  create an empty array (local)
             ARRAY=(1 2 3)        initialize array
+
+            readarray -t content < /proc/version  ## turn all output into an array (-t removes trailing \n)  ## returns Line1 Line2 Line3
+            readarray -t result < <(ls -1)        ## turn all output into an array (-t removes trailing \n)  ## returns File1 File2 File3
+
+            read -a content < /proc/version       ## turn first line of output into an array  ## returns Line1 [being an array itself]
+            read -a result < <(ls -1)             ## turn first line of output into an array  ## returns File1 [being an array itself]
+
             "${ARRAY[2]}"        retrieve third element
             "${ARRAY[@]}"        retrieve all elements
+            "${ARRAY[@]:x:n}"    retrieve n elements starting at index x
             "${!ARRAY[@]}"       retrieve array indices
-            "${#ARRAY[@]}"       calculate array size
+            "${#ARRAY[@]}"       array length
             ARRAY[0]=3           overwrite 1st element
             ARRAY+=(4)           append value(s)
-            STRING="$(ls)"       save ls output as a string
-            ARRAY=( $(ls) )      save ls output as an array of files
-            "${ARRAY[@]:x:n}"    retrieve n elements starting at index x
+            ARRAY=( $(ls) )      save ls output as an array of files (NOTE =( "$(ls)" ) or ="$(ls)" saves output as a string)
             unset 'ARRAY[@]'     empty an array
+            unset 'ARRAY[0]'     remove first element of array
+            unset 'ARRAY[-1]'    remove last element of array
 associative array ---> declare -A vids=(['key one']='value one' ['key two']='value two')
                        printf '%s\n' "${!vids[@]}"         ## keys
                        printf '%s\n' "${vids[@]}"          ## values
                        printf '%s\n' "${vids['key one']}"  ## specific
 create readonly variable         [i]  ---> readonly var=67
 create readonly variable (local) [ii] ---> declare -r var=67
-remove first element of array ($ and {} NOT needed) ---> unset 'ARRAY[0]'
-remove last element of array ($ and {} NOT needed) ---> unset 'ARRAY[-1]'
-assign a member of array to a variable ($ and {} needed) ---> VAR="${ARRAY[-2]}"
 diff the output of two commands ---> diff <(MYCOMMAND1) <(MYCOMMAND2)
 print sth on the right in bash (align right) ---> printf '%*s\n' "$COLUMNS" 'STRING'
 make read input invisible when entering ---> -s
@@ -174,9 +179,9 @@ turn off screensaver ---> xset s 0 0 && xset -dpms
 expand alias in script: ---> shopt -s expand_aliases (put it at the top of script)
 stop pop sound ---> add 'options snd-hda-intel power_save=0 power_save_controller=N' to the end of /etc/modprobe.d/alsa-base.conf
 repeated character (https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html) ---> dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"  ## NOTE do NOT replace double quote with single quote
-chack if variable is a number [i]  ---> re='^[0-9]+$'; if [[ "$VAR" =~ $re ]]; then printf '%s\n' 'number'; else printf '%s\n' 'not number'; fi  ## NOTE do not replace [[ with [, and do NOT quote $re
-chack if variable is a number [ii] ---> if [ "$VAR" -eq "$VAR" ] 2>/dev/null; then printf '%s\n' 'number';  else printf '%s\n' 'not number'; fi
-chack if variable matches pattern ---> re='*abc*'; [[ "$VAR" == $re ]] && printf '%s\n' 'match'  ## NOTE do not replace [[ with [, and do NOT quote $re
+chack if variable is a number [i]  ---> re='^[0-9]+$'; if [[ "$VAR" =~ $re ]]; then printf 'number\n'; else printf 'not number\n'; fi  ## NOTE do not replace [[ with [, and do NOT quote $re
+chack if variable is a number [ii] ---> if [ "$VAR" -eq "$VAR" ] 2>/dev/null; then printf 'number\n';  else printf 'not number\n'; fi
+chack if variable matches pattern ---> re='*abc*'; [[ "$VAR" == $re ]] && printf 'match\n'  ## NOTE do not replace [[ with [, and do NOT quote $re
 newest item in clipboard ---> xclip -o
 join many mp3 files (NOT tested) ---> ffmpeg -f concat -safe 0 -i <(for f in ./*.mp3; { printf '%s\n' "file '$PWD/$f'" ;} ) -c copy ./output.mp3
 to debug bash script ---> set -x; trap read debug
@@ -221,7 +226,7 @@ turn seconds (obtained with $(date +%s) or printf '%(%s)T\n') into a date format
 uniq lines [i]  ---> | sort --unique
 uniq lines [ii] ---> | sort | uniq
 list fonts ---> fc-list -f '%{file}\n'
-check if .git exists in pwd ---> [ ! "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ] && printf '%s\n' 'no git'
+check if .git exists in pwd ---> [ ! "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ] && printf 'no git\n'
 
 baskreference ---> [[ 'this is a random string' =~ ^this\ is\ (.*)\ st(ri)ng$ ]]
                    printf '%s\n' "${BASH_REMATCH[0]}"  ## returns this is a random string
@@ -231,7 +236,7 @@ baskreference ---> [[ 'this is a random string' =~ ^this\ is\ (.*)\ st(ri)ng$ ]]
 ignore leading whitespaces/tabs when using EOF:
 cat <<-'EOF' > FILE
     #!/usr/bin/env bash
-    printf '%s\n' 'STRING'
+    printf 'STRING\n'
 EOF
 
 join multiple videos ---> ## https://askubuntu.com/questions/637074/how-to-merge-multiple-more-than-two-videos-on-ubuntu
@@ -240,4 +245,18 @@ join multiple videos ---> ## https://askubuntu.com/questions/637074/how-to-merge
                           VID_3="PATH_3"; VID_3_TS="${VID_3}.ts"; ffmpeg -i "$VID_3" -c copy -f mpegts "$VID_3_TS" 2>/dev/null
                           output="PATH_4"; ffmpeg -i "concat:${VID_1_TS}|${VID_2_TS}|${VID_3_TS}" "$output" 2>/dev/null
 
+the way arithmetic operations are used ---> (( VAR="VAR1 - VAR2" ))
+                                            (( VAR="array[3] - VAR1" ))
+                                            (( VAR="$(COMMAND) / NUMBER" ))
+                                            (( VAR="${VAR1// /+}" ))  ## e.g. VAR1='32 1 761', VAR will be 794
+                                            (( VAR++ ))
+                                            (( VAR+=NUMBER ))
 
+birth                  ---> stat --format=%w FILE/DIR
+last access            ---> stat --format=%x FILE/DIR
+last status change     ---> stat --format=%z FILE/DIR
+last data modification ---> stat --format=%y FILE/DIR
+
+get dir size ---> du -bs DIR
+get file size [i]  ---> du -bs FILE
+get file size [ii] ---> stat --format=%s FILE

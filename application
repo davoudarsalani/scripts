@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 13:00:25 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -108,7 +108,7 @@ case "$main_item" in
                                           * ) yellow '  removing orphans skipped'
                                       esac
                                   else
-                                      printf '%s\n' '  no orphans'
+                                      printf '  no orphans\n'
                                   fi
                                   action_now "removing \$HOME/.cache (size: "$(du -sh "$HOME"/.cache/ | awk '{print $1}')"):"
                                   rm -rf "$HOME"/.cache
@@ -142,7 +142,7 @@ case "$main_item" in
 
                                        sleep 0.1
 
-                                       if [ "$ups_count" -eq 0 ] && [ "$aur_ups_count" -eq 0 ]; then
+                                       if (( ups_count == 0 && aur_ups_count == 0 )); then
                                            msgn "no available updates"
                                        else
                                            msgn "available updates: <span color=\"${orange}\">${ups_count}</span> / <span color=\"${orange}\">${aur_ups_count}</span>"

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 13:29:38 +0330 Saturday
 
-printf '%s\n\n' 'Normal:'
+printf 'Normal:\n\n'
 curl ipinfo.io
 ## OR:
   # curl -s http://myip.enix.org/REMOTE_ADDR
   # wget -qO - https://api.ipify.org  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
-printf '%s\n' '----------------------'
-printf '%s\n\n' 'Tor:'
+printf '\n'
+printf 'Tor\n\n'
 torsocks curl ipinfo.io
 printf '\n'

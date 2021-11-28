@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-03 21:53:59 +0330 Wednesday
+## last modified: 1400-09-06 13:41:09 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -40,12 +40,12 @@ function get_opt {
 }
 
 function separator {
-    printf '%s\n\n' "<!-- wp:separator --><hr class=\"wp-block-separator\"/><!-- /wp:separator -->" >> "$dest_file"
+    printf '<!-- wp:separator --><hr class=\"wp-block-separator\"/><!-- /wp:separator -->\n\n' >> "$dest_file"
 }
 
 function nextpage {
     [ "$n" == "$length" ] && return  ## to prevent inserting next page at the end
-    printf '%s\n\n' "<!-- wp:nextpage --><!--nextpage--><!-- /wp:nextpage -->" >> "$dest_file"
+    printf '<!-- wp:nextpage --><!--nextpage--><!-- /wp:nextpage -->\n\n' >> "$dest_file"
 }
 
 get_opt "$@"
@@ -58,13 +58,13 @@ for ((n=1; n<="$length"; n++)); do
     printf '%s\n' "$n3"
 
     ## audio player
-    printf '%s\n\n' "<!-- wp:audio --><figure class=\"wp-block-audio\"><audio controls=\"\" src=\"https://www.dl.davoudarsalani.ir/DL/Audio/${directory}/${n3}.mp3\"></audio></figure><!-- /wp:audio -->" >> "$dest_file"
+    printf '<!-- wp:audio --><figure class=\"wp-block-audio\"><audio controls=\"\" src=\"https://www.dl.davoudarsalani.ir/DL/Audio/%s/%s.mp3\"></audio></figure><!-- /wp:audio -->' "$directory" "$n3" >> "$dest_file"
 
     ## title
-    printf '%s\n\n' "<!-- wp:pullquote --><figure class=\"wp-block-pullquote\"><blockquote><p></p></blockquote></figure><!-- /wp:pullquote -->" >> "$dest_file"
+    printf '<!-- wp:pullquote --><figure class=\"wp-block-pullquote\"><blockquote><p></p></blockquote></figure><!-- /wp:pullquote -->\n\n' >> "$dest_file"
 
     ## body
-    printf '%s\n\n' "<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->" >> "$dest_file"
+    printf '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->\n\n' >> "$dest_file"
 
     ## separator or nextpage
     [ "$(( "$n" % "$per_page" ))" == 0 ] && nextpage || separator

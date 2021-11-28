@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 15:58:35 +0330 Thursday
+## last modified: 1400-09-06 15:38:32 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -60,7 +60,7 @@ case "$main_item" in
                                                  new_name="$(printf '%s\n' "$file" | \
                                                              sed -e 's/ /-/g' -e 's/\(---\|-_-\|-–-\|\%\|\!\)//g' -e 's/\&/and/g' -e 's/,/TMPCOMMA/g')"
                                                  mv -nv "$file" "$new_name" && accomplished
-                                                 let replaced_count++
+                                                 (( replaced_count++ ))
                                                  line
                                              }
                                              printf '\n'
@@ -73,7 +73,7 @@ case "$main_item" in
                            for vtt in "${vtts[@]}"; {
                                brown "→ $vtt"
                                ffmpeg -i "$vtt" "${vtt%.vtt}".srt 2>/dev/null && accomplished
-                               let vtt_count++
+                               (( vtt_count++ ))
                                line
                            }
                            printf '\n'
@@ -86,7 +86,7 @@ case "$main_item" in
                                     for srt in "${srts[@]}"; {
                                         brown "→ $srt"
                                         sed -Ei '/(-->|^$|^[0-9][0-9]*$)/!s/^/<font color="#f3f300">/g' "$srt" && accomplished
-                                        let srt_count++
+                                        (( srt_count++ ))
                                         line
                                     }
                                     printf '\n'
@@ -108,7 +108,7 @@ case "$main_item" in
                } || {
                    red 'burn failed'
                }
-               let vid_count++
+               (( vid_count++ ))
                dur="$(day_hour_min_sec "$SECONDS")"
                blue "Video burn duration: $dur"
                line
@@ -124,7 +124,7 @@ case "$main_item" in
                                          brown "→ $rename_vid"
                                          new_name="$(printf '%s\n' "$rename_vid" | sed -e 's/TMPCOMMA/,/g;s/----BURN//g')"
                                          purple "$(mv -nv "$rename_vid" "$new_name")" && accomplished
-                                         let vids_count++
+                                         (( vids_count++ ))
                                          line
                                      }
                                      printf '\n'
@@ -138,7 +138,7 @@ case "$main_item" in
                               brown "→ $burned_vid"
                               new_name="$(printf '%s\n' "$burned_vid" | sed -e 's/.\{13\}mp4$/.mp4/')"
                               purple "$(mv -nv "$burned_vid" "$new_name")" && accomplished
-                              let burned_vid_count++
+                              (( burned_vid_count++ ))
                               line
                           }
                           printf '\n'
@@ -155,8 +155,8 @@ case "$main_item" in
                                list_length="${#list[@]}"
                                declare -a rand_list=()
 
-                               while [ "$list" ]; do  ## NOTE no need to [@]
-                                   let rand_index="$RANDOM % $list_length"
+                               while [ "$list" ]; do  ## while array is full. no need to [@]
+                                   (( rand_index="RANDOM % list_length" ))
                                    rand_member="${list[$rand_index]}"
                                    rand_list+=( "$rand_member" )
                                    unset "list[$rand_index]"

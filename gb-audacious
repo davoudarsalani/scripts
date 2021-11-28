@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 15:50:39 +0330 Thursday
+## last modified: 1400-09-06 13:20:01 +0330 Saturday
 
 length_in_seconds="$(audtool --current-song-length-seconds)"  ## 3304
 length="$(audtool --current-song-length)"  ## 55:04
@@ -30,5 +30,5 @@ shuffle_status="$(audtool --playlist-shuffle-status)"  ## on/off
 play_status="$(audtool --playback-status)"  ## playing/paused
 
 bar_position="$(printf '%02d\n' "$(( "$current_position_in_seconds" * 100 / "$length_in_seconds" ))")"  ## <--,-- 19
-                                                                                                        ##    |-- NOTE do NOT remove printf '%02d\n'
+                                                                                                        ##    |-- NOTE do NOT replace printf '%02d\n' with echo
                                                                                                         ##    '-- otherwise bar will not display amounts properly

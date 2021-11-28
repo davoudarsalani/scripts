@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-07 10:30:38 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -11,11 +11,11 @@ title="${0##*/}"
 
 [ "$1" ] && {
     if [ "$1" == 's' ]; then
-        cd "$HOME"/scripts
+        dest="$HOME"/scripts
     elif [ "$1" == 'l' ]; then
-        cd "$HOME"/linux
-    # else
-    #     red 'Wrong arg' && exit
+        dest="$HOME"/linux
+    else
+        red 'only l/s for arg' && exit
     fi
 }
 

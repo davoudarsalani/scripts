@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 13:24:40 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -11,18 +11,21 @@ case "$1" in
                 printf '%s  %s  %s\n' "$vol_level" "$states_initials" "$indeces" ;;
     vol_30 ) source "$HOME"/scripts/gb-audio
              pactl set-sink-volume "$def_sink_index" 30% ;;
-    cpu_temp ) read -a temps < <(sensors | \grep '^Core' | awk '{print $3}' | sed 's/+\([0-9]\+\).*/\1/g')  ## exceptionally calculated in this way (only for sony)
-               let total_temp="${temps// /+}"  ## no need to [@]
-               length="${#temps[@]}"
-               let average="$total_temp / $length"
-               printf '%s\n' "${average}°" ;;
+    cpu_temp ) read -a temps_arr < <(sensors | \grep '^Core' | awk '{print $3}' | sed 's/+\([0-9]\+\).*/\1/g')  ## exceptionally used sensors (only for sony)
+               arr_length="${#temps_arr[@]}"
+               (( arr_length < 2 )) && if_one_cpu=" [${arr_length} CPU ONLY]"
+               ## turn array into str for it to be able to be used in JUMP_1 calculation:
+               temps_str="${temps_arr[@]:0}"
+               (( total_temp="${temps_str// /+}" ))  ## JUMP_1
+               (( average="total_temp / arr_length" ))
+               printf '%s°%s\n' "$average" "$if_one_cpu" ;;
     idle ) source "$HOME"/scripts/gb-calculation
            weekday="$(get_datetime 'jweekday')"
            current_date="$(get_datetime 'jymd')"
            current_datetime="$(get_datetime 'jymdhms')"
 
            idle_file=/tmp/idle-"$current_date"
-           let idle_secs="$(xprintidle) / 1000"
+           (( idle_secs="$(xprintidle) / 1000" ))
            perc="$(float_pad "${idle_secs}*100/3600" 1 2)"
 
            ## it's better to display perc as 0 if it is 0.00
@@ -45,10 +48,10 @@ case "$1" in
     firefox_whatsapp ) firefox --new-tab 'https://web.whatsapp.com' ;;
     if_uget ) while true; do
                   if [ ! "$(pgrep 'uget-gtk')" ]; then
-                      printf '%s\n' '>> started <<'
+                      printf '>> started <<\n'
                       uget-gtk 2>/dev/null &
                   else
-                      printf '%s\n' 'running'
+                      printf 'running\n'
                   fi
                   sleep 60
               done ;;

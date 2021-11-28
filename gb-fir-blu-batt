@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 09:25:37 +0330 Saturday
 
 ## firewall
 firewall_status="$(sudo ufw status | \grep -i status | awk '{print $NF}')"
@@ -17,4 +17,4 @@ read -a batt_info < <(acpi)  ## Battery 0: Charging, 1%, charging at zero rate -
     battery_level="${batt_info[3]//%,/}"  ## 28        ## OR cat /sys/class/power_supply/BAT1/capacity
     battery_rem="${batt_info[4]%:*}"      ## 12:47 OR charging
 }
-battery_temp="$(acpi -t | awk '{print $4}' | awk -F '.' '{print $1}')"
+battery_temp="$(acpi -t | awk '{print $4}' | cut -d '.' -f 1)"

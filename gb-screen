@@ -1,32 +1,30 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 11:45:17 +0330 Thursday
+## last modified: 1400-09-06 09:36:46 +0330 Saturday
 
 screens_count="$(wc -l < <(xrandr | \grep -iw connected | \grep '[0-9]\{3,4\}x[0-9]\{3,4\}'))"
 ## OR <--,-- xrandr --listmonitors | sed '1q;d' | awk '{print $NF}'
 ##       '-- awesome-client 'return screen.count()' | awk '{print $NF}'
 
-# awk -F '.' '{print $1}'
-
 scr_1_name="$(xrandr | \grep -iw 'connected'| \grep -i 'primary' | awk '{print $1}')"
-scr_1_res="$(xrandr  | \grep "^$scr_1_name" | awk '{print $4}' | awk -F '+' '{print $1}')"
-scr_1_x="$(xrandr    | \grep "^$scr_1_name" | awk '{print $4}' | awk -F '+' '{print $1}' | awk -F 'x' '{print $1}')"
-scr_1_y="$(xrandr    | \grep "^$scr_1_name" | awk '{print $4}' | awk -F '+' '{print $1}' | awk -F 'x' '{print $2}')"
+scr_1_res="$(xrandr  | \grep "^$scr_1_name" | awk '{print $4}' | cut -d '+' -f 1)"
+scr_1_x="$(xrandr    | \grep "^$scr_1_name" | awk '{print $4}' | cut -d '+' -f 1 | cut -d 'x' -f 1)"
+scr_1_y="$(xrandr    | \grep "^$scr_1_name" | awk '{print $4}' | cut -d '+' -f 1 | cut -d 'x' -f 2)"
 
 # scr_1_brightness="$(printf '%02d\n' "$(( "$(< /sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-"$scr_1_name"/intel_backlight/brightness)" * 200 / 187 / 2 ))")"
 ## OR:
-# "$(xbacklight | awk -F '.' '{print $1}')"
+# "$(xbacklight | cut -d '.' -f 1)"
 
 scr_2_name="$(xrandr | \grep -iw 'connected'  | \grep -iv 'primary' | sed '1q;d' | awk '{print $1}')"
-scr_2_res="$(xrandr  | \grep "^$scr_2_name" | awk '{print $3}'  | awk -F '+' '{print $1}')"
-scr_2_x="$(xrandr    | \grep "^$scr_2_name" | awk '{print $3}'  | awk -F '+' '{print $1}' | awk -F 'x' '{print $1}')"
-scr_2_y="$(xrandr    | \grep "^$scr_2_name" | awk '{print $3}'  | awk -F '+' '{print $1}' | awk -F 'x' '{print $2}')"
+scr_2_res="$(xrandr  | \grep "^$scr_2_name" | awk '{print $3}'  | cut -d '+' -f 1)"
+scr_2_x="$(xrandr    | \grep "^$scr_2_name" | awk '{print $3}'  | cut -d '+' -f 1 | cut -d -f 1)"
+scr_2_y="$(xrandr    | \grep "^$scr_2_name" | awk '{print $3}'  | cut -d '+' -f 1 | cut -d -f 2)"
 
 scr_3_name="$(xrandr | \grep -iw 'connected'  | \grep -iv 'primary' | sed '2q;d' | awk '{print $1}')"
-scr_3_res="$(xrandr  | \grep "^$scr_3_name" | awk '{print $3}'  | awk -F '+' '{print $1}')"
-scr_3_x="$(xrandr    | \grep "^$scr_3_name" | awk '{print $3}'  | awk -F '+' '{print $1}' | awk -F 'x' '{print $1}')"
-scr_3_y="$(xrandr    | \grep "^$scr_3_name" | awk '{print $3}'  | awk -F '+' '{print $1}' | awk -F 'x' '{print $2}')"
+scr_3_res="$(xrandr  | \grep "^$scr_3_name" | awk '{print $3}'  | cut -d '+' -f 1)"
+scr_3_x="$(xrandr    | \grep "^$scr_3_name" | awk '{print $3}'  | cut -d '+' -f 1 | cut -d -f 1)"
+scr_3_y="$(xrandr    | \grep "^$scr_3_name" | awk '{print $3}'  | cut -d '+' -f 1 | cut -d -f 2)"
 
 scr_all_res="$(xrandr | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',')"                            ## <--,
-scr_all_x="$(xrandr   | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',' | awk -F 'x' '{print $1}')"  ## <--|-- NOTE do NOT replace " with ' in awk
-scr_all_y="$(xrandr   | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',' | awk -F 'x' '{print $2}')"  ## <--'
+scr_all_x="$(xrandr   | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',' | cut -d -f 1)"  ## <--|-- NOTE do NOT replace " with ' in awk
+scr_all_y="$(xrandr   | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',' | cut -d -f 2)"  ## <--'

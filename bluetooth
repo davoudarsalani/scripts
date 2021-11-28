@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 13:11:00 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-fir-blu-batt
@@ -18,9 +18,9 @@ main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" ||
 
 case "$main_item" in
     status ) if [ "$bluetooth_status" == 'yes' ]; then
-                 printf '%s\n' 'Bluetooth is off' && update_bluetooth && accomplished
+                 printf 'Bluetooth is off\n' && update_bluetooth && accomplished
              else
-                 printf '%s\n' 'Bluetooth is on'  && update_bluetooth && accomplished
+                 printf 'Bluetooth is on\n'  && update_bluetooth && accomplished
              fi ;;
     blueman-manager ) blueman-manager 1>/dev/null &
                       sleep 2
@@ -83,7 +83,7 @@ case "$main_item" in
                                         disconnect ) get_input 'Device mac address' && mac="$input"
                                                      bluetoothctl connect "$mac" && accomplished ;;
                                     esac ;;
-    'configuration path' ) printf '%s\n' '/etc/bluetooth/main.conf' && accomplished ;;
+    'configuration path' ) printf '/etc/bluetooth/main.conf\n' && accomplished ;;
     'quit program' ) bluetoothctl quit && accomplished ;;
     'disable auto turning on' ) gsettings set org.blueman.plugins.powermanager auto-power-on false && accomplished ;;
     enable ) sudo systemctl enable bluetooth && accomplished ;;

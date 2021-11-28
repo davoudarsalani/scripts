@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 09:59:27 +0330 Saturday
 
-x="$(xdotool getmouselocation --shell | \grep -i x | awk -F '=' '{print $2}')"  ## OR x="$(xdotool getmouselocation | \grep -ioP '(?<=x:).*?(?= y:)')"
-y="$(xdotool getmouselocation --shell | \grep -i y | awk -F '=' '{print $2}')"  ## OR y="$(xdotool getmouselocation | \grep -ioP '(?<=y:).*?(?= screen:)')"
+x="$(xdotool getmouselocation --shell | \grep -i x | cut -d '=' -f 2)"  ## OR x="$(xdotool getmouselocation | \grep -ioP '(?<=x:).*?(?= y:)')"
+y="$(xdotool getmouselocation --shell | \grep -i y | cut -d '=' -f 2)"  ## OR y="$(xdotool getmouselocation | \grep -ioP '(?<=y:).*?(?= screen:)')"
 
-let xr="$x + 15"
-let xl="$x - 15"
-let yd="$y + 15"
-let yu="$y - 15"
+(( xr="x + 15" ))
+(( xl="x - 15" ))
+(( yd="y + 15" ))
+(( yu="y - 15" ))
 
 case "$1" in
     l   ) xdotool mousemove "$xl" "$y" ;;

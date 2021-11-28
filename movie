@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-06 11:43:58 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -46,9 +46,9 @@ for tmp_directory in "${directories[@]}"; {
     movies_count="$(wc -l < <(find "$tmp_directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
 
     ## decide how many spaces to add
-    if [ "$movies_count" -lt 10 ]; then
+    if (( movies_count < 10 )); then
         spaces="       "
-    elif [ "$movies_count" -lt 100 ]; then
+    elif (( movies_count < 100 )); then
         spaces="     "
     else
         spaces="   "
