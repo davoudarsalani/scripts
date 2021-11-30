@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-05 22:40:47 +0330 Friday
+## last modified: 1400-09-08 21:16:05 +0330 Monday
 
 source "$HOME"/scripts/gb-color
 
@@ -42,6 +42,20 @@ clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 allow app    $(flag '-a --application=') application to allow"
+exit
+}
+## }}}
+function g_help {  ## {{{
+clear
+printf '%s\n' "\
+$(heading "$title") $(yellow "help")
+$(flag '-d --directory=') [.]/~/scripts/etc.
+$(flag '-p --pattern=')
+$(flag '-m --message=')
+$(flag '-b --branch=')
+$(flag '-t --tag=')
+$(flag '-c --commit-hash=')
+$(flag '-n --noproxy')"
 exit
 }
 ## }}}
@@ -114,7 +128,7 @@ function update_fdpo_help {  ## {{{
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-r --repository=') linux/scripts"
+$(flag '-n --noconfirm')"
 exit
 }
 ## }}}

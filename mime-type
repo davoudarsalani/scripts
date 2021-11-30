@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-08 20:33:34 +0330 Monday
 
 source "$HOME"/scripts/gb
 
@@ -21,7 +21,7 @@ function prompt {
 }
 
 function get_opt {
-    local options="$(getopt -l 'help,name:' -o 'hn:' -a -- "$@")"
+    local options="$(getopt --longoptions 'help,name:' --options 'hn:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -36,8 +36,7 @@ function get_opt {
 get_opt "$@"
 heading "$title"
 
-main_items=( 'mime-type' 'help' )
-main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+main_item="$(pipe_to_fzf 'mime-type' 'help')" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     mime-type ) prompt -n

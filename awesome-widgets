@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 21:29:53 +0330 Saturday
+## last modified: 1400-09-09 12:17:54 +0330 Tuesday
 
 threshhold=70
 
@@ -516,7 +516,7 @@ msgn "$text" ;;
 
           readarray -t repos < <(find "$HOME" -type d ! -path '*.cache*' ! -path '*.venv*' ! -path '*.config*' ! -path '*.vim*' ! -path '*git-fdpo*' ! -path '*go*' ! -path '*trash*' -iname '*.git')
           for repo in "${repos[@]%/.git}"; {
-              status_count="$(wc -l < <(get_status "$repo"))"
+              status_count="$(wc -l < <(git_status "$repo"))"
 
               (( status_count > 0 )) && {
                   base="${repo##*/}"
@@ -528,7 +528,8 @@ msgn "$text" ;;
           re='FDPO_CA:'
           readarray -t fdpo_repos < <(find "$HOME"/git-fdpo -type d -iname '*.git')
           for fdpo_repo in "${fdpo_repos[@]%/.git}"; {
-              commits_ahead="$(get_commits_ahead "$fdpo_repo")"
+              commits_ahead="$(git_commits_ahead "$fdpo_repo")"
+
               (( commits_ahead > 0 )) && {
                   base="${fdpo_repo##*/}"
                   [[ ! "$modified_repos" =~ $re ]] && pref="$re"  ## NOTE do not replace [[ with [, and do NOT quote $re

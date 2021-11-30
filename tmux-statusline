@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-07 10:37:10 +0330 Sunday
+## last modified: 1400-09-09 12:23:04 +0330 Tuesday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
@@ -21,9 +21,9 @@ case "$1" in
 
           [ "$(if_git)" == 'false' ] && printf '..\n' && exit
 
-          commits_count="$(get_commits_count)"
+          commits_count="Ⓒ $(git_commits_count)"
 
-          stts="$(get_status)"
+          stts="$(git_status)"
           mod_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ M'))"
           del_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ D'))"
           ren_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ R'))"
@@ -40,18 +40,18 @@ case "$1" in
           (( sta_count   == 0 )) || sta="  $sta_count"
           (( sta_m_count == 0 )) || sta_m="  $sta_m_count"
 
-          commits_ahead="$(get_commits_ahead)"
+          commits_ahead="$(git_commits_ahead)"
           (( commits_ahead > 0 )) && commits_ahead=" Ⓐ $commits_ahead" || commits_ahead=''  ## 
 
-          if_rmt="$(if_remote)"
+          if_rmt="$(git_if_remote)"
           [ "$(printf '%s\n' "$if_rmt" | \grep -i 'github')" ] && logo='  '
           [ "$if_rmt" ] || is_local=' LOCAL'
 
-          branches_count="$(wc -l < <(get_branches_exclude_remote))"
-          (( branches_count > 1 )) && branches_count=" #BR:${branches_count}" || branches_count=''
+          branches_count="$(wc -l < <(git_branches_exclude_remote))"
+          (( branches_count > 1 )) && branches_count=" #Ⓑ ${branches_count}" || branches_count=''
 
-          current_branch="$(get_current_branch)"
-          [ "$current_branch" == 'master' ] && current_branch='' || current_branch=" BR:${current_branch}"
+          current_branch="$(git_current_branch)"
+          [ "$current_branch" == 'master' ] && current_branch='' || current_branch=" Ⓑ ${current_branch}"
 
           printf '%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "\
 ${commits_count}\

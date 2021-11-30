@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 13:11:00 +0330 Saturday
+## last modified: 1400-09-08 13:02:07 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-fir-blu-batt
@@ -38,15 +38,13 @@ case "$main_item" in
                                  printf 'paired:\t\t%s\n' "$(bluetoothctl paired-devices)" && accomplished ;;
     'device information' ) get_input 'Device mac address' && mac="$input"
                            bluetoothctl info "$mac" && accomplished ;;
-    'set pairable on/off' ) set_pairable_items=( 'on' 'off' )
-                            set_pairable_item="$(pipe_to_fzf "${set_pairable_items[@]}")" && wrap_fzf_choice "$set_pairable_item" || exit 37
+    'set pairable on/off' ) set_pairable_item="$(pipe_to_fzf 'on' 'off')" && wrap_fzf_choice "$set_pairable_item" || exit 37
 
                             case "$set_pairable_item" in
                                 on )  bluetoothctl pairable on  && accomplished ;;
                                 off ) bluetoothctl pairable off && accomplished ;;
                             esac ;;
-    'set discoverable on/off' ) set_discoverable_items=( 'on' 'off' )
-                                set_discoverable_item="$(pipe_to_fzf "${set_discoverable_items[@]}")" && wrap_fzf_choice "$set_discoverable_item" || exit 37
+    'set discoverable on/off' ) set_discoverable_item="$(pipe_to_fzf 'on' 'off')" && wrap_fzf_choice "$set_discoverable_item" || exit 37
 
                                 case "$set_discoverable_item" in
                                     on )  bluetoothctl discoverable on  && accomplished ;;
@@ -54,8 +52,7 @@ case "$main_item" in
                                 esac ;;
     'pair with a device' ) get_input 'Device mac address' && mac="$input"
                            bluetoothctl pair "$mac" && accomplished ;;
-    'trust/untrust a device' ) trust_items=( 'trust' 'nuntrust' )
-                               trust_item="$(pipe_to_fzf "${trust_items[@]}")" && wrap_fzf_choice "$trust_item" || exit 37
+    'trust/untrust a device' ) trust_item="$(pipe_to_fzf 'trust' 'nuntrust')" && wrap_fzf_choice "$trust_item" || exit 37
 
                                case "$trust_item" in
                                    trust )   get_input 'Device mac address' && mac="$input"
@@ -63,8 +60,7 @@ case "$main_item" in
                                    untrust ) get_input 'Device mac address' && mac="$input"
                                              bluetoothctl untrust "$mac" && accomplished ;;
                                esac ;;
-    'block/unblock a device' ) block_items=( 'block' 'unblock' )
-                               block_item="$(pipe_to_fzf "${block_items[@]}")" && wrap_fzf_choice "$block_item" || exit 37
+    'block/unblock a device' ) block_item="$(pipe_to_fzf 'block' 'unblock')" && wrap_fzf_choice "$block_item" || exit 37
 
                                case "$block_item" in
                                    block )   get_input 'Device mac address' && mac="$input"
@@ -74,8 +70,7 @@ case "$main_item" in
                                esac ;;
     'remove a device' ) get_input 'Device mac address' && mac="$input"
                         bluetoothctl remove "$mac" && accomplished ;;
-    'connect/disconnect a device' ) connect_items=( 'connect' 'disconnect' )
-                                    connect_item="$(pipe_to_fzf "${connect_items[@]}")" && wrap_fzf_choice "$connect_item" || exit 37
+    'connect/disconnect a device' ) connect_item="$(pipe_to_fzf 'connect' 'disconnect')" && wrap_fzf_choice "$connect_item" || exit 37
 
                                     case "$connect_item" in
                                         connect )    get_input 'Device mac address' && mac="$input"

@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 19:15:06 +0330 Thursday
-
-source "$HOME"/scripts/gb
+## last modified: 1400-09-08 13:04:10 +0330 Monday
 
 ## https://misc.flogisoft.com/bash/tip_colors_and_formatting
+
+source "$HOME"/scripts/gb
 
 title="${0##*/}"
 heading "$title"
 
-main_items=( 'all' '38;5;{0-255} (foreground)' '48;5;{0-255} (background)' 'tput setaf' )
-main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+main_item="$(pipe_to_fzf 'all' '38;5;{0-255} (foreground)' '48;5;{0-255} (background)' 'tput setaf')" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     all ) for clbg in 49 {40..47}; {  ## {40..47} {100..107} 49

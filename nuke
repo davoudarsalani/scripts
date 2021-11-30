@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 12:19:17 +0330 Saturday
-
-source "$HOME"/scripts/gb
+## last modified: 1400-09-08 10:53:14 +0330 Monday
 
 ## https://revelry.co/terminal-workflow-fzf/
 ## https://github.com/junegunn/fzf/wiki/examples
+
+source "$HOME"/scripts/gb
 
 IFS=$'\n'
 if (( UID == 0 )); then

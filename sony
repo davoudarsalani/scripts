@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 15:51:13 +0330 Thursday
+## last modified: 1400-09-08 20:34:13 +0330 Monday
 
 source "$HOME"/scripts/gb
 
@@ -37,7 +37,7 @@ function connect_plus_x2x {
 }
 
 function get_opt {
-    local options="$(getopt -l 'help,name:' -o 'hn:' -a -- "$@")"
+    local options="$(getopt --longoptions 'help,name:' --options 'hn:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in

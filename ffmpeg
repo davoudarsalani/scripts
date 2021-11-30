@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-08 20:32:16 +0330 Monday
 
 source "$HOME"/scripts/gb
 
@@ -32,7 +32,9 @@ function prompt {
 }
 
 function get_opt {
-    local options="$(getopt -l 'help,input-file:,offset:,output:,start:,end:,audio-input:,video-input:,time:,audio-stream:,camera:,subtitle-file:,subtitle-index:' -o 'hi:x:o:s:e:a:v:t:u:c:f:d:' -a -- "$@")"
+    local options="$(getopt --longoptions 'help,input-file:,offset:,output:,start:,end:,audio-input:,video-input:,time:,audio-stream:,camera:,subtitle-file:,subtitle-index:' \
+                            --options 'hi:x:o:s:e:a:v:t:u:c:f:d:' \
+                            --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in

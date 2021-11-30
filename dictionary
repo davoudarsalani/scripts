@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-08 13:08:08 +0330 Monday
 
 source "$HOME"/scripts/gb
 
+declare -a gold_items=( 'open' )
+
 case "$1" in
-     goldendict ) if [ ! "$2" ]; then
-                      gold_items=( 'open' )
-                  elif [ "$2" == 'words' ]; then
+     goldendict ) [ "$2" == 'words' ] && {
                       readarray -t words < "$HOME"/bgls/words
-                      gold_items=( 'open' '' "${words[@]}" )
-                  fi
+                      gold_items+=( '' "${words[@]}" )
+                  }
 
                   gold_item="$(pipe_to_rofi "${gold_items[@]}" 'goldendict' '')" || exit 37
+
                   case "$gold_item" in
                       open ) goldendict              &>/dev/null & ;;
                       * )    goldendict "$gold_item" &>/dev/null & ;;

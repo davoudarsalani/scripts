@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 13:41:09 +0330 Saturday
+## last modified: 1400-09-08 20:35:07 +0330 Monday
 
 source "$HOME"/scripts/gb
 
@@ -24,7 +24,7 @@ function prompt {
 }
 
 function get_opt {
-    local options="$(getopt -l 'help,length:,directory:,per-page:,destination-file:' -o 'hl:d:p:f:' -a -- "$@")"
+    local options="$(getopt --longoptions 'help,length:,directory:,per-page:,destination-file:' --options 'hl:d:p:f:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in

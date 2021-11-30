@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-03 23:25:08 +0330 Wednesday
+## last modified: 1400-09-08 16:38:01 +0330 Monday
 
 ## imports {{{
 from __future__ import unicode_literals
@@ -27,6 +27,26 @@ from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
 from gp import Color, duration, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
+## }}}
+def display_help() -> None:  ## {{{
+    run('clear', shell=True)
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
+{Col.flag('-s --source=')}a text file e.g. $HOME/downloads/lucy,
+            a url e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg,
+            a youtube playlist id e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu
+            or free
+{Col.flag('-f --file-type=')}{Col.default('[o]')}/v/s/vs/a/t
+{Col.flag('-d --downloader=')}{Col.default('[urlopen]')}/requests/wget/curl for o,
+                or {Col.default('[youtube_dl]')}/curl for v/s/vs/a/t
+{Col.flag('-q --quality=')}{Col.default('[22]')}/243/best/etc
+{Col.flag('-i --increment=')}{Col.default('[None]')}/1/24/etc
+{Col.flag('-r --retries=')}{Col.default('[5]')}/3/10/etc
+{Col.flag('-w --when=')}{Col.default('[n]')}/h
+{Col.flag('-t --tor')}
+{Col.flag('-n --no-information')}
+{Col.flag('-v --verbose')}
+{Col.flag('-p --purge')}''')  ## JUMP_1 whatever downloader you add/remove, update the allowed list of downloaders in Ini.verify_args()
+    exit()
 ## }}}
 def separator() -> str:  ## {{{
     width = int(get_width())
@@ -352,26 +372,6 @@ def main() -> None:  ## {{{
         ## END urls
     elif item == 'help':
         display_help()
-## }}}
-def display_help() -> None:  ## {{{
-    run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-s --source=')}a text file e.g. $HOME/downloads/lucy,
-            a url e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg,
-            a youtube playlist id e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu
-            or free
-{Col.flag('-f --file-type=')}{Col.default('[o]')}/v/s/vs/a/t
-{Col.flag('-d --downloader=')}{Col.default('[urlopen]')}/requests/wget/curl for o,
-                or {Col.default('[youtube_dl]')}/curl for v/s/vs/a/t
-{Col.flag('-q --quality=')}{Col.default('[22]')}/243/best/etc
-{Col.flag('-i --increment=')}{Col.default('[None]')}/1/24/etc
-{Col.flag('-r --retries=')}{Col.default('[5]')}/3/10/etc
-{Col.flag('-w --when=')}{Col.default('[n]')}/h
-{Col.flag('-t --tor')}
-{Col.flag('-n --no-information')}
-{Col.flag('-v --verbose')}
-{Col.flag('-p --purge')}''')  ## JUMP_1 whatever downloader you add/remove, update the allowed list of downloaders in Ini.verify_args()
-    exit()
 ## }}}
 
 @dataclass

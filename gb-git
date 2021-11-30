@@ -1,48 +1,84 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-07 10:41:34 +0330 Sunday
+## last modified: 1400-09-09 13:15:51 +0330 Tuesday
 
 # dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work, not here nor in "$HOME"/scripts/g
 
-function if_git {
+function if_git {  ## {{{
     git -C "${1:-.}" rev-parse --is-inside-work-tree 2>/dev/null && printf 'true\n' || printf 'false\n'
 }
-
-
-function if_remote {
+## }}}
+function git_if_remote {  ## {{{
     local rmt="$(git -C "${1:-.}" remote -v)"
     [ "$rmt" ] && printf '%s\n' "$rmt"
 }
-
-function get_commits_count {
+## }}}
+function git_commits_count {  ## {{{
     printf '%s\n' "$(git -C "${1:-.}" rev-list HEAD --count)"
 }
-
-
-function get_commits_ahead {
+## }}}
+function git_commits_ahead {  ## {{{
     local commits_ahead="$(git -C "${1:-.}" branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
     ## ^^ previously: git -C "${1:-.}" status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g'
     [ "$commits_ahead" ] && printf '%s\n' "$commits_ahead" || printf '0\n'
 }
-
-
-function get_status {
+## }}}
+function git_status {  ## {{{
     local stts="$(git -C "${1:-.}" status -s)"
     [ "$stts" ] && printf '%s\n' "$stts"
 }
-
-
-function get_branches_exclude_remote {
-    printf '%s\n' "$(git -C "${1:-.}" branch --list)"
-}
-
-
-function get_branches {
+## }}}
+function git_branches {  ## {{{
     printf '%s\n' "$(git -C "${1:-.}" branch -a --color=always | \grep -v '/HEAD\s' | sort)"
 }
-
-
-function get_current_branch {
-    printf '%s\n' "$(git -C "${1:-.}" rev-parse --abbrev-ref HEAD)"  ## FIXME if reverted (=checked out) to a commit, it only returns HEAD instead of (HEAD detached at 56bb92a)
-    ## ^^ previously: git -C "${1:-.}" branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/'
+## }}}
+function git_branches_exclude_remote {  ## {{{
+    printf '%s\n' "$(git -C "${1:-.}" branch --list)"
 }
+## }}}
+function git_current_branch {  ## {{{
+    printf '%s\n' "$(git -C "${1:-.}" branch | sed -n '/\* /s///p')"
+    ## OR 1: git -C "${1:-.}" branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/')"
+    ##    2: git -C "${1:-.}" rev-parse --abbrev-ref HEAD  ## FIXME only returns HEAD instead of (HEAD detached at 56bb92a) when reverted to a commit
+}
+## }}}
+
+function git_diff_specific { printf '%s\n' "$(git -C "${1:-.}" diff --unified=0 --color=always -- "$2" | sed 1,4d)" ;} ## --unified=0 makes git show only the modified lines           ## $2 is dir/file name
+function git_add_pattern { git -C "${1:-.}" add "$2" ;}    ## $2 is pattern
+function git_add_all { git -C "${1:-.}" add -A ;}
+function git_add_specific { git -C "${1:-.}" add "$2" ;}   ## $2 is df
+function git_commit_in_editor { git -C "${1:-.}" commit ;}
+function git_commit_with_message { git -C "${1:-.}" commit -m "$2" ;}  ## $2 is message
+function git_commit_amend { git -C "${1:-.}" commit --amend ;}  ## opens editor
+function git_commit_amend_with_message { git -C "${1:-.}" commit --amend -m "$2" ;}  ## $2 is message
+function git_undo_pattern { git -C "${1:-.}" checkout -- "$2" ;}  ## $2 is pattern
+function git_undo_all { git -C "${1:-.}" checkout -- '*' ;}  ## NOTE do NOT remove ''
+function git_undo_specific { git -C "${1:-.}" checkout -- "$2" ;}  ## $2 is df
+function git_unstage_pattern { git -C "${1:-.}" reset HEAD -- "$2" ;}  ## $2 is pattern
+function git_unstage_all { git -C "${1:-.}" reset HEAD -- ;}
+function git_unstage_specific { git -C "${1:-.}" reset HEAD -- "$2" ;}  ## $2 is df
+function git_push_proxy { torsocks git -C "${1:-.}" push -u origin master ;}
+function git_push_noproxy { git -C "${1:-.}" push -u origin master ;}
+function git_edit { git -C "${1:-.}" config -e ;}
+function git_empty_commit { git -C "${1:-.}" commit --allow-empty -n ;}  ## opens editor
+function git_empty_commit_with_message { git -C "${1:-.}" commit --allow-empty -n -m "$2" ;}  ## $2 is message
+function git_remove { git -C "${1:-.}" rm -r --cached "$2" ;}  ## $2 is pattern
+function git_branch_create { git -C "${1:-.}" branch "$2" ;}  ## $2 is branch
+function git_branch_checkout { git -C "${1:-.}" checkout "$2" ;} ## $2 is branch
+function git_branch_delete_all { git -C "${1:-.}" branch -d ;}
+function git_branch_force_delete_all { git -C "${1:-.}" branch -D ;}
+function git_branch_delete_specific { git -C "${1:-.}" branch -d "$2" ;}  ## $2 is branch
+function git_branch_force_delete_specific { git -C "${1:-.}" branch -D "$2" ;}  ## $2 is branch
+function git_tag_show_all { git -C "${1:-.}" tag ;}
+function git_tag_show_specific { git -C "${1:-.}" show "$2" ;}  ## $2 is tag
+function git_tag_create { git -C "${1:-.}" tag "$2" ;}  ## $2 is tag
+function git_tag_create_with_message { git -C "${1:-.}" tag -a "$2" -m "$3" ;}  ## $2 is tag, "$3 is message"
+function git_tag_create_with_message_for_specific_commit { git -C "${1:-.}" tag -a "$2" -m "$3" "$4" ;}  ## $2 is tag, "$3 is message", "$4" is commit hash
+function git_tag_delete_all { git -C "${1:-.}" tag -d ;}
+function git_tag_delete_specific { git -C "${1:-.}" tag -d "$2" ;}  ## $2 is tag
+function git_revert { git -C "${1:-.}" checkout "$2" ;}  ## $2 is commit hash
+function git_touched_count { printf '%s\n' "$(wc -l < <(git -C "${1:-.}" rev-list HEAD "$2"))" ;} ## $2 is dir/file name
+
+function git_last_commit { printf '%s\n' "$(git -C "${1:-.}" log -2 --format=%ci)" ;}  ## returns last commit in repo
+function git_last_committed { printf '%s\n' "$(git -C "${1:-.}" log -1 --pretty='format:%ci' "$2")" ;} ## $2 is df  ## returns last time df was committed
+function git_log { printf '%s\n' "$(git -C "${1:-.}" log --color --abbrev-commit --date=relative --graph --full-history --all --pretty=oneline --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')" ;}

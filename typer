@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 11:07:38 +0330 Saturday
+## last modified: 1400-09-08 20:34:24 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -78,7 +78,7 @@ function prompt {
 }
 
 function get_opt {
-    local options="$(getopt -l 'help,file:,sleep:' -o 'hf:s:' -a -- "$@")"
+    local options="$(getopt --longoptions 'help,file:,sleep:' --options 'hf:s:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -117,8 +117,7 @@ key_sounds_length="${#key_sounds[@]}"
 
 heading "$title"
 
-main_items=( 'in vim' 'in terminal' 'help' )
-main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+main_item="$(pipe_to_fzf 'in vim' 'in terminal' 'help')" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     'in vim' ) prompt -f -s
