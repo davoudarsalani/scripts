@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 16:03:27 +0330 Saturday
+## last modified: 1400-09-10 21:39:04 +0330 Wednesday
 
 function get_datetime {  ## {{{
     case "$1" in
@@ -47,59 +47,82 @@ function wrap_fzf_choice {  ## {{{
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
 ## }}}
-function pipe_to_fzf {  ## {{{
-    ## usage: this function expects 1 arg, for example:
-    ##     item="$(pipe_to_fzf "${items[@]}")"
 
-    declare -a received
-    readarray -t received < <(printf '%s\n' "$@")
-
-    local fzf_choice="$(printf '%s\n' "${received[@]}" | fzf)"
-    [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
+choose_directory() {  ## stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
+    dir=$(eval "$FZF_ALT_C_COMMAND" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)
+    [ "$dir" ] && printf '%q' "${dir/\~/$HOME}" || return 37  ## keep \~ escaped
 }
-## }}}
-function pipe_to_dmenu {  ## {{{
-    ## usage: this function expects 3 args, for example:
-    ##     item="$(pipe_to_dmenu "${items[@]}")" 'TITLE' ''
-    ##     item="$(pipe_to_dmenu "${items[@]}")" ''      ''     ## <--,-- last arg can only be either 'red' or ''
-    ##     item="$(pipe_to_dmenu "${items[@]}")" 'TITLE' 'red'  ## <--'
-    ##     item="$(pipe_to_dmenu "${items[@]}")" ''      'red'
 
-    declare -a received
-    readarray -t received < <(printf '%s\n' "$@")
+function pipe_to_fzf {  ## {{{
+    ## usages:
+    ##   item="$(pipe_to_fzf "${items[@]}")"
+    ##   item="$(pipe_to_fzf "${items[@]}" 'header=my header')"
 
-    local fg="${received[-1]}"
-    local title="${received[-2]}"
+    local header last regex='^header='
+    declare -a received=( "$@" )
+    last="${received[-1]}"
 
-    unset 'received[-2]'
-    unset 'received[-1]'
+    ## remove last member if it is a header
+    [[ "$last" =~ $regex ]] && {
+        header="${last#*=}"  ## JUMP_3 "${last/$regex}" works too but the latter one does not work for pipe_to_rofi and pipe_to_dmenu so we picked this way
+        unset 'received[-1]'
+    }
 
-    [ "$fg" == 'red' ] && local dmenusb="$red_dark"
-
-    local dmenu_choice="$(printf '%s\n' "${received[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$title")"
-    [ "$dmenu_choice" ] && printf '%s\n' "$dmenu_choice" || return 37
+    printf '%s\n' "${received[@]}" | fzf --header "$header"
 }
 ## }}}
 function pipe_to_rofi {  ## {{{
-    ## usage: this function expects 3 args, for example:
-    ##     item="$(pipe_to_rofi "${items[@]}")" 'TITLE' ''
-    ##     item="$(pipe_to_rofi "${items[@]}")" ''      ''     ## <--,-- last arg can only be either 'red' or ''
-    ##     item="$(pipe_to_rofi "${items[@]}")" 'TITLE' 'red'  ## <--'
-    ##     item="$(pipe_to_rofi "${items[@]}")" ''      'red'
+    ## usages:
+    ##   item="$(pipe_to_rofi "${items[@]}")"
+    ##   item="$(pipe_to_rofi "${items[@]}" 'header=my header' 'bg=red')"  ## NOTE header comes first
+    ##   item="$(pipe_to_rofi "${items[@]}" 'header=my header')"
+    ##   item="$(pipe_to_rofi "${items[@]}" 'bg=red')"
 
-    declare -a received
-    readarray -t received < <(printf '%s\n' "$@")
+    local last theme header bg bg_regex='^bg=' header_regex='^header=' theme='onedark.rasi'
+    declare -a received=( "$@" )
+    last="${received[-1]}"
 
-    local fg="${received[-1]}"
-    local title="${received[-2]}"
+    ## NOTE as bg is passed as last arg, bg_regex should be checked first (e.i. before header_regex)
+    [[ "$last" =~ $bg_regex ]] && {
+        bg="${last#*=}"  ## JUMP_3 "${last/$bg_regex}" didn't work
+        unset 'received[-1]'
+        theme='onedark-red.rasi'
+    }
 
-    unset 'received[-2]'
-    unset 'received[-1]'
+    last="${received[-1]}"
+    [[ "$last" =~ $header_regex ]] && {
+        header="${last#*=}"  ## JUMP_3 "${last/$header_regex}" didn't work
+        unset 'received[-1]'
+    }
 
-    [ ! "$fg" == 'red' ] && local theme="$HOME"/.config/rofi/onedark.rasi || local theme="$HOME"/.config/rofi/onedark-red.rasi
+    printf '%s\n' "${received[@]}" | rofi -theme "$HOME"/.config/rofi/"$theme" -dmenu -i -p "$header"
+}
+## }}}
+function pipe_to_dmenu {  ## {{{
+    ## usages:
+    ##   item="$(pipe_to_dmenu "${items[@]}")"
+    ##   item="$(pipe_to_dmenu "${items[@]}" 'header=my header' 'bg=red')"  ## NOTE header comes first
+    ##   item="$(pipe_to_dmenu "${items[@]}" 'header=my header')"
+    ##   item="$(pipe_to_dmenu "${items[@]}" 'bg=red')"
 
-    local rofi_choice="$(printf '%s\n' "${received[@]}" | rofi -theme "$theme" -dmenu -i -p "$title")"
-    [ "$rofi_choice" ] && printf '%s\n' "$rofi_choice" || return 37
+    local last header bg bg_regex='^bg=' header_regex='^header=' theme='onedark.rasi'
+    declare -a received=( "$@" )
+    last="${received[-1]}"
+
+    ## NOTE as bg is passed as last arg, bg_regex should be checked first (e.i. before header_regex)
+    [[ "$last" =~ $bg_regex ]] && {
+        bg="${last#*=}"  ## JUMP_3 "${last/$bg_regex}" didn't work
+        unset 'received[-1]'
+        local dmenusb="$bg"
+    }
+
+    last="${received[-1]}"
+    [[ "$last" =~ $header_regex ]] && {
+        header="${last#*=}"  ## JUMP_3 "${last/$header_regex}" didn't work
+        unset 'received[-1]'
+    }
+
+    printf '%s\n' "${received[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$header"
 }
 ## }}}
 function lsblk_full {  ## {{{
@@ -226,6 +249,8 @@ function rand_str {  ## {{{
  # function find_duplicate_images {  ## {{{
  #     source "$HOME"/scripts/gb-color
 
+ #     declare -a pics
+
  #     [ ! "$1" ] && red 'arg needed' && exit
  #     dest_dir="$1"
  #     [ ! -d "$dest_dir" ] && {
@@ -272,6 +297,8 @@ function rand_str {  ## {{{
 
  #    source "$HOME"/scripts/gb-calculation
  #    source "$HOME"/scripts/gb-color
+
+ #    declare -a loop_durs loops_durs
 
  #    durs_file=/tmp/0-durs
  #    totals_file=/tmp/0-totals
@@ -332,6 +359,8 @@ function rand_str {  ## {{{
 # }
 ## }}}
 # function convert_Fun_to_lower_size {  ## {{{
+#     declare -a pics
+#
 #     old_fun="$HOME"/website/Files/Fun
 #     new_fun="$HOME"/downloads/New_Fun
 #     if [ -d "$new_fun" ]; then

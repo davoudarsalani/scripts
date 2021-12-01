@@ -1,4 +1,4 @@
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-10 14:02:13 +0330 Wednesday
 
 # {{{ requirements
 ## for .venv_keylogger: keylogger
@@ -852,6 +852,7 @@ def xtract_tar(inpt: str) -> None:  ## {{{
 ## }}}
 def compress_zip(inpt: str, password: str='') -> None:  ## {{{
     from os import chdir, path, listdir
+    import shutil
     from zipfile import ZipFile, ZIP_DEFLATED
     from pyminizip import compress
     inpt = remove_trailing_slash(inpt)
@@ -860,12 +861,16 @@ def compress_zip(inpt: str, password: str='') -> None:  ## {{{
     chdir(dest_dir)
     if password == '':
         dest_zip = f'{base}.zip'
-        if path.isdir(inpt):  ## FIXME creats empty zip when inpt is a dir containing dirs
-            with ZipFile(dest_zip, 'w', compression=ZIP_DEFLATED) as opened_new_zipfile:
-                chdir(inpt)
-                for i in listdir():
-                    opened_new_zipfile.write(i)
-        ## or just: shutil.make_archive(inpt, 'zip', inpt)  ## the problem is it creates a dir inside zip
+        if path.isdir(inpt):
+            shutil.make_archive(inpt, 'zip', inpt)
+
+            ## OR: FIXME the problem is it creats empty zip when inpt is a dir containing dir(s)
+            # with ZipFile(dest_zip, 'w', compression=ZIP_DEFLATED) as opened_new_zipfile:
+            #     chdir(inpt)
+            #     for i in listdir():
+            #         print(i)
+            #         msgn(i)
+            #         opened_new_zipfile.write(i)
         else:
             with ZipFile(dest_zip, 'w', compression=ZIP_DEFLATED) as opened_new_zipfile:
                 opened_new_zipfile.write(base)

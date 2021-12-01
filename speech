@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 12:20:01 +0330 Saturday
+## last modified: 1400-09-10 21:50:45 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -24,10 +24,11 @@ function error_moving {
     exit
 }
 
+declare -a directories_plus_count
+
 readarray -t directories < <(find "$HOME"/speech -mindepth 1 -maxdepth 1 -type d | sort)
 
 ## get audio count in each directory and prepend it to the directory name
-declare -a directories_plus_count=()
 for tmp_directory in "${directories[@]}"; {
     audios_count="$(wc -l < <(find "$tmp_directory" -mindepth 1 -maxdepth 1 -type f -iname '*.mp3'))"
 
@@ -45,7 +46,7 @@ for tmp_directory in "${directories[@]}"; {
 }
 
 case "$1" in
-    play ) directory="$(pipe_to_rofi "${directories_plus_count[@]}" 'speech' '')" || exit 37
+    play ) directory="$(pipe_to_rofi "${directories_plus_count[@]}" 'header=speech')" || exit 37
 
            directory="${directory##*' '}"  ## remove count
 
@@ -71,7 +72,7 @@ case "$1" in
               directory="${current_song_dir}"  ## /home/${USER}/speech/pargar
               directory="${directory##*/}"  ## pargar
            else
-               directory="$(pipe_to_rofi "${directories_plus_count[@]}" 'speech' 'red')" || exit 37
+               directory="$(pipe_to_rofi "${directories_plus_count[@]}" 'header=speech' 'bg=red')" || exit 37
                ## remove count:
                directory="${directory##*' '}"  ## pargar
            fi

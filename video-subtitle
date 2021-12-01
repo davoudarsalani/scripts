@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:35:00 +0330 Monday
+## last modified: 1400-09-10 21:51:49 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -53,7 +53,7 @@ case "$main_item" in
 
                                              printf '\n'
 
-                                             replaced_count=0
+                                             declare -i replaced_count=0
                                              readarray -t files < <(find "$dir" -mindepth 1 -maxdepth 1 | sort)
                                              for file in "${files[@]}"; {
                                                  brown "→ $file"
@@ -68,7 +68,7 @@ case "$main_item" in
     'convert vtt to srt' ) prompt -d
 
                            printf '\n'
-                           vtt_count=0
+                           declare -i vtt_count=0
                            readarray -t vtts < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.vtt' | sort)
                            for vtt in "${vtts[@]}"; {
                                brown "→ $vtt"
@@ -81,7 +81,7 @@ case "$main_item" in
     'change srt color to #f3f300' ) prompt -d
 
                                     printf '\n'
-                                    srt_count=0
+                                    declare -i srt_count=0
                                     readarray -t srts < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.srt' | sort)
                                     for srt in "${srts[@]}"; {
                                         brown "→ $srt"
@@ -95,7 +95,7 @@ case "$main_item" in
            prompt -d
 
            printf '\n'
-           vid_count=0
+           declare -i vid_count=0
            readarray -t vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
            for vid in "${vids[@]}"; {
                SECONDS=0
@@ -118,7 +118,7 @@ case "$main_item" in
     'remove TMPCOMMA and ----BURN' ) prompt -d
 
                                      printf '\n'
-                                     vids_count=0
+                                     declare -i vids_count=0
                                      readarray -t rename_vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
                                      for rename_vid in "${rename_vids[@]}"; {
                                          brown "→ $rename_vid"
@@ -132,7 +132,7 @@ case "$main_item" in
     'remove youtube ID' ) prompt -d
 
                           printf '\n'
-                          burned_vid_count=0
+                          declare -i burned_vid_count=0
                           readarray -t burned_vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
                           for burned_vid in "${burned_vids[@]}"; {
                               brown "→ $burned_vid"
@@ -143,7 +143,8 @@ case "$main_item" in
                           }
                           printf '\n'
                           blue "$burned_vid_count youtube IDs removed" ;;
-    'prepend random numbers' ) prompt -d
+    'prepend random numbers' ) declare -a rand_list
+                               prompt -d
 
                                printf '\n'
                                readarray -t rename_vids < <(find "$dir" -mindepth 1 -maxdepth 1 -iname '*.mp4' | sort)
@@ -153,7 +154,6 @@ case "$main_item" in
                                readarray -t list < <(seq "$number_of_vids")
 
                                list_length="${#list[@]}"
-                               declare -a rand_list=()
 
                                while [ "$list" ]; do  ## while array is full. no need to [@]
                                    (( rand_index="RANDOM % list_length" ))

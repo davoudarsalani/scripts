@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 09:57:51 +0330 Wednesday
+## last modified: 1400-09-10 20:07:05 +0330 Wednesday
 
 threshhold=70
 
@@ -537,7 +537,7 @@ msgn "$text" ;;
               ## check if repo is ahead of origin
               commits_ahead="$(git_commits_ahead "$fdpo_repo")"
               (( commits_ahead > 0 )) && {
-                  [[ ! "$modified_repos" =~ $regex_commits_ahead ]] && pref="$regex_commits_ahead"  ## NOTE do not replace [[ with [, and do NOT quote $regex_commits_ahead
+                  [[ ! "$modified_repos" =~ $regex_commits_ahead ]] && pref="$regex_commits_ahead"
                   modified_repos+=" ${pref}${base::1}${commits_ahead},"
                   unset pref
               }
@@ -545,7 +545,7 @@ msgn "$text" ;;
               ## check if there are changes
               status_count="$(wc -l < <(git_status "$fdpo_repo"))"
               (( status_count > 0 )) && {
-                  [[ ! "$modified_repos" =~ $regex_status ]] && pref="$regex_status"  ## NOTE do not replace [[ with [, and do NOT quote $regex_status
+                  [[ ! "$modified_repos" =~ $regex_status ]] && pref="$regex_status"
                   modified_repos+=" ${pref}${base::1}${status_count},"
                   unset pref
               }
@@ -767,7 +767,7 @@ msgn "$text" ;;
                     -60 )         audtool --playback-seek-relative -60 ;;
                     songs )       IFS=$'\n'
                                   readarray -t current_songs < <(audtool --playlist-display)
-                                  selected_song="$(pipe_to_rofi "${current_songs[@]}" 'songs' '')" || exit 37
+                                  selected_song="$(pipe_to_rofi "${current_songs[@]}" 'header=songs')" || exit 37
 
                                   selected_song_index="$(printf '%s\n' "$selected_song" | awk '{print $1}')"
                                   audtool --playlist-jump "$selected_song_index" ;;
@@ -776,8 +776,8 @@ msgn "$text" ;;
                 update_variables
 
                 ## save currnt song output length seconds (csols) if speech
-                re='^(playing|paused)$'
-                [[ "$play_status" =~ $re ]] && [ "$album" == 'speech' ] && {  ## NOTE do not replace [[ with [, and do NOT quote $re
+                regex='^(playing|paused)$'
+                [[ "$play_status" =~ $regex ]] && [ "$album" == 'speech' ] && {
                     printf '%s\n' "$current_position_in_seconds" > "$HOME"/scripts/.last/csols
                     # msgn 'saved csol' "<span color=\"${orange}\">${current_position}</span>"
                 }

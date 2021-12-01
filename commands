@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-07 12:46:10 +0330 Sunday
+## last modified: 1400-09-10 21:48:06 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -121,7 +121,7 @@ print variable length [i]   ---> printf '%s\n' "${#VAR}"
 print variable length [ii]  ---> printf '%s' "$VAR" | wc -c  ## NOTE no \n
 print variable length [iii] ---> echo -n "$VAR" | wc -c
 arrays ---> ARRAY=()             create an empty array
-            declare -a ARRAY=()  create an empty array (local)
+            declare -a ARRAY     create an empty array (local)
             ARRAY=(1 2 3)        initialize array
 
             readarray -t content < /proc/version  ## turn all output into an array (-t removes trailing \n)  ## returns Line1 Line2 Line3
@@ -179,9 +179,9 @@ turn off screensaver ---> xset s 0 0 && xset -dpms
 expand alias in script: ---> shopt -s expand_aliases (put it at the top of script)
 stop pop sound ---> add 'options snd-hda-intel power_save=0 power_save_controller=N' to the end of /etc/modprobe.d/alsa-base.conf
 repeated character (https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html) ---> dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"  ## NOTE do NOT replace double quote with single quote
-chack if variable is a number [i]  ---> re='^[0-9]+$'; if [[ "$VAR" =~ $re ]]; then printf 'number\n'; else printf 'not number\n'; fi  ## NOTE do not replace [[ with [, and do NOT quote $re
+chack if variable is a number [i]  ---> regex='^[0-9]+$'; if [[ "$VAR" =~ $regex ]]; then printf 'number\n'; else printf 'not number\n'; fi
 chack if variable is a number [ii] ---> if [ "$VAR" -eq "$VAR" ] 2>/dev/null; then printf 'number\n';  else printf 'not number\n'; fi
-chack if variable matches pattern ---> re='*abc*'; [[ "$VAR" == $re ]] && printf 'match\n'  ## NOTE do not replace [[ with [, and do NOT quote $re
+chack if variable matches pattern ---> regex='*abc*'; [[ "$VAR" == $regex ]] && printf 'match\n'  ## NOTE do not replace [[ with [, and do NOT quote $regex
 newest item in clipboard ---> xclip -o
 join many mp3 files (NOT tested) ---> ffmpeg -f concat -safe 0 -i <(for f in ./*.mp3; { printf '%s\n' "file '$PWD/$f'" ;} ) -c copy ./output.mp3
 to debug bash script ---> set -x; trap read debug

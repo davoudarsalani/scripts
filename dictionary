@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 13:08:08 +0330 Monday
+## last modified: 1400-09-10 21:48:16 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
-declare -a gold_items=( 'open' )
+gold_items=( 'open' )
 
 case "$1" in
      goldendict ) [ "$2" == 'words' ] && {
@@ -12,7 +12,7 @@ case "$1" in
                       gold_items+=( '' "${words[@]}" )
                   }
 
-                  gold_item="$(pipe_to_rofi "${gold_items[@]}" 'goldendict' '')" || exit 37
+                  gold_item="$(pipe_to_rofi "${gold_items[@]}" 'header=goldendict')" || exit 37
 
                   case "$gold_item" in
                       open ) goldendict              &>/dev/null & ;;

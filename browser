@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-04 11:44:22 +0330 Thursday
+## last modified: 1400-09-10 20:08:11 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -8,7 +8,7 @@ readarray -t bookmarks < <(\grep 'HREF=' "$HOME"/linux/cfg-firefox/bookmarks.htm
 
 case "$1" in
     firefox ) ff_items=( 'new page' 'new tab' 'private' 'safe mode' 'preferences' 'tor' "${bookmarks[@]}" )
-              ff_item="$(pipe_to_rofi "${ff_items[@]}" 'firefox' '')" || exit 37
+              ff_item="$(pipe_to_rofi "${ff_items[@]}" 'header=firefox')" || exit 37
 
               case "$ff_item" in
                   'new page' ) firefox &>/dev/null & ;;
@@ -20,7 +20,7 @@ case "$1" in
                   * ) firefox "$ff_item" &>/dev/null & ;;
               esac ;;
     chromium ) chr_items=( 'new page' 'new tab' 'private' "${bookmarks[@]}" )
-               chr_item="$(pipe_to_rofi "${chr_items[@]}" 'chromium' '')" || exit 37
+               chr_item="$(pipe_to_rofi "${chr_items[@]}" 'header=chromium')" || exit 37
 
                case "$chr_item" in
                    'new page' ) chromium &>/dev/null & ;;
@@ -29,7 +29,7 @@ case "$1" in
                    * ) chromium "$chr_item" &>/dev/null & ;;
                esac ;;
     qb ) qb_items=( 'new page' "${bookmarks[@]}" )
-         qb_item="$(pipe_to_rofi "${qb_items[@]}" 'qutebrowser' '')" || exit 37
+         qb_item="$(pipe_to_rofi "${qb_items[@]}" 'header=qutebrowser')" || exit 37
 
          case "$qb_item" in
              'new page' ) qutebrowser --target tab &>/dev/null & ;;

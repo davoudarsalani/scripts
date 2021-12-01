@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 11:43:58 +0330 Saturday
+## last modified: 1400-09-10 21:50:22 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -33,6 +33,8 @@ function error_removing {
     msgc 'ERROR' "removing <span color=\"${orange}\">${base}</span>$1" "$HOME"/linux/themes/alert-w.png
 }
 
+declare -a directories_plus_count
+
 [ "$play_status" == 'playing' ] && continue_playing='true' || continue_playing='false'
 
 [ ! "$1" ] && exit
@@ -41,7 +43,6 @@ function error_removing {
 readarray -t directories < <(find "$HOME"/movie -mindepth 1 -maxdepth 1 -type d | sort)
 
 ## get movie count in each directory and prepend it to the directory name
-declare -a directories_plus_count=()
 for tmp_directory in "${directories[@]}"; {
     movies_count="$(wc -l < <(find "$tmp_directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
 
@@ -56,7 +57,7 @@ for tmp_directory in "${directories[@]}"; {
     directories_plus_count+=( "${movies_count}${spaces}${tmp_directory##*/}" )
 }
 
-directory="$(pipe_to_rofi "${directories_plus_count[@]}" "$title" '')" || exit 37
+directory="$(pipe_to_rofi "${directories_plus_count[@]}" "header=${title}")" || exit 37
 
 directory="${directory##*' '}"  ## remove count
 
@@ -67,7 +68,7 @@ case "$1" in
     random ) movie="$(shuf -n 1 < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
              movie="${movie##*/}" ;;
     select ) readarray -t movies < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt' | sort)
-             movie="$(pipe_to_rofi "${movies[@]##*/}" "$directory" '')" || exit 37 ;;
+             movie="$(pipe_to_rofi "${movies[@]##*/}" "header=${directory}")" || exit 37 ;;
     * ) exit ;;  ## NOTE do NOT remove
 esac
 
@@ -79,7 +80,7 @@ vlc -f --play-and-exit -- "$HOME"/movie/"$directory"/"$movie" 2>/dev/null
 
 ## move to WATCHED or remove
 what_to_dos=( '' 'mv to WATCHED' 'remove' )
-what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "$movie" 'red')" # || exit 37  ## the exit is exceptionally commented
+what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "header=${movie}" 'bg=red')" # || exit 37  ## the exit is exceptionally commented
 
 case "$what_to_do" in
     'mv to WATCHED' ) [ -d "$HOME"/movie/"$directory"/WATCHED ] || mkdir "$HOME"/movie/"$directory"/WATCHED

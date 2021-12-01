@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-09 23:26:05 +0330 Tuesday
+## last modified: 1400-09-10 21:53:49 +0330 Wednesday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
@@ -8,37 +8,18 @@ source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 
 title="${0##*/}"
-
-function display_help {
-    source "$HOME"/scripts/.help
-    r_help
-}
-
-function get_opts {
-    local options="$(getopt --longoptions 'help,directory:' --options 'hd:' --alternative -- "$@")"
-    eval set -- "$options"
-    while true; do
-        case "$1" in
-            -h|--help )      display_help ;;
-            -d|--directory ) shift; directory="$1" ;;
-            -- )             break ;;
-        esac
-        shift
-    done
-}
-
-get_opts "$@"
 heading "$title"
 
-cd "${directory:-.}"  ## TODO find how to pass $dest to rg down below before fzf instead of cding
+directory="$(choose_directory)" || exit 37
 
-main_item="$(pipe_to_fzf 'all' 'bash' 'python' 'help')" && wrap_fzf_choice "$main_item" || exit 37
+cd "$directory"  ## TODO find how to pass $directory to rg down below before fzf instead of cding
+
+main_item="$(pipe_to_fzf 'all' 'bash' 'python')" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     all )    : ;;
     bash )   RG="$RG --type-not py" ;;
     python ) RG="$RG --type py" ;;
-    * ) display_help ;;
 esac
 
 INITIAL_QUERY=''

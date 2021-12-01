@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 11:41:17 +0330 Saturday
+## last modified: 1400-09-10 19:14:22 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -55,8 +55,8 @@ case "$main_item" in
                             }
 
                             ## now check if python version has changed from 3.9.*
-                            re='3.9.*'
-                            [[ ! "$os_python" == $re ]] && {  ## NOTE do NOT replace [[ with [, and do NOT quote $re
+                            regex='3.9.*'
+                            [[ ! "$os_python" == $regex ]] && {
                                 red "python version changed ($os_python)" && exit
                             }
 

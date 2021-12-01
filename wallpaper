@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-10 20:56:56 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -8,7 +8,7 @@ current_wallpaper_file=/tmp/current_wallpaper
 
 case "$1" in
     select ) readarray -t wallpapers < <(find "$HOME"/wallpapers/ -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
-             wallpaper="$(pipe_to_rofi "${wallpapers[@]##*/}" 'wallpaper' '')" || exit 37
+             wallpaper="$(pipe_to_rofi "${wallpapers[@]##*/}" 'header=wallpaper')" || exit 37
 
              printf '%s\n' "$wallpaper" > "$current_wallpaper_file"
              feh --bg-fill "$HOME"/wallpapers/"$wallpaper" ;;

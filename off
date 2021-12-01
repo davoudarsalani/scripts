@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-10 20:54:01 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -13,7 +13,7 @@ function shutdown_now {
 
 function shutdown_later {
     shutdown_later_items=( 'Usage: e.g. +10 [for 10 minutes] OR 14:31' )
-    shutdown_later_item="$(pipe_to_rofi "${shutdown_later_items[@]}" 'shutdown at:' '')" || exit 37
+    shutdown_later_item="$(pipe_to_rofi "${shutdown_later_items[@]}" 'header=shutdown at:')" || exit 37
 
     sleep 0.1
     copy_pacman_log
@@ -22,7 +22,7 @@ function shutdown_later {
     shutdown -h "$shutdown_later_item"
 
     shutdown_later_confirm_items=( 'ok' 'cancel it' )
-    shutdown_later_confirm_item="$(pipe_to_rofi "${shutdown_later_confirm_items[@]}" "will shutdown at $shutdown_later_confirm_item" '')" || exit 37
+    shutdown_later_confirm_item="$(pipe_to_rofi "${shutdown_later_confirm_items[@]}" "header=will shutdown at $shutdown_later_confirm_item")" || exit 37
 
     sleep 0.1
     [ "$shutdown_later_confirm_item" == 'cancel it' ] && shutdown -c && msgn 'shutdown canceled' && exit
@@ -50,11 +50,11 @@ function restart_awesome_now {
 }
 
 main_items=( 'shutdown' 'reboot' 'lock' 'screen off' 'quit awesome' 'restart awesome' )
-main_item="$(pipe_to_rofi "${main_items[@]}" 'off' '')" || exit 37
+main_item="$(pipe_to_rofi "${main_items[@]}" 'header=off')" || exit 37
 
 case "$main_item" in
     shutdown ) shutdown_items=( 'now' 'now + clear clipboard' 'later' 'later + clear clipboard' 'cancel shutdown' )
-               shutdown_item="$(pipe_to_rofi "${shutdown_items[@]}" 'shutdown' '')" || exit 37
+               shutdown_item="$(pipe_to_rofi "${shutdown_items[@]}" 'header=shutdown')" || exit 37
 
                sleep 0.1
                case "$shutdown_item" in
@@ -67,7 +67,7 @@ case "$main_item" in
                    'cancel shutdown' )         shutdown -c && msgn 'shutdown canceled' ;;
                esac ;;
     reboot ) reboot_items=( 'now' 'now + clear clipboard' )
-             reboot_item="$(pipe_to_rofi "${reboot_items[@]}" 'reboot' '')" || exit 37
+             reboot_item="$(pipe_to_rofi "${reboot_items[@]}" 'header=reboot')" || exit 37
 
              sleep 0.1
              case "$reboot_item" in
@@ -78,7 +78,7 @@ case "$main_item" in
     lock ) dm-tool lock ;;
     'screen off' ) xset dpms force off ;;
     'quit awesome' ) quit_awesome_items=( 'now' 'now + clear clipboard' )
-                     quit_awesome_item="$(pipe_to_rofi "${quit_awesome_items[@]}" 'quit awesome' '')" || exit 37
+                     quit_awesome_item="$(pipe_to_rofi "${quit_awesome_items[@]}" 'header=quit awesome')" || exit 37
 
                      sleep 0.1
                      case "$quit_awesome_item" in

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-10 20:50:52 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -15,7 +15,7 @@ function update_audacious {
 }
 
 readarray -t directories < <(find "$HOME"/music -mindepth 1 -maxdepth 1 -type d | sort)
-directory="$(pipe_to_rofi "${directories[@]##*/}" 'music' '')" || exit 37
+directory="$(pipe_to_rofi "${directories[@]##*/}" 'header=music')" || exit 37
 
 [ ! -d "$HOME"/music/"$directory" ] && no_such_dir
 
