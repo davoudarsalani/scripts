@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 21:16:05 +0330 Monday
+## last modified: 1400-09-09 23:24:05 +0330 Tuesday
 
 source "$HOME"/scripts/gb-color
 
@@ -50,7 +50,7 @@ clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-d --directory=') [.]/~/scripts/etc.
-$(flag '-p --pattern=')
+$(flag '-p --pattern=') (e.g. '*mp3' <- keep quoted)
 $(flag '-m --message=')
 $(flag '-b --branch=')
 $(flag '-t --tag=')
@@ -94,6 +94,14 @@ clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-d --default=') default sink/source index/name"
+exit
+}
+## }}}
+function r_help {  ## {{{
+clear
+printf '%s\n' "\
+$(heading "$title") $(yellow "help")
+$(flag '-d --directory=') [.]/~/scripts/etc."
 exit
 }
 ## }}}

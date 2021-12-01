@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-09 12:17:54 +0330 Tuesday
+## last modified: 1400-09-10 09:57:51 +0330 Wednesday
 
 threshhold=70
 
@@ -514,28 +514,42 @@ msgn "$text" ;;
 
           set_widget 'git' 'markup' "$refresh_icon"
 
-          readarray -t repos < <(find "$HOME" -type d ! -path '*.cache*' ! -path '*.venv*' ! -path '*.config*' ! -path '*.vim*' ! -path '*git-fdpo*' ! -path '*go*' ! -path '*trash*' -iname '*.git')
-          for repo in "${repos[@]%/.git}"; {
-              status_count="$(wc -l < <(git_status "$repo"))"
+          readarray -t all_repos      < <(git_repositories)
+          readarray -t non_fdpo_repos < <(printf '%s\n' "${all_repos[@]}" | \grep -v 'git-fdpo')
+          readarray -t fdpo_repos     < <(printf '%s\n' "${all_repos[@]}" | \grep    'git-fdpo')
+
+          ## non-fdpo repos:
+          for non_fdpo_repo in "${non_fdpo_repos[@]}"; {
+              status_count="$(wc -l < <(git_status "$non_fdpo_repo"))"
 
               (( status_count > 0 )) && {
-                  base="${repo##*/}"
+                  base="${non_fdpo_repo##*/}"
                   modified_repos+="${base::1}${status_count},"
               }
           }
 
-          ## check if fdpo repos have commits ahead of origin
-          re='FDPO_CA:'
-          readarray -t fdpo_repos < <(find "$HOME"/git-fdpo -type d -iname '*.git')
+          ## fdpo repos:
+          regex_status='>ST:'
+          regex_commits_ahead='>AH:'
           for fdpo_repo in "${fdpo_repos[@]%/.git}"; {
-              commits_ahead="$(git_commits_ahead "$fdpo_repo")"
+              base="${fdpo_repo##*/}"
 
+              ## check if repo is ahead of origin
+              commits_ahead="$(git_commits_ahead "$fdpo_repo")"
               (( commits_ahead > 0 )) && {
-                  base="${fdpo_repo##*/}"
-                  [[ ! "$modified_repos" =~ $re ]] && pref="$re"  ## NOTE do not replace [[ with [, and do NOT quote $re
+                  [[ ! "$modified_repos" =~ $regex_commits_ahead ]] && pref="$regex_commits_ahead"  ## NOTE do not replace [[ with [, and do NOT quote $regex_commits_ahead
                   modified_repos+=" ${pref}${base::1}${commits_ahead},"
                   unset pref
               }
+
+              ## check if there are changes
+              status_count="$(wc -l < <(git_status "$fdpo_repo"))"
+              (( status_count > 0 )) && {
+                  [[ ! "$modified_repos" =~ $regex_status ]] && pref="$regex_status"  ## NOTE do not replace [[ with [, and do NOT quote $regex_status
+                  modified_repos+=" ${pref}${base::1}${status_count},"
+                  unset pref
+              }
+
           }
 
           [ ! "$modified_repos" ] && git_text="GI" || git_text="<span color=\"${red}\">GI:${modified_repos%,*}</span>"  ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)

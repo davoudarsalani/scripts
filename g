@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-09 12:58:16 +0330 Tuesday
+## last modified: 1400-09-10 09:58:41 +0330 Wednesday
 
 # directory="${1:-.}"  ## NOTE doing this and using -C "${directory:-.}" in front of git instances did not work, not here nor in "$HOME"/scripts/gb-git
 
@@ -20,10 +20,18 @@ function if_locked {  ## {{{
     [ -f "${directory:-.}"/.git/index.lock ] && red 'locked' && exit  ## 
 }
 ## }}}
-if_locked
-
+function offer_repositories {  ## {{{
+    declare -a all_repos
+    [ "$(if_git "${directory:-.}")" == 'false' ] && [ ! "$directory" ] && {
+        readarray -t all_repos < <(git_repositories)
+        directory="$(pipe_to_fzf "${all_repos[@]/$HOME/\~}" 'help')" && wrap_fzf_choice "$directory" || exit 37  ## replacing /home/nnnn with ~ to look nicer
+        [ "$directory" == 'help' ] && display_help
+        directory="${directory/\~/$HOME}"  ## replacing back ~ with /home/nnnn otherwise git won't find the path
+    }
+}
+## }}}
 function check_pattern {  ## {{{
-    matches="$(find -mindepth 1 -iname "$pattern")"   ## -maxdepth 1 is not needed here
+    matches="$(find "${directory:-.}" -mindepth 1 -iname "$pattern")"   ## -maxdepth 1 is not needed here
     [ ! "$matches" ] && red 'no such pattern' && exit
 }
 ## }}}
@@ -57,12 +65,14 @@ function if_changed {  ## {{{
 }
 ## }}}
 function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
+    local short_pwd="${PWD/$HOME/\~}"
+    local short_directory="${directory/$HOME/\~}"
     export directory2="${directory:-.}"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
                                          ##        we have to do the sourcing for the very same reason
-    local fzf_choice="$(printf '%s\n' "$@" | fzf --nth 2..,.. \
-                        --preview-window "$preview_status" \
-                        --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})'  ## --unified=0 makes git show only the modified lines
-                       )"  ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+    local fzf_choice="$(printf '%s\n' "$@" | fzf --header "g in ${short_directory:-$short_pwd}" --nth 2..,.. \
+                                                 --preview-window "$preview_status" \
+                                                 --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
+                                                 ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
 ## }}}
@@ -84,12 +94,11 @@ function branches_array {  ## {{{
     printf '%s\n' "${branches_list[@]}"
 }
 ## }}}
-## }}}
 function prompt {  ## {{{
     for args in "$@"; {
         case "$1" in
           # -d ) [ ! "${directory:-.}"   ] && get_input 'Directory    && directory="$input" ;;
-            -p ) [ ! "$pattern"     ] && get_input 'Pattern'     && pattern="$input"; check_pattern ;;
+            -p ) [ ! "$pattern"     ] && get_input "Pattern (e.g. '*mp3' <- keep quoted)" && pattern="$input"; check_pattern ;;
             -m ) [ ! "$message"     ] && get_input 'Message'     && message="$input"     ;;
             -b ) [ ! "$branch"      ] && get_input 'Branch'      && branch="$input"      ;;
             -t ) [ ! "$tag"         ] && get_input 'Tag'         && tag="$input"         ;;
@@ -122,12 +131,11 @@ function get_opt {  ## {{{
 get_opt "$@"
 heading "$title"
 
-[ "$(if_git "${directory:-.}")" == 'false' ] && {
-    red 'no git'
-    exit
-}
+## offer repos to choose when neither a directory is passed as arg nor there is a git repository in pwd
+offer_repositories
+if_locked
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'revert' 'commits' 'help')
+main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'revert' 'commits' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -142,15 +150,14 @@ case "$main_item" in
           case "$add_item" in
               pattern ) prompt -p
                         if_locked
-                        git_add_pattern "${directory:-.}" "$pattern" && \
+                        git_add_specific_or_pattern "${directory:-.}" "$pattern" && \
                         accomplished "$pattern added" ;;
               all )     if_locked
                         git_add_all "${directory:-.}" && \
                         accomplished 'all added' ;;
-              * )       add_item="${add_item:2}"  ## JUMP_1 remove '[] ' from the beginning
-                        if_locked
-                        git_add_specific "${directory:-.}" "$add_item" && \
-                        accomplished "$add_item added" ;;
+              * )       if_locked
+                        git_add_specific_or_pattern "${directory:-.}" "${add_item:2}" && \
+                        accomplished "$add_item added" ;;  ## ^^ :2 to JUMP_1 remove '[] ' from the beginning
           esac ;;
           ## }}}
     commit )  ## {{{
@@ -177,7 +184,7 @@ case "$main_item" in
                  case "$add_commit_item" in
                      pattern ) prompt -p -m
                                if_locked
-                               git_add_pattern "${directory:-.}" "$pattern" && \
+                               git_add_specific_or_pattern "${directory:-.}" "$pattern" && \
                                git_commit_with_message "${directory:-.}" "${pattern}: $message" && \
                                accomplished "$pattern added, message: ${pattern}: $message" ;;
                      all ) prompt -m
@@ -190,12 +197,11 @@ case "$main_item" in
                                      git_add_all "${directory:-.}" && \
                                      git_commit_amend "${directory:-.}" && \
                                      accomplished "all added, commit amended in $editor" ;;
-                     * ) add_commit_item="${add_commit_item:2}"  ## JUMP_1 remove '[] ' from the beginning
-                         prompt -m
+                     * ) prompt -m
                          if_locked
-                         git_add_specific "${directory:-.}" "$add_commit_item" && \
+                         git_add_specific_or_pattern "${directory:-.}" "${add_commit_item:2}" && \
                          git_commit_with_message "${directory:-.}" "${add_commit_item}: $message" && \
-                         accomplished "$add_commit_item added, message: ${add_commit_item}: $message" ;;
+                         accomplished "$add_commit_item added, message: ${add_commit_item}: $message" ;;  ## :2 to JUMP_1 remove '[] ' from the beginning
                  esac ;;
                  ## }}}
     commit_amend )  ## {{{
@@ -220,15 +226,14 @@ case "$main_item" in
            case "$undo_item" in
                 pattern ) prompt -p
                           if_locked
-                          git_undo_pattern "${directory:-.}" "$pattern" && \
+                          git_undo_specific_or_pattern "${directory:-.}" "$pattern" && \
                           accomplished "$pattern undid" ;;
                 all )     if_locked
                           git_undo_all "${directory:-.}" && \
                           accomplished "all undid" ;;
-                * )       undo_item="${undo_item:2}"  ## JUMP_1 remove '[] ' from the beginning
-                          if_locked
-                          git_undo_specific "${directory:-.}" "$undo_item" && \
-                          accomplished "$undo_item undid" ;;
+                * )       if_locked
+                          git_undo_specific_or_pattern "${directory:-.}" "${undo_item:2}" && \
+                          accomplished "$undo_item undid" ;;  ## ^^ :2 to JUMP_1 remove '[] ' from the beginning
            esac ;;
            ## }}}
     unstage )  ## {{{
@@ -241,15 +246,14 @@ case "$main_item" in
               case "$unstage_item" in
                   pattern ) prompt -p
                             if_locked
-                            git_unstage_pattern "${directory:-.}" "$pattern" && \
+                            git_unstage_specific_or_pattern "${directory:-.}" "$pattern" && \
                             accomplished "$pattern unstaged" ;;  ## unstage a pattern
                   all )     if_locked
                             git_unstage_all "${directory:-.}" && \
                             accomplished 'all unstaged' ;;  ## unstage all staged files
-                  * )       unstage_item="${unstage_item:2}"  ## JUMP_1 remove '[] ' from the beginning
-                            if_locked
-                            git_unstage_specific "${directory:-.}" "$unstage_item" && \
-                            accomplished "$unstage_item unstaged" ;;  ## unstage a specific file
+                  * )       if_locked
+                            git_unstage_specific_or_pattern "${directory:-.}" "${unstage_item:2}" && \
+                            accomplished "$unstage_item unstaged" ;;  ## ^^ :2 to JUMP_1 remove '[] ' from the beginning
               esac ;;
               ## }}}
     log )  ## {{{
