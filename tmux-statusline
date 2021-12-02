@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 12:54:21 +0330 Wednesday
+## last modified: 1400-09-11 11:46:37 +0330 Thursday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
     if_ssh ) [ "$SSH_CONNECTION" ] && printf 'SSH \n' ;;
-    pwd ) printf '%s\n' "${PWD/$HOME/\~}" ;;  ## keep \~ escaped
+    pwd ) printf '%s\n' "${PWD/$HOME/\~}" ;;
     info ) source "$HOME"/scripts/gb-calculation
 
            size="$(du -bs | awk '{print $1}')"

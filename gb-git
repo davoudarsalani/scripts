@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 17:53:00 +0330 Wednesday
+## last modified: 1400-09-11 16:15:00 +0330 Thursday
 
 # dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work
 
@@ -10,15 +10,11 @@ function if_git {  ## {{{
 ## }}}
 function git_repositories {  ## {{{
     declare -a repos
-    readarray -t repos < <(find "$HOME"  -type  d     \
-                                 ! -path  '*.cache*'  \
-                                 ! -path  '*.venv*'   \
-                                 ! -path  '*.config*' \
-                                 ! -path  '*.vim*'    \
-                                 ! -path  '*go*'      \
-                                 ! -path  '*trash*'   \
-                                   -iname '.git'      \
-                                 | sort)
+    readarray -t repos < <(find "$HOME" -type d \
+                                        ! -path '*.cache*' ! -path '*.venv*' ! -path '*kaddy*' ! -path '*.config*' \
+                                        ! -path '*.vim*' ! -path '*go*' ! -path '*trash*' \
+                                          -iname '.git' | sed "s#$HOME#~#")
+
     printf '%s\n' "${repos[@]%/.git}"
 }
 ## }}}
@@ -59,7 +55,7 @@ function git_log {  ## {{{
 ## }}}
 function git_diff_specific {  ## {{{
     printf '%s\n' "$(git -C "${1:-.}" \
-                     diff --unified=0 --color=always --color-words --src-prefix=1st: --dst-prefix=2nd: -- "$2" | sed 1,4d)"  ## $2 is dir/file name
+                     diff --unified=0 --color=always --src-prefix=1st: --dst-prefix=2nd: -- "$2" | sed 1,4d)"  ## $2 is dir/file name
                                  ## '--,--> --unified=0 makes git show only the modified lines
                                  ##    '--> --color-words show modified words side-by-side
 }

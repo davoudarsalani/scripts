@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 21:18:47 +0330 Wednesday
+## last modified: 1400-09-11 16:17:51 +0330 Thursday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -15,7 +15,10 @@ function display_help {  ## {{{
 }
 ## }}}
 function if_locked {  ## {{{
-    [ -f "$directory"/.git/index.lock ] && red 'locked' && exit  ## 
+    [ -f "$directory"/.git/index.lock ] && {
+        red 'locked'  ## 
+        exit
+    }
 }
 ## }}}
 function check_pattern {  ## {{{
@@ -57,7 +60,7 @@ function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
     local short_directory="${directory/$HOME/\~}"
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
                                          ##        we have to do the sourcing for the very same reason
-    local fzf_choice="$(printf '%s\n' "$@" | fzf --header "g in ${short_directory:-$short_pwd}" --nth 2..,.. \
+    local fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
                                                  --preview-window "$preview_status" \
                                                  --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
                                                  ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
@@ -117,12 +120,9 @@ function get_opt {  ## {{{
 get_opt "$@"
 heading "$title"
 
-directory="$(choose_directory)" || exit 37
-
-[ "$(if_git "$directory")" == 'false' ] && {
-    red 'no git'
-    exit
-}
+readarray -t repositories < <(git_repositories)
+repository="$(pipe_to_fzf "${repositories[@]}")" && wrap_fzf_choice "$repository" || exit 37
+directory="${repository/\~/$HOME}"
 
 if_locked
 

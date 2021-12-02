@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 21:39:04 +0330 Wednesday
+## last modified: 1400-09-11 15:38:45 +0330 Thursday
 
 function get_datetime {  ## {{{
     case "$1" in
@@ -47,12 +47,21 @@ function wrap_fzf_choice {  ## {{{
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
 ## }}}
+function choose_directory {  ## {{{
+    ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
+    ##      any change you make here, make sure to apply the changes there too
+    ## NOTE used also in ~/.config/lfrc
 
-choose_directory() {  ## stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
-    dir=$(eval "$FZF_ALT_C_COMMAND" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)
-    [ "$dir" ] && printf '%q' "${dir/\~/$HOME}" || return 37  ## keep \~ escaped
+    ## usages:
+    ##   choose_directory
+    ##   choose_directory 'dir_name'  ## to limit the results
+
+    local dir limiting
+    [ "$1" ] && limiting="-iname $1"
+    dir="$(eval "$FZF_ALT_C_COMMAND" "$limiting" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
+    printf '%q\n' "${dir/\~/$HOME}"
 }
-
+## }}}
 function pipe_to_fzf {  ## {{{
     ## usages:
     ##   item="$(pipe_to_fzf "${items[@]}")"

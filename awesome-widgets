@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 20:07:05 +0330 Wednesday
+## last modified: 1400-09-11 13:32:53 +0330 Thursday
 
 threshhold=70
 
@@ -515,8 +515,8 @@ msgn "$text" ;;
           set_widget 'git' 'markup' "$refresh_icon"
 
           readarray -t all_repos      < <(git_repositories)
-          readarray -t non_fdpo_repos < <(printf '%s\n' "${all_repos[@]}" | \grep -v 'git-fdpo')
-          readarray -t fdpo_repos     < <(printf '%s\n' "${all_repos[@]}" | \grep    'git-fdpo')
+          readarray -t non_fdpo_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'git-fdpo')
+          readarray -t fdpo_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'git-fdpo')
 
           ## non-fdpo repos:
           for non_fdpo_repo in "${non_fdpo_repos[@]}"; {
