@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-11 13:32:53 +0330 Thursday
+## last modified: 1400-09-12 13:29:29 +0330 Friday
 
 threshhold=70
 
@@ -514,28 +514,28 @@ msgn "$text" ;;
 
           set_widget 'git' 'markup' "$refresh_icon"
 
-          readarray -t all_repos      < <(git_repositories)
-          readarray -t non_fdpo_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'git-fdpo')
-          readarray -t fdpo_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'git-fdpo')
+          readarray -t all_repos        < <(git_repositories)
+          readarray -t non_public_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'git-public')
+          readarray -t public_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'git-public')
 
-          ## non-fdpo repos:
-          for non_fdpo_repo in "${non_fdpo_repos[@]}"; {
-              status_count="$(wc -l < <(git_status "$non_fdpo_repo"))"
+          ## non-public repos:
+          for non_public_repo in "${non_public_repos[@]}"; {
+              status_count="$(wc -l < <(git_status "$non_public_repo"))"
 
               (( status_count > 0 )) && {
-                  base="${non_fdpo_repo##*/}"
+                  base="${non_public_repo##*/}"
                   modified_repos+="${base::1}${status_count},"
               }
           }
 
-          ## fdpo repos:
+          ## public repos:
           regex_status='>ST:'
           regex_commits_ahead='>AH:'
-          for fdpo_repo in "${fdpo_repos[@]%/.git}"; {
-              base="${fdpo_repo##*/}"
+          for public_repo in "${public_repos[@]%/.git}"; {
+              base="${public_repo##*/}"
 
               ## check if repo is ahead of origin
-              commits_ahead="$(git_commits_ahead "$fdpo_repo")"
+              commits_ahead="$(git_commits_ahead "$public_repo")"
               (( commits_ahead > 0 )) && {
                   [[ ! "$modified_repos" =~ $regex_commits_ahead ]] && pref="$regex_commits_ahead"
                   modified_repos+=" ${pref}${base::1}${commits_ahead},"
@@ -543,7 +543,7 @@ msgn "$text" ;;
               }
 
               ## check if there are changes
-              status_count="$(wc -l < <(git_status "$fdpo_repo"))"
+              status_count="$(wc -l < <(git_status "$public_repo"))"
               (( status_count > 0 )) && {
                   [[ ! "$modified_repos" =~ $regex_status ]] && pref="$regex_status"
                   modified_repos+=" ${pref}${base::1}${status_count},"
