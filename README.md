@@ -1,8 +1,8 @@
 ![thumbnail](https://github.com/davoudarsalani/scripts/blob/master/thumbnail.jpg?raw=true)
 # Bash/python scripts for everyday use on Arch Linux
 ![total](https://img.shields.io/static/v1?label=Total&message=70&labelColor=black&color=grey&style=flat)
-![size](https://img.shields.io/static/v1?label=Size&message=2.57MB&labelColor=black&color=grey&style=flat)
-![commits](https://img.shields.io/static/v1?label=Commits&message=33&labelColor=black&color=grey&style=flat)
+![size](https://img.shields.io/static/v1?label=Size&message=2.61MB&labelColor=black&color=grey&style=flat)
+![commits](https://img.shields.io/static/v1?label=Commits&message=34&labelColor=black&color=grey&style=flat)
 ![last-commit](https://img.shields.io/github/last-commit/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat)
 ![commit-activity](https://img.shields.io/github/commit-activity/m/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat)
 ![platform](https://img.shields.io/static/v1?label=Platform&message=GNU/Linux&labelColor=black&color=grey&style=flat)
@@ -16,29 +16,29 @@
 |[arch-install](https://github.com/davoudarsalani/scripts/blob/master/arch-install)|467|1,413|15,899|15.53KB|7|2021-12-01 22:17:44 +0330|
 |[awesome-app-off](https://github.com/davoudarsalani/scripts/blob/master/awesome-app-off)|72|357|3,120|3.05KB|5|2021-11-26 22:35:34 +0330|
 |[awesome-autorun](https://github.com/davoudarsalani/scripts/blob/master/awesome-autorun)|61|220|1,962|1.92KB|6|2021-11-28 15:40:32 +0330|
-|[awesome-widgets](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets)|805|3,628|42,618|41.62KB|12|2021-12-03 13:46:21 +0330|
+|[awesome-widgets](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets)|805|3,628|42,618|41.62KB|13|2021-12-04 13:26:42 +0330|
 |[bash](https://github.com/davoudarsalani/scripts/blob/master/bash)|22|92|820|820B|5|2021-11-26 22:35:34 +0330|
 |[bluetooth](https://github.com/davoudarsalani/scripts/blob/master/bluetooth)|91|534|5,650|5.52KB|7|2021-11-30 17:08:25 +0330|
 |[browser](https://github.com/davoudarsalani/scripts/blob/master/browser)|40|201|1,877|1.83KB|7|2021-12-01 22:17:44 +0330|
 |[colors](https://github.com/davoudarsalani/scripts/blob/master/colors)|53|213|2,262|2.21KB|7|2021-11-30 17:08:25 +0330|
-|[commands](https://github.com/davoudarsalani/scripts/blob/master/commands)|264|2,367|16,916|16.52KB|12|2021-12-02 23:18:09 +0330|
+|[commands](https://github.com/davoudarsalani/scripts/blob/master/commands)|264|2,367|16,916|16.52KB|13|2021-12-04 13:26:42 +0330|
 |[copy](https://github.com/davoudarsalani/scripts/blob/master/copy)|213|1,088|16,822|16.43KB|8|2021-12-01 22:17:44 +0330|
 |[count-lines](https://github.com/davoudarsalani/scripts/blob/master/count-lines)|22|64|523|523B|6|2021-12-01 22:17:44 +0330|
 |[dictionary](https://github.com/davoudarsalani/scripts/blob/master/dictionary)|23|62|633|633B|7|2021-12-01 22:17:44 +0330|
 |[ffmpeg](https://github.com/davoudarsalani/scripts/blob/master/ffmpeg)|157|1,054|11,795|11.52KB|6|2021-11-30 17:08:25 +0330|
 |[fingil](https://github.com/davoudarsalani/scripts/blob/master/fingil)|351|1,390|11,563|11.29KB|5|2021-11-26 22:35:34 +0330|
 |[firewall](https://github.com/davoudarsalani/scripts/blob/master/firewall)|73|298|2,683|2.62KB|6|2021-11-30 17:08:25 +0330|
-|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|410|2,041|22,140|21.62KB|▲13|2021-12-02 23:18:09 +0330|
+|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|410|2,041|22,140|21.62KB|▲14|2021-12-04 13:26:42 +0330|
 |[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|493|2,172|17,008|16.61KB|10|2021-12-02 23:18:09 +0330|
 |[gb-audacious](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious)|34|141|2,021|1.97KB|7|2021-11-28 15:40:32 +0330|
 |[gb-audio](https://github.com/davoudarsalani/scripts/blob/master/gb-audio)|40|347|2,499|2.44KB|4|2021-11-26 22:35:34 +0330|
 |[gb-calculation](https://github.com/davoudarsalani/scripts/blob/master/gb-calculation)|83|399|3,132|3.06KB|7|2021-11-28 15:40:32 +0330|
 |[gb-color](https://github.com/davoudarsalani/scripts/blob/master/gb-color)|304|831|5,792|5.66KB|▼2|2021-11-26 22:35:34 +0330|
 |[gb-fir-blu-batt](https://github.com/davoudarsalani/scripts/blob/master/gb-fir-blu-batt)|20|124|931|931B|5|2021-11-28 15:40:32 +0330|
-|[gb-git](https://github.com/davoudarsalani/scripts/blob/master/gb-git)|205|1,010|6,571|6.42KB|5|2021-12-02 23:18:09 +0330|
+|[gb-git](https://github.com/davoudarsalani/scripts/blob/master/gb-git)|205|1,010|6,571|6.42KB|6|2021-12-04 13:26:42 +0330|
 |[gb-network](https://github.com/davoudarsalani/scripts/blob/master/gb-network)|42|298|2,423|2.37KB|4|2021-11-26 22:35:34 +0330|
 |[gb-screen](https://github.com/davoudarsalani/scripts/blob/master/gb-screen)|30|342|2,048|2.00KB|7|2021-11-28 15:40:32 +0330|
-|[.help](https://github.com/davoudarsalani/scripts/blob/master/.help)|153|715|5,280|5.16KB|▲13|2021-12-03 13:46:21 +0330|
+|[.help](https://github.com/davoudarsalani/scripts/blob/master/.help)|153|715|5,280|5.16KB|13|2021-12-03 13:46:21 +0330|
 |[launcher](https://github.com/davoudarsalani/scripts/blob/master/launcher)|▼10|41|▼264|▼264B|5|2021-11-26 22:35:34 +0330|
 |[mime-type](https://github.com/davoudarsalani/scripts/blob/master/mime-type)|49|124|1,034|1.01KB|6|2021-11-30 17:08:25 +0330|
 |[mint](https://github.com/davoudarsalani/scripts/blob/master/mint)|60|244|2,627|2.57KB|3|2021-11-28 15:40:32 +0330|
@@ -56,7 +56,7 @@
 |[sony](https://github.com/davoudarsalani/scripts/blob/master/sony)|83|234|2,182|2.13KB|7|2021-11-30 17:08:25 +0330|
 |[speech](https://github.com/davoudarsalani/scripts/blob/master/speech)|131|512|5,145|5.02KB|6|2021-12-01 22:17:44 +0330|
 |[tmux](https://github.com/davoudarsalani/scripts/blob/master/tmux)|30|131|1,051|1.03KB|5|2021-11-26 22:35:34 +0330|
-|[tmux-statusline](https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline)|76|347|2,979|2.91KB|12|2021-12-02 23:18:09 +0330|
+|[tmux-statusline](https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline)|76|347|2,979|2.91KB|13|2021-12-04 13:26:42 +0330|
 |[todo](https://github.com/davoudarsalani/scripts/blob/master/todo)|35|176|1,513|1.48KB|6|2021-12-01 22:17:44 +0330|
 |[typer](https://github.com/davoudarsalani/scripts/blob/master/typer)|130|356|3,379|3.30KB|7|2021-11-30 17:08:25 +0330|
 |[user](https://github.com/davoudarsalani/scripts/blob/master/user)|61|266|2,181|2.13KB|7|2021-11-30 17:08:25 +0330|
@@ -64,7 +64,7 @@
 |[wallpaper](https://github.com/davoudarsalani/scripts/blob/master/wallpaper)|21|67|743|743B|7|2021-12-01 22:17:44 +0330|
 |[website-create-audio-template](https://github.com/davoudarsalani/scripts/blob/master/website-create-audio-template)|73|259|2,537|2.48KB|4|2021-11-30 17:08:25 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|total|6,366|29,276|281,380|274.79KB|342||
+|total|6,366|29,276|281,380|274.79KB|347||
 |average|124|574|5,517|5.39KB|6||
 <br>
 
@@ -89,10 +89,10 @@
 |[reminder.py](https://github.com/davoudarsalani/scripts/blob/master/reminder.py)|41|115|1,210|1.18KB|5|2021-11-26 22:35:34 +0330|
 |[screenshot.py](https://github.com/davoudarsalani/scripts/blob/master/screenshot.py)|127|426|4,898|4.78KB|5|2021-11-26 22:35:34 +0330|
 |[split-and-merge.py](https://github.com/davoudarsalani/scripts/blob/master/split-and-merge.py)|303|1,017|10,712|10.46KB|3|2021-11-26 22:35:34 +0330|
-|[weather.py](https://github.com/davoudarsalani/scripts/blob/master/weather.py)|121|369|3,741|3.65KB|6|2021-11-26 22:35:34 +0330|
+|[weather.py](https://github.com/davoudarsalani/scripts/blob/master/weather.py)|121|369|3,741|3.65KB|7|2021-12-04 13:26:42 +0330|
 |[website-fun.py](https://github.com/davoudarsalani/scripts/blob/master/website-fun.py)|81|241|2,322|2.27KB|▼2|2021-11-26 22:35:34 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|total|3,816|14,154|152,820|149.24KB|100||
+|total|3,816|14,154|152,820|149.24KB|101||
 |average|200|744|8,043|7.85KB|5||
 <br>
 
@@ -100,12 +100,14 @@
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|total|10,182|43,430|434,200|424.02KB|442||
+|total|10,182|43,430|434,200|424.02KB|448||
 |average|145|620|6,202|6.06KB|6||
 <br>
 **In the table that comes next, you there is presented the top 500 most frequent words in the scripts above with the exact number of times each of them has been used:**
+
 <details>
 <summary>Show/Hide</summary>
+
 |word|count|word|count|word|count|word|count|word|count|
 |-:|:-|-:|:-|-:|:-|-:|:-|-:|:-|
 |**file**|591|**home**|454|**in**|438|**printf**|422|**self**|396|
