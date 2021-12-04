@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-12 13:29:29 +0330 Friday
+## last modified: 1400-09-12 23:17:00 +0330 Friday
 
 threshhold=70
 
@@ -515,8 +515,8 @@ msgn "$text" ;;
           set_widget 'git' 'markup' "$refresh_icon"
 
           readarray -t all_repos        < <(git_repositories)
-          readarray -t non_public_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'git-public')
-          readarray -t public_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'git-public')
+          readarray -t non_public_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'public')
+          readarray -t public_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'public')
 
           ## non-public repos:
           for non_public_repo in "${non_public_repos[@]}"; {

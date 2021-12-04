@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-11 16:17:51 +0330 Thursday
+## last modified: 1400-09-12 16:46:05 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -73,7 +73,7 @@ function branch_info {  ## {{{ https://revelry.co/terminal-workflow-fzf/
     ## no need to --preview-window "$preview_status" because it uses the value set in bahrc in FZF_DEFAULT_OPTS
     local fzf_choice="$(printf '%s\n' "$@" | fzf \
                         --preview 'source "$HOME"/scripts/gb-git; git_log "${directory2:-.}" \
-                        $(sed s/^..// <<< {} | cut -d " " -f 1)' | sed 's/^..//' | cut -d " " -f 1
+                        $(sed s/^..// <<< {} | cut -d " " -f 1)' #| sed 's/^..//' | cut -d " " -f 1
                         ## ^^ ORIG: --preview 'git -C "${directory2:-.}" log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
                       )"
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37

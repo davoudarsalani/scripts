@@ -10,8 +10,8 @@ from requests import Session
 from gp import get_headers, msgc, msgn, set_widget, refresh_icon, last_file_exists, save_as_last, save_error, get_last
 
 lang = 'en'
-lat = 29.4519  ## zzzz latitude
-lon = 60.8842  ## zzzz longitude
+lat = 29.4519  ## zahedan latitude
+lon = 60.8842  ## zahedan longitude
 appid = getenv('api_weather')
 url = f'https://api.openweathermap.org/data/2.5/onecall?lang={lang}&lat={lat}&lon={lon}&units=metric&exclude=hourly,minutely&appid={appid}'
 Ses = Session()

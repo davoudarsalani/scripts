@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-11 16:15:00 +0330 Thursday
+## last modified: 1400-09-13 07:54:07 +0330 Saturday
 
 # dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work
 
@@ -9,6 +9,8 @@ function if_git {  ## {{{
 }
 ## }}}
 function git_repositories {  ## {{{
+    ## NOTE cant use FZF_ALT_C_COMMAND because git option in ~/scripts/awesome-widgets apparently can't access it
+
     declare -a repos
     readarray -t repos < <(find "$HOME" -type d \
                                         ! -path '*.cache*' ! -path '*.venv*' ! -path '*kaddy*' ! -path '*.config*' \
@@ -146,7 +148,7 @@ function git_branch_create {  ## {{{
 }
 ## }}}
 function git_branch_checkout {  ## {{{
-    git -C "${1:-.}" checkout "$2" ## $2 is branch
+    git -C "${1:-.}" checkout "$2"  ## $2 is branch
 }
 ## }}}
 function git_branch_delete_all {  ## {{{
