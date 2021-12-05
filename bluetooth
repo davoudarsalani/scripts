@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 13:02:07 +0330 Monday
+## last modified: 1400-09-14 10:26:48 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-fir-blu-batt
@@ -32,11 +32,11 @@ case "$main_item" in
     'turn off' ) sudo rfkill block bluetooth && update_bluetooth && accomplished ;;
     'available controllers' ) bluetoothctl list && accomplished ;;
     'controller information' ) bluetoothctl show "$def_ctrlr_mac" && accomplished ;;
-    'select default controller' ) get_input 'Mac address [!! or name]' && mac="$input"
+    'select default controller' ) mac="$(get_input 'Mac address [!! or name]')"
                                   bluetoothctl select "$mac" && accomplished ;;
     'available/paired devices' ) printf 'available:\t%s\n' "$(bluetoothctl devices)"
                                  printf 'paired:\t\t%s\n' "$(bluetoothctl paired-devices)" && accomplished ;;
-    'device information' ) get_input 'Device mac address' && mac="$input"
+    'device information' ) mac="$(get_input 'Device mac address')"
                            bluetoothctl info "$mac" && accomplished ;;
     'set pairable on/off' ) set_pairable_item="$(pipe_to_fzf 'on' 'off')" && wrap_fzf_choice "$set_pairable_item" || exit 37
 
@@ -50,32 +50,32 @@ case "$main_item" in
                                     on )  bluetoothctl discoverable on  && accomplished ;;
                                     off ) bluetoothctl discoverable off && accomplished ;;
                                 esac ;;
-    'pair with a device' ) get_input 'Device mac address' && mac="$input"
+    'pair with a device' ) mac="$(get_input 'Device mac address')"
                            bluetoothctl pair "$mac" && accomplished ;;
     'trust/untrust a device' ) trust_item="$(pipe_to_fzf 'trust' 'nuntrust')" && wrap_fzf_choice "$trust_item" || exit 37
 
                                case "$trust_item" in
-                                   trust )   get_input 'Device mac address' && mac="$input"
+                                   trust )   mac="$(get_input 'Device mac address')"
                                              bluetoothctl trust "$mac" && accomplished ;;
-                                   untrust ) get_input 'Device mac address' && mac="$input"
+                                   untrust ) mac="$(get_input 'Device mac address')"
                                              bluetoothctl untrust "$mac" && accomplished ;;
                                esac ;;
     'block/unblock a device' ) block_item="$(pipe_to_fzf 'block' 'unblock')" && wrap_fzf_choice "$block_item" || exit 37
 
                                case "$block_item" in
-                                   block )   get_input 'Device mac address' && mac="$input"
+                                   block )   mac="$(get_input 'Device mac address')"
                                              bluetoothctl block "$mac" && accomplished ;;
-                                   unblock ) get_input 'Device mac address' && mac="$input"
+                                   unblock ) mac="$(get_input 'Device mac address')"
                                              bluetoothctl unblock "$mac" && accomplished ;;
                                esac ;;
-    'remove a device' ) get_input 'Device mac address' && mac="$input"
+    'remove a device' ) mac="$(get_input 'Device mac address')"
                         bluetoothctl remove "$mac" && accomplished ;;
     'connect/disconnect a device' ) connect_item="$(pipe_to_fzf 'connect' 'disconnect')" && wrap_fzf_choice "$connect_item" || exit 37
 
                                     case "$connect_item" in
-                                        connect )    get_input 'Device mac address' && mac="$input"
+                                        connect )    mac="$(get_input 'Device mac address')"
                                                      bluetoothctl connect "$mac" && accomplished ;;
-                                        disconnect ) get_input 'Device mac address' && mac="$input"
+                                        disconnect ) mac="$(get_input 'Device mac address')"
                                                      bluetoothctl connect "$mac" && accomplished ;;
                                     esac ;;
     'configuration path' ) printf '/etc/bluetooth/main.conf\n' && accomplished ;;

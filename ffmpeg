@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:32:16 +0330 Monday
+## last modified: 1400-09-14 18:15:52 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -12,27 +12,29 @@ function display_help {
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -i ) [ ! "$input_file"   ] && get_input 'Input file'                      && input_file="$input"   ;;
-            -x ) [ ! "$offset"       ] && get_input 'Offset (e.g. 1.2 or -0.8)'       && offset="$input"       ;;
-            -o ) [ ! "$output"       ] && get_input 'Output file'                     && output="$input"       ;;
-            -s ) [ ! "$start"        ] && get_input 'Start time (e.g. 00:00:09)'      && start="$input"        ;;
-            -e ) [ ! "$end"          ] && get_input 'End time (e.g. 00:18:34)'        && end="$input"          ;;
-            -a ) [ ! "$audio_input"  ] && get_input 'Audio input file'                && audio_input="$input"  ;;
-            -v ) [ ! "$video_input"  ] && get_input 'Video input file'                && video_input="$input"  ;;
-            -t ) [ ! "$time"         ] && get_input 'Time (e.g. 00:00:09)'            && time="$input"         ;;
-            -u ) [ ! "$audio_stream" ] && get_input 'Audio stream to keep (e.g. 1)'   && audio_stream="$input" ;;
-            -c ) [ ! "$camera"       ] && get_input 'Camera (e.g. /dev/video0)'       && camera="$input"       ;;
-            -f ) [ ! "$sub_file"     ] && get_input 'Subtitle file'                   && sub_file="$input"     ;;
-            -d ) [ ! "$sub_index"    ] && get_input 'Subtitle index (e.g. 0, 1, etc)' && sub_index="$input"    ;;
+            -i ) [ "$input_file"   ] || input_file="$(get_input 'Input file')"                      ;;
+            -x ) [ "$offset"       ] || offset="$(get_input 'Offset (e.g. 1.2 or -0.8)')"           ;;
+            -o ) [ "$output"       ] || output="$(get_input 'Output file')"                         ;;
+            -s ) [ "$start"        ] || start="$(get_input 'Start time (e.g. 00:00:09)')"           ;;
+            -e ) [ "$end"          ] || end="$(get_input 'End time (e.g. 00:18:34)')"               ;;
+            -a ) [ "$audio_input"  ] || audio_input="$(get_input 'Audio input file')"               ;;
+            -v ) [ "$video_input"  ] || video_input="$(get_input 'Video input file')"               ;;
+            -t ) [ "$time"         ] || time="$(get_input 'Time (e.g. 00:00:09)')"                  ;;
+            -u ) [ "$audio_stream" ] || audio_stream="$(get_input 'Audio stream to keep (e.g. 1)')" ;;
+            -c ) [ "$camera"       ] || camera="$(get_input 'Camera (e.g. /dev/video0)')"           ;;
+            -f ) [ "$sub_file"     ] || sub_file="$(get_input 'Subtitle file')"                     ;;
+            -d ) [ "$sub_index"    ] || sub_index="$(get_input 'Subtitle index (e.g. 0, 1, etc)')"  ;;
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,input-file:,offset:,output:,start:,end:,audio-input:,video-input:,time:,audio-stream:,camera:,subtitle-file:,subtitle-index:' \
+    local options
+
+    options="$(getopt --longoptions 'help,input-file:,offset:,output:,start:,end:,audio-input:,video-input:,time:,audio-stream:,camera:,subtitle-file:,subtitle-index:' \
                             --options 'hi:x:o:s:e:a:v:t:u:c:f:d:' \
                             --alternative -- "$@")"
     eval set -- "$options"

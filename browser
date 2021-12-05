@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 20:08:11 +0330 Wednesday
+## last modified: 1400-09-14 11:13:34 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -16,7 +16,8 @@ case "$1" in
                   private ) firefox --private-window &>/dev/null & ;;
                   'safe mode' ) firefox --safe-mode &>/dev/null & ;;
                   preferences ) firefox --preferences &>/dev/null & ;;
-                  tor ) cd "$HOME"/tor-browser_en-US && ./start-tor-browser.desktop &>/dev/null & ;;  ## absolute path won't work
+                  tor ) cd "$HOME"/tor-browser_en-US || exit  ## absolute path won't work
+                        ./start-tor-browser.desktop &>/dev/null & ;;
                   * ) firefox "$ff_item" &>/dev/null & ;;
               esac ;;
     chromium ) chr_items=( 'new page' 'new tab' 'private' "${bookmarks[@]}" )

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 21:50:22 +0330 Wednesday
+## last modified: 1400-09-14 16:11:47 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -16,12 +16,14 @@ function no_such_dir {
 }
 
 function success_moving {
-    local text="$(printf "moved to <span color=\"%s\">WATCHED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$base")"
+    local text
+
+    text="$(printf "moved to <span color=\"%s\">WATCHED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$base")"
     msgn "$text" '' "$HOME"/linux/themes/delete-w.png
 }
 
 function error_moving {
-    msgc 'ERROR' "moving <span color=\"${orange}\">${base}</span> to <span color=\"${blue}\">WATCHED</span>$1" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "moving <span color=\"${orange}\">${base}</span> to <span color=\"${blue}\">WATCHED</span>" "$HOME"/linux/themes/alert-w.png
     # exit  ## exceptionally commented
 }
 
@@ -30,14 +32,14 @@ function success_removing {
 }
 
 function error_removing {
-    msgc 'ERROR' "removing <span color=\"${orange}\">${base}</span>$1" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "removing <span color=\"${orange}\">${base}</span>" "$HOME"/linux/themes/alert-w.png
 }
 
 declare -a directories_plus_count
 
 [ "$play_status" == 'playing' ] && continue_playing='true' || continue_playing='false'
 
-[ ! "$1" ] && exit
+[ "$1" ] || exit
 [ "$1" == 'random' ] && title='random movie' || title='select movie'
 
 readarray -t directories < <(find "$HOME"/movie -mindepth 1 -maxdepth 1 -type d | sort)
@@ -62,7 +64,7 @@ directory="$(pipe_to_rofi "${directories_plus_count[@]}" "header=${title}")" || 
 directory="${directory##*' '}"  ## remove count
 
 ## pick
-[ ! -d "$HOME"/movie/"$directory" ] && no_such_dir
+[ -d "$HOME"/movie/"$directory" ] || no_such_dir
 
 case "$1" in
     random ) movie="$(shuf -n 1 < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
@@ -75,7 +77,7 @@ esac
 ## play
 base="${movie%.*}"
 msgn 'playing' "<span color=\"${orange}\">${base}</span>" "$HOME"/linux/themes/filmroll-w.png
-[ ! -f "$HOME"/movie/"$directory"/"$movie" ] && no_such_file
+[ -f "$HOME"/movie/"$directory"/"$movie" ] || no_such_file
 vlc -f --play-and-exit -- "$HOME"/movie/"$directory"/"$movie" 2>/dev/null
 
 ## move to WATCHED or remove

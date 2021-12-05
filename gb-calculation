@@ -1,29 +1,31 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 13:22:51 +0330 Saturday
+## last modified: 1400-09-14 15:44:57 +0330 Sunday
 
 function float_pad {  ## {{{
-    local input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or "${var}*932/12" (no spaces allowd in expression)
-    local desired_l_length="${2:-1}"  ## min   length for l, e.g. 1
-    local desired_r_length="${3:-2}"  ## exact length for r, e.g. 2
+    local input desired_l_length desired_r_length float l r r_length lacking_pad
+
+    input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or "${var}*932/12" (no spaces allowd in expression)
+    desired_l_length="${2:-1}"  ## min   length for l, e.g. 1
+    desired_r_length="${3:-2}"  ## exact length for r, e.g. 2
 
     ## make input a float even if it is an int or an expression (https://www.shell-tips.com/bash/math-arithmetic-calculation)
-    local float="$(awk "BEGIN {printf \"%.${desired_r_length}f\n\", "$input"}")"
+    float="$(awk "BEGIN {printf \"%.${desired_r_length}f\n\", $input}")"
 
     ## separate l and r
-    local l="${float%.*}"  ## 8
-    local r="${float#*.}"  ## 123
+    l="${float%.*}"  ## 8
+    r="${float#*.}"  ## 123
 
     ## make l have the desired_l_length
-    local l="$(printf "%0${desired_l_length}d" "$l")"  ## 8 to 08
+    l="$(printf "%0${desired_l_length}d" "$l")"  ## 8 to 08
 
     ## make r have the desired_r_length
-    local r_length="${#r}"
+    r_length="${#r}"
     if (( desired_r_length > r_length )); then  ## add trailing zeros to r if shorter than desired_r_length
-        local lacking_pad
+        lacking_pad
         (( lacking_pad="desired_r_length - r_length" ))
         for ((i=0; i<"$lacking_pad"; i++)); {
-            local r="${r}0"
+            r="${r}0"
         }
     elif (( desired_r_length < r_length )); then  ## purge r if longer than desired_r_length
         r="${r::$desired_r_length}"
@@ -36,9 +38,11 @@ function compare_floats {  ## {{{
     ## https://stackoverflow.com/questions/8654051/how-to-compare-two-floating-point-numbers-in-bash
     ## usage: is_smaller="$(compare_floats "$first" '<' "$second")"  ## returns true or false
 
-    local float1="$1"
-    local oper="$2"
-    local float2="$3"
+    local float1 float2 oper
+
+    float1="$1"
+    oper="$2"
+    float2="$3"
 
     ## validate floatness
     # [[ "$float1" =~ ^-*[[:digit:]]*[.][[:digit:]]* ]] || float1="$(float_pad "$float1" 2 2)"
@@ -60,22 +64,24 @@ function convert_byte {  ## {{{
     ## MB = "$bytes" / 1024000     ## 248.72MB
     ## GB = "$bytes" / 1024000000  ## 00.25GB
 
-    local bytes="$1"
+    local bytes number suffix
+
+    bytes="$1"
     if (( bytes == 0 )); then
-        local number=0
-        local suffix='B'
+        number=0
+        suffix='B'
     elif (( bytes > 1024000000 )); then
-        local number="$(float_pad "${bytes}/1024000000" 1 2)"
-        local suffix='GB'
+        number="$(float_pad "${bytes}/1024000000" 1 2)"
+        suffix='GB'
     elif (( bytes > 1024000 )); then
-        local number="$(float_pad "${bytes}/1024000" 1 2)"
-        local suffix='MB'
+        number="$(float_pad "${bytes}/1024000" 1 2)"
+        suffix='MB'
     elif (( bytes > 1024 )); then
-        local number="$(float_pad "${bytes}/1024" 1 2)"
-        local suffix='KB'
+        number="$(float_pad "${bytes}/1024" 1 2)"
+        suffix='KB'
     else
-        local number="$bytes"
-        local suffix='B'
+        number="$bytes"
+        suffix='B'
     fi
 
     printf '%s%s\n' "$number" "$suffix"

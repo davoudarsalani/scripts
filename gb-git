@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-13 07:54:07 +0330 Saturday
+## last modified: 1400-09-14 15:49:39 +0330 Sunday
 
 # dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work
 
@@ -21,7 +21,9 @@ function git_repositories {  ## {{{
 }
 ## }}}
 function git_remotes {  ## {{{
-    local rmt="$(git -C "${1:-.}" remote -v)"
+    local rmo
+
+    rmt="$(git -C "${1:-.}" remote -v)"
     [ "$rmt" ] && printf '%s\n' "$rmt"
 }
 ## }}}
@@ -30,13 +32,17 @@ function git_commits_count {  ## {{{
 }
 ## }}}
 function git_commits_ahead {  ## {{{
-    local commits_ahead="$(git -C "${1:-.}" branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
+    local commits_ahead
+
+    commits_ahead="$(git -C "${1:-.}" branch -v | \grep 'ahead' | \grep -ioP '(?<=\[).*?(?=\])' | awk '{print $2}')"
     ## ^^ previously: git -C "${1:-.}" status -s | sed '1q;d' | \grep -i 'ahead' | awk '{print $NF}' | sed 's/[^0-9]//g'
     [ "$commits_ahead" ] && printf '%s\n' "$commits_ahead" || printf '0\n'
 }
 ## }}}
 function git_status {  ## {{{
-    local stts="$(git -C "${1:-.}" status -s)"
+    local stts
+
+    stts="$(git -C "${1:-.}" status -s)"
     [ "$stts" ] && printf '%s\n' "$stts"
 }
 ## }}}

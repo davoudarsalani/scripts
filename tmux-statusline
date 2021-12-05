@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-12 17:47:47 +0330 Friday
+## last modified: 1400-09-14 16:42:37 +0330 Sunday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
@@ -47,7 +47,7 @@ case "$1" in
           (( commits_ahead > 0 )) && commits_ahead=" Ⓐ $commits_ahead" || commits_ahead=''  ## 
 
           remotes="$(git_remotes "$2")"
-          [ "$(printf '%s\n' "$remotes" | \grep -i 'github')" ] && logo='  '
+          \grep -i 'github' <<< "$remotes" && logo='  '
           [ "$remotes" ] || is_local=' LOCAL'
 
           branches_count="$(wc -l < <(git_branches_exclude_remote "$2"))"
@@ -56,21 +56,22 @@ case "$1" in
           current_branch="$(git_current_branch "$2")"
           [ "$current_branch" == 'master' ] && current_branch='' || current_branch=" Ⓑ ${current_branch}"
 
-          printf '%s%s%s%s%s%s%s%s%s%s%s%s%s\n' "\
-${commits_count}\
-${mod}\
-${del}\
-${ren}\
-${add}\
-${unt}\
-${sta}\
-${sta_m}\
-${commits_ahead}\
-${logo}\
-${is_local}\
-${branches_count}\
-${current_branch}\
-${if_status}" ;;
+          printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
+                 "$commits_count" \
+                 "$mod" \
+                 "$del" \
+                 "$ren" \
+                 "$add" \
+                 "$unt" \
+                 "$sta" \
+                 "$sta_m" \
+                 "$commits_ahead" \
+                 "$logo" \
+                 "$is_local" \
+                 "$branches_count" \
+                 "$current_branch" \
+                 "$if_status"
+          ;;
 esac
 
 exit

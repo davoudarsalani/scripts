@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-11 15:38:45 +0330 Thursday
+## last modified: 1400-09-14 17:43:26 +0330 Sunday
 
 function get_datetime {  ## {{{
     case "$1" in
@@ -47,6 +47,20 @@ function wrap_fzf_choice {  ## {{{
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
 ## }}}
+function choose_file {  ## {{{
+    ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
+    ##      any change you make here, make sure to apply the changes there too
+    ## NOTE used also in ~/.config/lfrc
+
+    local item
+
+    eval "$FZF_CTRL_T_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf "$@" | \
+    while read -r item; do
+        item="$(head -2 <<< "$item" | tail -1)"
+        printf '%s\n' "${item/\~/$HOME}"
+    done
+}
+## }}}
 function choose_directory {  ## {{{
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
@@ -56,9 +70,9 @@ function choose_directory {  ## {{{
     ##   choose_directory
     ##   choose_directory 'dir_name'  ## to limit the results
 
-    local dir limiting
-    [ "$1" ] && limiting="-iname $1"
-    dir="$(eval "$FZF_ALT_C_COMMAND" "$limiting" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
+    local dir
+
+    dir="$(eval "$FZF_ALT_C_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
     printf '%q\n' "${dir/\~/$HOME}"
 }
 ## }}}
@@ -67,9 +81,11 @@ function pipe_to_fzf {  ## {{{
     ##   item="$(pipe_to_fzf "${items[@]}")"
     ##   item="$(pipe_to_fzf "${items[@]}" 'header=my header')"
 
-    local header last regex='^header='
+    local header last
     declare -a received=( "$@" )
+
     last="${received[-1]}"
+    regex='^header='
 
     ## remove last member if it is a header
     [[ "$last" =~ $regex ]] && {
@@ -87,9 +103,13 @@ function pipe_to_rofi {  ## {{{
     ##   item="$(pipe_to_rofi "${items[@]}" 'header=my header')"
     ##   item="$(pipe_to_rofi "${items[@]}" 'bg=red')"
 
-    local last theme header bg bg_regex='^bg=' header_regex='^header=' theme='onedark.rasi'
+    local last theme header bg
     declare -a received=( "$@" )
+
     last="${received[-1]}"
+    bg_regex='^bg='
+    header_regex='^header='
+    theme='onedark.rasi'
 
     ## NOTE as bg is passed as last arg, bg_regex should be checked first (e.i. before header_regex)
     [[ "$last" =~ $bg_regex ]] && {
@@ -114,15 +134,19 @@ function pipe_to_dmenu {  ## {{{
     ##   item="$(pipe_to_dmenu "${items[@]}" 'header=my header')"
     ##   item="$(pipe_to_dmenu "${items[@]}" 'bg=red')"
 
-    local last header bg bg_regex='^bg=' header_regex='^header=' theme='onedark.rasi'
+    local last header bg dmenusb
     declare -a received=( "$@" )
+
     last="${received[-1]}"
+    bg_regex='^bg='
+    header_regex='^header='
+    theme='onedark.rasi'
 
     ## NOTE as bg is passed as last arg, bg_regex should be checked first (e.i. before header_regex)
     [[ "$last" =~ $bg_regex ]] && {
         bg="${last#*=}"  ## JUMP_3 "${last/$bg_regex}" didn't work
         unset 'received[-1]'
-        local dmenusb="$bg"
+        dmenusb="$bg"
     }
 
     last="${received[-1]}"
@@ -186,11 +210,13 @@ function play_shutdown_track {  ## {{{
 }
 ## }}}
 function day_hour_min_sec {  ## {{{
-    local seconds="${1%.*}"  ## remove decimal in case arg is a float
-    local sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
-    local min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
-    local hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
-    local day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 ))")"
+    local seconds sec min hour day
+
+    seconds="${1%.*}"  ## remove decimal in case arg is a float
+    sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
+    min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
+    hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
+    day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 ))")"
     (( day == 0 )) && printf '%s\n' "${hour}:${min}:${sec}" || printf '%s\n' "${day}:${hour}:${min}:${sec}"
 }
 ## }}}
@@ -200,17 +226,20 @@ function clear_clipboard {  ## {{{
 }
 ## }}}
 function random_wallpaper {  ## {{{
-    local current_wallpaper_file=/tmp/current_wallpaper
+    local current_wallpaper_file rand_wall
+
+    current_wallpaper_file=/tmp/current_wallpaper
     ## same wallpaper for both screens
-    local rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
+    rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
     printf '%s\n' "${rand_wall##*/}" > "$current_wallpaper_file"
     feh --bg-scale "$rand_wall"
 }
 ## }}}
 function copy_random_wallpaper_for_startup {  ## {{{
     source "$HOME"/scripts/gb-color
+    local rand_wall
 
-    local rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
+    rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
     sudo cp "$rand_wall" /usr/share/wallpapers/startup_background.jpg
     msgn "<span color=\"${orange}\">${rand_wall##*/}</span> copied"
 }
@@ -218,28 +247,32 @@ function copy_random_wallpaper_for_startup {  ## {{{
 function set_widget {  ## {{{
     ## only the awesome-widgets use this function but it'd better be here (rather than the script itself)
     ## because sometimes it's needed by 0-test
-    local widget="$1"
-    local attr="$2"
-    local value="$3"
+
+    local widget attr value
+
+    widget="$1"
+    attr="$2"
+    value="$3"
+
     awesome-client "${widget}.${attr} = '${value}'"  ## NOTE do NOT change quotes
 }
 ## }}}
 function get_input {  ## {{{
     source "$HOME"/scripts/gb-color
+    local input
 
     unset input
-    while [ ! "$input" ]; do
-        read -p "$(olive "$@") " input
-        printf '\33[A'
-    done
-    printf '\n'
+    read -p "$(olive "$@") " input
+    printf '%s\n' "$input"
 }
 ## }}}
 function get_single_input {  ## {{{
     source "$HOME"/scripts/gb-color
+    local single_input
 
     unset single_input
-    while [ ! "$single_input" ]; do read -p "$(olive "$@") " -n 1 single_input; printf '\33[A'; done && printf '\n\n'
+    read -p "$(olive "$@") " -n 1 single_input
+    printf '%s\n' "$single_input"
 }
 ## }}}
 function line {  ## {{{
@@ -260,10 +293,14 @@ function rand_str {  ## {{{
 
  #     declare -a pics
 
- #     [ ! "$1" ] && red 'arg needed' && exit
+ #     [ "$1" ] || {
+ #         red 'arg needed'
+ #         exit
+ #     }
  #     dest_dir="$1"
- #     [ ! -d "$dest_dir" ] && {
- #         red 'no such dir' && exit
+ #     [ -d "$dest_dir" ] || {
+ #         red 'no such dir'
+ #         exit
  #     }
 
  #     SECONDS=0
@@ -276,14 +313,14 @@ function rand_str {  ## {{{
 
  #         ## start comparing only if p1 is not already in dups
  #         if_p1_in_dups="$(printf '%s\n' "$dups" | \grep "$p1")"  ## I quoted $p1 and didn't check if it still works
- #         if [ ! "$if_p1_in_dups" ]; then
+ #         [ "$if_p1_in_dups" ] || {
  #             printf '%s\n' "$p1"
  #             for p2 in "${pics[@]:$i}"; {
  #                 ## prevent comparing with itself
- #                 if [ ! "$p1" == "$p2" ]; then
+ #                 [ "$p1" == "$p2" ] || {
  #                     difference="$(diff "$p1" "$p2")"
- #                     [ ! "$(printf '%s\n' "$difference" | \grep 'differ$')" ] && dups+="${p1} = ${p2}, "
- #                 fi
+ #                     \grep -q 'differ$' <<< "$difference" || dups+="${p1} = ${p2}, "
+ #                 }
  #             }
 
  #             ## write dups already found if any
@@ -291,7 +328,7 @@ function rand_str {  ## {{{
 
  #             grey '-------------------------'
 
- #         fi
+ #         }
  #     }
 
  #     green "dups: $dups"
@@ -314,7 +351,7 @@ function rand_str {  ## {{{
  #    loops_count=10
  #    position="$1"
 
- #    [ ! "$position" == 'old' ] && [ ! "$position" == 'new' ] && {
+ #    [ "$position" == 'old' ] || [ "$position" == 'new' ] || {
  #        printf '%s\n' "$(red "arg can only be either old or new")"
  #        exit
  #    }

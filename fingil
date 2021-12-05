@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-14 15:24:38 +0330 Sunday
 
 ## Fingli written by alireza.amirsamimi@gmail.com & https://github.com/alireaza & fzero@rubi.gd
 ## https://github.com/alireza-amirsamimi/fingil
@@ -8,7 +8,9 @@
 ## Fingil Version 1.00
 
 function convert {
-    text="$@"  ## get arguments and set to variable
+    local text out
+
+    text=( "$@" )  ## get arguments and set to variable
     out=''  ## set variable
 
     for i in $(seq 0 "$(( "${#text}" - 1 ))"); {  ## split charactor  ## NOTE do NOT change quotes
@@ -113,9 +115,9 @@ function convert {
                 out='d9900a' ;;  ##ِ
             '5a0a' )  ## Z
                 out='d9830a' ;;  ## ك
-            '5b0a' )  ## [
+            '5b0a' )  ## [  SC2221 (warning): This pattern always overrides a later one in JUMP_1
                 out='d8ac0a' ;;  ## ج
-            '5d0a' )  ## ]
+            '5d0a' )  ## ]  SC2221 (warning): This pattern always overrides a later one on JUMP_2
                 out='da860a' ;;  ## چ
             '5e0a' )  ## ^
                 out='c3970a' ;;  ## ×
@@ -247,9 +249,9 @@ function convert {
                 out='4d0a' ;;  ## M
             'd9940a' )  ##ٔ
                 out='4e0a' ;;  ## N
-            '5d0a' )  ## ]
+            '5d0a' )  ## ]  JUMP_2
                 out='4f0a' ;;  ## O
-            '5b0a' )  ## [
+            '5b0a' )  ## [  JUMP_1
                 out='500a' ;;  ## P
             'd9920a' )  ##ْ
                 out='510a' ;;  ## Q

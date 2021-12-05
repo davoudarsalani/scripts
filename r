@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-11 15:40:37 +0330 Thursday
+## last modified: 1400-09-14 11:15:15 +0330 Sunday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
@@ -10,7 +10,7 @@ source "$HOME"/scripts/gb-color
 title="${0##*/}"
 heading "$title"
 
-cd "$(choose_directory)" 2>/dev/null || exit 37  ## TODO find how to pass $directory to rg down below before fzf instead of cding
+cd "$(choose_directory)" || exit 37  ## TODO find how to pass $directory to rg down below before fzf instead of cding
 
 main_item="$(pipe_to_fzf 'all' 'bash' 'python')" && wrap_fzf_choice "$main_item" || exit 37
 

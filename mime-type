@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:33:34 +0330 Monday
+## last modified: 1400-09-14 18:16:02 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -12,16 +12,18 @@ function display_help {
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -n ) [ ! "$name" ] && get_input 'Dir/fie name' && name="$input" ;;
+            -n ) [ "$name" ] || name="$(get_input 'Dir/fie name')" ;;
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,name:' --options 'hn:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,name:' --options 'hn:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in

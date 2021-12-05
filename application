@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 19:25:27 +0330 Wednesday
+## last modified: 1400-09-14 18:14:54 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -14,17 +14,19 @@ function display_help {
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -p ) [ ! "$package" ] && get_input 'Package name' && package="$input" ;;
-            -u ) [ ! "$unit"    ] && get_input 'Unit name'    && unit="$input"    ;;
+            -p ) [ "$package" ] || package="$(get_input 'Package name')" ;;
+            -u ) [ "$unit"    ] || unit="$(get_input 'Unit name')" ;;
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,package:,unit:' --options 'hp:u:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,package:,unit:' --options 'hp:u:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -40,7 +42,7 @@ function get_opt {
 get_opt "$@"
 heading "$title"
 
-main_items=( 'install' 'remove' 'packages' 'clear cache and clipboard' 'update' 'restore pacman database' 'systemd' 'systemctl' 'help' )
+main_items=( 'install' 'remove' 'packages' 'clear cache and clipboard' 'update' 'systemd' 'systemctl' 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -54,16 +56,16 @@ case "$main_item" in
                   local ) prompt -p
                           sudo pacman -U "$package" && accomplished ;;
                   'download (no install)' ) pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Sw && accomplished ;;
-                  'reinstall all packages' ) get_single_input 'You sure?' && reinstall_prompt="$single_input"
+                  'reinstall all packages' ) reinstall_prompt="$(get_single_input 'You sure?')" && printf '\n'
                                              case "$reinstall_prompt" in
                                                  y ) sudo pacman -Qnq | pacman -S - && accomplished ;;
                                              esac ;;
-                  'lts kernel & header' ) get_single_input 'Start?' && start_prompt="$single_input"
+                  'lts kernel & header' ) start_prompt="$(get_single_input 'Start?')" && printf '\n'
                                           case "$start_prompt" in
                                               y ) action_now 'Installing'
                                                   sudo pacman -S --needed linux-lts linux-lts-headers
                                                   printf '\n'
-                                                  get_single_input 'Update bootloader?' && update_prompt="$single_input"
+                                                  update_prompt="$(get_single_input 'Update bootloader?')" && printf '\n'
                                                   case "$update_prompt" in
                                                       y ) action_now 'Updating bootloader'
                                                           sudo grub-mkconfig -o /boot/grub/grub.cfg && accomplished 'Please reboot now.\n  You can choose linux-lts in grub menu when booting.\n  You can remove the latest kernel after reboot.' ;;
@@ -84,7 +86,7 @@ case "$main_item" in
                  'remove latest kernel' ) sudo pacman -R linux && accomplished ;;
              esac ;;
     packages ) packages_items=( 'count' 'names' 'AUR packages' 'pacman tools' 'system stats (using yay)' )
-               packages_item="$(pipe_to_fzf "${packages_items[@]}")" && wrap_fzf_choice "$packaegs_item" || exit 37
+               packages_item="$(pipe_to_fzf "${packages_items[@]}")" && wrap_fzf_choice "$packages_item" || exit 37
 
                case "$packages_item" in
                    count ) pkg_count="$(wc -l < <(pacman -Q))"
@@ -101,16 +103,16 @@ case "$main_item" in
                                   sudo pacman -Sc --noconfirm  ## cc will clean all the files (which is not a good idea)
                                   action_now 'removing orphans'
                                   readarray -t os < <(sudo pacman -Qtdq)  ## is sudo needed?
-                                  if [ "$os" ]; then
-                                      get_single_input 'Orphans found but the uninstall command is not fully testde yet. Proceed?' && remove_orphans="$single_input"
+                                  if [ "${os[0]}" ]; then
+                                      remove_orphans="$(get_single_input 'Orphans found but the uninstall command is not fully tested yet. Proceed?')" && printf '\n'
                                       case "$remove_orphans" in
-                                          y ) sudo pacman -Rns "${orphans[@]}" --noconfirm ;;
+                                          y ) sudo pacman -Rns "${os[@]}" --noconfirm ;;
                                           * ) yellow '  removing orphans skipped'
                                       esac
                                   else
                                       printf '  no orphans\n'
                                   fi
-                                  action_now "removing \$HOME/.cache (size: "$(du -sh "$HOME"/.cache/ | awk '{print $1}')"):"
+                                  action_now "removing \$HOME/.cache (size: $(du -sh "$HOME"/.cache/ | awk '{print $1}')):"
                                   rm -rf "$HOME"/.cache
                                   accomplished ;;
     update ) update_items=( 'pacman' 'yay' 'yay + torsocks' 'sync repos' 'available updates' 'last update' )
@@ -147,18 +149,12 @@ case "$main_item" in
                                        else
                                            msgn "available updates: <span color=\"${orange}\">${ups_count}</span> / <span color=\"${orange}\">${aur_ups_count}</span>"
                                        fi ;;
-                 'last update' ) last_update_date="$(egrep 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/g')"  ## 2021-04-15T11:10:03+0430
+                 'last update' ) last_update_date="$(grep -E 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/')"  ## 2021-04-15T11:10:03+0430
                                  last_update_sec="$(date -d "$last_update_date" +%s)"  ## <--,     ## convert 2021-04-15T11:10:03+0430 to 1618468803
                                  current_seconds="$(get_datetime 'jseconds')"          ## <--'---  ## only +%s and jseconds (OR seconds) work
                                  dur="$(day_hour_min_sec "$(( "$current_seconds" - "$last_update_sec" ))")"
                                  printf 'last update: %s ago (on %s)\n' "$dur" "$last_update_date"
              esac ;;
-    'restore pacman database' ) get_single_input 'You sure?' && restore_prompt="$single_input"
-                                case "$restore_prompt" in
-                                    y ) cp "$HOME"/linux/cfg-pacman-database/pacman_database.tar.bz2 / && cd /
-                                        sleep 0.5
-                                        tar -xjvf pacman_database.tar.bz2 && accomplished ;;
-                                esac ;;
     systemd ) systemd_items=( 'systemd-analyze' 'systemd-analyze blame' 'reload systemd' 'reload systemd units' )
               systemd_item="$(pipe_to_fzf "${systemd_items[@]}")" && wrap_fzf_choice "$systemd_item" || exit 37
 

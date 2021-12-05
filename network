@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:33:55 +0330 Monday
+## last modified: 1400-09-14 12:34:07 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-network
@@ -12,26 +12,28 @@ function display_help {
     network_help
 }
 
-function prompt {
-    for args in "$@"; {
-        case "$1" in
-            -i ) [ ! "$ip"         ] && get_input 'ip'                    && ip="$input"         ;;
-            -d ) [ ! "$device"     ] && get_input 'Device (e.g. eth0)'    && device="$input"     ;;
-            -c ) [ ! "$connection" ] && get_input 'Connection (e.g. MOB)' && connection="$input" ;;
-            -s ) [ ! "$ssid"       ] && get_input 'ssid'                  && ssid="$input"       ;;
-            -p ) [ ! "$password"   ] && get_input 'Password'              && password="$input"   ;;
-        esac
-        shift
-    }
-}
-
 function add_desired_ip_to_ethernet {
     source "$HOME"/scripts/gb-network
     sudo ip address add "$desired_eth_ip" broadcast + dev "$eth_devc"
 }
 
+function prompt {
+    for _ in "$@"; {
+        case "$1" in
+            -i ) [ "$ip"         ] || ip="$(get_input 'ip')"                            ;;
+            -d ) [ "$device"     ] || device="$(get_input 'Device (e.g. eth0)')"        ;;
+            -c ) [ "$connection" ] || connection="$(get_input 'Connection (e.g. MOB)')" ;;
+            -s ) [ "$ssid"       ] || ssid="$(get_input 'ssid')"                        ;;
+            -p ) [ "$password"   ] || password="$(get_input 'Password')"                ;;
+        esac
+        shift
+    }
+}
+
 function get_opt {
-    local options="$(getopt --longoptions 'help,ip:,device:,connection:,ssid:,password:' --options 'hi:d:c:s:p:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,ip:,device:,connection:,ssid:,password:' --options 'hi:d:c:s:p:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in

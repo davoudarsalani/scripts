@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:35:07 +0330 Monday
+## last modified: 1400-09-14 19:10:40 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -12,19 +12,21 @@ function display_help {
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -l ) [ ! "$length"    ] && get_input 'Length'                                             && length="$input"    ;;
-            -d ) [ ! "$directory" ] && get_input 'Directory (e.g. TOEIC/Level-1 or 6-Minute-English)' && directory="$input" ;;
-            -p ) [ ! "$per_page"  ] && get_input 'Per page'                                           && per_page="$input"  ;;
-            -f ) [ ! "$dest_file" ] && get_input 'Destination file'                                   && dest_file="$input" ;;
+            -l ) [ "$length"    ] || length="$(get_input 'Length')"                                                 ;;
+            -d ) [ "$directory" ] || directory="$(get_input 'Directory (e.g. TOEIC/Level-1 or 6-Minute-English))')" ;;
+            -p ) [ "$per_page"  ] || per_page="$(get_input 'Per page')"                                             ;;
+            -f ) [ "$dest_file" ] || dest_file="$(get_input 'Destination file')"                                    ;;
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,length:,directory:,per-page:,destination-file:' --options 'hl:d:p:f:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,length:,directory:,per-page:,destination-file:' --options 'hl:d:p:f:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -57,14 +59,16 @@ for ((n=1; n<="$length"; n++)); do
     n3="$(printf "%03d" "$n")"
     printf '%s\n' "$n3"
 
-    ## audio player
-    printf '<!-- wp:audio --><figure class=\"wp-block-audio\"><audio controls=\"\" src=\"https://www.dl.davoudarsalani.ir/DL/Audio/%s/%s.mp3\"></audio></figure><!-- /wp:audio -->' "$directory" "$n3" >> "$dest_file"
+    {
+        ## audio player
+        printf '<!-- wp:audio --><figure class=\"wp-block-audio\"><audio controls=\"\" src=\"https://www.dl.davoudarsalani.ir/DL/Audio/%s/%s.mp3\"></audio></figure><!-- /wp:audio -->' "$directory" "$n3"
 
-    ## title
-    printf '<!-- wp:pullquote --><figure class=\"wp-block-pullquote\"><blockquote><p></p></blockquote></figure><!-- /wp:pullquote -->\n\n' >> "$dest_file"
+        ## title
+        printf '<!-- wp:pullquote --><figure class=\"wp-block-pullquote\"><blockquote><p></p></blockquote></figure><!-- /wp:pullquote -->\n\n'
 
-    ## body
-    printf '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->\n\n' >> "$dest_file"
+        ## body
+        printf '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->\n\n'
+    } >> "$dest_file"
 
     ## separator or nextpage
     [ "$(( "$n" % "$per_page" ))" == 0 ] && nextpage || separator

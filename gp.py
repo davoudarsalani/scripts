@@ -1,4 +1,4 @@
-## last modified: 1400-09-10 14:02:13 +0330 Wednesday
+## last modified: 1400-09-14 11:07:45 +0330 Sunday
 
 # {{{ requirements
 ## for .venv_keylogger: keylogger
@@ -434,10 +434,9 @@ def get_width() -> int:  ## {{{
     # return subprocess.check_output('tput cols', shell=True, universal_newlines=True).strip()
 ## }}}
 def get_input(prompt: str) -> Any:  ## {{{
-    while len(inp := input(Color().ask(f'{prompt} '))) < 1:
-        pass
-
-    return inp
+    answer=input(Color().ask(f'{prompt} '))
+    if answer:
+        return answer
 ## }}}
 def get_single_input(prompt: str) -> Any:  ## {{{ https://stackoverflow.com/questions/510357/how-to-read-a-single-character-from-the-user
     def _find_getch() -> Any:
@@ -458,12 +457,11 @@ def get_single_input(prompt: str) -> Any:  ## {{{ https://stackoverflow.com/ques
         return _getch
 
     getch = _find_getch()
-    while (single_char := getch()) == '\r':
-        print()
+    single_char = getch()
 
-    print(single_char)
-
-    return single_char
+    if single_char:
+        print(single_char)
+        return single_char
 
     '''
     from click import getchar, echo

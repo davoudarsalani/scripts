@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 13:24:40 +0330 Saturday
+## last modified: 1400-09-14 15:56:32 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -39,7 +39,7 @@ case "$1" in
 
               ## ping and send messages if unsuccessful
               output="$(ping -c 1 4.2.2.4 2>&1)"
-              [ "$(printf '%s\n' "$output" | \grep -i 'network is unreachable')" ] && {
+              \grep -qi 'network is unreachable' <<< "$output" && {
                   for ((i=1; i<=10; i++)); {
                       msgn "$output"
                       sleep 0.1

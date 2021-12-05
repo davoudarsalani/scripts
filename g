@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-12 16:46:05 +0330 Friday
+## last modified: 1400-09-14 17:39:30 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -23,7 +23,10 @@ function if_locked {  ## {{{
 ## }}}
 function check_pattern {  ## {{{
     matches="$(find "$directory" -mindepth 1 -iname "$pattern")"   ## -maxdepth 1 is not needed here
-    [ ! "$matches" ] && red 'no such pattern' && exit
+    [ "$matches" ] || {
+        red 'no such pattern'
+        exit
+    }
 }
 ## }}}
 function if_amend_allowed {  ## {{{
@@ -31,9 +34,10 @@ function if_amend_allowed {  ## {{{
 }
 ## }}}
 function add_to_changes {  ## {{{
+    local icon
     declare -a received=( "$@" )
 
-    local icon="${received[0]}"
+    icon="${received[0]}"
     unset 'received[0]'
 
     for member in "${received[@]}"; {
@@ -42,8 +46,10 @@ function add_to_changes {  ## {{{
 }
 ## }}}
 function if_changed {  ## {{{
+    local stts
+
     changes=()  ## NOTE do NOT use declare -a changes since declare makes changes a local variable
-    local stts="$(git_status "$directory")"
+    stts="$(git_status "$directory")"
     readarray -t mod   < <(printf '%s\n' "$stts" | \grep '^ M'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${mod[@]}"
     readarray -t del   < <(printf '%s\n' "$stts" | \grep '^ D'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${del[@]}"
     readarray -t ren   < <(printf '%s\n' "$stts" | \grep '^ R'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes 'Ⓡ' "${ren[@]}"
@@ -52,30 +58,37 @@ function if_changed {  ## {{{
     readarray -t sta   < <(printf '%s\n' "$stts" | \grep '^[MDRA] '      | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta[@]}"
     readarray -t sta_m < <(printf '%s\n' "$stts" | \grep '^[MDRA][MDRA]' | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta_m[@]}"
 
-    [ ! "$changes" ] && green 'sleeping ...' && exit  ## checking if array is empty. no need to [@]
+    [ "${changes[0]}" ] || {
+        green 'sleeping ...'
+        exit
+    }
 }
 ## }}}
 function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
-    local short_pwd="${PWD/$HOME/\~}"
-    local short_directory="${directory/$HOME/\~}"
+    local fzf_choice short_pwd short_directory
+
+    short_pwd="${PWD/$HOME/\~}"
+    short_directory="${directory/$HOME/\~}"
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
                                          ##        we have to do the sourcing for the very same reason
-    local fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
-                                                 --preview-window "$preview_status" \
-                                                 --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
-                                                 ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+    fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
+                                           --preview-window "$preview_status" \
+                                           --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
+                                           ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
 ## }}}
 function branch_info {  ## {{{ https://revelry.co/terminal-workflow-fzf/
+    local fzf_choice
+
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
                                          ##        we have to do the sourcing for the very same reason
     ## no need to --preview-window "$preview_status" because it uses the value set in bahrc in FZF_DEFAULT_OPTS
-    local fzf_choice="$(printf '%s\n' "$@" | fzf \
-                        --preview 'source "$HOME"/scripts/gb-git; git_log "${directory2:-.}" \
-                        $(sed s/^..// <<< {} | cut -d " " -f 1)' #| sed 's/^..//' | cut -d " " -f 1
-                        ## ^^ ORIG: --preview 'git -C "${directory2:-.}" log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
-                      )"
+    fzf_choice="$(printf '%s\n' "$@" | fzf \
+                  --preview 'source "$HOME"/scripts/gb-git; git_log "${directory2:-.}" \
+                  $(sed s/^..// <<< {} | cut -d " " -f 1)' #| sed 's/^..//' | cut -d " " -f 1
+                  ## ^^ ORIG: --preview 'git -C "${directory2:-.}" log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
+                )"
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
 ## }}}
@@ -86,20 +99,22 @@ function branches_array {  ## {{{
 }
 ## }}}
 function prompt {  ## {{{
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -p ) [ ! "$pattern"     ] && get_input 'Pattern'     && pattern="$input"; check_pattern ;;
-            -m ) [ ! "$message"     ] && get_input 'Message'     && message="$input"     ;;
-            -b ) [ ! "$branch"      ] && get_input 'Branch'      && branch="$input"      ;;
-            -t ) [ ! "$tag"         ] && get_input 'Tag'         && tag="$input"         ;;
-            -c ) [ ! "$commit_hash" ] && get_input 'Commit hash' && commit_hash="$input" ;;
+            -p ) [ "$pattern"     ] || pattern="$(get_input 'Pattern')"; check_pattern ;;
+            -m ) [ "$message"     ] || message="$(get_input 'Message')"         ;;
+            -b ) [ "$branch"      ] || branch="$(get_input 'Branch')"           ;;
+            -t ) [ "$tag"         ] || tag="$(get_input 'Tag')"                 ;;
+            -c ) [ "$commit_hash" ] || commit_hash="$(get_input 'Commit hash')" ;;
         esac
         shift
     }
 }
 ## }}}
 function get_opt {  ## {{{
-    local options="$(getopt --longoptions 'help,noproxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hnp:m:b:t:c:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,noproxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hnp:m:b:t:c:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -154,12 +169,15 @@ case "$main_item" in
           ## }}}
     commit )  ## {{{
              if_changed
-             [ ! "$sta" ] && red 'no staged files' && exit  ## checking if array is empty. no need to [@]
+             [ "${sta[0]}" ] || {
+                 red 'no staged files'
+                 exit
+             }
 
              preview_status='hidden'
-             commmit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$commit_item" || exit 37
+             commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$commit_item" || exit 37
 
-             case "$commmit_item" in
+             case "$commit_item" in
                  "open $editor" ) if_locked
                                   git_commit_in_editor "$directory" && \
                                   accomplished "committed in $editor" ;;
@@ -232,7 +250,10 @@ case "$main_item" in
            ## }}}
     unstage )  ## {{{
               if_changed
-              [ ! "$sta" ] && red 'no staged files' && exit  ## checking if array is empty. no need to [@]
+              [ "${sta[0]}" ] || {
+                  red 'no staged files'
+                  exit
+              }
 
               preview_status='hidden'
               unstage_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$unstage_item" || exit 37
@@ -384,7 +405,7 @@ case "$main_item" in
              revert_item="$(pipe_to_fzf_locally "${revert_items[@]}")" && wrap_fzf_choice "$revert_item" || exit 37
              revert_item="$(printf '%s\n' "$revert_item" | sed 's/\* \([^ ]\+\) .*/\1/g')"
 
-             get_single_input "revert to ${revert_item}?" && revert_prompt="$single_input"
+             revert_prompt="$(get_single_input "revert to ${revert_item}?")" && printf '\n'
              case "$revert_prompt" in
                  y ) git_revert "$directory" "$revert_item" && \
                      accomplished "$revert_item reverted to" ;;

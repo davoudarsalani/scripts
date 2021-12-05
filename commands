@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-11 13:55:55 +0330 Thursday
+## last modified: 1400-09-14 17:45:18 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
 title="${0##*/}"
 
 function ctc_msg {
-    local trimmed="$(printf '%s\n' "$@" | tr -d \<,\&)"
+    local trimmed
+
+    trimmed="$(printf '%s\n' "$@" | tr -d \<,\&)"
     msgn 'copied to clipboard' "<span color=\"${orange}\">${trimmed}</span>"
 }
 
@@ -145,8 +147,8 @@ associative array ---> declare -A vids=(['key one']='value one' ['key two']='val
                        printf '%s\n' "${!vids[@]}"         ## keys
                        printf '%s\n' "${vids[@]}"          ## values
                        printf '%s\n' "${vids['key one']}"  ## specific
-create readonly variable         [i]  ---> readonly var=67
-create readonly variable (local) [ii] ---> declare -r var=67
+create readonly variable         [i]  ---> readonly var
+create readonly variable (local) [ii] ---> declare -r var
 diff the output of two commands ---> diff <(MYCOMMAND1) <(MYCOMMAND2)
 print sth on the right in bash (align right) ---> printf '%*s\n' "$COLUMNS" 'STRING'
 make read input invisible when entering ---> -s
@@ -218,15 +220,14 @@ weather [vii] ---> curl -s wttr.in/zahedan?format=%t+%h+%p >> +10°C 54% 0.0mm
 print lines between two phrases ---> sed -n '/PHRASE1/,/PHRASE2/p' PATH
 get installation date ---> stat / | grep 'Birth'
 get signal names and integers ---> kill -l
-check if array is full  ---> [ "$ARRAY" ] && MYCOMMAND  ## no need to [@]
-check if array is empty ---> [ ! "$ARRAY" ] && MYCOMMAND  ## no need to [@]
+check if array is full  ---> [ "${ARRAY[0]}" ] && ...
+check if array is empty ---> [ "${ARRAY[0]}" ] || ...
 create var using printf ---> printf -v VAR 'STRING'/NUMBER
 insert commas into number ---> printf "%'d\n" NUMBER  ## returns 5,364,536  ## NOTE do NOT change quotes
 turn seconds (obtained with $(date +%s) or printf '%(%s)T\n') into a date format ---> printf '%(%F %X)T\n' SECONDS  ## returns 1971-09-14 12:59:24 AM
 uniq lines [i]  ---> | sort --unique
 uniq lines [ii] ---> | sort | uniq
 list fonts ---> fc-list -f '%{file}\n'
-check if .git exists in pwd ---> [ ! "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ] && printf 'no git\n'
 
 baskreference ---> [[ 'this is a random string' =~ ^this\ is\ (.*)\ st(ri)ng$ ]]
                    printf '%s\n' "${BASH_REMATCH[0]}"  ## returns this is a random string

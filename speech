@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 21:50:45 +0330 Wednesday
+## last modified: 1400-09-14 12:40:48 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -15,7 +15,9 @@ function no_such_dir {
 }
 
 function success_moving {
-    local text="$(printf "moved to <span color=\"%s\">LISTENED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$no_suffix")"
+    local text
+
+    text="$(printf "moved to <span color=\"%s\">LISTENED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$no_suffix")"
     msgn "$text" '' "$HOME"/linux/themes/delete-w.png
 }
 
@@ -50,7 +52,7 @@ case "$1" in
 
            directory="${directory##*' '}"  ## remove count
 
-           [ ! -d "$HOME"/speech/"$directory" ] && no_such_dir
+           [ -d "$HOME"/speech/"$directory" ] || no_such_dir
 
            turn_off_shuffle; sleep 0.1
            clear_playlist  ; sleep 0.1
@@ -63,8 +65,8 @@ case "$1" in
            "$HOME"/scripts/awesome-widgets audacious resume ;;
 
     move ) ## exit if album is not speech
-           [ ! "$album" == 'speech' ] && exit  ## NOTE <--,-- do NOT remove this line because audacious is told to run the scripts with remove auto args
-                                               ##         '-- whenever starting a new song no matter what the album is
+           [ "$album" == 'speech' ] || exit  ## NOTE <--,-- do NOT remove this line because audacious is told to run the scripts with remove auto args
+                                             ##         '-- whenever starting a new song no matter what the album is
 
            if [ "$2" == 'auto' ]; then
               ## this option is called directly by audacious when starting a new song
@@ -77,7 +79,7 @@ case "$1" in
                directory="${directory##*' '}"  ## pargar
            fi
 
-           [ ! -d "$HOME"/speech/"$directory" ] && no_such_dir
+           [ -d "$HOME"/speech/"$directory" ] || no_such_dir
 
            first_file="$(find "$HOME"/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 1)"  ## /home/${USER}/speech/pargar/709.mp3
 
@@ -119,7 +121,7 @@ case "$1" in
                 for file in "${first_five_files[@]}"; {
                     base="${file##*/}"
                     no_suffix="${base%.*}"
-                    if [ ! "$(printf '%s\n' "$current_songs" | \grep -i "$no_suffix")" ]; then
+                    if ! \grep -qi "$no_suffix" <<< "$current_songs"; then
                         audacious -e "$file"
                         msgn "added <span color=\"${orange}\">${no_suffix}</span>"
                     fi

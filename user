@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:34:55 +0330 Monday
+## last modified: 1400-09-14 16:46:51 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -13,16 +13,18 @@ function display_help {
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -g ) [ ! "$group" ] && get_input 'Group' && group="$input" ;;
+            -g ) [ "$group" ] || group="$(get_input 'Group')" ;;
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,group:' --options 'hg:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,group:' --options 'hg:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -42,7 +44,7 @@ main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" ||
 
 case "$main_item" in
     info ) printf 'User/ID:\t\t%s/%s\n' "$(id -un)" "$(id -u)"  ## OR $EUID (for user ID)
-           printf 'Groups:\t\t\t%s\n' "$(groups $(id -un))"
+           printf 'Groups:\t\t\t%s\n' "$(groups "$(id -un)")"
            printf 'Groups IDs:\t\t%s\n' "$(id -G)"
            printf 'Effective group ID:\t%s\n' "$(id -g)" && accomplished ;;
     'create group' ) prompt -g

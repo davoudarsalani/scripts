@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:34:24 +0330 Monday
+## last modified: 1400-09-14 12:43:50 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -68,17 +68,19 @@ function type_in_terminal {  ## by Metalx1000 (https://pastebin.com/Uqf6DPmZ)
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -f ) [ ! "$file" ] && get_input 'File'                             && file="$input" ;;
-            -s ) [ ! "$slp"  ] && get_input 'Sleep (e.g. 0.2, 1, random, etc)' && slp="$input" ;;
+            -f ) [ "$file" ] || file="$(get_input 'File')"                            ;;
+            -s ) [ "$slp"  ] || slp="$(get_input 'Sleep (e.g. 0.2, 1, random, etc)')" ;;
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,file:,sleep:' --options 'hf:s:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,file:,sleep:' --options 'hf:s:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in

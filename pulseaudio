@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:34:06 +0330 Monday
+## last modified: 1400-09-14 17:33:11 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -13,16 +13,18 @@ function display_help {
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -d ) [ ! "$default" ] && get_input 'Default sink/source index/name' && default="$input"
+            -d ) [ "$default" ] || default="$(get_input 'Default sink/source index/name')"
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,default:' --options 'hd:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,default:' --options 'hd:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -42,8 +44,8 @@ main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" ||
 
 case "$main_item" in
     cards ) pacmd list-cards && accomplished ;;
-    'sinks/sources' ) pacmd list-sinks | egrep -i 'index:|name:'  ## OR  printf '%s\n' "$(pacmd list-cards | \grep -iA 5 sinks | sed '/sources/q' | \egrep -iv 'sinks|sources' | cut -d '#' -f 2 | cut -c 1)
-                      pacmd list-sources | egrep -i 'index:|name:' && accomplished ;;  ## OR  printf '%s\n' "$(pacmd list-cards | \grep -iA 5 sources | sed '/ports/q' | \egrep -iv 'sources|ports' | cut -d '#' -f 2 | cut -c 1)
+    'sinks/sources' ) pacmd list-sinks | grep -Ei 'index:|name:'  ## OR  printf '%s\n' "$(pacmd list-cards | \grep -iA 5 sinks | sed '/sources/q' | \grep -Eiv 'sinks|sources' | cut -d '#' -f 2 | cut -c 1)
+                      pacmd list-sources | grep -Ei 'index:|name:' && accomplished ;;  ## OR  printf '%s\n' "$(pacmd list-cards | \grep -iA 5 sources | sed '/ports/q' | \grep -Eiv 'sources|ports' | cut -d '#' -f 2 | cut -c 1)
     'default sink/source/mon' ) printf 'default sink name:\t%s\n' "$def_sink_name"
                                 printf 'default sink index:\t%s\n' "$def_sink_index"
                                 printf 'default source name:\t%s\n' "$def_source_name"
@@ -94,7 +96,7 @@ source: ${active_source_port}"
                                     'set default source' ) prompt -d
                                                            pacmd set-default-source "$default" && accomplished ;;
                                 esac ;;
-    restart ) get_single_input 'You sure?' && restart_prompt="$single_input"
+    restart ) restart_prompt="$(get_single_input 'You sure?')" && printf '\n'
               case "$restart_prompt" in
                   y ) pulseaudio --kill && sleep 1 && pulseaudio --start && msgn 'pulseaudio restarted' && accomplished ;;
               esac ;;

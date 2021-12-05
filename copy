@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 19:14:22 +0330 Wednesday
+## last modified: 1400-09-14 17:31:51 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -8,13 +8,18 @@ source "$HOME"/scripts/gb-color
 title="${0##*/}"
 
 function cd_and_rm_all_except_path {
-    [ ! -d "$HOME"/linux/"$cfg_dir" ] && red 'No such cfg-dir' && exit
+    local remove_propmt
+
+    [ -d "$HOME"/linux/"$cfg_dir" ] || {
+        red 'no such cfg-dir'
+        exit
+    }
 
     readarray -t files < <(find "$HOME"/linux/"$cfg_dir" -mindepth 1 -maxdepth 1 ! -iname '*0-path.txt' | sort)
     printf '%s\n' "${files[@]##*/}" | column
 
-    get_single_input 'Remove these?' && propmt="$single_input"
-    case "$propmt" in
+    remove_propmt="$(get_single_input 'Remove these?')" && printf '\n'
+    case "$remove_propmt" in
         y ) rm -rf "${files[@]}" ;;
         * ) exit ;;
     esac
@@ -50,13 +55,14 @@ case "$main_item" in
     ranger )                ## first, check if the version of os python and ranger python are different
                             ranger_python="$(ranger --version | \grep -i 'python version' | awk '{print $3}')"
                             os_python="$(python --version | awk '{print $NF}')"
-                            [ ! "$os_python" == "$ranger_python" ] && {
-                                red "Different python versions. ranger python: ${ranger_python}, os python: ${os_python})" && exit
+                            [ "$os_python" == "$ranger_python" ] || {
+                                red "Different python versions. ranger python: ${ranger_python}, os python: ${os_python})"
+                                exit
                             }
 
                             ## now check if python version has changed from 3.9.*
                             regex='3.9.*'
-                            [[ ! "$os_python" == $regex ]] && {
+                            [[ "$os_python" =~ $regex ]] || {
                                 red "python version changed ($os_python)" && exit
                             }
 
@@ -80,7 +86,10 @@ case "$main_item" in
                             action_now 'removing'; cd_and_rm_all_except_path
                             action_now 'copying';  cp -r /etc/pacman.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
     gtk-2.0 )               cfg_dir='cfg-gtk-2.0'
-                            [ ! -f "$HOME/.gtkrc-2.0" ] && red " The file ${HOME}/.gtkrc-2.0 does not exist!" && exit
+                            [ -f "$HOME/.gtkrc-2.0" ] || {
+                                red "${HOME}/.gtkrc-2.0 does not exist!"
+                                exit
+                            }
                             action_now 'removing'; cd_and_rm_all_except_path
                             action_now 'copying';  cp -r "$HOME"/.gtkrc-2.0                         "$HOME"/linux/"$cfg_dir"
                                                    cp -r "$HOME"/.config/gtk-2.0/gtkfilechooser.ini "$HOME"/linux/"$cfg_dir" && accomplished ;;

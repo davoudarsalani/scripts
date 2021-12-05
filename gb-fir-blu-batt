@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 09:25:37 +0330 Saturday
+## last modified: 1400-09-14 12:00:16 +0330 Sunday
 
 ## firewall
 firewall_status="$(sudo ufw status | \grep -i status | awk '{print $NF}')"
@@ -12,7 +12,7 @@ headset_mac="$(bluetoothctl devices | \grep 'Headset$' | awk '{print $2}')"
 
 ## battery
 read -a batt_info < <(acpi)  ## Battery 0: Charging, 1%, charging at zero rate - will never fully charge.
-[ "$batt_info" ] && {  ## checking if array is full. no need to [@]
+[ "${batt_info[0]}" ] && {
     battery_status="${batt_info[2]//,/}"  ## Charging  ## OR cat /sys/class/power_supply/BAT1/status
     battery_level="${batt_info[3]//%,/}"  ## 28        ## OR cat /sys/class/power_supply/BAT1/capacity
     battery_rem="${batt_info[4]%:*}"      ## 12:47 OR charging

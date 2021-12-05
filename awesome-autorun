@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 13:05:31 +0330 Saturday
+## last modified: 1400-09-14 12:12:25 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -39,7 +39,10 @@ current_date="$(get_datetime 'jymd')"
 "$HOME"/scripts/.venv_keylogger/bin/python3 "$HOME"/scripts/.venv_keylogger/bin/keylogger --log-file "$HOME"/linux/keylogs/keylog-"$current_date" &
 
 # source "$HOME"/scripts/gb-network
-# [ ! "$eth_ip" ] && add_desired_ip_to_ethernet && msgn "added <span color=\"${orange}\">${desired_eth_ip}</span> to <span color=\"${orange}\">${eth_devc}</span>"
+# [ "$eth_ip" ] || {
+#    add_desired_ip_to_ethernet
+#    msgn "added <span color=\"${orange}\">${desired_eth_ip}</span> to <span color=\"${orange}\">${eth_devc}</span>"
+# }
 
 widgets=(
     'audio'

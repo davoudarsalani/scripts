@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 21:40:38 +0330 Wednesday
+## last modified: 1400-09-14 16:44:25 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -15,10 +15,13 @@ case "$main_item" in
           add_item="$(pipe_to_rofi "${add_items[@]}" 'header=add')" || exit 37
 
           ## exit if it already exists
-          [ "$(\grep -w "$add_item" "$file")" ] && msgc 'ERROR' "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/linux/themes/alert-w.png && exit
+          \grep -qw "$add_item" "$file" && msgc 'ERROR' "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/linux/themes/alert-w.png && exit
 
           printf '%s\n' "$add_item" >> "$file" && msgn "added <span color=\"${orange}\">${add_item}</span>" ;;
-    REMOVE ) [ ! "$content" ] && msgc 'ERROR' 'todo is empty' "$HOME"/linux/themes/alert-w.png && exit
+    REMOVE ) [ "${content[0]}" ] || {
+                 msgc 'ERROR' 'todo is empty' "$HOME"/linux/themes/alert-w.png
+                 exit
+             }
 
              # remove_items=  ## exceptionally skipped this line because we already have the content in the form of an array an can use it below
              remove_item="$(pipe_to_rofi "${content[@]}" 'header=remove' 'bg=red')" || exit 37
@@ -28,7 +31,7 @@ case "$main_item" in
             empty_item="$(pipe_to_rofi "${empty_items[@]}" 'header=you sure?')" || exit 37
 
             case "$empty_item" in
-                yes ) > "$file" && msgn 'emptied' ;;
+                yes ) : > "$file" && msgn 'emptied' ;;
             esac ;;
 esac
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 20:43:38 +0330 Wednesday
+## last modified: 1400-09-14 18:16:13 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -12,17 +12,19 @@ function display_help {
 }
 
 function prompt {
-    for args in "$@"; {
+    for _ in "$@"; {
         case "$1" in
-            -d ) [ ! "$device" ] && get_input 'Device (e.g. /dev/sdc)' && device="$input" ;;
-            -n ) [ ! "$name"   ] && get_input "Name (e.g. ${USER^^})"  && name="$input"   ;;
+            -d ) [ "$device" ] || device="$(get_input 'Device (e.g. /dev/sdc)')" ;;
+            -n ) [ "$name"   ] || name="$(get_input "Name (e.g. ${USER^^})")"    ;;
         esac
         shift
     }
 }
 
 function get_opt {
-    local options="$(getopt --longoptions 'help,device:,name:' --options 'hd:n:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,device:,name:' --options 'hd:n:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -39,7 +41,10 @@ get_opt "$@"
 
 case "$1" in
     mount ) get_mountable_umountable
-            [ ! "$mountable" ] && msgn 'nothing to mount' && exit
+            [ "$mountable" ] || {
+                msgn 'nothing to mount'
+                exit
+            }
             mountable_item="$(pipe_to_rofi "${mountable[@]}" 'header=mountable')" || exit 37
 
             current_datetime="$(get_datetime 'jymdhms')"
@@ -55,7 +60,7 @@ case "$1" in
 
             mkdir -p /tmp/"$current_datetime"-"$name"
 
-            if [ "$(printf '%s\n' "$name" | \grep '^sr')" ]; then
+            if  \grep -q '^sr' <<< "$name"; then
                 sudo mount /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
             else
                 sudo mount -o umask=000 /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
@@ -63,7 +68,10 @@ case "$1" in
 
             accomplished ;;
     umount ) get_mountable_umountable
-             [ ! "$umountable" ] && msgn 'nothing to umount' && exit
+             [ "$umountable" ] || {
+                 msgn 'nothing to umount'
+                 exit
+             }
              umountable_item="$(pipe_to_rofi "${umountable[@]}" 'header=umountable')" || exit 37
 
              name="$(printf '%s\n' "$umountable_item" | awk '{print $1}')"
@@ -100,7 +108,7 @@ case "$man_item" in
     lspci ) lspci && accomplished ;;
     'mounted drives' ) printf '%s\n' "$(mounted_drives)" && accomplished ;;
     'kernel drivers' ) lspci -k && accomplished ;;
-    'remount root partition' ) get_single_input 'You sure?' && remount_prompt="$single_input"
+    'remount root partition' ) remount_prompt="$(get_single_input 'You sure?')" && printf '\n'
                                case "$remount_prompt" in
                                    y ) mount -o remount,rw / && accomplished ;;
                                esac ;;

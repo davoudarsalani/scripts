@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-08 20:34:13 +0330 Monday
+## last modified: 1400-09-14 16:35:36 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -11,21 +11,15 @@ function display_help {
     sony_help
 }
 
-function prompt {
-    for args in "$@"; {
-        case "$1" in
-            -n ) [ ! "$name" ] && get_input 'Dir/file name' && name="$input" ;;
-        esac
-        shift
-    }
-}
-
 function upload {
     scp -r "$@" "${USER}"@sony-"$bed":"$HOME"/downloads && accomplished
 }
 
 function download {
-    scp -r "${USER}"@sony-"$bed":"$@" "$HOME"/downloads && accomplished
+    local all
+
+    all="${@:0}"  ## turn array into str because shelccheck said: SC2145 (error): Argument mixes string and array. Use * or separate argument.
+    scp -r "${USER}"@sony-"$bed":"$all" "$HOME"/downloads && accomplished
 }
 
 function connect {
@@ -36,8 +30,19 @@ function connect_plus_x2x {
     ssh -Y "${USER}"@sony-"$bed" 'x2x -west -to :0'
 }
 
+function prompt {
+    for _ in "$@"; {
+        case "$1" in
+            -n ) [ ! "$name" ] && name="$(get_input 'Dir/file name')" ;;
+        esac
+        shift
+    }
+}
+
 function get_opt {
-    local options="$(getopt --longoptions 'help,name:' --options 'hn:' --alternative -- "$@")"
+    local options
+
+    options="$(getopt --longoptions 'help,name:' --options 'hn:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in

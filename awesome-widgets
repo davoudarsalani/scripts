@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-12 23:17:00 +0330 Friday
+## last modified: 1400-09-14 17:46:17 +0330 Sunday
 
 threshhold=70
 
@@ -13,7 +13,7 @@ case "$1" in
                 [ -f "$rand_wall_allowed_file" ] && \
                 [ ! "$(pgrep 'vlc')" ] && \
                 [ ! "$(pgrep 'ffmpeg')" ] && \
-                [ ! "$(ps -f -u "$UID" | sed 1d | \grep -v '\-remote' | \grep '[s]implescreenrecorder')" ] && \
+                ! ps -f -u "$UID" | sed 1d | \grep -qv '\-remote' | \grep -q '[s]implescreenrecorder' && \
                 random_wallpaper || touch "$rand_wall_allowed_file" ;;  ## ^^ exceptionally used ps because pgrep cannot find simplescreenrecorder
                 ## }}}
     jadi )  ## {{{
@@ -96,14 +96,15 @@ case "$1" in
 
             function connecttoheadset {
                 source "$HOME"/scripts/gb-fir-blu-batt
+                local output text
 
                 msgn "connecting to headset <span color=\"${orange}\">${headset_mac}</span>"
 
-                local output="$(bluetoothctl connect "$headset_mac")"
-                if [ ! "$(printf '%s\n' "$output" | \grep -i 'failed to connect')" ]; then
+                output="$(bluetoothctl connect "$headset_mac")"
+                if ! \grep -qi 'failed to connect' <<< "$output"; then
                     msgn "connected to <span color=\"${orange}\">${headset_mac}</span>"
                 else
-                    local text="$(printf "connecting to <span color=\"%s\">%s</span>\n%s\n" "$orange" "$headset_mac" "$output")"
+                    text="$(printf "connecting to <span color=\"%s\">%s</span>\n%s\n" "$orange" "$headset_mac" "$output")"
                      msgc 'ERROR' "$text" "$HOME"/linux/themes/alert-w.png
                 fi
             }
@@ -174,20 +175,20 @@ msgn "$text" ;;
             update_variables
 
             [ "$vol_mute_status" == 'yes' ] && vol_on_off="<span color=\"${red}\">:OF</span>"
-            (( vol_level == 0 )) && vol_level="<span color=\"${red}\">${vol_level}</span>"  || vol_level="$vol_level"
+            (( vol_level == 0 )) && vol_level="<span color=\"${red}\">${vol_level}</span>"
 
             [ "$mic_mute_status" == 'no' ] && mic_on_off="<span color=\"${red}\">:ON</span>"
-            (( mic_level != 0 )) && mic_level="<span color=\"${red}\">${mic_level}</span>" || mic_level="$mic_level"
+            (( mic_level != 0 )) && mic_level="<span color=\"${red}\">${mic_level}</span>"
 
 
             [ "$mon_mute_status" == 'no' ] && mon_on_off="<span color=\"${red}\">:ON</span>"
-            (( mon_level != 0 )) && mon_level="<span color=\"${red}\">${mon_level}</span>" || mon_level="$mon_level"
+            (( mon_level != 0 )) && mon_level="<span color=\"${red}\">${mon_level}</span>"
 
             states_initials="${vol_state::1}${mic_state::1}${mon_state::1}"  ## RSI
             indeces="${def_sink_index}${def_source_index}${def_source_mon_index}"  ## 010
 
             headset_regex='bluez_sink*'
-            [[ "$def_sink_name" == $headset_regex ]] && headset_connectivity=' HE'  ## NOTE do not replace [[ with [, and do NOT quote $headset_regex
+            [[ "$def_sink_name" == $headset_regex ]] && headset_connectivity=' HE'
             ## previously: [ "$(printf '%s\n' "$def_sink_name" | \grep '^bluez_sink')" ] && headset_connectivity=' HE'
 
             set_widget 'audio' 'markup' "${vol_level}${vol_on_off} ${mic_level}${mic_on_off} ${mon_level}${mon_on_off} ${states_initials} ${indeces}${headset_connectivity}" ;;
@@ -279,7 +280,7 @@ msgn "$text" ;;
 
                     ## cpu governor
                     readarray -t cpu_governor < <(for file in /sys/devices/system/cpu/cpu{0..3}/cpufreq/scaling_governor; {
-                        [ -f "$file" -a -r "$file" ] || continue
+                        [ -f "$file" ] && [ -r "$file" ] || continue
                         cat "$file"
                     } | sort --unique)
                     [ "$(printf '%s\n' "${cpu_governor[@]}" | \grep -i 'powersave')" ] || cpu_gov=" <span color=\"${red}\">${cpu_governor[@]^^}</span>"
@@ -308,7 +309,7 @@ msgn "$text" ;;
                     mem_geater="$(compare_floats "$mem_perc" '>' "$threshhold")"
                     [ "$mem_geater" == 'true' ] && mem_perc="<span color=\"${red}\">${mem_perc}</span>"
 
-                    set_widget 'memory_cpu' 'markup' "${cpu_pref}${mem_perc} ${cpu_perc} ${pref}${cpu_temp}°${cpu_gov}" ;;
+                    set_widget 'memory_cpu' 'markup' "${mem_perc} ${cpu_perc} ${pref}${cpu_temp}°${cpu_gov}" ;;
         esac ;;
                  ## }}}
     harddisk )  ## {{{
@@ -327,8 +328,8 @@ msgn "$text" ;;
                     home_size="$(mounted_drives | \grep '\/home$' | awk '{print $3}')"
                     home_used="$(mounted_drives | \grep '\/home$' | awk '{print $4}')"
                     (( home_used > 0 )) && home_used="$(float_pad "${home_used}*100/${home_size}" 1 2)"
-                    home_geater="$(compare_floats "$home_used" '>' "$threshhold")"
-                    # [ "$home_geater" == 'true' ] && home_used="<span color=\"${red}\">${home_used}</span>"  ## TODO temporarily commented
+                    home_greater="$(compare_floats "$home_used" '>' "$threshhold")"
+                    [ "$home_greater" == 'true' ] && home_used="<span color=\"${red}\">${home_used}</span>"  ## TODO temporarily commented
 
                     swap_size="$(swapon --summary | \grep -i 'partition' | awk '{print $3}')"
                     swap_used="$(swapon --summary | \grep -i 'partition' | awk '{print $4}')"
@@ -529,15 +530,15 @@ msgn "$text" ;;
           }
 
           ## public repos:
-          regex_status='>ST:'
-          regex_commits_ahead='>AH:'
+          regex_status=' ST:'
+          regex_commits_ahead=' AH:'
           for public_repo in "${public_repos[@]%/.git}"; {
               base="${public_repo##*/}"
 
               ## check if repo is ahead of origin
               commits_ahead="$(git_commits_ahead "$public_repo")"
               (( commits_ahead > 0 )) && {
-                  [[ ! "$modified_repos" =~ $regex_commits_ahead ]] && pref="$regex_commits_ahead"
+                  [[ "$modified_repos" =~ $regex_commits_ahead ]] || pref="$regex_commits_ahead"
                   modified_repos+=" ${pref}${base::1}${commits_ahead},"
                   unset pref
               }
@@ -545,14 +546,14 @@ msgn "$text" ;;
               ## check if there are changes
               status_count="$(wc -l < <(git_status "$public_repo"))"
               (( status_count > 0 )) && {
-                  [[ ! "$modified_repos" =~ $regex_status ]] && pref="$regex_status"
+                  [[ "$modified_repos" =~ $regex_status ]] || pref="$regex_status"
                   modified_repos+=" ${pref}${base::1}${status_count},"
                   unset pref
               }
 
           }
 
-          [ ! "$modified_repos" ] && git_text="GI" || git_text="<span color=\"${red}\">GI:${modified_repos%,*}</span>"  ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)
+          [ "$modified_repos" ] && git_text="<span color=\"${red}\">GI:${modified_repos%,*}</span>" || git_text="GI"  ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)
           set_widget 'git' 'markup' "$git_text" ;;
           ## }}}
     clipboard )  ## {{{
@@ -752,7 +753,7 @@ msgn "$text" ;;
                     play_pause )  audtool --playback-playpause ;;  ## OR audacious -t
                     pause )       [ "$play_status" == 'playing' ] && audtool --playback-pause ;;
                     main_window ) audtool --mainwin-show ;;  ## OR audacious -H OR audacious -m
-                    resume )      [ "$album" == 'speech' ] && audtool --playback-seek "$(< ${HOME}/scripts/.last/csols)" ;;
+                    resume )      [ "$album" == 'speech' ] && audtool --playback-seek "$(< "$HOME"/scripts/.last/csols)" ;;
                     tog_shuff )   audtool --playlist-shuffle-toggle ;;
                     prev )        audtool --playlist-reverse ;;  ## OR audacious -r
                     next )        audtool --playlist-advance ;;  ## OR audacious -f
@@ -787,7 +788,7 @@ msgn "$text" ;;
                 [ "$preamp_iz_zero" == 'false' ] && equalizer='EQ '
                 [ "$shuffle_status" == 'on' ] && shuffle_text='SH '
                 order="${position_in_playlist}/${playlist_length}"  ## 1/5
-                [ ! "$length" ] && time='0:00/0:00' || time="${current_position}/${length}"  ## 2:24/18:54
+                [ "$length" ] && time="${current_position}/${length}" || time='0:00/0:00'  ## 2:24/18:54
                 (( bar_position > 99 )) && bar_position=1 || bar_position=0.${bar_position}
                 left="$(day_hour_min_sec "$left_in_seconds")"  ## 00:45:16
                 ## remove leading 00: if left is less than one hour:

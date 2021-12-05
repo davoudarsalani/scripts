@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 21:47:45 +0330 Wednesday
+## last modified: 1400-09-14 17:34:55 +0330 Sunday
 
 function display_help {
     cmd="
@@ -31,14 +31,16 @@ function display_mode {
 }
 
 function not_valid {
-    ## NOTE do NOT use (( choice == choice )) for checking if choice is a number:
-    [ "$choice" -eq "$choice" ] 2>/dev/null && local msg='out of range' || local msg='not valid'
+    local msg space
+
+    ## NOTE do NOT use (( choice == choice )) to check if choice is a number:
+    [ "$choice" -eq "$choice" ] 2>/dev/null && msg='out of range' || msg='not valid'
     printf '%s is %s\n' "$("$fg_color" "$choice")" "$msg"
 }
 
 function read_user_choice {
     for ((i=0; i<"${#main_items[@]}"; i++)); {
-        (( i < 10 )) && local space='  ' || local space=' '
+        (( i < 10 )) && space='  ' || space=' '
         printf '%s%s%s\n' "$("$fg_color" "$i")" "$space" "${main_items[$i]}" | sed 's/\t/  /g'
     }
 
