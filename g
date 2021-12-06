@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 17:39:30 +0330 Sunday
+## last modified: 1400-09-15 14:00:12 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -101,11 +101,12 @@ function branches_array {  ## {{{
 function prompt {  ## {{{
     for _ in "$@"; {
         case "$1" in
-            -p ) [ "$pattern"     ] || pattern="$(get_input 'Pattern')"; check_pattern ;;
-            -m ) [ "$message"     ] || message="$(get_input 'Message')"         ;;
-            -b ) [ "$branch"      ] || branch="$(get_input 'Branch')"           ;;
-            -t ) [ "$tag"         ] || tag="$(get_input 'Tag')"                 ;;
-            -c ) [ "$commit_hash" ] || commit_hash="$(get_input 'Commit hash')" ;;
+            -p ) pattern="${pattern:-"$(get_input 'Pattern (e.g. *.py)')"}"  ## NOTE pattern does NOT need quotes here, but if pattern is passed as arg, it will
+                 check_pattern ;;
+            -m ) message="${message:-"$(get_input 'Message')"}"                ;;
+            -b ) branch="${branch:-"$(get_input 'Branch')"}"                   ;;
+            -t ) tag="${tag:-"$(get_input 'Tag')"}"                            ;;
+            -c ) commit_hash="${commit_hash:-"$(get_input 'Commit hash')"}"    ;;
         esac
         shift
     }
@@ -136,12 +137,14 @@ get_opt "$@"
 heading "$title"
 
 readarray -t repositories < <(git_repositories)
-repository="$(pipe_to_fzf "${repositories[@]}")" && wrap_fzf_choice "$repository" || exit 37
+repository="$(pipe_to_fzf "${repositories[@]}" 'help')" && wrap_fzf_choice "$repository" || exit 37
 directory="${repository/\~/$HOME}"
+
+[ "$repository" == 'help' ] && display_help
 
 if_locked
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'commits' 'help' )
+main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'commits' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -183,7 +186,7 @@ case "$main_item" in
                                   accomplished "committed in $editor" ;;
                  'write here' ) prompt -m
                                 if_locked
-                                git_commit_with_message "$directory" "$message" \
+                                git_commit_with_message "$directory" "$message" && \
                                 accomplished "committed, message: $message" ;;
              esac ;;
              ## }}}
@@ -419,9 +422,6 @@ case "$main_item" in
                } | sort --numeric-sort --reverse | column  ## --numeric-sort is for comparing according to string numerical value
                ;;
                ## }}}
-    help ) display_help  ## {{{
-           ;;
-           ## }}}
 esac
 
 exit

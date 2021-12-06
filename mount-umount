@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 18:16:13 +0330 Sunday
+## last modified: 1400-09-14 20:23:39 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -14,8 +14,8 @@ function display_help {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -d ) [ "$device" ] || device="$(get_input 'Device (e.g. /dev/sdc)')" ;;
-            -n ) [ "$name"   ] || name="$(get_input "Name (e.g. ${USER^^})")"    ;;
+            -d ) device="${device:-"$(get_input 'Device (e.g. /dev/sdc)')"}" ;;
+            -n ) name="${name:-"$(get_input "Name (e.g. ${USER^^})")"}"      ;;
         esac
         shift
     }

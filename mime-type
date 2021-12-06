@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 18:16:02 +0330 Sunday
+## last modified: 1400-09-14 20:21:41 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -14,7 +14,7 @@ function display_help {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -n ) [ "$name" ] || name="$(get_input 'Dir/fie name')" ;;
+            -n ) name="${name:-"$(get_input 'Dir/fie name')"}" ;;
         esac
         shift
     }

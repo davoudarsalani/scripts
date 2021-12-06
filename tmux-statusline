@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 16:42:37 +0330 Sunday
+## last modified: 1400-09-14 19:38:33 +0330 Sunday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
@@ -47,7 +47,7 @@ case "$1" in
           (( commits_ahead > 0 )) && commits_ahead=" Ⓐ $commits_ahead" || commits_ahead=''  ## 
 
           remotes="$(git_remotes "$2")"
-          \grep -i 'github' <<< "$remotes" && logo='  '
+          \grep -qi 'github' <<< "$remotes" && logo='  '
           [ "$remotes" ] || is_local=' LOCAL'
 
           branches_count="$(wc -l < <(git_branches_exclude_remote "$2"))"

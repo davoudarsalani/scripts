@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 16:35:36 +0330 Sunday
+## last modified: 1400-09-14 20:30:28 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -33,7 +33,7 @@ function connect_plus_x2x {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -n ) [ ! "$name" ] && name="$(get_input 'Dir/file name')" ;;
+            -n ) name="${name:-"$(get_input 'Dir/file name')"}" ;;
         esac
         shift
     }

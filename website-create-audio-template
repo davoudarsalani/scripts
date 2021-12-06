@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 19:10:40 +0330 Sunday
+## last modified: 1400-09-14 20:35:31 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -14,10 +14,10 @@ function display_help {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -l ) [ "$length"    ] || length="$(get_input 'Length')"                                                 ;;
-            -d ) [ "$directory" ] || directory="$(get_input 'Directory (e.g. TOEIC/Level-1 or 6-Minute-English))')" ;;
-            -p ) [ "$per_page"  ] || per_page="$(get_input 'Per page')"                                             ;;
-            -f ) [ "$dest_file" ] || dest_file="$(get_input 'Destination file')"                                    ;;
+            -l ) length="${length:-"$(get_input 'Length')"}"                                                    ;;
+            -d ) directory="${directory:-"$(get_input 'Directory (e.g. TOEIC/Level-1 or 6-Minute-English))')"}" ;;
+            -p ) per_page="${per_page:-"$(get_input 'Per page')"}"                                              ;;
+            -f ) dest_file="${dest_file:-"$(get_input 'Destination file')"}"                                    ;;
         esac
         shift
     }

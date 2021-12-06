@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 18:15:52 +0330 Sunday
+## last modified: 1400-09-14 20:15:28 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -14,18 +14,18 @@ function display_help {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -i ) [ "$input_file"   ] || input_file="$(get_input 'Input file')"                      ;;
-            -x ) [ "$offset"       ] || offset="$(get_input 'Offset (e.g. 1.2 or -0.8)')"           ;;
-            -o ) [ "$output"       ] || output="$(get_input 'Output file')"                         ;;
-            -s ) [ "$start"        ] || start="$(get_input 'Start time (e.g. 00:00:09)')"           ;;
-            -e ) [ "$end"          ] || end="$(get_input 'End time (e.g. 00:18:34)')"               ;;
-            -a ) [ "$audio_input"  ] || audio_input="$(get_input 'Audio input file')"               ;;
-            -v ) [ "$video_input"  ] || video_input="$(get_input 'Video input file')"               ;;
-            -t ) [ "$time"         ] || time="$(get_input 'Time (e.g. 00:00:09)')"                  ;;
-            -u ) [ "$audio_stream" ] || audio_stream="$(get_input 'Audio stream to keep (e.g. 1)')" ;;
-            -c ) [ "$camera"       ] || camera="$(get_input 'Camera (e.g. /dev/video0)')"           ;;
-            -f ) [ "$sub_file"     ] || sub_file="$(get_input 'Subtitle file')"                     ;;
-            -d ) [ "$sub_index"    ] || sub_index="$(get_input 'Subtitle index (e.g. 0, 1, etc)')"  ;;
+            -i ) input_file="${input_file:-"$(get_input 'Input file')"}"                        ;;
+            -x ) offset="${offset:-"$(get_input 'Offset (e.g. 1.2 or -0.8)')"}"                 ;;
+            -o ) output="${output:-"$(get_input 'Output file')"}"                               ;;
+            -s ) start="${start:-"$(get_input 'Start time (e.g. 00:00:09)')"}"                  ;;
+            -e ) end="${end:-"$(get_input 'End time (e.g. 00:18:34)')"}"                        ;;
+            -a ) audio_input="${audio_input:-"$(get_input 'Audio input file')"}"                ;;
+            -v ) video_input="${video_input:-"$(get_input 'Video input file')"}"                ;;
+            -t ) time="${time:-"$(get_input 'Time (e.g. 00:00:09)')"}"                          ;;
+            -u ) audio_stream="${audio_stream:-"$(get_input 'Audio stream to keep (e.g. 1)')"}" ;;
+            -c ) camera="${camera:-"$(get_input 'Camera (e.g. /dev/video0)')"}"                 ;;
+            -f ) sub_file="${sub_file:-"$(get_input 'Subtitle file')"}"                         ;;
+            -d ) sub_index="${sub_index:-"$(get_input 'Subtitle index (e.g. 0, 1, etc)')"}"     ;;
         esac
         shift
     }

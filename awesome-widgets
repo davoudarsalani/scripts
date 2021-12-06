@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 17:46:17 +0330 Sunday
+## last modified: 1400-09-14 20:55:48 +0330 Sunday
 
 threshhold=70
 
@@ -188,7 +188,7 @@ msgn "$text" ;;
             indeces="${def_sink_index}${def_source_index}${def_source_mon_index}"  ## 010
 
             headset_regex='bluez_sink*'
-            [[ "$def_sink_name" == $headset_regex ]] && headset_connectivity=' HE'
+            [[ "$def_sink_name" =~ $headset_regex ]] && headset_connectivity=' HE'
             ## previously: [ "$(printf '%s\n' "$def_sink_name" | \grep '^bluez_sink')" ] && headset_connectivity=' HE'
 
             set_widget 'audio' 'markup' "${vol_level}${vol_on_off} ${mic_level}${mic_on_off} ${mon_level}${mon_on_off} ${states_initials} ${indeces}${headset_connectivity}" ;;

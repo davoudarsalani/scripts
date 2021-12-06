@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-12 13:28:01 +0330 Friday
+## last modified: 1400-09-15 13:53:54 +0330 Monday
 
 source "$HOME"/scripts/gb-color
 
@@ -50,12 +50,12 @@ clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-d --directory=') [.]/~/scripts/etc.
-$(flag '-p --pattern=')
+$(flag '-p --pattern=') e.g. '*.py'
 $(flag '-m --message=')
 $(flag '-b --branch=')
 $(flag '-t --tag=')
 $(flag '-c --commit-hash=')
-$(flag '-n --noproxy')"
+$(flag '-n --noproxy')"  ## ^^ NOTE pattern needs quotes here, but if pattern is entered through get_input in prompt, it won't
 exit
 }
 ## }}}
@@ -128,6 +128,7 @@ function public_help {  ## {{{
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
+$(flag '-g --git-options')
 $(flag '-n --noconfirm')"
 exit
 }
