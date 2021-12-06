@@ -8,17 +8,28 @@ from gp import Audio, Record, get_datetime, rofi, update_audio, record_icon, set
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
 length = rofi(lengths, 'rec audio')
-if   length == '30s': secs = 30
-elif length == '1m':  secs = 60
-elif length == '5m':  secs = 300
-elif length == '10m': secs = 600
-elif length == '30m': secs = 1800
-elif length == '1h':  secs = 3600
-elif length == '2h':  secs = 7200
-elif length == '3h':  secs = 10800
-elif length == '4h':  secs = 14400
-elif length == '5h':  secs = 18000
-else: exit()
+if length == '30s':
+    secs = 30
+elif length == '1m':
+    secs = 60
+elif length == '5m':
+    secs = 300
+elif length == '10m':
+    secs = 600
+elif length == '30m':
+    secs = 1800
+elif length == '1h':
+    secs = 3600
+elif length == '2h':
+    secs = 7200
+elif length == '3h':
+    secs = 10800
+elif length == '4h':
+    secs = 14400
+elif length == '5h':
+    secs = 18000
+else:
+    exit()
 
 dur = duration(secs)
 suffix = 'AUD'

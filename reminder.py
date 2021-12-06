@@ -22,7 +22,7 @@ if 'relative' in mode:
     msgc('Reminder', message)
 elif 'specific' in mode:
     try:
-        specific  = rofi(title='specific time')
+        specific = rofi(title='specific time')
         specific2 = specific.replace(':', '')
         specific2 = remove_leading_zeros(specific2)
         specific2 = int(specific2)

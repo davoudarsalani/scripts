@@ -17,11 +17,16 @@ dest_file = if_exists(dest_file)
 content_list = []
 Col = Color()
 
+
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-l --length=')}''')
+    print(
+        f'''{Col.heading(f'{title}')} {Col.yellow('help')}
+{Col.flag('-l --length=')}'''
+    )
     exit()
+
+
 ## }}}
 def getopts() -> None:  ## {{{
     global length
@@ -31,19 +36,28 @@ def getopts() -> None:  ## {{{
         invalid(f'{exc!r}')
 
     for opt, arg in duos:
-        if   opt in ('-h', '--help'):   display_help()
-        elif opt in ('-l', '--length'): length = int(arg)
+        if opt in ('-h', '--help'):
+            display_help()
+        elif opt in ('-l', '--length'):
+            length = int(arg)
+
+
 ## }}}
 def prompt(*args: list[str]) -> None:  ## {{{
     global length
     for arg in args:
-        if   arg == '-l':
-            try:    length
-            except: length = int(get_input('Length'))
+        if arg == '-l':
+            try:
+                length
+            except:
+                length = int(get_input('Length'))
+
+
 ## }}}
 
 getopts()
 prompt('-l')
+
 
 def create_list() -> None:
     separator = '<!-- wp:separator -->\n<hr class="wp-block-separator"/>\n<!-- /wp:separator -->'
@@ -63,6 +77,7 @@ def create_list() -> None:
         else:
             content_list.append(separator)
         content_list.append('')
+
 
 for i in range(length, 0, -1):
     create_list()

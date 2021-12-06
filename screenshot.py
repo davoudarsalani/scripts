@@ -4,12 +4,14 @@
 
 from os import path, remove, getenv
 from gi import require_version
+
 require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from PIL import Image
 from pynput.mouse import Listener
 
 from gp import Screen, get_datetime, rofi, msgn, msgc, countdown
+
 
 def convert_to_jpg(png_image: str) -> None:  ## {{{
     global output
@@ -22,6 +24,8 @@ def convert_to_jpg(png_image: str) -> None:  ## {{{
         remove(png_image)
     except Exception:
         pass
+
+
 ## }}}
 
 main_items = ['screen 1', 'screen 2', 'screen all', 'current window', 'selected area']
@@ -37,7 +41,7 @@ scr_2_name, scr_2_res, scr_2_x, scr_2_y = Scr.screen_2()
 scr_all_res = Scr.screen_all()
 
 ## https://askubuntu.com/questions/1011507/screenshot-of-an-active-application-using-python
-if   main_item == 'screen 1':  ## {{{
+if main_item == 'screen 1':  ## {{{
     try:
         countdown()
         window = Gdk.get_default_root_window()

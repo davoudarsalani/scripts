@@ -6,13 +6,14 @@
 
 import os, sys, re
 
+
 def msg(value):
-    """ This is just a print method"""
+    """This is just a print method"""
     print(value)
 
 
 def error_args(error_msg):
-    """ this is just a error message for args"""
+    """this is just a error message for args"""
     print("\n")
     print("Error :  Arguments provided is invalid")
     print(error_msg)
@@ -51,7 +52,7 @@ def usage():
 
 
 class SplitAndCombineFiles:
-    """ This is a simple class to split and merge the files
+    """This is a simple class to split and merge the files
 
     1. Split the binary files to the smaller chunks
     2. merge the binary files into the single file
@@ -77,6 +78,7 @@ class SplitAndCombineFiles:
 
     Author : Roshan Krishnappa
     """
+
     def __init__(self):
         self.__input_file_name = None
         self.__chunk = None
@@ -85,19 +87,18 @@ class SplitAndCombineFiles:
         self.check_list = ""
 
     def get_file_chunks_from_count(self):
-        """ This method is to get the file chunk sizes"""
+        """This method is to get the file chunk sizes"""
         # get the file zize
         self.f_size = os.path.getsize(self.__input_file_name)
         msg("Total file Size : {}".format(str(self.f_size)))
 
         # get the file chunks
         f_chunk = int(float(self.f_size) / float(self.__chunk))
-        msg("Splitting into {} files of {} size".format(str(self.__chunk),
-                                                        str(f_chunk)))
+        msg("Splitting into {} files of {} size".format(str(self.__chunk), str(f_chunk)))
         return int(f_chunk), int(self.__chunk)
 
     def get_file_count_from_size(self):
-        """ This method is to get the file chunk sizes"""
+        """This method is to get the file chunk sizes"""
 
         size = {"B": 1, "KB": 1024, "MB": 1024 ** 2, "GB": 1024 ** 3}
 
@@ -111,19 +112,16 @@ class SplitAndCombineFiles:
         f_chunk = int(f_chunk) * size[size_type]
         no_of_files = self.f_size / f_chunk
         if no_of_files > 1:
-            no_of_files = int(no_of_files) + 1 if \
-                no_of_files%int(no_of_files) > 0 \
-                else int(no_of_files)
+            no_of_files = int(no_of_files) + 1 if no_of_files % int(no_of_files) > 0 else int(no_of_files)
         else:
             no_of_files = 1
 
-        msg("Splitting into {} files of {} size".format(str(no_of_files),
-                                                        str(self.__chunk)))
+        msg("Splitting into {} files of {} size".format(str(no_of_files), str(self.__chunk)))
 
         return int(f_chunk), int(no_of_files)
 
     def __split(self, input_file_name, chunk_size):
-        """ Split the files
+        """Split the files
         :param input_file_name : The filename which has to be split
         :param chunk_size : Actual number of files to be split
         :return None
@@ -144,9 +142,7 @@ class SplitAndCombineFiles:
 
         # Iterate through chunk size
         for i in range(int(chunk_size)):
-            _chunk_file_name = "{}-{}{}".format(str(self.__input_file_name),
-                                                str(i+1),
-                                                str(self.__postfix))
+            _chunk_file_name = "{}-{}{}".format(str(self.__input_file_name), str(i + 1), str(self.__postfix))
 
             # Last chunk , include the remaining data
             if i == chunk_size - 1:
@@ -157,9 +153,7 @@ class SplitAndCombineFiles:
 
             # create the content for the file copy check
             data_length = len(data)
-            self.check_list += str(data[:5]) + str(
-                data[int(data_length / 2) - 1:
-                     int(data_length / 2) + 1]) + str(data[-5:])
+            self.check_list += str(data[:5]) + str(data[int(data_length / 2) - 1 : int(data_length / 2) + 1]) + str(data[-5:])
 
             tot_bytes_in_file += data_length
 
@@ -168,8 +162,7 @@ class SplitAndCombineFiles:
             with open(_chunk_file_name, "wb") as _:
                 _.write(data)
 
-        _crc_file_name = "{}-{}{}".format(str(self.__input_file_name),
-                                          "CRC", str(self.__postfix))
+        _crc_file_name = "{}-{}{}".format(str(self.__input_file_name), "CRC", str(self.__postfix))
 
         msg("Creating the check file : {}".format(str(_crc_file_name)))
         with open(_crc_file_name, "w") as crc_file:
@@ -178,19 +171,17 @@ class SplitAndCombineFiles:
         msg("File split successfully")
 
     def __merge(self, input_file_name):
-        """ Merge the Files
+        """Merge the Files
         :param input_file_name : filename in .zip format ex : filename.zip
         :return none"""
         msg("Merging the file to {}".format(str(input_file_name)))
 
-        _root_dir, _file_name = os.path.split(
-            os.path.realpath(input_file_name))
+        _root_dir, _file_name = os.path.split(os.path.realpath(input_file_name))
 
         _file_path = os.path.join(_root_dir, _file_name)
 
         if os.path.exists(_file_path):
-            msg("File Already Exist. Please remove the {} and "
-                "then re-run.".format(str(_file_path)))
+            msg("File Already Exist. Please remove the {} and " "then re-run.".format(str(_file_path)))
 
             # Prompt if file need to be deleted automatically
             prompt = input("\nDo you want to remove the file [Y/N] : ")
@@ -206,10 +197,9 @@ class SplitAndCombineFiles:
             return
 
         # get the crc file
-        _crc_file_name = "{}-{}{}".format(str(_file_name),
-                                          "CRC", str(self.__postfix))
+        _crc_file_name = "{}-{}{}".format(str(_file_name), "CRC", str(self.__postfix))
 
-        _crc_file_path = os.path.join(_root_dir,_crc_file_name)
+        _crc_file_path = os.path.join(_root_dir, _crc_file_name)
         if not os.path.exists(_crc_file_path):
             msg("{} file is missing".format(str(_crc_file_path)))
             return
@@ -222,17 +212,13 @@ class SplitAndCombineFiles:
             f_name = file_list[files]
             msg("Merging the file {}".format(f_name))
             with open(input_file_name, 'ab') as new_file:
-                data = open(os.path.join(_root_dir,
-                                         f_name), 'rb').read()
+                data = open(os.path.join(_root_dir, f_name), 'rb').read()
 
                 new_file.write(data)
 
                 # create the content for the file copy check
                 data_length = len(data)
-                self.check_list += str(data[:5]) + \
-                                   str(data[int(data_length/2)-1:
-                                            int(data_length/2)+1]) \
-                                   + str(data[-5:])
+                self.check_list += str(data[:5]) + str(data[int(data_length / 2) - 1 : int(data_length / 2) + 1]) + str(data[-5:])
         # check the crc data
         msg("Checking if the files are merged properly")
         if _crc_data == self.check_list:
@@ -244,7 +230,7 @@ class SplitAndCombineFiles:
         msg("File Merged successfully")
 
     def get_split_files(self, root_dir, file_name):
-        """ Find out all the zip files in the folder
+        """Find out all the zip files in the folder
         :param root_dir : Directory path where files are present
         :param file_name : filename in .zip format ex : filename.zip
         :return list of the files
@@ -252,7 +238,7 @@ class SplitAndCombineFiles:
         # Find all the files matching the format
         file_list = {}
 
-        file_format = re.compile(file_name + '-' + '[0-9]+'+self.__postfix)
+        file_format = re.compile(file_name + '-' + '[0-9]+' + self.__postfix)
         for f in os.listdir(root_dir):
             if file_format.match(f):
                 _ = f.split('-')[-1]
@@ -272,14 +258,10 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input',
-                        help="Provide the File that needs to be Split")
-    parser.add_argument('-s', '--split', action="store_true",
-                        help="To Split the File")
-    parser.add_argument('-n', '--chunk',
-                        help="No. of Chunks to be created")
-    parser.add_argument('-m', '--merge', action="store_true",
-                        help="Merge the Files")
+    parser.add_argument('-i', '--input', help="Provide the File that needs to be Split")
+    parser.add_argument('-s', '--split', action="store_true", help="To Split the File")
+    parser.add_argument('-n', '--chunk', help="No. of Chunks to be created")
+    parser.add_argument('-m', '--merge', action="store_true", help="Merge the Files")
 
     args = parser.parse_args()
 
@@ -288,7 +270,7 @@ if __name__ == "__main__":
         error_args("-s or -m has to be Specified")
 
     if args.split:
-        if not(args.input and args.chunk):
+        if not (args.input and args.chunk):
             error_args("Split command requires -i and -n")
         else:
             sm = SplitAndCombineFiles()

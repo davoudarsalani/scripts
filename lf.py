@@ -9,17 +9,16 @@ from sys import argv
 from time import sleep
 
 from magic import Magic
-from gp import (msgn, msgc, get_datetime, get_single_input, invalid, get_password, fzf,
-                compress_tar, compress_zip, xtract_tar, xtract_zip, xtract_rar)
+from gp import msgn, msgc, get_datetime, get_single_input, invalid, get_password, fzf, compress_tar, compress_zip, xtract_tar, xtract_zip, xtract_rar
 
 script_args = argv[1:]
-main_arg    = script_args[0]
-files       = script_args[1:]
+main_arg = script_args[0]
+files = script_args[1:]
 
-if   main_arg == 'chattr':  ## {{{
+if main_arg == 'chattr':  ## {{{
     main_items = ['mutable', 'immutable', 'deletable', 'undeletable', 'delete normal', 'delete secure', 'lsattr']
     main_item = fzf(main_items, 'chattr')
-    if   main_item == 'mutable':
+    if main_item == 'mutable':
         for f in files:
             _, base = path.split(f)
             cmd = run(f'sudo chattr -R -i {base}', shell=True, universal_newlines=True, capture_output=True)
@@ -208,7 +207,7 @@ elif main_arg == 'unzip':  ## {{{
         try:
             _, base = path.split(f)
             has_password = get_single_input('Has password (y/n)?')
-            if   has_password == 'y':
+            if has_password == 'y':
                 password = get_password('Password ')
                 xtract_zip(f, password)
             elif has_password == 'n':
@@ -225,7 +224,7 @@ elif main_arg == 'unrar':  ## {{{
         try:
             _, base = path.split(f)
             has_password = get_single_input('Has password (y/n)?')
-            if   has_password == 'y':
+            if has_password == 'y':
                 password = get_password('Password ')
                 xtract_rar(f, password)
                 pass

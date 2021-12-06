@@ -20,32 +20,39 @@ last_file = f'{getenv("HOME")}/scripts/.last/weather'
 error_file = f'{getenv("HOME")}/scripts/.error/weather'
 arg = argv[1]
 
+
 def get_info() -> dict[str, str]:  ## {{{
     resp = Ses.get(url, headers=hdrs, timeout=20)
     resp = resp.json()  ## dict
 
     return resp
+
+
 ## }}}
 def get_current() -> tuple[str, int, str]:  ## {{{
-    current     = resp['current']  ## dict
-    dt          = current['dt']  ## int
-    weekday     = jdt.fromtimestamp(dt).strftime('%A')[:3]
-    temp        = int(current['temp'])  ## int
-    weather     = current['weather']  ## list
+    current = resp['current']  ## dict
+    dt = current['dt']  ## int
+    weekday = jdt.fromtimestamp(dt).strftime('%A')[:3]
+    temp = int(current['temp'])  ## int
+    weather = current['weather']  ## list
     description = weather[0]['description']
 
     return weekday, temp, description
+
+
 ## }}}
 def get_forecast() -> tuple[str, int, int, str]:  ## {{{
-    dt          = day['dt']  ## int
-    weekday     = jdt.fromtimestamp(dt).strftime('%A')[:3]
-    temp        = day['temp']  ## dict
-    temp_min    = int(temp['min'])
-    temp_max    = int(temp['max'])
-    weather     = day['weather']  ## list
+    dt = day['dt']  ## int
+    weekday = jdt.fromtimestamp(dt).strftime('%A')[:3]
+    temp = day['temp']  ## dict
+    temp_min = int(temp['min'])
+    temp_max = int(temp['max'])
+    weather = day['weather']  ## list
     description = weather[0]['description']
 
     return weekday, temp_min, temp_max, description
+
+
 ## }}}
 
 if arg == 'update':
@@ -108,7 +115,7 @@ elif arg == 'forecast':
             weekday, temp_min, temp_max, description = get_forecast()
 
             if weekday == 'Fri' or weekday == 'Sat':
-                tabs = '\t'*2
+                tabs = '\t' * 2
             else:
                 tabs = '\t'
             message = f'{message}{weekday}{tabs}{temp_min}°-{temp_max}°\t{description}\n'

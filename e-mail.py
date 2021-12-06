@@ -14,13 +14,13 @@ from gp import get_datetime, set_widget, refresh_icon, save_error
 arg = argv[1]
 
 if arg == 'ymail':
-    prefix   = 'YA'
-    server   = 'imap.mail.yahoo.com'
+    prefix = 'YA'
+    server = 'imap.mail.yahoo.com'
     username = getenv('email1')
     password = getenv('email1_password2')
 elif arg == 'gmail':
-    prefix   = 'GM'
-    server   = 'imap.gmail.com'
+    prefix = 'GM'
+    server = 'imap.gmail.com'
     username = getenv('email2')
     password = getenv('email2_password2')
 else:

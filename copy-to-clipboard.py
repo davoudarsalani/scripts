@@ -14,13 +14,18 @@ title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
 Col = Color()
 
+
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
+    print(
+        f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-s --string=')}
 {Col.flag('-f --file=')}
-{Col.flag('-c --command=')}''')
+{Col.flag('-c --command=')}'''
+    )
     exit()
+
+
 ## }}}
 def getopts() -> None:  ## {{{
     global string, file, command
@@ -31,26 +36,41 @@ def getopts() -> None:  ## {{{
         invalid(f'{exc!r}')
 
     for opt, arg in duos:
-        if   opt in ('-h', '--help'):    display_help()
-        elif opt in ('-s', '--string'):  string = arg
-        elif opt in ('-f', '--file'):    file = arg
-        elif opt in ('-c', '--command'): command = arg
+        if opt in ('-h', '--help'):
+            display_help()
+        elif opt in ('-s', '--string'):
+            string = arg
+        elif opt in ('-f', '--file'):
+            file = arg
+        elif opt in ('-c', '--command'):
+            command = arg
+
+
 ## }}}
 def prompt(*args: list[str]) -> None:  ## {{{
     global string, file, command
 
     for arg in args:
-        if   arg == '-s':
-            try:    string
-            except: string = get_input('String')
+        if arg == '-s':
+            try:
+                string
+            except:
+                string = get_input('String')
         elif arg == '-f':
-            try:    file
-            except: file = get_input('File')
-            if not path.exists(f'{file}'): invalid('No such file')
+            try:
+                file
+            except:
+                file = get_input('File')
+            if not path.exists(f'{file}'):
+                invalid('No such file')
         elif arg == '-c':
-            try:    command
-            except: command = get_input('Command')
+            try:
+                command
+            except:
+                command = get_input('Command')
             # if path.isdir(f'{file}'): invalid('Files only')
+
+
 ## }}}
 
 getopts()
@@ -60,7 +80,7 @@ print(Col.heading(title))
 main_items = ['string', 'file', 'command', 'datetime', 'jalali datetime', 'help']
 main_item = fzf(main_items)
 
-if   main_item == 'string':
+if main_item == 'string':
     prompt('-s')
     clipboard_copy(string)
     msgn(f'copied\n<span color=\"{getenv("orange")}\">{string}</span>')

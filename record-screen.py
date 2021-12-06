@@ -13,25 +13,40 @@ scr_all_res = S.screen_all()
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
 length = rofi(lengths, 'rec screen')
-if   length == '30s': secs = 30
-elif length == '1m':  secs = 60
-elif length == '5m':  secs = 300
-elif length == '10m': secs = 600
-elif length == '30m': secs = 1800
-elif length == '1h':  secs = 3600
-elif length == '2h':  secs = 7200
-elif length == '3h':  secs = 10800
-elif length == '4h':  secs = 14400
-elif length == '5h':  secs = 18000
-else: exit()
+if length == '30s':
+    secs = 30
+elif length == '1m':
+    secs = 60
+elif length == '5m':
+    secs = 300
+elif length == '10m':
+    secs = 600
+elif length == '30m':
+    secs = 1800
+elif length == '1h':
+    secs = 3600
+elif length == '2h':
+    secs = 7200
+elif length == '3h':
+    secs = 10800
+elif length == '4h':
+    secs = 14400
+elif length == '5h':
+    secs = 18000
+else:
+    exit()
 
 dur = duration(secs)
 screens = ['1', '2', 'all']
 screen = rofi(screens, 'screen')
-if   screen == '1':   x_offset, resolution, suffix = 0,       scr_1_res,   'SCR-1'
-elif screen == '2':   x_offset, resolution, suffix = scr_1_x, scr_2_res,   'SCR-2'
-elif screen == 'all': x_offset, resolution, suffix = 0,       scr_all_res, 'SCR-ALL'
-else: exit()
+if screen == '1':
+    x_offset, resolution, suffix = 0, scr_1_res, 'SCR-1'
+elif screen == '2':
+    x_offset, resolution, suffix = scr_1_x, scr_2_res, 'SCR-2'
+elif screen == 'all':
+    x_offset, resolution, suffix = 0, scr_all_res, 'SCR-ALL'
+else:
+    exit()
 
 output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
 Aud = Audio()
@@ -39,7 +54,7 @@ Rec = Record()
 
 need_mics = ['no', 'yes']
 need_mic = rofi(need_mics, 'need mic?')
-if   need_mic == 'yes':
+if need_mic == 'yes':
     Aud.mic('unmute')
     Aud.mic('25')
     Aud.mon('unmute')

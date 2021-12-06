@@ -13,6 +13,7 @@ Col = Color()
 Rec = Record()
 Scr = Screen()
 
+
 def received_ctrl_c(signum: int, stack) -> None:  ## {{{
     ## https://stackoverflow.com/questions/52269334/python-trap-routine
     Aud.mic('mute')
@@ -25,6 +26,8 @@ def received_ctrl_c(signum: int, stack) -> None:  ## {{{
     set_widget('record', 'fg', 'reset')
     set_widget('record', 'markup', record_icon())
     exit()
+
+
 handler = signal(SIGINT, received_ctrl_c)
 ## }}}
 
@@ -34,7 +37,7 @@ main_items = ['audio', 'screen 1', 'screen 2', 'screen all', 'video']
 main_item = fzf(main_items)
 
 mic = get_single_input('Need mic?')
-if   mic == 'y':
+if mic == 'y':
     Aud.mic('unmute')
     Aud.mic('25')
     Aud.mon('unmute')
@@ -49,7 +52,7 @@ update_audio()
 
 set_widget('record', 'fg', getenv('red'))
 
-if   main_item == 'audio':
+if main_item == 'audio':
     suffix = 'AUD-UL'
     output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mp3'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')

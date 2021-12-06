@@ -27,10 +27,12 @@ from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
 from gp import Color, duration, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
+
 ## }}}
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
+    print(
+        f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-s --source=')}a text file e.g. $HOME/downloads/lucy,
             a url e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg,
             a youtube playlist id e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu
@@ -45,66 +47,97 @@ def display_help() -> None:  ## {{{
 {Col.flag('-t --tor')}
 {Col.flag('-n --no-information')}
 {Col.flag('-v --verbose')}
-{Col.flag('-p --purge')}''')  ## JUMP_1 whatever downloader you add/remove, update the allowed list of downloaders in Ini.verify_args()
+{Col.flag('-p --purge')}'''
+    )  ## JUMP_1 whatever downloader you add/remove, update the allowed list of downloaders in Ini.verify_args()
     exit()
+
+
 ## }}}
 def separator() -> str:  ## {{{
     width = int(get_width())
 
-    return Col.grey('-'*width)
+    return Col.grey('-' * width)
+
+
 ## }}}
 def make_attempts() -> list[int]:  ## {{{
-    return [_ for _ in range(1, int(Ini.retries)+1)]
+    return [_ for _ in range(1, int(Ini.retries) + 1)]
+
+
 ## }}}
 def make_qualities() -> list[str]:  ## {{{
-    return ['18', '22', '133', '134', '135', '136', '137', '140', '160', '242', '243', '244', '247', '248', '249', '250', '251', '278', '394', '395', '396', '397', '398', '399', 'best']
+    return [
+        '18',
+        '22',
+        '133',
+        '134',
+        '135',
+        '136',
+        '137',
+        '140',
+        '160',
+        '242',
+        '243',
+        '244',
+        '247',
+        '248',
+        '249',
+        '250',
+        '251',
+        '278',
+        '394',
+        '395',
+        '396',
+        '397',
+        '398',
+        '399',
+        'best',
+    ]
+
+
 ## }}}
 def make_errors() -> dict[str, str]:  ## {{{
     '''possible errors (i.e. keys) and what we should do (i.e. values)'''
 
     return {
         ## [[ mainly happening in youtube-dl
-        'No video formats found':            '',  ## 'break' not necessary because it was seen to be running ok in the next Cur.attempt
-        'Too Many Requests':                 'restart',
-        'requested format not available':    'best',
-        'PERROR torsocks':                   'break',
-        'video doesnt have subtitles':       'break',
+        'No video formats found': '',  ## 'break' not necessary because it was seen to be running ok in the next Cur.attempt
+        'Too Many Requests': 'restart',
+        'requested format not available': 'best',
+        'PERROR torsocks': 'break',
+        'video doesnt have subtitles': 'break',
         'No subtitle format found matching': 'break',
-        'Unable to extract video title':     'break',
-        'is not a valid URL':                'break',
-        'This video is unavailable':         'break',
-        'This video is not available':       'break',
-        'YouTube said: Invalid parameters':  'break',
-        'unable to download video data':     'break',
-        'No video results':                  'break',
-        'An extractor error has occurred':   'break',
-        'Unsupported URL':                   'break',
-        'Signature extraction failed':       'break',
-        'Incorrect padding':                 'break',
-        '404 Not Found':                     'break',
-        '403: Forbidden':                    'break',
-        'unable to resolve host address':    'break',
-        'Could not resolve host':            'break',
-        'Unable to connect to server':       'break',
+        'Unable to extract video title': 'break',
+        'is not a valid URL': 'break',
+        'This video is unavailable': 'break',
+        'This video is not available': 'break',
+        'YouTube said: Invalid parameters': 'break',
+        'unable to download video data': 'break',
+        'No video results': 'break',
+        'An extractor error has occurred': 'break',
+        'Unsupported URL': 'break',
+        'Signature extraction failed': 'break',
+        'Incorrect padding': 'break',
+        '404 Not Found': 'break',
+        '403: Forbidden': 'break',
+        'unable to resolve host address': 'break',
+        'Could not resolve host': 'break',
+        'Unable to connect to server': 'break',
         ## ]]
-
         ## [[ mainly happening in youtube_dl and wget modules
         'Connection refused': 'break',
         ## happened when tor is off
         ## Full: Unable to download webpage: <urlopen error [Errno 111] Connection refused>
-
         'ConnectionError': 'break',
         ## happened for o when url (domain part) is misspelled (e.g. https://www.davoni.ir/Files/Temp/002.jpg)
         ## Full: ConnectionError(MaxRetryError("HTTPSConnectionPool(host=\'www.davoni.ir\', port=443): Max retries exceeded with url: /Files/Temp/002.jp
         ##       (Caused by NewConnectionError(\'<urllib3.connection.HTTPSConnection object at 0x7f3a26fcba60>:
         ##       Failed to establish a new connection: [Errno -2] Name or service not known\'))"))
-
         'ConnectTimeout': 'break',
         ## happened for File.get_info() when url is censored
         ## Full: ConnectTimeout(MaxRetryError("HTTPConnectionPool(host=\'wsdownload.bbc.co.uk\', port=80): Max retries exceeded with url:
         ##       /learningenglish/pdf/2014/09/140924101602_140924_vwitn_inmates_bank.pdf (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection
         ##       object at 0x7fcb37ab2b20>, \'Connection to wsdownload.bbc.co.uk timed out. (connect timeout=20)\'))"))
-
         'DownloadError': 'break',
         ## Full: DownloadError("ERROR: Unable to download API page: Remote end closed connection without response (caused by RemoteDisconnected(\'Remote
         ##       and closed connection without response\')); please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version;
@@ -115,7 +148,6 @@ def make_errors() -> dict[str, str]:  ## {{{
         ##
         ## happened when youtube video is private
         ## Full: DownloadError("ERROR: Private video\\nSign in if you\'ve been granted access to this video")
-
         'HTTPError': 'break',
         ## happened for o when url (file name part) is misspelled (e.g. https://www.davoudarsalani.ir/Files/Temp/002.jp)
         ## Full: HTTPError('404 Client Error: Not Found for url: https://www.davoudarsalani.ir/Files/Temp/002.jp')
@@ -123,15 +155,12 @@ def make_errors() -> dict[str, str]:  ## {{{
         ## happened for o when url (file name part) is misspelled (e.g. https://raw.githubusercontent.com/ran.jpg)
         ## Full: <HTTPError 400: 'Bad Request'>
         ## Full: HTTPError('400 Client Error: Bad Request for url: https://raw.githubusercontent.com/ran.jpg')
-
         ## happened for o when url is censored
         ## Full: HTTPError('403 Client Error: Forbidden for url: http://open.live.bbc.co.uk/p09cn7sc.mp3')
         ## Full: <HTTPError 403: 'Forbidden'
-
         'IndexError': 'break',
         ## happened for Youtube.get_info() when url is misspelled (e.g. it's incomplete) or private and can't get info, and therefore 'items' list is empty
         ## Full: IndexError('list index out of range')
-
         'URLError': 'break',
         ## happened for File.get_info() when url is censored
         ## Full: URLError(ConnectionResetError(104, 'Connection reset by peer'))
@@ -141,78 +170,58 @@ def make_errors() -> dict[str, str]:  ## {{{
         ##
         ## happened when url is censored
         ## Full: URLError('unknown url type: socks5')
-
         'ExtractorError': 'break',
         ## Full: ExtractorError('No video formats found')
-
         'RemoteDisconnected': 'break',
         ## Full: RemoteDisconnected('Remote end closed connection without response')
-
         'RegexNotFoundError': 'break',
         ## Full: RegexNotFoundError('Unable to extract Initial JS player signature function name; please report this issue on https://yt-dl.org/bug .
         ##       Make sure you are using the latest version; type  youtube-dl -U  to update. Be sure to call youtube-dl with the --verbose flag
         ##       and include its complete output.',)); please report this issue on https://yt-dl.org/bug . Make sure you are using the latest version;
         ##       type  youtube-dl -U  to update. Be sure to call youtube-dl with the --verbose flag and include its complete output.
-
         'MissingSchema': 'break',
         ## Full: MissingSchema("Invalid URL \'\': No schema supplied. Perhaps you meant http://?")
-
         'NameError': 'break',
         ## Full: NameError("name \'xxxxxxx\' is not defined")
-
         'ValueError': 'break',
         ## Full: ValueError("unknown url type: \'\'")
-
         ## error(28, 'Connection timed out after 20001 milliseconds')
         ## error(23, 'Failure writing output to destination')
         ## ]]
-
         ## [[ happening in error files (i.e. error files of bwu, weather, etc. in $HOME/scripts/.last directory) just to add more examples
         'AttributeError': 'break',
         ## Full: AttributeError("'NoneType' object has no attribute 'text'")
-
         'OSError': 'break',
         ## Full: OSError(101, 'Network is unreachable')
-
         'ReadTimeout': 'break',
         ## Full: ReadTimeout(ReadTimeoutError("HTTPSConnectionPool(host='api.openweathermap.org', port=443): Read timed out. (read timeout=20)"))
-
-        'ServerNotFoundError':'break',
+        'ServerNotFoundError': 'break',
         ## Full: ServerNotFoundError('Unable to find the server at youtube.googleapis.com')
-
-        'SSLCertVerificationError':'break',
+        'SSLCertVerificationError': 'break',
         ## Full: SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed:
         ##       self signed certificate in certificate chain (_ssl.c:1123)')
-
         'SSLEOFError': 'break',
         ## Full: SSLEOFError(8, 'EOF occurred in violation of protocol (_ssl.c:1123)')
-
         'SSLError': 'break',
         ## Full: SSLError(MaxRetryError("HTTPSConnectionPool(host='<ADDR>', port=443): Max retries exceeded with url: <ADDR>
         ##       (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed:
         ##       self signed certificate in certificate chain (_ssl.c:1123)')))"))
-
         'TypeError': 'break',
         ## Full: TypeError('Missing required parameter "part"')
-
         'TimeoutError': 'break',
         ## Full: TimeoutError(110, 'Connection timed out')
-
         'timeout': 'break',
         ## Full: timeout('_ssl.c:1112: The handshake operation timed out')
         ## Full: timeout('timed out')
-
         'HttpError': 'break',
         ## Full: <HttpError 400 when requesting <ADDR> returned "API key not valid. Please pass a valid API key.".
         ##       Details: "[{'message': 'API key not valid. Please pass a valid API key.', 'domain': 'global', 'reason': 'badRequest'}]">
         ## Full: <HttpError 400 when requesting <ADDR> returned "No filter selected. Expected one of: id, managedByMe, forUsername, mine, mySubscribers, categoryId".
         ##       Details: "[{'message': 'No filter selected. Expected one of: id, managedByMe, forUsername, mine, mySubscribers, categoryId',
         ##       'domain': 'youtube.parameter', 'reason': 'missingRequiredParameter', 'location': 'parameters.', 'locationType': 'other'}]">
-
         'abort': 'break',
         ## Full: abort('command: STATUS => IMAP4rev1 Server logging out')
         ## Full: abort('socket error: EOF')
-
         'ConnectionError': 'break',
         ## Full: ConnectionError(MaxRetryError("HTTPSConnectionPool(host='api.openweathermap.org', port=443):
         ##       Max retries exceeded with url: /data/2.5/onecall?lang=en&lat=29.4519&lon=60.8842&units=metric&exclude=hourly,minutely&appid=5283a501dcfcf51f4cb59e29e1d70382
@@ -221,14 +230,14 @@ def make_errors() -> dict[str, str]:  ## {{{
         ## Full: ConnectionError(ProtocolError('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer')))
         ## Full: ConnectionError(ProtocolError('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')))
         ## Full: ConnectionError(ReadTimeoutError("HTTPSConnectionPool(host='stackoverflow.com', port=443): Read timed out."))
-
         'ConnectionResetError': 'break',
         ## Full: ConnectionResetError(104, 'Connection reset by peer')
-
         'gaierror': 'break',
         ## Full: gaierror(-3, 'Temporary failure in name resolution')
         ## ]]
     }
+
+
 ## }}}
 def convert_byte(size_in_bytes) -> str:  ## {{{ https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
     if size_in_bytes == 0:
@@ -240,6 +249,8 @@ def convert_byte(size_in_bytes) -> str:  ## {{{ https://stackoverflow.com/questi
     conv = f'{float(size_in_bytes / p):.2f}'
 
     return f'{conv}{suff[i]}'
+
+
 ## }}}
 def restart_tor() -> None:  ## {{{
     ## restart tor only if it is already on
@@ -258,8 +269,10 @@ def restart_tor() -> None:  ## {{{
             return
 
         sleep(15)
+
+
 ## }}}
-def savelog_print(text: Any, fg: str='', prnt: bool=True) -> None:  ## {{{
+def savelog_print(text: Any, fg: str = '', prnt: bool = True) -> None:  ## {{{
     text = str(text)
 
     ## savelog
@@ -270,15 +283,24 @@ def savelog_print(text: Any, fg: str='', prnt: bool=True) -> None:  ## {{{
     ## print
     if prnt:
         ## TODO get rid of multiple ifs
-        if not fg:              print(text)
-        elif fg == 'blue':      print(Col.blue(text))
-        elif fg == 'brown':     print(Col.brown(text))
-        elif fg == 'red':       print(Col.red(text))
-        elif fg == 'white_dim': print(Col.white_dim(text))
-        elif fg == 'white':     print(Col.white(text))
-        elif fg == 'yellow':    print(Col.yellow(text))
+        if not fg:
+            print(text)
+        elif fg == 'blue':
+            print(Col.blue(text))
+        elif fg == 'brown':
+            print(Col.brown(text))
+        elif fg == 'red':
+            print(Col.red(text))
+        elif fg == 'white_dim':
+            print(Col.white_dim(text))
+        elif fg == 'white':
+            print(Col.white(text))
+        elif fg == 'yellow':
+            print(Col.yellow(text))
+
+
 ## }}}
-def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str='') -> None:  ## {{{ TODO is Type correct?
+def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str = '') -> None:  ## {{{ TODO is Type correct?
     class_ins.should_restart_tor = False  ## TODO is it needed here?
 
     if nth_attempt < len(class_ins.attempts):
@@ -303,7 +325,7 @@ def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str='') -> N
     else:
         class_ins.error_msg = f'Failed after {nth_attempt} attempts. Last error: {stderr}'
         class_ins.should_break = True  ## <--,-- this is the last Cur.attempt and the loop will automatically break anyawy,
-                                       ##    '-- but it is needed here for the url to be added to failures
+        ##    '-- but it is needed here for the url to be added to failures
 
     if caller == 'download':
         savelog_print(class_ins.error_dict, 'red')
@@ -312,6 +334,8 @@ def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str='') -> N
 
     if class_ins.should_restart_tor:
         restart_tor()
+
+
 ## }}}
 def normalize(text: str) -> str:  ## {{{
     text = text.lower()
@@ -320,11 +344,15 @@ def normalize(text: str) -> str:  ## {{{
     text = sub(r'-+', r'-', text)
 
     return text
+
+
 ## }}}
 def calculate_order() -> dict[str, str]:  ## {{{
     perc = int((Cur.index * 100) / Ini.urls_length)
 
     return {f'{Cur.index}/{Ini.urls_length}': f'%{perc}'}
+
+
 ## }}}
 @duration_wrapper()
 def main() -> None:  ## {{{
@@ -372,187 +400,207 @@ def main() -> None:  ## {{{
         ## END urls
     elif item == 'help':
         display_help()
+
+
 ## }}}
+
 
 @dataclass
 class Initial:  ## {{{
     ## {{{
-    time: int                   = field(repr=False, default=get_datetime('jhms'))
-    attrs: dict[str, str]       = field(repr=False, default_factory=dict)
-    urls: list[str]             = field(repr=False, default_factory=list)
-    failures: list[str]         = field(repr=False, default_factory=list)
-    failures_count: int         = field(repr=False, default=0)
-    failed_table: str           = field(repr=False, default=None)
-    table_header: list[str]     = field(repr=False, default_factory=list)
-    table_rows: list[str]       = field(repr=False, default_factory=list)
-    permission: bool            = field(repr=False, default=False)
-    total_duration: str         = field(repr=False, default=None)
-    total_downloaded_raw: int   = field(repr=False, default=None)
-    total_downloaded: str       = field(repr=False, default=None)
-    wait_duration: str          = field(repr=False, default=None)
+    time: int = field(repr=False, default=get_datetime('jhms'))
+    attrs: dict[str, str] = field(repr=False, default_factory=dict)
+    urls: list[str] = field(repr=False, default_factory=list)
+    failures: list[str] = field(repr=False, default_factory=list)
+    failures_count: int = field(repr=False, default=0)
+    failed_table: str = field(repr=False, default=None)
+    table_header: list[str] = field(repr=False, default_factory=list)
+    table_rows: list[str] = field(repr=False, default_factory=list)
+    permission: bool = field(repr=False, default=False)
+    total_duration: str = field(repr=False, default=None)
+    total_downloaded_raw: int = field(repr=False, default=None)
+    total_downloaded: str = field(repr=False, default=None)
+    wait_duration: str = field(repr=False, default=None)
     happy_hours_start_time: int = field(repr=False, default=21000)
-    happy_hours_end_time: int   = field(repr=False, default=63000)
-    is_playlist: bool           = field(repr=False, default=False)
-    increment_prefix: str       = field(repr=False, default='')  ## NOTE do NOT replace '' with None
-    valid_qualities: list[str]  = field(repr=False, default_factory=make_qualities)
-    datetime: int               = get_datetime('jymdhms')
-    weekday: int                = get_datetime('jweekday').lower()
-    dest_dir: str               = None
+    happy_hours_end_time: int = field(repr=False, default=63000)
+    is_playlist: bool = field(repr=False, default=False)
+    increment_prefix: str = field(repr=False, default='')  ## NOTE do NOT replace '' with None
+    valid_qualities: list[str] = field(repr=False, default_factory=make_qualities)
+    datetime: int = get_datetime('jymdhms')
+    weekday: int = get_datetime('jweekday').lower()
+    dest_dir: str = None
 
-    source: str          = None
-    file_type: str       = 'o'
-    downloader: bool     = False
-    quality: str         = '22'
-    increment: int       = None
-    retries: int         = 5
-    when: str            = 'n'
-    tor: bool            = False
+    source: str = None
+    file_type: str = 'o'
+    downloader: bool = False
+    quality: str = '22'
+    increment: int = None
+    retries: int = 5
+    when: str = 'n'
+    tor: bool = False
     no_information: bool = False
-    verbose: bool        = False
-    purge : bool         = False
+    verbose: bool = False
+    purge: bool = False
     ## }}}
     def getopts(self) -> None:  ## {{{
         try:
             duos, duos_long = getopt(
                 script_args,
                 'hs:f:d:q:i:r:w:tnvp',
-                ['help', 'source=', 'file-type=', 'downloader=', 'quality=', 'increment=', 'retries=', 'when=', 'tor', 'no-information', 'verbose', 'purge']
+                ['help', 'source=', 'file-type=', 'downloader=', 'quality=', 'increment=', 'retries=', 'when=', 'tor', 'no-information', 'verbose', 'purge'],
             )
             for opt, arg in duos:
-                if   opt in ('-h', '--help'):           display_help()
-                elif opt in ('-s', '--source'):         self.source         = arg
-                elif opt in ('-f', '--file-type'):      self.file_type      = arg
-                elif opt in ('-d', '--downloader'):     self.downloader     = arg
-                elif opt in ('-q', '--quality'):        self.quality        = arg
-                elif opt in ('-i', '--increment'):      self.increment      = arg
-                elif opt in ('-r', '--retries'):        self.retries        = arg
-                elif opt in ('-w', '--when'):           self.when           = arg
-                elif opt in ('-t', '--tor'):            self.tor            = True
-                elif opt in ('-n', '--no-information'): self.no_information = True
-                elif opt in ('-v', '--verbose'):        self.verbose        = True
-                elif opt in ('-p', '--purge'):          self.purge          = True
+                if opt in ('-h', '--help'):
+                    display_help()
+                elif opt in ('-s', '--source'):
+                    self.source = arg
+                elif opt in ('-f', '--file-type'):
+                    self.file_type = arg
+                elif opt in ('-d', '--downloader'):
+                    self.downloader = arg
+                elif opt in ('-q', '--quality'):
+                    self.quality = arg
+                elif opt in ('-i', '--increment'):
+                    self.increment = arg
+                elif opt in ('-r', '--retries'):
+                    self.retries = arg
+                elif opt in ('-w', '--when'):
+                    self.when = arg
+                elif opt in ('-t', '--tor'):
+                    self.tor = True
+                elif opt in ('-n', '--no-information'):
+                    self.no_information = True
+                elif opt in ('-v', '--verbose'):
+                    self.verbose = True
+                elif opt in ('-p', '--purge'):
+                    self.purge = True
         except Exception as exc:
             getopts_error_msg = f'{exc!r}'
             invalid({'GETOPTS ERROR': getopts_error_msg})
+
     ## }}}
     def verify_args(self) -> None:  ## {{{
-            ## {{{ self.source + self.urls, self.dest_dir & self.log_file
-            ## https://www.geeksforgeeks.org/python-check-url-string/
-            url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-            playlist_id_regex = '^PL'  ## TODO better regex (I don't think - is required after PL)
+        ## {{{ self.source + self.urls, self.dest_dir & self.log_file
+        ## https://www.geeksforgeeks.org/python-check-url-string/
+        url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+        playlist_id_regex = '^PL'  ## TODO better regex (I don't think - is required after PL)
 
-            if not self.source:
-                self.source = get_input('Source')
+        if not self.source:
+            self.source = get_input('Source')
 
-            ## check if self.source is a file
-            if path.isfile(self.source):
+        ## check if self.source is a file
+        if path.isfile(self.source):
 
-                ## create self.urls list from self.source
-                with open(self.source, 'r') as opened_source:
-                    lines = opened_source.read().splitlines()  ## OR: opened_source.readlines()
-                self.urls = list(filter(lambda line: not line.startswith('#') and line, lines))
-                if not self.urls:
-                    invalid('Source contains no downloadable urls')
+            ## create self.urls list from self.source
+            with open(self.source, 'r') as opened_source:
+                lines = opened_source.read().splitlines()  ## OR: opened_source.readlines()
+            self.urls = list(filter(lambda line: not line.startswith('#') and line, lines))
+            if not self.urls:
+                invalid('Source contains no downloadable urls')
 
-                root_base, _ = path.splitext(self.source)  ## '$HOME/downloads/lucy', '.txt'
-                self.dest_dir = root_base
+            root_base, _ = path.splitext(self.source)  ## '$HOME/downloads/lucy', '.txt'
+            self.dest_dir = root_base
 
-            ## check if we should download videos from my website
-            ## better be placed before the statement that makes sure self.source is not a directory
-            elif self.source == 'free':
-                v_dirs = glob(f'{getenv("HOME")}/website/DL/Video/*')
-                for v_dir in v_dirs:
-                    v_count = len(list(glob(f'{v_dir}/*mp4')))
-                    if v_count:
-                        for number in range(1, v_count + 1):
-                            _, base = path.split(v_dir)  ## '$HOME/website/DL/Video', 'Sprouts'
-                            self.urls.append(f'https://www.dl.davoudarsalani.ir/DL/Video/{base}/{number:03}.mp4')
+        ## check if we should download videos from my website
+        ## better be placed before the statement that makes sure self.source is not a directory
+        elif self.source == 'free':
+            v_dirs = glob(f'{getenv("HOME")}/website/DL/Video/*')
+            for v_dir in v_dirs:
+                v_count = len(list(glob(f'{v_dir}/*mp4')))
+                if v_count:
+                    for number in range(1, v_count + 1):
+                        _, base = path.split(v_dir)  ## '$HOME/website/DL/Video', 'Sprouts'
+                        self.urls.append(f'https://www.dl.davoudarsalani.ir/DL/Video/{base}/{number:03}.mp4')
 
-                shuffle(self.urls)
+            shuffle(self.urls)
 
-                self.dest_dir = f'{getenv("HOME")}/downloads/free'
+            self.dest_dir = f'{getenv("HOME")}/downloads/free'
 
-            ## make sure self.source is not a directory
-            elif path.isdir(self.source):
-                invalid('Source cannot be a directory')
+        ## make sure self.source is not a directory
+        elif path.isdir(self.source):
+            invalid('Source cannot be a directory')
 
-            ## check if self.source is a url
-            elif match(url_regex, self.source):
-                ## create self.urls list from self.source
-                self.urls = [self.source]
+        ## check if self.source is a url
+        elif match(url_regex, self.source):
+            ## create self.urls list from self.source
+            self.urls = [self.source]
 
-                if 'youtube' in self.source:
-                    _, *url_id = self.source.split('=')  ## [WpqCLcAXkJs] or []
-                    url_id = ''.join(url_id)
-                    ## url_id may be left empty here due to bad self.source (e.g. https://www.youtube.com/watch?vWpqCLcAXkJs)
-                    ## if so, we have nothing else to do but exit
-                    if not url_id:
-                        invalid('url seems incorrect.')
+            if 'youtube' in self.source:
+                _, *url_id = self.source.split('=')  ## [WpqCLcAXkJs] or []
+                url_id = ''.join(url_id)
+                ## url_id may be left empty here due to bad self.source (e.g. https://www.youtube.com/watch?vWpqCLcAXkJs)
+                ## if so, we have nothing else to do but exit
+                if not url_id:
+                    invalid('url seems incorrect.')
 
-                    self.dest_dir = f'{getenv("HOME")}/downloads/{url_id}'
-                else:
-                    _, source_base = path.split(self.source)  ## 'https://www.davoudarsalani.ir/Files/Temp', '001.jpg'
-                    root_source_base, _ = path.splitext(source_base)  ## '001', '.jpg'
-                    self.dest_dir = f'{getenv("HOME")}/downloads/{root_source_base}'
-
-            ## check if self.source is a playlist id
-            elif match(playlist_id_regex, self.source):
-                global Pla
-
-                self.is_playlist = True
-                Pla = Playlist()
-                Pla.get_info()
-
-                ## create self.urls list from Pla.pl_urls which is s list
-                self.urls = list(filter(lambda line: not line.startswith('#') and line, Pla.pl_urls))
-                if not self.urls:
-                    invalid('No urls extracted from playlist id')
-                self.dest_dir = f'{getenv("HOME")}/downloads/{normalize(self.source)}'
-
+                self.dest_dir = f'{getenv("HOME")}/downloads/{url_id}'
             else:
-                invalid('Source neither exists nor is a valid url')
+                _, source_base = path.split(self.source)  ## 'https://www.davoudarsalani.ir/Files/Temp', '001.jpg'
+                root_source_base, _ = path.splitext(source_base)  ## '001', '.jpg'
+                self.dest_dir = f'{getenv("HOME")}/downloads/{root_source_base}'
 
-            ## FIXME find how to remove trailing/leading space self.urls members
-            ## TODO remove repeated urls and print if so
+        ## check if self.source is a playlist id
+        elif match(playlist_id_regex, self.source):
+            global Pla
 
-            if self.purge:
-                self.dest_dir = f'/tmp/purge_{self.time}'
+            self.is_playlist = True
+            Pla = Playlist()
+            Pla.get_info()
 
-            self.dest_dir = if_exists(self.dest_dir)
-            mkdir(self.dest_dir)
-            chdir(self.dest_dir)
-            ## }}}
-            ## {{{ file_type
-            if self.file_type not in ['v', 's', 'vs', 'a', 't', 'o']:
-                invalid('Invalid file type')
-            ## }}}
-            ## downloader {{{ JUMP_1
-            if self.downloader and ((self.file_type in ['v', 's', 'vs', 't', 'a'] and not self.downloader == 'curl') or (self.file_type == 'o' and self.downloader not in ['requests', 'wget', 'curl'])):
-                invalid(f'invalid downloader for {self.file_type}')
-            ## }}}
-            ## quality {{{
-            if self.quality not in self.valid_qualities:
-                invalid(f'Invalid quality. It has to be one of these: {self.valid_qualities}')
-            ## }}}
-            ## increment {{{
-            if self.increment:
-                try:
-                    self.increment = int(self.increment)
-                except Exception:
-                    invalid('increment should be a number')
-            ## }}}
-            ## retries {{{
+            ## create self.urls list from Pla.pl_urls which is s list
+            self.urls = list(filter(lambda line: not line.startswith('#') and line, Pla.pl_urls))
+            if not self.urls:
+                invalid('No urls extracted from playlist id')
+            self.dest_dir = f'{getenv("HOME")}/downloads/{normalize(self.source)}'
+
+        else:
+            invalid('Source neither exists nor is a valid url')
+
+        ## FIXME find how to remove trailing/leading space self.urls members
+        ## TODO remove repeated urls and print if so
+
+        if self.purge:
+            self.dest_dir = f'/tmp/purge_{self.time}'
+
+        self.dest_dir = if_exists(self.dest_dir)
+        mkdir(self.dest_dir)
+        chdir(self.dest_dir)
+        ## }}}
+        ## {{{ file_type
+        if self.file_type not in ['v', 's', 'vs', 'a', 't', 'o']:
+            invalid('Invalid file type')
+        ## }}}
+        ## downloader {{{ JUMP_1
+        if self.downloader and (
+            (self.file_type in ['v', 's', 'vs', 't', 'a'] and not self.downloader == 'curl')
+            or (self.file_type == 'o' and self.downloader not in ['requests', 'wget', 'curl'])
+        ):
+            invalid(f'invalid downloader for {self.file_type}')
+        ## }}}
+        ## quality {{{
+        if self.quality not in self.valid_qualities:
+            invalid(f'Invalid quality. It has to be one of these: {self.valid_qualities}')
+        ## }}}
+        ## increment {{{
+        if self.increment:
             try:
-                self.retries = int(self.retries)  ## make sure self.retries is an int
-                _ = 1 / self.retries  ## make sure self.retries is not 0
-                self.retries = abs(self.retries)  ## make sure self.retries is greater than 0
+                self.increment = int(self.increment)
             except Exception:
-                invalid('retries should be a number and greater than zero')
-            ## }}}
-            ## when {{{
-            if self.when not in ['n', 'h']:
-                invalid('Invalid time')
-            ## }}}
+                invalid('increment should be a number')
+        ## }}}
+        ## retries {{{
+        try:
+            self.retries = int(self.retries)  ## make sure self.retries is an int
+            _ = 1 / self.retries  ## make sure self.retries is not 0
+            self.retries = abs(self.retries)  ## make sure self.retries is greater than 0
+        except Exception:
+            invalid('retries should be a number and greater than zero')
+        ## }}}
+        ## when {{{
+        if self.when not in ['n', 'h']:
+            invalid('Invalid time')
+        ## }}}
+
     ## }}}
     def create_current(self, url) -> None:  ## {{{
         global Cur
@@ -563,6 +611,7 @@ class Initial:  ## {{{
             Cur = File()
 
         Cur.get_info(url)  ## TODO how can we pass url directly when creating the class above?
+
     ## }}}
     def calculate_total_downloaded(self) -> None:  ## {{{
         ## FIXME <--,-- we are currently calculating dest_dir size after each download but this is not a reliable way
@@ -573,10 +622,12 @@ class Initial:  ## {{{
         root_directory = Path(self.dest_dir)
         self.total_downloaded_raw = sum(file.stat().st_size for file in root_directory.glob('**/*'))
         self.total_downloaded = convert_byte(self.total_downloaded_raw)
+
     ## }}}
     def add_to_failures(self) -> None:  ## {{{
         self.failures.append({**Cur.order, 'url': Cur.url, **Cur.error_dict})
         self.failures_count += 1
+
     ## }}}
     def draw_failed_table(self) -> str:  ## {{{
         if self.failures:
@@ -585,9 +636,11 @@ class Initial:  ## {{{
             self.failed_table = tabulate(self.table_rows, headers=self.table_header, tablefmt='grid')
 
             savelog_print(self.failed_table, 'red')
+
     ## }}}
     def update_time(self) -> None:  ## {{{
         self.time = int(get_datetime('jhms'))
+
     ## }}}
     def check_to_start(self) -> None:  ## {{{
         self.update_time()
@@ -597,6 +650,7 @@ class Initial:  ## {{{
             self.permission = True
         else:
             savelog_print({'time': self.time, 'wait': self.wait_duration}, 'brown')
+
     ## }}}
     def check_to_exit(self) -> None:  ## {{{
         self.update_time()
@@ -604,6 +658,7 @@ class Initial:  ## {{{
         if self.when == 'h' and self.time > self.happy_hours_end_time:
             savelog_print('Happy hours over. Exit.', 'brown')
             exit()
+
     ## }}}
     def calculate_wait_duration(self) -> None:  ## {{{ https://stackoverflow.com/questions/36810003/calculate-seconds-from-now-to-specified-time-today-or-tomorrow
         hr = int(str(self.happy_hours_start_time)[:1])  ## 2
@@ -611,6 +666,7 @@ class Initial:  ## {{{
         now = dt.now()  ## 2021-08-05 18:55:06.865231
         secsleft = int((timedelta(hours=24) - (now - now.replace(hour=hr, minute=mins, second=0, microsecond=0))).total_seconds() % (24 * 3600))
         self.wait_duration = duration(secsleft)
+
     ## }}}
     def report(self) -> None:  ## {{{
         ## report failures if any
@@ -618,91 +674,107 @@ class Initial:  ## {{{
 
         self.update_time()
         savelog_print({'time': self.time, 'took': self.total_duration}, 'brown')
+
     ## }}}
     @property
     def urls_length(self) -> int:  ## {{{
         return len(self.urls)
+
     ## }}}
     @property
     def log_file(self) -> str:  ## {{{
         return f'{self.dest_dir}/log'
+
     ## }}}
     @property
     def total_downloaded_dict(self) -> dict[str, str]:  ## {{{
         self.calculate_total_downloaded()
         return {'total downloaded': self.total_downloaded}
+
     ## }}}
     @property
     def failures_count_dict(self) -> dict[str, str]:  ## {{{
         if self.failures_count:
             return {'failures': self.failures_count}
         return {}
+
     ## }}}
+
+
 ## }}}
 @dataclass
 class Profile:  ## {{{
     ## {{{
-    errors: dict[str, str]   = field(repr=False, default_factory=make_errors)
-    attempts: list[int]      = field(repr=False, default_factory=make_attempts)
-    attempt: int             = field(repr=False, default=None)
-    get_info_attempt: int    = field(repr=False, default=None)
-    counter: int             = field(repr=False, default=0)
-    index: int               = field(repr=False, default=None)
-    should_break: bool       = field(repr=False, default=False)
+    errors: dict[str, str] = field(repr=False, default_factory=make_errors)
+    attempts: list[int] = field(repr=False, default_factory=make_attempts)
+    attempt: int = field(repr=False, default=None)
+    get_info_attempt: int = field(repr=False, default=None)
+    counter: int = field(repr=False, default=0)
+    index: int = field(repr=False, default=None)
+    should_break: bool = field(repr=False, default=False)
     should_restart_tor: bool = field(repr=False, default=False)
-    error_msg: str           = field(repr=False, default=None)
-    download_duration: str   = field(repr=False, default=None)
+    error_msg: str = field(repr=False, default=None)
+    download_duration: str = field(repr=False, default=None)
 
     order: dict[str, str] = field(default_factory=dict)
-    time: int             = None
-    url: int              = None
-    outputname: str       = None
+    time: int = None
+    url: int = None
+    outputname: str = None
     ## }}}
     def report(self) -> None:  ## {{{
         savelog_print({**self.download_duration_dict, **Ini.total_downloaded_dict, **Ini.failures_count_dict}, 'brown')
         savelog_print(separator())
+
     ## }}}
     def index_up(self) -> None:  ## {{{
         Profile.counter += 1
         self.index = Profile.counter
+
     ## }}}
     @property
     def download_duration_dict(self) -> dict[str, str]:  ## {{{
         return {'took': self.download_duration}
+
     ## }}}
     @property
     def error_dict(self) -> dict[str, str]:  ## {{{
         return {'ERROR MSG': self.error_msg}
+
     ## }}}
     @property
     def attempt_dict(self) -> dict[str, int]:  ## {{{
         return {'attempt': self.attempt}
+
     ## }}}
     @property
     def attempt_message(self) -> None:  ## {{{
         if self.attempt == 1:
             return self
         return self.attempt_dict
+
     ## }}}
+
+
 ## }}}
 @dataclass
 class File(Profile):  ## {{{
     ## {{{
-    progress_file_downloaded_raw: int  = field(repr=False, default=0)  ## NOTE do NOT replace 0 with None because it'll be later added to in JUMP_4
-    progress_file_downloaded: int      = field(repr=False, default=None)
+    progress_file_downloaded_raw: int = field(repr=False, default=0)  ## NOTE do NOT replace 0 with None because it'll be later added to in JUMP_4
+    progress_file_downloaded: int = field(repr=False, default=None)
     progress_file_downloaded_perc: int = field(repr=False, default=None)
-    chunksize: int                     = field(repr=False, default=8192)  ## 8192 is 8KB
-    file_raw_size_validity: bool       = field(repr=False, default=False)
-    file_raw_size_invalidity_msg: str  = field(repr=False, default=None)
+    chunksize: int = field(repr=False, default=8192)  ## 8192 is 8KB
+    file_raw_size_validity: bool = field(repr=False, default=False)
+    file_raw_size_invalidity_msg: str = field(repr=False, default=None)
 
-    file_raw_size: int      = field(repr=False, default=None)
-    file_size: str          = None
-    file_content_type: str  = None
+    file_raw_size: int = field(repr=False, default=None)
+    file_size: str = None
+    file_content_type: str = None
     file_last_modified: str = None
     ## }}}
     def __post_init__(self):  ## {{{
         super().__init__()
         self.index_up()
+
     ## }}}
     def get_info(self, url) -> None:  ## {{{
         if Ini.increment:
@@ -741,10 +813,10 @@ class File(Profile):  ## {{{
                     # headers = get_info_requests_response.headers
                     # status_code = get_info_requests_response.status_code  ## 200
 
-                    file_content_type = headers.get('Content-Type', 'ERROR')    ## <--, <--,-- if url (domain part) is misspelled, file_content_type is assigned 'ERROR'
+                    file_content_type = headers.get('Content-Type', 'ERROR')  ## <--, <--,-- if url (domain part) is misspelled, file_content_type is assigned 'ERROR'
                     file_last_modified = headers.get('Last-Modified', 'ERROR')  ## <--|    |-- in except, but if url (file name part) is misspelled, the file_content_type
-                    file_raw_size = int(headers.get('Content-Length', 0))       ## <--|    '-- is always 'text/html; charset=UTF-8' regardless of the real file type
-                    file_size = convert_byte(file_raw_size)                     ##    '-- exceptionally used get because the key is not always there
+                    file_raw_size = int(headers.get('Content-Length', 0))  ## <--|    '-- is always 'text/html; charset=UTF-8' regardless of the real file type
+                    file_size = convert_byte(file_raw_size)  ##    '-- exceptionally used get because the key is not always there
 
                     info = order, time, url, file_raw_size, file_size, file_content_type, file_last_modified, outputname
 
@@ -760,6 +832,7 @@ class File(Profile):  ## {{{
 
         self.order, self.time, self.url, self.file_raw_size, self.file_size, self.file_content_type, self.file_last_modified, self.outputname = info
         self.check_raw_size_validity()  ## self.file_raw_size may be set as NOINFO (if requested so), ERROR or 0
+
     ## }}}
     def check_raw_size_validity(self) -> None:  ## {{{
         '''helps decide which progress_info to display'''
@@ -779,18 +852,20 @@ class File(Profile):  ## {{{
                 self.file_raw_size_invalidity_msg = f'UNKNOWN: {self.file_raw_size}'
 
             self.file_raw_size_validity = False
+
     ## }}}
     def calculate_progress(self) -> None:  ## {{{
-            self.progress_file_downloaded_raw += self.chunksize  ## JUMP_4
-            self.progress_file_downloaded = convert_byte(self.progress_file_downloaded_raw)
-            self.progress_file_downloaded_perc = (self.progress_file_downloaded_raw * 100) / self.file_raw_size
+        self.progress_file_downloaded_raw += self.chunksize  ## JUMP_4
+        self.progress_file_downloaded = convert_byte(self.progress_file_downloaded_raw)
+        self.progress_file_downloaded_perc = (self.progress_file_downloaded_raw * 100) / self.file_raw_size
 
-            ## FIXME <--,-- self.progress_file_downloaded_perc exceeds 100. what's more, adding if chunk:
-            ##          '-- at JUMP_2 prevents it from reaching 100, so here's a dirty trick:
-            if self.progress_file_downloaded_raw > self.file_raw_size:
-                self.progress_file_downloaded = self.file_size
-            if self.progress_file_downloaded_perc > 100:
-                self.progress_file_downloaded_perc = 100
+        ## FIXME <--,-- self.progress_file_downloaded_perc exceeds 100. what's more, adding if chunk:
+        ##          '-- at JUMP_2 prevents it from reaching 100, so here's a dirty trick:
+        if self.progress_file_downloaded_raw > self.file_raw_size:
+            self.progress_file_downloaded = self.file_size
+        if self.progress_file_downloaded_perc > 100:
+            self.progress_file_downloaded_perc = 100
+
     ## }}}
     @duration_wrapper()
     def download(self) -> None:  ## {{{
@@ -847,7 +922,7 @@ class File(Profile):  ## {{{
                 ## https://www.itersdesktop.com/2020/09/06/downloading-files-in-python-using-wget-module/
                 def wget_bar(progress_file_downloaded_raw, total=self.file_raw_size, width=80) -> None:  ## JUMP_5 FIXME can't use self.progress_file_downloaded_raw
                     self.progress_file_downloaded = convert_byte(progress_file_downloaded_raw)
-                    self.progress_file_downloaded_perc = (progress_file_downloaded_raw /total) * 100
+                    self.progress_file_downloaded_perc = (progress_file_downloaded_raw / total) * 100
                     print(Col.purple(self.progress_info_dict), end=endpoint)
 
                 ## FIXME doesn't show
@@ -896,42 +971,48 @@ class File(Profile):  ## {{{
         except Exception as exc:
             method_name = stack()[0][3]
             analyze(f'{exc!r}', nth_attempt=self.attempt, class_ins=Cur, caller=method_name)
+
     ## }}}
     @property
     def progress_info_dict(self) -> dict[str, str]:  ## {{{
         return {f'{self.progress_file_downloaded}/{self.file_size}': f'%{self.progress_file_downloaded_perc:.2f}'}
+
     ## }}}
     @property
     def progress_info_error_dict(self) -> dict[str, str]:  ## {{{
         return {'BAR ERROR MSG': self.file_raw_size_invalidity_msg}
+
     ## }}}
+
+
 ## }}}
 @dataclass
 class Youtube(Profile):  ## {{{
     ## {{{
-    progress_status: str                = field(repr=False, default=None)
-    progress_speed_raw: int             = field(repr=False, default=None)
-    progress_speed: str                 = field(repr=False, default=None)
-    progress_elapsed: int               = field(repr=False, default=None)
-    progress_eta: int                   = field(repr=False, default=None)
-    progress_video_raw_size: int        = field(repr=False, default=None)
-    progress_video_size: str            = field(repr=False, default=None)
-    progress_video_downloaded_raw: int  = field(repr=False, default=None)
-    progress_video_downloaded: str      = field(repr=False, default=None)
+    progress_status: str = field(repr=False, default=None)
+    progress_speed_raw: int = field(repr=False, default=None)
+    progress_speed: str = field(repr=False, default=None)
+    progress_elapsed: int = field(repr=False, default=None)
+    progress_eta: int = field(repr=False, default=None)
+    progress_video_raw_size: int = field(repr=False, default=None)
+    progress_video_size: str = field(repr=False, default=None)
+    progress_video_downloaded_raw: int = field(repr=False, default=None)
+    progress_video_downloaded: str = field(repr=False, default=None)
     progress_video_downloaded_perc: int = field(repr=False, default=None)
-    progress_info_error: str            = field(repr=False, default=None)
+    progress_info_error: str = field(repr=False, default=None)
 
-    video_title: str         = None
-    video_uploader: str      = None
-    video_channel: str       = None
-    video_duration: int      = None
-    video_view_count: int    = None
-    video_like_count: int    = None
-    video_ext: str           = None
+    video_title: str = None
+    video_uploader: str = None
+    video_channel: str = None
+    video_duration: int = None
+    video_view_count: int = None
+    video_like_count: int = None
+    video_ext: str = None
     ## }}}
     def __post_init__(self):  ## {{{
         super().__init__()
         self.index_up()
+
     ## }}}
     def get_info(self, url) -> None:  ## {{{
         if Ini.increment:
@@ -986,7 +1067,20 @@ class Youtube(Profile):  ## {{{
                 if self.should_break:
                     break
 
-        self.order, self.time, self.url, self.video_title, self.video_uploader, self.video_channel, self.video_duration, self.video_view_count, self.video_like_count, self.video_ext, self.outputname = info
+        (
+            self.order,
+            self.time,
+            self.url,
+            self.video_title,
+            self.video_uploader,
+            self.video_channel,
+            self.video_duration,
+            self.video_view_count,
+            self.video_like_count,
+            self.video_ext,
+            self.outputname,
+        ) = info
+
     ## }}}
     @duration_wrapper()
     def download(self) -> None:  ## {{{
@@ -1053,16 +1147,23 @@ class Youtube(Profile):  ## {{{
             ##          |-- wget throws 'DownloadError('ERROR: wget exited with code 8')' for v, vs and a but works well for s and t
             ##          '-- axel throws 'DownloadError('ERROR: axel exited with code 1')' for v, vs and a but works well for s and t
             ## JUMP_6 FIXME it prompts for every url
-            continue_with_default_downloader = get_single_input('Setting downloader other than curl for v/s/vs/a/t is not possible at the moment. Continue with default downloader (i.e. youtube_dl)?')
+            continue_with_default_downloader = get_single_input(
+                'Setting downloader other than curl for v/s/vs/a/t is not possible at the moment. Continue with default downloader (i.e. youtube_dl)?'
+            )
             if not continue_with_default_downloader == 'y':
                 exit()
 
         langs = ['en', 'en-AU', 'en-CA', 'en-GB', 'en-IE', 'en-NZ', 'en-US']
-        if   Ini.file_type == 'v':  options = {**options, 'format': Ini.quality}
-        elif Ini.file_type == 's':  options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'skip_download': True}
-        elif Ini.file_type == 'vs': options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'format': Ini.quality}
-        elif Ini.file_type == 'a':  options = {**options, 'format': 'bestaudio', 'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]}
-        elif Ini.file_type == 't':  options = {**options, 'write_all_thumbnails': True, 'writethumbnail': True, 'skip_download': True}
+        if Ini.file_type == 'v':
+            options = {**options, 'format': Ini.quality}
+        elif Ini.file_type == 's':
+            options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'skip_download': True}
+        elif Ini.file_type == 'vs':
+            options = {**options, 'writesubtitles': True, 'writeautomaticsub': True, 'subtitleslangs': langs, 'format': Ini.quality}
+        elif Ini.file_type == 'a':
+            options = {**options, 'format': 'bestaudio', 'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}]}
+        elif Ini.file_type == 't':
+            options = {**options, 'write_all_thumbnails': True, 'writethumbnail': True, 'skip_download': True}
 
         try:
             with YoutubeDL(options) as opened_youtubedl:
@@ -1072,6 +1173,7 @@ class Youtube(Profile):  ## {{{
         except Exception as exc:
             method_name = stack()[0][3]
             analyze(f'{exc!r}', nth_attempt=self.attempt, class_ins=Cur, caller=method_name)
+
     ## }}}
     @property
     def progress_info_dict(self) -> dict[str, str]:  ## {{{
@@ -1081,25 +1183,30 @@ class Youtube(Profile):  ## {{{
             'elapsed': self.progress_elapsed,
             'eta': self.progress_eta,
         }
+
     ## }}}
     @property
     def progress_info_error_dict(self) -> dict[str, str]:  ## {{{
         return {'BAR ERROR MSG': f'{self.progress_status} {self.progress_info_error}'}
+
     ## }}}
+
+
 ## }}}
 @dataclass
 class Playlist(Profile):  ## {{{
     ## {{{
     pl_fullinfo: dict[str, str] = field(repr=False, default_factory=dict)
-    pl_urls: list[str]          = field(repr=False, default_factory=list)
+    pl_urls: list[str] = field(repr=False, default_factory=list)
 
-    pl_title: str         = None
-    pl_uploader: str      = None
+    pl_title: str = None
+    pl_uploader: str = None
     pl_entries: list[str] = field(repr=False, default_factory=list)
     pl_entries_count: int = None
     ## }}}
     def __post_init__(self):  ## {{{
         super().__init__()
+
     ## }}}
     def get_info(self) -> None:  ## {{{
         options = {
@@ -1143,6 +1250,8 @@ class Playlist(Profile):  ## {{{
 
         self.pl_title, self.pl_uploader, self.pl_entries_count = info
         ## }}}
+
+
 ## }}}
 class YoutubedlLoggerW:  ## {{{
     '''logger for youtube_dl displaying warning messages'''
@@ -1160,6 +1269,8 @@ class YoutubedlLoggerW:  ## {{{
     @staticmethod
     def error(log_msg) -> None:
         pass
+
+
 ## }}}
 class YoutubedlLoggerEmpty:  ## {{{
     '''logger for youtube_dl displaying no messages'''
@@ -1175,6 +1286,8 @@ class YoutubedlLoggerEmpty:  ## {{{
     @staticmethod
     def error(log_msg) -> None:
         pass
+
+
 ## }}}
 
 if __name__ == '__main__':

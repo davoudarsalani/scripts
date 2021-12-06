@@ -13,12 +13,17 @@ title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
 Col = Color()
 
+
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
+    print(
+        f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-i --input=')}
-{Col.flag('-p --password=')}''')
+{Col.flag('-p --password=')}'''
+    )
     exit()
+
+
 ## }}}
 def getopts() -> None:  ## {{{
     global inpt, password
@@ -29,21 +34,33 @@ def getopts() -> None:  ## {{{
         invalid(f'{exc!r}')
 
     for opt, arg in duos:
-        if   opt in ('-h', '--help'):     display_help()
-        elif opt in ('-i', '--input'):    inpt = arg
-        elif opt in ('-p', '--password'): password = arg
+        if opt in ('-h', '--help'):
+            display_help()
+        elif opt in ('-i', '--input'):
+            inpt = arg
+        elif opt in ('-p', '--password'):
+            password = arg
+
+
 ## }}}
 def prompt(*args: list[str]) -> None:  ## {{{
     global inpt, password
 
     for arg in args:
-        if   arg == '-i':
-            try:    inpt
-            except: inpt = get_input('Input')
-            if not path.exists(f'{inpt}'): invalid('No such file/dir')
+        if arg == '-i':
+            try:
+                inpt
+            except:
+                inpt = get_input('Input')
+            if not path.exists(f'{inpt}'):
+                invalid('No such file/dir')
         elif arg == '-p':
-            try:    password
-            except: password = get_password('Password ')
+            try:
+                password
+            except:
+                password = get_password('Password ')
+
+
 ## }}}
 
 getopts()
@@ -53,7 +70,7 @@ print(Col.heading(title))
 main_items = ['tar', 'untar', 'zip', 'unzip', 'unrar', 'help']
 main_item = fzf(main_items)
 
-if   main_item == 'tar':
+if main_item == 'tar':
     prompt('-i')
     compress_tar(inpt)
 elif main_item == 'untar':
@@ -61,7 +78,7 @@ elif main_item == 'untar':
     xtract_tar(inpt)
 elif main_item == 'zip':
     use_password = get_single_input('Use password (y/n)?')
-    if   use_password == 'y':
+    if use_password == 'y':
         prompt('-i', '-p')
         compress_zip(inpt, password)
     elif use_password == 'n':
@@ -71,7 +88,7 @@ elif main_item == 'zip':
         invalid('Wrong choice')
 elif main_item == 'unzip':
     has_password = get_single_input('Has password (y/n)?')
-    if   has_password == 'y':
+    if has_password == 'y':
         prompt('-i', '-p')
         xtract_zip(inpt, password)
     elif has_password == 'n':
@@ -81,7 +98,7 @@ elif main_item == 'unzip':
         invalid('Wrong choice')
 elif main_item == 'unrar':
     has_password = get_single_input('Has password (y/n)?')
-    if   has_password == 'y':
+    if has_password == 'y':
         prompt('-i', '-p')
         xtract_rar(inpt, password)
     elif has_password == 'n':
