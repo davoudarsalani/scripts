@@ -2,7 +2,7 @@
 
 ## last modified: 1400-09-14 15:44:57 +0330 Sunday
 
-function float_pad {  ## {{{
+function float_pad {
     local input desired_l_length desired_r_length float l r r_length lacking_pad
 
     input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or "${var}*932/12" (no spaces allowd in expression)
@@ -33,8 +33,7 @@ function float_pad {  ## {{{
 
     printf '%s.%s\n' "$l" "$r"
 }
-## }}}
-function compare_floats {  ## {{{
+function compare_floats {
     ## https://stackoverflow.com/questions/8654051/how-to-compare-two-floating-point-numbers-in-bash
     ## usage: is_smaller="$(compare_floats "$first" '<' "$second")"  ## returns true or false
 
@@ -55,8 +54,7 @@ function compare_floats {  ## {{{
          '>' ) [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
     esac
 }
-## }}}
-function convert_byte {  ## {{{
+function convert_byte {
     ## conversion table:
     ## bytes=2546790
     ## B  = "$bytes"               ## 2546790
@@ -86,4 +84,3 @@ function convert_byte {  ## {{{
 
     printf '%s%s\n' "$number" "$suffix"
 }
-## }}}

@@ -21,15 +21,14 @@ error_file = f'{getenv("HOME")}/scripts/.error/weather'
 arg = argv[1]
 
 
-def get_info() -> dict[str, str]:  ## {{{
+def get_info() -> dict[str, str]:
     resp = Ses.get(url, headers=hdrs, timeout=20)
     resp = resp.json()  ## dict
 
     return resp
 
 
-## }}}
-def get_current() -> tuple[str, int, str]:  ## {{{
+def get_current() -> tuple[str, int, str]:
     current = resp['current']  ## dict
     dt = current['dt']  ## int
     weekday = jdt.fromtimestamp(dt).strftime('%A')[:3]
@@ -40,8 +39,7 @@ def get_current() -> tuple[str, int, str]:  ## {{{
     return weekday, temp, description
 
 
-## }}}
-def get_forecast() -> tuple[str, int, int, str]:  ## {{{
+def get_forecast() -> tuple[str, int, int, str]:
     dt = day['dt']  ## int
     weekday = jdt.fromtimestamp(dt).strftime('%A')[:3]
     temp = day['temp']  ## dict
@@ -52,8 +50,6 @@ def get_forecast() -> tuple[str, int, int, str]:  ## {{{
 
     return weekday, temp_min, temp_max, description
 
-
-## }}}
 
 if arg == 'update':
     set_widget('weather', 'fg', 'reset')

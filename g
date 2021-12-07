@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-15 14:00:12 +0330 Monday
+## last modified: 1400-09-16 11:12:57 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -9,31 +9,27 @@ source "$HOME"/scripts/gb-git
 title="${0##*/}"
 noproxy='false'
 
-function display_help {  ## {{{
+function display_help {
     source "$HOME"/scripts/.help
     g_help
 }
-## }}}
-function if_locked {  ## {{{
+function if_locked {
     [ -f "$directory"/.git/index.lock ] && {
         red 'locked'  ## 
         exit
     }
 }
-## }}}
-function check_pattern {  ## {{{
+function check_pattern {
     matches="$(find "$directory" -mindepth 1 -iname "$pattern")"   ## -maxdepth 1 is not needed here
     [ "$matches" ] || {
         red 'no such pattern'
         exit
     }
 }
-## }}}
-function if_amend_allowed {  ## {{{
+function if_amend_allowed {
     (( "$(git_commits_ahead "$directory")" == 0 )) && red 'amend not allowed' && exit
 }
-## }}}
-function add_to_changes {  ## {{{
+function add_to_changes {
     local icon
     declare -a received=( "$@" )
 
@@ -44,8 +40,7 @@ function add_to_changes {  ## {{{
         changes+=( "${icon}---${member}" )
     }
 }
-## }}}
-function if_changed {  ## {{{
+function if_changed {
     local stts
 
     changes=()  ## NOTE do NOT use declare -a changes since declare makes changes a local variable
@@ -63,8 +58,7 @@ function if_changed {  ## {{{
         exit
     }
 }
-## }}}
-function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
+function pipe_to_fzf_locally {
     local fzf_choice short_pwd short_directory
 
     short_pwd="${PWD/$HOME/\~}"
@@ -77,8 +71,7 @@ function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
                                            ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
-## }}}
-function branch_info {  ## {{{ https://revelry.co/terminal-workflow-fzf/
+function branch_info {
     local fzf_choice
 
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
@@ -91,14 +84,12 @@ function branch_info {  ## {{{ https://revelry.co/terminal-workflow-fzf/
                 )"
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
-## }}}
-function branches_array {  ## {{{
+function branches_array {
     declare -a branches_list
     readarray -t branches_list < <(git_branches "$directory")  ## branches
     printf '%s\n' "${branches_list[@]}"
 }
-## }}}
-function prompt {  ## {{{
+function prompt {
     for _ in "$@"; {
         case "$1" in
             -p ) pattern="${pattern:-"$(get_input 'Pattern (e.g. *.py)')"}"  ## NOTE pattern does NOT need quotes here, but if pattern is passed as arg, it will
@@ -111,8 +102,7 @@ function prompt {  ## {{{
         shift
     }
 }
-## }}}
-function get_opt {  ## {{{
+function get_opt {
     local options
 
     options="$(getopt --longoptions 'help,noproxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hnp:m:b:t:c:' --alternative -- "$@")"
@@ -131,7 +121,6 @@ function get_opt {  ## {{{
         shift
     done
 }
-## }}}
 
 get_opt "$@"
 heading "$title"
@@ -148,11 +137,10 @@ main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    status )  ## {{{
+    status )
              if_changed
              pipe_to_fzf_locally "${changes[@]/---/' '}" && accomplished ;;
-             ## }}}
-    add )  ## {{{
+    add )
           if_changed
           add_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$add_item" || exit 37
 
@@ -169,8 +157,7 @@ case "$main_item" in
                         git_add_specific_or_pattern "$directory" "$add_item" && \
                         accomplished "$add_item added" ;;
           esac ;;
-          ## }}}
-    commit )  ## {{{
+    commit )
              if_changed
              [ "${sta[0]}" ] || {
                  red 'no staged files'
@@ -189,8 +176,7 @@ case "$main_item" in
                                 git_commit_with_message "$directory" "$message" && \
                                 accomplished "committed, message: $message" ;;
              esac ;;
-             ## }}}
-    add_commit ) ## {{{
+    add_commit )
                  if_changed
                  add_commit_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all + amend')" && wrap_fzf_choice "$add_commit_item" || exit 37
 
@@ -217,8 +203,7 @@ case "$main_item" in
                          git_commit_with_message "$directory" "${add_commit_item}: $message" && \
                          accomplished "$add_commit_item added, message: ${add_commit_item}: $message" ;;
                  esac ;;
-                 ## }}}
-    commit_amend )  ## {{{
+    commit_amend )
                    if_amend_allowed
                    preview_status='hidden'
                    commit_amend_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$commit_amend_item" || exit 37
@@ -232,8 +217,7 @@ case "$main_item" in
                                       git_commit_amend_with_message "$directory" "$message" && \
                                       accomplished "commit amended, message: $message" ;;
                    esac ;;
-                   ## }}}
-    undo )  ## {{{
+    undo )
            if_changed
            undo_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$undo_item" || exit 37
 
@@ -250,8 +234,7 @@ case "$main_item" in
                           git_undo_specific_or_pattern "$directory" "$undo_item" && \
                           accomplished "$undo_item undid" ;;
            esac ;;
-           ## }}}
-    unstage )  ## {{{
+    unstage )
               if_changed
               [ "${sta[0]}" ] || {
                   red 'no staged files'
@@ -274,15 +257,13 @@ case "$main_item" in
                             git_unstage_specific_or_pattern "$directory" "$unstage_item" && \
                             accomplished "$unstage_item unstaged" ;;
               esac ;;
-              ## }}}
-    log )  ## {{{
+    log )
           IFS=$'\n'
           if_locked
           preview_status='hidden'
           readarray -t log_items < <(git_log "$directory")
           pipe_to_fzf_locally "${log_items[@]}" ;;
-          ## }}}
-    push )  ## {{{
+    push )
            if [ "$(git_remotes "$directory")" ]; then
                if_locked
                if [ "$noproxy" == 'false' ]; then
@@ -295,13 +276,11 @@ case "$main_item" in
            else
                red 'no remote'
            fi ;;
-           ## }}}
-    edit )  ## {{{
+    edit )
            if_locked
            git_edit "$directory" && \
            accomplished 'edited' ;;
-           ## }}}
-    empty_commit )  ## commit with nothing staged {{{
+    empty_commit )
                    preview_status='hidden'
                    empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
 
@@ -314,14 +293,12 @@ case "$main_item" in
                                       git_empty_commit_with_message "$directory" "$message" && \
                                       accomplished "committed empty, message: $message" ;;
                    esac ;;
-                   ## }}}
-    remove )  ## {{{
+    remove )
              prompt -p
              if_locked
              git_remove "$directory" "$pattern" && \
              accomplished "$pattern removed" ;;
-             ## }}}
-    branch )  ## {{{
+    branch )
              preview_status='hidden'
              branch_items=( 'show branches' 'create branch' 'checkout to a branch' 'delete all branches' 'force delete all branches' 'delete a specific branch' 'force delete a specific branch' )
              branch_item="$(pipe_to_fzf_locally "${branch_items[@]}")" && wrap_fzf_choice "$branch_item" || exit 37
@@ -358,8 +335,7 @@ case "$main_item" in
                                                     git_branch_force_delete_specific "$directory" "$force_delete_branch_item" && \
                                                     accomplished "$force_delete_branch_item branch force deleted" ;;
              esac ;;
-             ## }}}
-    tag )  ## {{{
+    tag )
           preview_status='hidden'
           tag_items=( 'show tags' 'show a specific tag' 'create tag' 'create tag + message' 'create tag + message for a specific commit' 'delete all tags' 'delete a specific tag')
           tag_item="$(pipe_to_fzf_locally "${tag_items[@]}")" && wrap_fzf_choice "$tag_item" || exit 37
@@ -396,11 +372,10 @@ case "$main_item" in
                                         git_tag_delete_specific "$directory" "$tag" && \
                                         accomplished "$tag tag deleted" ;;
           esac ;;
-          ## }}}
     remotes )
         git_remotes && \
         accomplished ;;
-    revert )  ## {{{
+    revert )
              IFS=$'\n'
              if_locked
              preview_status='hidden'
@@ -413,15 +388,13 @@ case "$main_item" in
                  y ) git_revert "$directory" "$revert_item" && \
                      accomplished "$revert_item reverted to" ;;
              esac ;;
-             ## }}}
-    commits )  ## {{{ tell how many times dirs/files have been commited (https://github.com/terminalforlife/BashConfig/blob/master/source/.bash_functions)
+    commits )
                readarray -t dirs_files < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included
 
                for df in "${dirs_files[@]##*/}"; {
                    printf '%s %s\n' "$(git_touched_count "$directory" "$df")" "$df"
                } | sort --numeric-sort --reverse | column  ## --numeric-sort is for comparing according to string numerical value
                ;;
-               ## }}}
 esac
 
 exit

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-15 13:53:54 +0330 Monday
+## last modified: 1400-09-15 19:55:30 +0330 Monday
 
 source "$HOME"/scripts/gb-color
 
-function application_help {  ## {{{
+function application_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -12,8 +12,7 @@ $(flag '-p --package=') package
 $(flag '-u --unit=')    unit"
 exit
 }
-## }}}
-function ffmpeg_help {  ## {{{
+function ffmpeg_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -36,16 +35,14 @@ audio stream to keep   $(flag '-i --input-file=') input file $(flag '-u --audio-
 live camera            $(flag '-c --camera=') camera (e.g. /dev/video0)"
 exit
 }
-## }}}
-function firewall_help {  ## {{{
+function firewall_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 allow app    $(flag '-a --application=') application to allow"
 exit
 }
-## }}}
-function g_help {  ## {{{
+function g_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -58,16 +55,14 @@ $(flag '-c --commit-hash=')
 $(flag '-n --noproxy')"  ## ^^ NOTE pattern needs quotes here, but if pattern is entered through get_input in prompt, it won't
 exit
 }
-## }}}
-function mime_type_help {  ## {{{
+function mime_type_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-n --name=') dir/file name"
 exit
 }
-## }}}
-function mount_umount_help {  ## {{{
+function mount_umount_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -76,8 +71,7 @@ udisksctl umount -b $(flag '-d --device=') device (e.g. /dev/sdc)
 format usb device   $(flag '-d --device=') device (e.g. /dev/sdc) $(flag '-n --name=') name (e.g. ${USER^^})"
 exit
 }
-## }}}
-function network_help {  ## {{{
+function network_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -88,24 +82,28 @@ delete all ips                  $(flag '-d --device=') device
 connect to a new wifi network   $(flag '-s --ssid=') ssid $(flag '-p --password=') password"
 exit
 }
-## }}}
-function pulseaudio_help {  ## {{{
+function public_help {
+clear
+printf '%s\n' "\
+$(heading "$title") $(yellow "help")
+$(flag '-i --interactive')"
+exit
+}
+function pulseaudio_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-d --default=') default sink/source index/name"
 exit
 }
-## }}}
-function sony_help {  ## {{{
+function sony_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-n --name=') dir/file name"
 exit
 }
-## }}}
-function typer_help {  ## {{{
+function typer_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -113,8 +111,7 @@ $(flag '-f --file=')  file
 $(flag '-s --sleep=') sleep (e.g. random, 0.2, 1, etc)"
 exit
 }
-## }}}
-function user_help {  ## {{{
+function user_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -123,25 +120,14 @@ add $USER to a group        $(flag '-g --group=') group
 remove $USER from a group   $(flag '-g --group=') group"
 exit
 }
-## }}}
-function public_help {  ## {{{
-clear
-printf '%s\n' "\
-$(heading "$title") $(yellow "help")
-$(flag '-g --git-options')
-$(flag '-n --noconfirm')"
-exit
-}
-## }}}
-function video_subtitle_help {  ## {{{
+function video_subtitle_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
 $(flag '-d --directory=') directory"
 exit
 }
-## }}}
-function website_create_audio_template_help {  ## {{{
+function website_create_audio_template_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
@@ -151,4 +137,3 @@ $(flag '-p --per-page=')
 $(flag '-f --destination-file=')"
 exit
 }
-## }}}

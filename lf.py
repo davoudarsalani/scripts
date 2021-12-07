@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-16 11:15:34 +0330 Tuesday
 
 from os import path, getenv, symlink, rename, remove
 from shutil import rmtree
@@ -15,7 +15,7 @@ script_args = argv[1:]
 main_arg = script_args[0]
 files = script_args[1:]
 
-if main_arg == 'chattr':  ## {{{
+if main_arg == 'chattr':
     main_items = ['mutable', 'immutable', 'deletable', 'undeletable', 'delete normal', 'delete secure', 'lsattr']
     main_item = fzf(main_items, 'chattr')
     if main_item == 'mutable':
@@ -120,8 +120,7 @@ if main_arg == 'chattr':  ## {{{
             except Exception as exc:
                 msgc('ERROR', f'printing lsattr for <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
             sleep(0.1)
-## }}}
-elif main_arg == 'trash':  ## {{{
+elif main_arg == 'trash':
     for f in files:
         try:
             _, base = path.split(f)
@@ -131,8 +130,7 @@ elif main_arg == 'trash':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'trashing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'rm':  ## {{{
+elif main_arg == 'rm':
     for f in files:
         try:
             _, base = path.split(f)
@@ -144,8 +142,7 @@ elif main_arg == 'rm':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'removing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'mime_type':  ## {{{
+elif main_arg == 'mime_type':
     for f in files:
         try:
             _, base = path.split(f)
@@ -154,8 +151,7 @@ elif main_arg == 'mime_type':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'showing mimetype of <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'softlink':  ## {{{
+elif main_arg == 'softlink':
     for f in files:
         try:
             _, base = path.split(f)
@@ -164,8 +160,7 @@ elif main_arg == 'softlink':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'softlinking <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'tar':  ## {{{
+elif main_arg == 'tar':
     for f in files:
         try:
             _, base = path.split(f)
@@ -174,8 +169,7 @@ elif main_arg == 'tar':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to tar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'untar':  ## {{{
+elif main_arg == 'untar':
     for f in files:
         try:
             _, base = path.split(f)
@@ -184,8 +178,7 @@ elif main_arg == 'untar':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'zip':  ## {{{
+elif main_arg == 'zip':
     for f in files:
         try:
             _, base = path.split(f)
@@ -201,8 +194,7 @@ elif main_arg == 'zip':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'unzip':  ## {{{
+elif main_arg == 'unzip':
     for f in files:
         try:
             _, base = path.split(f)
@@ -218,8 +210,7 @@ elif main_arg == 'unzip':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}
-elif main_arg == 'unrar':  ## {{{
+elif main_arg == 'unrar':
     for f in files:
         try:
             _, base = path.split(f)
@@ -236,4 +227,3 @@ elif main_arg == 'unrar':  ## {{{
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
-## }}}

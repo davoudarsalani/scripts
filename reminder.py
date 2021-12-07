@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## last modified: 1400-09-16 11:16:44 +0330 Tuesday
 
 from time import sleep
 

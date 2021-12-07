@@ -18,7 +18,7 @@ content_list = []
 Col = Color()
 
 
-def display_help() -> None:  ## {{{
+def display_help() -> None:
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
@@ -27,8 +27,7 @@ def display_help() -> None:  ## {{{
     exit()
 
 
-## }}}
-def getopts() -> None:  ## {{{
+def getopts() -> None:
     global length
     try:
         duos, duos_long = getopt(script_args, 'hl:', ['help', 'length='])
@@ -42,8 +41,7 @@ def getopts() -> None:  ## {{{
             length = int(arg)
 
 
-## }}}
-def prompt(*args: list[str]) -> None:  ## {{{
+def prompt(*args: list[str]) -> None:
     global length
     for arg in args:
         if arg == '-l':
@@ -52,8 +50,6 @@ def prompt(*args: list[str]) -> None:  ## {{{
             except:
                 length = int(get_input('Length'))
 
-
-## }}}
 
 getopts()
 prompt('-l')

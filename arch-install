@@ -51,7 +51,7 @@ u="${USER:-nnnn}"
 runnable='false'
 
 case "$1" in
-    -l|--legacy ) mode='LEGACY'  ## {{{
+    -l|--legacy ) mode='LEGACY'
         fg_color='legacy_fg'
         display_mode
         main_items=(
@@ -226,8 +226,7 @@ case "$1" in
                 ;;
         esac
         ;;
-        ## }}}
-    -u|--uefi )  mode='UEFI (Ermanno Ferrari)'  ## {{{
+    -u|--uefi )  mode='UEFI (Ermanno Ferrari)'
         fg_color='uefi_fg'
         display_mode
         main_items=(
@@ -433,8 +432,7 @@ case "$1" in
                 ;;
         esac
         ;;
-    ## }}}
-    -c|--connect )  ## {{{
+    -c|--connect )
     cmd="
     iwctl
     ## list of devices:
@@ -447,14 +445,12 @@ case "$1" in
     exit"
     display_cmd "$cmd"
     ;;
-    ## }}}
-    -v|--verify )  ## {{{
+    -v|--verify )
         runnable='true'
         cmd="
         ls /sys/firmware/efi/efivars 2>/dev/null && printf 'UEFI mode verified: YES\n' || printf 'UEFI mode verified: NO\n'"
         display_cmd "$cmd"
         ;;
-        ## }}}
     * ) display_help
         ;;
 esac

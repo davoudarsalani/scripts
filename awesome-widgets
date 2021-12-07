@@ -5,7 +5,7 @@
 threshhold=70
 
 case "$1" in
-    rand_wall )  ## {{{
+    rand_wall )
                 source "$HOME"/scripts/gb
 
                 rand_wall_allowed_file=/tmp/rand_wall_allowed
@@ -15,14 +15,11 @@ case "$1" in
                 [ ! "$(pgrep 'ffmpeg')" ] && \
                 ! ps -f -u "$UID" | sed 1d | \grep -qv '\-remote' | \grep -q '[s]implescreenrecorder' && \
                 random_wallpaper || touch "$rand_wall_allowed_file" ;;  ## ^^ exceptionally used ps because pgrep cannot find simplescreenrecorder
-                ## }}}
-    jadi )  ## {{{
+    jadi )
            "$HOME"/scripts/jadi.py ;;
-           ## }}}
-    restart_picom )  ## {{{
+    restart_picom )
                     pkill picom && sleep 2 && picom -b ;;
-                    ## }}}
-    turn_off_scr_3 )  ## {{{
+    turn_off_scr_3 )
                      source "$HOME"/scripts/gb
                      source "$HOME"/scripts/gb-screen
 
@@ -30,21 +27,18 @@ case "$1" in
                          xrandr --output "$scr_3_name" --off  ## https://superuser.com/questions/618127/disable-unplugged-displays-xrandr
                          msgn "turned off <span color=\"${orange}\">screen 3 (${scr_3_name})</span>"
                      } ;;
-                     ## }}}
 
-    date_jdate )  ## {{{
+    date_jdate )
                  source "$HOME"/scripts/gb
 
                  message="$(printf '%s\n%s\n%s' "$(get_datetime 'jweekday')" "$(get_datetime 'ymdhms')" "$(get_datetime 'jymdhms')")"
                  msgn "$message" ;;
-                ## }}}
-    weather )  ## {{{
+    weather )
               case "$2" in
                   update )   "$HOME"/scripts/weather.py 'update'   ;;
                   forecast ) "$HOME"/scripts/weather.py 'forecast' ;;
               esac ;;
-              ## }}}
-    audio )  ## {{{
+    audio )
             source "$HOME"/scripts/gb
 
             function update_variables {
@@ -192,8 +186,7 @@ msgn "$text" ;;
             ## previously: [ "$(printf '%s\n' "$def_sink_name" | \grep '^bluez_sink')" ] && headset_connectivity=' HE'
 
             set_widget 'audio' 'markup' "${vol_level}${vol_on_off} ${mic_level}${mic_on_off} ${mon_level}${mon_on_off} ${states_initials} ${indeces}${headset_connectivity}" ;;
-            ## }}}
-    battery )  ## {{{
+    battery )
               source "$HOME"/scripts/gb
               source "$HOME"/scripts/gb-fir-blu-batt
 
@@ -227,8 +220,7 @@ msgn "$text" ;;
               (( battery_temp > threshhold )) && battery_temp="<span color=\"${red}\">${battery_temp}</span>"
 
               set_widget 'battery' 'markup' "${ac_or_dc}${battery_level}${battery_rem}${pref}${battery_temp}°" ;;
-              ## }}}
-    memory_cpu )  ## {{{
+    memory_cpu )
         source "$HOME"/scripts/gb
         source "$HOME"/scripts/gb-calculation
 
@@ -311,8 +303,7 @@ msgn "$text" ;;
 
                     set_widget 'memory_cpu' 'markup' "${mem_perc} ${cpu_perc} ${pref}${cpu_temp}°${cpu_gov}" ;;
         esac ;;
-                 ## }}}
-    harddisk )  ## {{{
+    harddisk )
         source "$HOME"/scripts/gb
         source "$HOME"/scripts/gb-calculation
 
@@ -360,22 +351,19 @@ msgn "$text" ;;
 
                     set_widget 'harddisk' 'markup' "${root_used} ${home_used} ${swap_used} ${pref}${hdd_temp}°" ;;
         esac ;;
-               ## }}}
-    # gpu )  ## {{{
+    # gpu )
     #       source "$HOME"/scripts/gb
     #
     #       active_gpu="$(optimus-manager --status | \grep 'Current GPU mode' | awk '{print $NF}')"
     #       active_gpu="${active_gpu::1}"
     #       [ "$active_gpu" == 'n' ] && active_gpu="<span color=\"${red}\">${active_gpu}</span>"
     #       set_widget 'gpu' 'markup' "$active_gpu" ;;
-            ## }}}
-    pkg_count )  ## {{{
+    pkg_count )
                 source "$HOME"/scripts/gb
 
                 pkg_count="$(wc -l < <(pacman -Q))"
                 set_widget 'pkg_count' 'markup' "$pkg_count" ;;
-                ## }}}
-    processes )  ## {{{
+    processes )
                 source "$HOME"/scripts/gb
 
                 ## get last processes_count
@@ -395,8 +383,7 @@ msgn "$text" ;;
                 fi
 
                 set_widget 'processes' 'markup' "${pref}${processes_count}" ;;
-                ## }}}
-    idle )  ## {{{
+    idle )
            source "$HOME"/scripts/gb
            source "$HOME"/scripts/gb-calculation
 
@@ -416,11 +403,9 @@ msgn "$text" ;;
            is_bigger="$(compare_floats "$perc" '>' 90)"
            [ "$is_bigger" == 'true' ] && perc="<span color=\"${red}\">${perc}</span>"
            set_widget 'idle' 'markup' "$perc" ;;
-           ## }}}
-    reputation )  ## {{{
+    reputation )
             "$HOME"/scripts/reputation.py ;;
-            ## }}}
-    youtube )  ## {{{
+    youtube )
               source "$HOME"/scripts/gb
               source "$HOME"/scripts/gb-screen
 
@@ -436,8 +421,7 @@ msgn "$text" ;;
               sleep 0.1
               xdotool click --repeat 2 --delay 200 1
               msgn 'fullscreen' ;;
-              ## }}}
-    mbl_umbl )  ## {{{
+    mbl_umbl )
                source "$HOME"/scripts/gb
 
                get_mountable_umountable
@@ -447,8 +431,7 @@ msgn "$text" ;;
                (( m_count > 0 || u_count > 0 )) && text="<span color=\"${red}\">${M}${seperator}${U}</span>" || text='MU'
 
                set_widget 'mbl_umbl' 'markup' "$text" ;;
-               ## }}}
-    firewall )  ## {{{
+    firewall )
                source "$HOME"/scripts/gb
 
                function update_variables {
@@ -468,8 +451,7 @@ msgn "$text" ;;
                    active ) set_widget 'firewall' 'markup' 'FI' ;;
                    * )      set_widget 'firewall' 'markup' "<span color=\"${red}\">FI:OF</span>" ;;
                esac ;;
-               ## }}}
-    bluetooth )  ## {{{
+    bluetooth )
                 source "$HOME"/scripts/gb
 
                 function update_variables {
@@ -489,25 +471,20 @@ msgn "$text" ;;
                     yes ) set_widget 'bluetooth' 'markup' 'BL' ;;
                     * )   set_widget 'bluetooth' 'markup' "<span color=\"${red}\">BL:ON</span>" ;;
                 esac ;;
-                ## }}}
-    ymail )  ## {{{
+    ymail )
             "$HOME"/scripts/e-mail.py 'ymail' ;;
-            ## }}}
-    gmail )  ## {{{
+    gmail )
             sleep 10  ## only to prevent probable collision with ymail
             "$HOME"/scripts/e-mail.py 'gmail' ;;
-            ## }}}
-    security_remote )  ## {{{
+    security_remote )
                       "$HOME"/scripts/security-remote.py ;;
-                      ## }}}
-    webcam )  ## {{{
+    webcam )
              source "$HOME"/scripts/gb
 
              webcam_status="$(lsmod | \grep -i '^uvcvideo' | awk '{print $NF}')"
              (( webcam_status == 0 )) && webcam_text='WE' || webcam_text="<span color=\"${red}\">WE:ON</span>"
              set_widget 'webcam' 'markup' "$webcam_text" ;;
-             ## }}}
-    git )  ## {{{
+    git )
           source "$HOME"/scripts/gb
           source "$HOME"/scripts/gb-git
 
@@ -555,8 +532,7 @@ msgn "$text" ;;
 
           [ "$modified_repos" ] && git_text="<span color=\"${red}\">GI:${modified_repos%,*}</span>" || git_text="GI"  ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)
           set_widget 'git' 'markup' "$git_text" ;;
-          ## }}}
-    clipboard )  ## {{{
+    clipboard )
                 source "$HOME"/scripts/gb
 
                 case "$2" in
@@ -566,8 +542,7 @@ msgn "$text" ;;
 
                 [ "$(pgrep 'greenclip')" ] && clipboard_text='CL' || clipboard_text="<span color=\"${red}\">CL:OF</span>"
                 set_widget 'clipboard' 'markup' "$clipboard_text" ;;
-                ## }}}
-    klgr )  ## {{{
+    klgr )
            source "$HOME"/scripts/gb
 
            ## append current_datetime to the most recent log
@@ -581,8 +556,7 @@ msgn "$text" ;;
            keylogger_status="$(ps -f -u "$UID" | sed 1d | \grep -v '\-remote' | \grep '[k]eylogger')"
            [ "$keylogger_status" ] && keylogger_text='KE' || keylogger_text="<span color=\"${red}\">KE:OF</span>"
            set_widget 'keylogger' 'markup' "$keylogger_text" ;;
-           ## }}}
-    established )  ## {{{
+    established )
                   source "$HOME"/scripts/gb
 
                   ## we can add sudo in this case to get instances other than the user-related ones:
@@ -597,8 +571,7 @@ msgn "$text" ;;
                       message ) (( estab_count > 0 )) && message_text="$(printf "<span color=\"%s\">Established</span>\n%s\n" "$orange" "$estab")" || message_text='No established connections'
                                 msgn "$message_text" ;;
                   esac ;;
-                  ## }}}
-    open_ports )  ## {{{
+    open_ports )
                  source "$HOME"/scripts/gb
 
                  ## FIXME
@@ -612,8 +585,7 @@ msgn "$text" ;;
                      message ) (( open_ports_count > 0 )) && message_text="$(printf "<span color=\"%s\">Open ports</span>\n%s\n" "$orange" "$open_ports")" || message_text='No open ports'
                                msgn "$message_text" ;;
                  esac ;;
-                 ## }}}
-    tor )  ## {{{
+    tor )
           source "$HOME"/scripts/gb
 
           case "$2" in
@@ -625,8 +597,7 @@ msgn "$text" ;;
           tor_status="$(pgrep 'tor')"  ## why exceptionally used "$(sudo lsof -i -P -n | \grep 'LISTEN' | \grep '^tor')" instead of pgrep?
           [ "$tor_status" ] && tor_status_text="<span color=\"${red}\">TO:ON</span>" || tor_status_text='TO'
           set_widget 'tor' 'markup' "$tor_status_text" ;;
-          ## }}}
-    network )  ## {{{
+    network )
         source "$HOME"/scripts/gb
         source "$HOME"/scripts/gb-calculation
         source "$HOME"/scripts/gb-network
@@ -651,7 +622,6 @@ msgn "$text" ;;
 
                     connections_text="<span color=\"${fg_l}\">${vpn_conn}${eth_conn}</span> <span color=\"${wf_conn_color}\">${wf_conn}</span><span color=\"${orange}\">${if_simcard}${if_wf_down}</span>"
                     # connections_text="<span color=\"${fg_l}\">${vpn_conn}${eth_conn} ${wf_conn}</span>"
-                    ## }}}
                     # down/up {{{ https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
                     for interface in 'ethernet' 'wifi'; {
 
@@ -726,14 +696,12 @@ msgn "$text" ;;
 <span color=\"${down_total_color}\">${down_total}</span> <span color=\"${up_total_color}\">${up_total}</span>"   ## 317KB 2.31MB 4.32GB 4.32GB
 
                     }
-## }}}
                     set_widget 'network' 'markup' "${connections_text} ${down_up_text# }"  ## remove leading space
                     ;;
             turn_on_wifi ) nmcli radio wifi on ;;
             turn_off_wifi ) nmcli radio wifi off ;;
         esac ;;
-## }}}
-    audacious )  ## {{{
+    audacious )
                 source "$HOME"/scripts/gb
                 source "$HOME"/scripts/gb-calculation
 
@@ -800,7 +768,6 @@ msgn "$text" ;;
                 set_widget 'audacious_bar' 'color'            "$fg_d"
                 awesome-client "audacious_bar.value = ${bar_position}"  ## set_widget doesn't work properly for audacious_bar
                 ;;
-                ## }}}
 esac
 
 exit
