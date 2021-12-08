@@ -18,4 +18,9 @@ jobs:
         # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
         # SC2154 --> warning: *** is referenced but not assigned
         # SC2162 --> note: read without -r will mangle backslashes.
+        # SC2034 --> warning: mem_free appears unused. Verify use (or export if used externally).
+        # SC2124 --> warning: Assigning an array to a string! Assign as array, or use * instead of @ to concatenate.
+      with:
+        ignore_names: commands
+        format: tty
 
