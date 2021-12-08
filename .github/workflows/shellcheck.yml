@@ -1,6 +1,8 @@
 name:
   'Shellcheck'
 on:
+  # push:
+  #   branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -9,18 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Run
+    - name: Check
       uses: davoudarsalani/shellcheck@master
       env:
-        SHELLCHECK_OPTS: -e SC1091  # -e SC2034 -e SC1090
-      with:
-#         ignore_paths: ignoreme ignoremetoo
-        ignore_names: '*.py' '*.md' 'thumbnail.jpg'
-#       with:
-#         severity: error
-#       If you run into SC1090/SC1091 errors you may need to tell shellcheck to check all files at once:
-#       with:
-#         check_together: 'yes'
-#       Run only in a single directory
-#       with:
-#         scandir: './scripts'
+        SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162  --color=always
+        # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
+        # SC2154 --> warning: *** is referenced but not assigned
+        # SC2162 --> note: read without -r will mangle backslashes.
+
