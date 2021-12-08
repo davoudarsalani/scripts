@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 13:39:38 +0330 Saturday
+## last modified: 1400-09-16 21:54:32 +0330 Tuesday
+
+cmd='wget -qO - https://api.ipify.org'  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
+## OR:
+    # curl -s http://myip.enix.org/REMOTE_ADDR
+    # curl ipinfo.io
 
 printf 'Normal:\n\n'
-curl ipinfo.io
-## OR:
-  # curl -s http://myip.enix.org/REMOTE_ADDR
-  # wget -qO - https://api.ipify.org  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
+eval "$cmd"
 printf '\n'
+
+printf '++++++++++++++++++\n'
+
 printf 'Tor\n\n'
-torsocks curl ipinfo.io
+cmd="torsocks $cmd"
+eval "$cmd"
 printf '\n'

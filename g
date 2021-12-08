@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-16 11:12:57 +0330 Tuesday
+## last modified: 1400-09-17 21:45:45 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -265,6 +265,22 @@ case "$main_item" in
           pipe_to_fzf_locally "${log_items[@]}" ;;
     push )
            if [ "$(git_remotes "$directory")" ]; then
+               current_branch="$(git_current_branch)"
+               commits_ahead="$(git_commits_ahead "$directory")"
+
+               action_now 'updating remote'
+               git -C "$directory" remote -v update
+               ## getting the total number of "different" commits between local and remote (https://stackoverflow.com/questions/3258243/check-if-pull-needed-in-git):
+               commits_behind_ahead="$(git -C "$directory" rev-list HEAD...origin/${current_branch} --count)"
+
+               ## getting commits_behind
+               (( commits_behind="commits_behind_ahead - commits_ahead" ))
+               (( commits_behind > 0 )) && {
+                   red "local is $commits_behind commit behind remote."
+                   red 'pull first.'
+                   exit
+               }
+
                if_locked
                if [ "$noproxy" == 'false' ]; then
                    git_push_proxy "$directory" && \
@@ -373,8 +389,8 @@ case "$main_item" in
                                         accomplished "$tag tag deleted" ;;
           esac ;;
     remotes )
-        git_remotes && \
-        accomplished ;;
+              git_remotes && \
+              accomplished ;;
     revert )
              IFS=$'\n'
              if_locked

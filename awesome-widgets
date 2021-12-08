@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 20:55:48 +0330 Sunday
+## last modified: 1400-09-17 20:05:49 +0330 Wednesday
 
 threshhold=70
 
@@ -320,7 +320,7 @@ msgn "$text" ;;
                     home_used="$(mounted_drives | \grep '\/home$' | awk '{print $4}')"
                     (( home_used > 0 )) && home_used="$(float_pad "${home_used}*100/${home_size}" 1 2)"
                     home_greater="$(compare_floats "$home_used" '>' "$threshhold")"
-                    [ "$home_greater" == 'true' ] && home_used="<span color=\"${red}\">${home_used}</span>"  ## TODO temporarily commented
+                    # [ "$home_greater" == 'true' ] && home_used="<span color=\"${red}\">${home_used}</span>"  ## TODO temporarily commented
 
                     swap_size="$(swapon --summary | \grep -i 'partition' | awk '{print $3}')"
                     swap_used="$(swapon --summary | \grep -i 'partition' | awk '{print $4}')"
