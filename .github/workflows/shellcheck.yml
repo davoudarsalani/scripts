@@ -11,8 +11,8 @@ jobs:
     # environment: env_name
     runs-on: ubuntu-latest
     steps:
-      name: Check
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+    - name: Check
       uses: davoudarsalani/shellcheck@master
       env:
         SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162  --color=always
