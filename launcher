@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-02 23:12:01 +0330 Tuesday
+## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
 
 case "$1" in
     rofi ) rofi -show combi & ;;

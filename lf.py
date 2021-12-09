@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-16 11:15:34 +0330 Tuesday
+## @last-modified 1400-09-16 11:15:34 +0330 Tuesday
 
 from os import path, getenv, symlink, rename, remove
 from shutil import rmtree

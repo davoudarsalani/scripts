@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 19:38:33 +0330 Sunday
+## @last-modified 1400-09-14 19:38:33 +0330 Sunday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;

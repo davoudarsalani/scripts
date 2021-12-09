@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-17 21:45:45 +0330 Wednesday
+## @last-modified 1400-09-17 22:22:50 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 source "$HOME"/scripts/gb-git
 
 title="${0##*/}"
-noproxy='false'
+proxy='false'
 
 function display_help {
     source "$HOME"/scripts/.help
@@ -105,12 +105,12 @@ function prompt {
 function get_opt {
     local options
 
-    options="$(getopt --longoptions 'help,noproxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hnp:m:b:t:c:' --alternative -- "$@")"
+    options="$(getopt --longoptions 'help,proxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hnx:m:b:t:c:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
             -h|--help )        display_help            ;;
-            -n|--noproxy )     noproxy='true'          ;;
+            -x|--proxy )       proxy='true'            ;;
             -p|--pattern )     shift; pattern="$1"     ;;
             -m|--message )     shift; message="$1"     ;;
             -b|--branch )      shift; branch="$1"      ;;
@@ -264,6 +264,7 @@ case "$main_item" in
           readarray -t log_items < <(git_log "$directory")
           pipe_to_fzf_locally "${log_items[@]}" ;;
     push )
+           if_locked
            if [ "$(git_remotes "$directory")" ]; then
                current_branch="$(git_current_branch)"
                commits_ahead="$(git_commits_ahead "$directory")"
@@ -282,12 +283,12 @@ case "$main_item" in
                }
 
                if_locked
-               if [ "$noproxy" == 'false' ]; then
+               if [ "$proxy" == 'true' ]; then
                    git_push_proxy "$directory" && \
                    accomplished 'pushed with proxy'
                else
                    git_push_noproxy "$directory" && \
-                   accomplished 'pushed with noproxy'
+                   accomplished 'pushed without proxy'
                fi
            else
                red 'no remote'

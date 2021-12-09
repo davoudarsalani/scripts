@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-16 10:53:35 +0330 Tuesday
+## @last-modified 1400-09-16 10:53:35 +0330 Tuesday
 
 # dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work
 

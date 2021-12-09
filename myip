@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-16 21:54:32 +0330 Tuesday
+## @last-modified 1400-09-16 21:54:32 +0330 Tuesday
 
 cmd='wget -qO - https://api.ipify.org'  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
 ## OR:

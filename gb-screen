@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-06 09:36:46 +0330 Saturday
+## @last-modified 1400-09-06 09:36:46 +0330 Saturday
 
 screens_count="$(wc -l < <(xrandr | \grep -iw connected | \grep '[0-9]\{3,4\}x[0-9]\{3,4\}'))"
 ## OR <--,-- xrandr --listmonitors | sed '1q;d' | awk '{print $NF}'

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-16 11:16:53 +0330 Tuesday
+## @last-modified 1400-09-16 11:16:53 +0330 Tuesday
 
 from os import path, remove, getenv
 from gi import require_version

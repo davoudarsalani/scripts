@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-16 10:39:09 +0330 Tuesday
+## @last-modified 1400-09-16 10:39:09 +0330 Tuesday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 

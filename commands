@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 17:45:18 +0330 Sunday
+## @last-modified 1400-09-17 22:34:07 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -261,5 +261,5 @@ last data modification ---> stat --format=%y FILE/DIR
 get dir size ---> du -bs DIR
 get file size [i]  ---> du -bs FILE
 get file size [ii] ---> stat --format=%s FILE
-bind keys to commands (\015 means Enter) [i]  ---> bind '"\C-u" : "echo command\015"'  ## Ctrl+u <--,-- https://stackoverflow.com/questions/4200800/in-bash-how-do-i-bind-a-function-key-to-a-command
-bind keys to commands (\015 means Enter) [ii] ---> bind '"\eu"  : "echo command\015"'  ## Alt+u  <--'
+bind keys to commands (\015 means Enter) [i]  ---> bind '"\C-u":"echo command\015"'  ## Ctrl+u <--,-- https://stackoverflow.com/questions/4200800/in-bash-how-do-i-bind-a-function-key-to-a-command
+bind keys to commands (\015 means Enter) [ii] ---> bind '"\eu" :"echo command\015"'  ## Alt+u  <--'

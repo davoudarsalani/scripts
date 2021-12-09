@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-14 17:43:26 +0330 Sunday
+## @last-modified 1400-09-14 17:43:26 +0330 Sunday
 
 function get_datetime {
     case "$1" in

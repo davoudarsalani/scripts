@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## last modified: 1400-09-16 11:16:06 +0330 Tuesday
+## @last-modified 1400-09-16 11:16:06 +0330 Tuesday
 
 from os import getenv
 

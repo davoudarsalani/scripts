@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## last modified: 1400-09-10 21:48:16 +0330 Wednesday
+## @last-modified 1400-09-10 21:48:16 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
