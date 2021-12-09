@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Check
       - uses: actions/checkout@v2
-      - uses: davoudarsalani/shellcheck@master
+        uses: davoudarsalani/shellcheck@master
         env:
           SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162  --color=always
           # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
