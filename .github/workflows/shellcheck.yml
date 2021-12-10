@@ -22,9 +22,12 @@ jobs:
     - name: Creating an array of bash files
       run: |
         readarray -t text_files < <(find -mindepth 1 -maxdepth 1 -type f ! -iname 'thumbnail.jpg' | sort)
-        readarray -t bashes     < <(printf '%s\n' "${text_files[@]}" | \grep -Ev '(\.py|\.md|thumbnail.jpg)$' | sort)
-        echo "${#text_files[@]}"
-        # shellcheck ./application
+        readarray -t bashes     < <(printf '%s\n' "${text_files[@]}" | \grep -Ev '(\.py|\.md|thumbnail.jpg|commands)$' | sort)  ## commands exceptionally added here
+    - name: applying shellcheck
+      run: |
+        for b in "${bashes[@]}"; {
+          shellcheck --severity=error --color=always --format=tty "$b"
+        }
 
 
 
