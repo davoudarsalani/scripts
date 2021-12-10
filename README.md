@@ -3,107 +3,113 @@
 <div align='center'>
 <img alt='platform' src='https://img.shields.io/static/v1?label=Platform&message=GNU/Linux&labelColor=black&color=grey&style=flat&logo=gnu&logoColor=white'>
 <img alt='total' src='https://img.shields.io/static/v1?label=Total&message=70&labelColor=black&color=grey&style=flat'>
-<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.00MB&labelColor=black&color=grey&style=flat'>
-<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=46&labelColor=black&color=grey&style=flat'>
+<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.17MB&labelColor=black&color=grey&style=flat'>
+<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=54&labelColor=black&color=grey&style=flat'>
 <img alt='last-commit' src='https://img.shields.io/github/last-commit/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 <img alt='commit-activity' src='https://img.shields.io/github/commit-activity/m/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 </div>
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Bash&message=51&labelColor=black&color=blue&style=flat&logo=gnubash&logoColor=white)
+[![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)]\
+                      (https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[application](https://github.com/davoudarsalani/scripts/blob/master/application)|199|1,295|13,313|13.00KB|10|2021-12-06 14:02:12 +0330|
-|[arch-install](https://github.com/davoudarsalani/scripts/blob/master/arch-install)|465|1,395|15,805|15.43KB|9|2021-12-07 15:57:41 +0330|
-|[awesome-app-off](https://github.com/davoudarsalani/scripts/blob/master/awesome-app-off)|72|355|3,117|3.04KB|6|2021-12-05 19:34:07 +0330|
-|[awesome-autorun](https://github.com/davoudarsalani/scripts/blob/master/awesome-autorun)|64|222|1,971|1.92KB|7|2021-12-05 19:34:07 +0330|
-|[awesome-widgets](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets)|773|3,476|41,520|40.55KB|17|2021-12-08 21:47:37 +0330|
-|[bash](https://github.com/davoudarsalani/scripts/blob/master/bash)|22|91|820|820B|5|2021-11-26 22:35:34 +0330|
-|[bluetooth](https://github.com/davoudarsalani/scripts/blob/master/bluetooth)|91|513|5,580|5.45KB|8|2021-12-05 19:34:07 +0330|
-|[browser](https://github.com/davoudarsalani/scripts/blob/master/browser)|41|201|1,903|1.86KB|8|2021-12-05 19:34:07 +0330|
-|[colors](https://github.com/davoudarsalani/scripts/blob/master/colors)|53|212|2,262|2.21KB|7|2021-11-30 17:08:25 +0330|
-|[commands](https://github.com/davoudarsalani/scripts/blob/master/commands)|265|2,335|16,765|16.37KB|14|2021-12-05 19:34:07 +0330|
-|[copy](https://github.com/davoudarsalani/scripts/blob/master/copy)|222|1,084|16,984|16.59KB|9|2021-12-05 19:34:07 +0330|
-|[count-lines](https://github.com/davoudarsalani/scripts/blob/master/count-lines)|22|64|525|525B|7|2021-12-05 19:34:07 +0330|
-|[dictionary](https://github.com/davoudarsalani/scripts/blob/master/dictionary)|23|61|633|633B|7|2021-12-01 22:17:44 +0330|
-|[ffmpeg](https://github.com/davoudarsalani/scripts/blob/master/ffmpeg)|158|967|11,613|11.34KB|9|2021-12-07 15:57:41 +0330|
-|[fingil](https://github.com/davoudarsalani/scripts/blob/master/fingil)|353|1,418|11,744|11.47KB|6|2021-12-05 19:34:07 +0330|
-|[firewall](https://github.com/davoudarsalani/scripts/blob/master/firewall)|75|292|2,683|2.62KB|8|2021-12-06 14:02:12 +0330|
-|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|421|1,936|22,190|21.67KB|🔺18|2021-12-08 21:47:37 +0330|
-|[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|487|2,041|16,846|16.45KB|12|2021-12-07 15:57:41 +0330|
-|[gb-audacious](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious)|34|140|2,021|1.97KB|7|2021-11-28 15:40:32 +0330|
-|[gb-audio](https://github.com/davoudarsalani/scripts/blob/master/gb-audio)|40|338|2,464|2.41KB|5|2021-12-05 19:34:07 +0330|
-|[gb-calculation](https://github.com/davoudarsalani/scripts/blob/master/gb-calculation)|86|379|3,082|3.01KB|9|2021-12-07 15:57:41 +0330|
-|[gb-color](https://github.com/davoudarsalani/scripts/blob/master/gb-color)|218|511|4,580|4.47KB|🔻3|2021-12-07 15:57:41 +0330|
-|[gb-fir-blu-batt](https://github.com/davoudarsalani/scripts/blob/master/gb-fir-blu-batt)|20|113|888|888B|6|2021-12-05 19:34:07 +0330|
-|[gb-git](https://github.com/davoudarsalani/scripts/blob/master/gb-git)|179|883|6,417|6.27KB|8|2021-12-07 15:57:41 +0330|
-|[gb-network](https://github.com/davoudarsalani/scripts/blob/master/gb-network)|36|249|2,219|2.17KB|6|2021-12-07 15:57:41 +0330|
-|[gb-screen](https://github.com/davoudarsalani/scripts/blob/master/gb-screen)|30|341|2,048|2.00KB|7|2021-11-28 15:40:32 +0330|
-|[.help](https://github.com/davoudarsalani/scripts/blob/master/.help)|139|678|5,188|5.07KB|15|2021-12-07 15:57:41 +0330|
-|[launcher](https://github.com/davoudarsalani/scripts/blob/master/launcher)|🔻10|40|🔻264|🔻264B|5|2021-11-26 22:35:34 +0330|
-|[mime-type](https://github.com/davoudarsalani/scripts/blob/master/mime-type)|51|117|1,031|1.01KB|8|2021-12-06 14:02:12 +0330|
-|[mint](https://github.com/davoudarsalani/scripts/blob/master/mint)|60|239|2,605|2.54KB|4|2021-12-05 19:34:07 +0330|
-|[mount-umount](https://github.com/davoudarsalani/scripts/blob/master/mount-umount)|139|518|5,497|5.37KB|11|2021-12-06 14:02:12 +0330|
-|[mouse](https://github.com/davoudarsalani/scripts/blob/master/mouse)|34|198|1,219|1.19KB|5|2021-12-08 21:47:37 +0330|
-|[movie](https://github.com/davoudarsalani/scripts/blob/master/movie)|98|390|3,620|3.54KB|8|2021-12-05 19:34:07 +0330|
-|[music](https://github.com/davoudarsalani/scripts/blob/master/music)|31|123|1,240|1.21KB|7|2021-12-05 19:34:07 +0330|
-|[myip](https://github.com/davoudarsalani/scripts/blob/master/myip)|19|🔻39|393|393B|7|2021-12-08 21:47:37 +0330|
-|[network](https://github.com/davoudarsalani/scripts/blob/master/network)|100|536|4,617|4.51KB|9|2021-12-06 14:02:12 +0330|
-|[nuke](https://github.com/davoudarsalani/scripts/blob/master/nuke)|23|77|633|633B|8|2021-12-05 19:34:07 +0330|
-|[off](https://github.com/davoudarsalani/scripts/blob/master/off)|92|297|3,416|3.34KB|6|2021-12-01 22:17:44 +0330|
-|[previewer](https://github.com/davoudarsalani/scripts/blob/master/previewer)|38|266|2,164|2.11KB|5|2021-11-26 22:35:34 +0330|
-|[pulseaudio](https://github.com/davoudarsalani/scripts/blob/master/pulseaudio)|106|446|4,359|4.26KB|9|2021-12-06 14:02:12 +0330|
-|[r](https://github.com/davoudarsalani/scripts/blob/master/r)|30|104|875|875B|6|2021-12-07 15:57:41 +0330|
-|[sony](https://github.com/davoudarsalani/scripts/blob/master/sony)|88|250|2,339|2.28KB|9|2021-12-06 14:02:12 +0330|
-|[speech](https://github.com/davoudarsalani/scripts/blob/master/speech)|133|505|5,124|5.00KB|7|2021-12-05 19:34:07 +0330|
-|[tmux](https://github.com/davoudarsalani/scripts/blob/master/tmux)|30|130|1,051|1.03KB|5|2021-11-26 22:35:34 +0330|
-|[tmux-statusline](https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline)|77|355|3,220|3.14KB|15|2021-12-06 14:02:12 +0330|
-|[todo](https://github.com/davoudarsalani/scripts/blob/master/todo)|38|174|1,555|1.52KB|7|2021-12-05 19:34:07 +0330|
-|[typer](https://github.com/davoudarsalani/scripts/blob/master/typer)|132|342|3,360|3.28KB|9|2021-12-06 14:02:12 +0330|
-|[user](https://github.com/davoudarsalani/scripts/blob/master/user)|63|259|2,180|2.13KB|9|2021-12-06 14:02:12 +0330|
-|[video-subtitle](https://github.com/davoudarsalani/scripts/blob/master/video-subtitle)|189|717|8,987|8.78KB|12|2021-12-06 14:02:12 +0330|
-|[wallpaper](https://github.com/davoudarsalani/scripts/blob/master/wallpaper)|21|66|743|743B|7|2021-12-01 22:17:44 +0330|
-|[website-create-audio-template](https://github.com/davoudarsalani/scripts/blob/master/website-create-audio-template)|77|229|2,503|2.44KB|6|2021-12-06 14:02:12 +0330|
+|[application](https://github.com/davoudarsalani/scripts/blob/master/application)|199|1,295|13,313|13.00KB|11|2021-12-09 19:23:36 +0330|
+|[arch-install](https://github.com/davoudarsalani/scripts/blob/master/arch-install)|465|1,395|15,805|15.43KB|10|2021-12-09 19:23:36 +0330|
+|[awesome-app-off](https://github.com/davoudarsalani/scripts/blob/master/awesome-app-off)|72|355|3,117|3.04KB|7|2021-12-09 19:23:36 +0330|
+|[awesome-autorun](https://github.com/davoudarsalani/scripts/blob/master/awesome-autorun)|64|222|1,971|1.92KB|8|2021-12-09 19:23:36 +0330|
+|[awesome-widgets](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets)|773|3,476|41,520|40.55KB|18|2021-12-09 19:23:36 +0330|
+|[bash](https://github.com/davoudarsalani/scripts/blob/master/bash)|22|91|820|820B|6|2021-12-09 19:23:36 +0330|
+|[bluetooth](https://github.com/davoudarsalani/scripts/blob/master/bluetooth)|91|513|5,580|5.45KB|9|2021-12-09 19:23:36 +0330|
+|[browser](https://github.com/davoudarsalani/scripts/blob/master/browser)|41|201|1,903|1.86KB|9|2021-12-09 19:23:36 +0330|
+|[colors](https://github.com/davoudarsalani/scripts/blob/master/colors)|53|212|2,262|2.21KB|8|2021-12-09 19:23:36 +0330|
+|[commands](https://github.com/davoudarsalani/scripts/blob/master/commands)|265|2,335|16,765|16.37KB|15|2021-12-09 19:23:36 +0330|
+|[copy](https://github.com/davoudarsalani/scripts/blob/master/copy)|222|1,084|16,984|16.59KB|10|2021-12-09 19:23:36 +0330|
+|[count-lines](https://github.com/davoudarsalani/scripts/blob/master/count-lines)|22|64|525|525B|8|2021-12-09 19:23:36 +0330|
+|[dictionary](https://github.com/davoudarsalani/scripts/blob/master/dictionary)|23|61|633|633B|8|2021-12-09 19:23:36 +0330|
+|[ffmpeg](https://github.com/davoudarsalani/scripts/blob/master/ffmpeg)|158|967|11,613|11.34KB|10|2021-12-09 19:23:36 +0330|
+|[fingil](https://github.com/davoudarsalani/scripts/blob/master/fingil)|353|1,418|11,744|11.47KB|7|2021-12-09 19:23:36 +0330|
+|[firewall](https://github.com/davoudarsalani/scripts/blob/master/firewall)|75|292|2,683|2.62KB|9|2021-12-09 19:23:36 +0330|
+|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|421|1,936|22,190|21.67KB|🔺19|2021-12-09 19:23:36 +0330|
+|[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|487|2,041|16,846|16.45KB|13|2021-12-09 19:23:36 +0330|
+|[gb-audacious](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious)|34|140|2,021|1.97KB|8|2021-12-09 19:23:36 +0330|
+|[gb-audio](https://github.com/davoudarsalani/scripts/blob/master/gb-audio)|40|338|2,464|2.41KB|6|2021-12-09 19:23:36 +0330|
+|[gb-calculation](https://github.com/davoudarsalani/scripts/blob/master/gb-calculation)|86|379|3,082|3.01KB|10|2021-12-09 19:23:36 +0330|
+|[gb-color](https://github.com/davoudarsalani/scripts/blob/master/gb-color)|218|511|4,580|4.47KB|🔻4|2021-12-09 19:23:36 +0330|
+|[gb-fir-blu-batt](https://github.com/davoudarsalani/scripts/blob/master/gb-fir-blu-batt)|20|113|888|888B|7|2021-12-09 19:23:36 +0330|
+|[gb-git](https://github.com/davoudarsalani/scripts/blob/master/gb-git)|179|883|6,417|6.27KB|9|2021-12-09 19:23:36 +0330|
+|[gb-network](https://github.com/davoudarsalani/scripts/blob/master/gb-network)|36|249|2,219|2.17KB|7|2021-12-09 19:23:36 +0330|
+|[gb-screen](https://github.com/davoudarsalani/scripts/blob/master/gb-screen)|30|341|2,048|2.00KB|8|2021-12-09 19:23:36 +0330|
+|[.help](https://github.com/davoudarsalani/scripts/blob/master/.help)|139|678|5,188|5.07KB|16|2021-12-09 19:23:36 +0330|
+|[launcher](https://github.com/davoudarsalani/scripts/blob/master/launcher)|🔻10|40|🔻264|🔻264B|6|2021-12-09 19:23:36 +0330|
+|[mime-type](https://github.com/davoudarsalani/scripts/blob/master/mime-type)|51|117|1,031|1.01KB|9|2021-12-09 19:23:36 +0330|
+|[mint](https://github.com/davoudarsalani/scripts/blob/master/mint)|60|239|2,605|2.54KB|5|2021-12-09 19:23:36 +0330|
+|[mount-umount](https://github.com/davoudarsalani/scripts/blob/master/mount-umount)|139|518|5,497|5.37KB|12|2021-12-09 19:23:36 +0330|
+|[mouse](https://github.com/davoudarsalani/scripts/blob/master/mouse)|34|198|1,219|1.19KB|6|2021-12-09 19:23:36 +0330|
+|[movie](https://github.com/davoudarsalani/scripts/blob/master/movie)|98|390|3,620|3.54KB|9|2021-12-09 19:23:36 +0330|
+|[music](https://github.com/davoudarsalani/scripts/blob/master/music)|31|123|1,240|1.21KB|8|2021-12-09 19:23:36 +0330|
+|[myip](https://github.com/davoudarsalani/scripts/blob/master/myip)|19|🔻39|393|393B|8|2021-12-09 19:23:36 +0330|
+|[network](https://github.com/davoudarsalani/scripts/blob/master/network)|100|536|4,617|4.51KB|10|2021-12-09 19:23:36 +0330|
+|[nuke](https://github.com/davoudarsalani/scripts/blob/master/nuke)|23|77|633|633B|9|2021-12-09 19:23:36 +0330|
+|[off](https://github.com/davoudarsalani/scripts/blob/master/off)|92|297|3,416|3.34KB|7|2021-12-09 19:23:36 +0330|
+|[previewer](https://github.com/davoudarsalani/scripts/blob/master/previewer)|38|266|2,164|2.11KB|6|2021-12-09 19:23:36 +0330|
+|[pulseaudio](https://github.com/davoudarsalani/scripts/blob/master/pulseaudio)|106|446|4,359|4.26KB|10|2021-12-09 19:23:36 +0330|
+|[r](https://github.com/davoudarsalani/scripts/blob/master/r)|30|104|875|875B|7|2021-12-09 19:23:36 +0330|
+|[sony](https://github.com/davoudarsalani/scripts/blob/master/sony)|88|250|2,339|2.28KB|10|2021-12-09 19:23:36 +0330|
+|[speech](https://github.com/davoudarsalani/scripts/blob/master/speech)|133|505|5,124|5.00KB|8|2021-12-09 19:23:36 +0330|
+|[tmux](https://github.com/davoudarsalani/scripts/blob/master/tmux)|30|130|1,051|1.03KB|6|2021-12-09 19:23:36 +0330|
+|[tmux-statusline](https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline)|77|355|3,220|3.14KB|16|2021-12-09 19:23:36 +0330|
+|[todo](https://github.com/davoudarsalani/scripts/blob/master/todo)|38|174|1,555|1.52KB|8|2021-12-09 19:23:36 +0330|
+|[typer](https://github.com/davoudarsalani/scripts/blob/master/typer)|132|342|3,360|3.28KB|10|2021-12-09 19:23:36 +0330|
+|[user](https://github.com/davoudarsalani/scripts/blob/master/user)|63|259|2,180|2.13KB|10|2021-12-09 19:23:36 +0330|
+|[video-subtitle](https://github.com/davoudarsalani/scripts/blob/master/video-subtitle)|189|717|8,987|8.78KB|13|2021-12-09 19:23:36 +0330|
+|[wallpaper](https://github.com/davoudarsalani/scripts/blob/master/wallpaper)|21|66|743|743B|8|2021-12-09 19:23:36 +0330|
+|[website-create-audio-template](https://github.com/davoudarsalani/scripts/blob/master/website-create-audio-template)|77|229|2,503|2.44KB|7|2021-12-09 19:23:36 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|__total__|6,267|28,007|278,176|271.66KB|417||
-|__average__|122|549|5,454|5.33KB|8||
+|__total__|6,267|28,007|278,176|271.66KB|468||
+|__average__|122|549|5,454|5.33KB|9||
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Python&message=19&labelColor=black&color=blue&style=flat&logo=python&logoColor=white)
+[![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)]\
+                      (https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[checksum.py](https://github.com/davoudarsalani/scripts/blob/master/checksum.py)|80|183|1,801|1.76KB|8|2021-12-07 15:57:41 +0330|
-|[compress-xtract.py](https://github.com/davoudarsalani/scripts/blob/master/compress-xtract.py)|106|258|2,662|2.60KB|8|2021-12-07 15:57:41 +0330|
-|[copy-to-clipboard.py](https://github.com/davoudarsalani/scripts/blob/master/copy-to-clipboard.py)|104|260|2,979|2.91KB|8|2021-12-07 15:57:41 +0330|
-|[download.py](https://github.com/davoudarsalani/scripts/blob/master/download.py)|🔺1,227|🔺4,830|🔺55,992|🔺54.68KB|10|2021-12-07 15:57:41 +0330|
-|[e-mail.py](https://github.com/davoudarsalani/scripts/blob/master/e-mail.py)|56|131|1,364|1.33KB|5|2021-12-06 13:59:39 +0330|
-|[emojis.py](https://github.com/davoudarsalani/scripts/blob/master/emojis.py)|28|71|735|735B|7|2021-12-07 15:57:41 +0330|
-|[gp.py](https://github.com/davoudarsalani/scripts/blob/master/gp.py)|1,180|3,502|37,246|36.37KB|10|2021-12-07 15:57:41 +0330|
-|[jadi.py](https://github.com/davoudarsalani/scripts/blob/master/jadi.py)|86|231|2,919|2.85KB|4|2021-11-26 22:35:34 +0330|
-|[lf.py](https://github.com/davoudarsalani/scripts/blob/master/lf.py)|229|793|11,480|11.21KB|7|2021-12-07 15:57:41 +0330|
-|[password.py](https://github.com/davoudarsalani/scripts/blob/master/password.py)|119|295|2,631|2.57KB|8|2021-12-07 15:57:41 +0330|
-|[record-audio.py](https://github.com/davoudarsalani/scripts/blob/master/record-audio.py)|67|171|1,343|1.31KB|7|2021-12-07 15:57:41 +0330|
-|[record-screen.py](https://github.com/davoudarsalani/scripts/blob/master/record-screen.py)|82|233|1,833|1.79KB|7|2021-12-07 15:57:41 +0330|
-|[record-unlimited.py](https://github.com/davoudarsalani/scripts/blob/master/record-unlimited.py)|91|247|2,881|2.81KB|8|2021-12-07 15:57:41 +0330|
-|[record-video.py](https://github.com/davoudarsalani/scripts/blob/master/record-video.py)|67|171|1,343|1.31KB|7|2021-12-07 15:57:41 +0330|
-|[reminder.py](https://github.com/davoudarsalani/scripts/blob/master/reminder.py)|41|114|1,209|1.18KB|7|2021-12-07 15:57:41 +0330|
-|[screenshot.py](https://github.com/davoudarsalani/scripts/blob/master/screenshot.py)|123|397|4,794|4.68KB|7|2021-12-07 15:57:41 +0330|
-|[split-and-merge.py](https://github.com/davoudarsalani/scripts/blob/master/split-and-merge.py)|285|1,020|10,074|9.84KB|4|2021-12-06 13:59:39 +0330|
-|[weather.py](https://github.com/davoudarsalani/scripts/blob/master/weather.py)|124|358|3,646|3.56KB|9|2021-12-07 15:57:41 +0330|
-|[website-fun.py](https://github.com/davoudarsalani/scripts/blob/master/website-fun.py)|92|230|2,346|2.29KB|4|2021-12-07 15:57:41 +0330|
+|[checksum.py](https://github.com/davoudarsalani/scripts/blob/master/checksum.py)|80|183|1,801|1.76KB|9|2021-12-09 19:23:36 +0330|
+|[compress-xtract.py](https://github.com/davoudarsalani/scripts/blob/master/compress-xtract.py)|106|258|2,662|2.60KB|9|2021-12-09 19:23:36 +0330|
+|[copy-to-clipboard.py](https://github.com/davoudarsalani/scripts/blob/master/copy-to-clipboard.py)|104|260|2,979|2.91KB|9|2021-12-09 19:23:36 +0330|
+|[download.py](https://github.com/davoudarsalani/scripts/blob/master/download.py)|🔺1,227|🔺4,830|🔺55,992|🔺54.68KB|11|2021-12-09 19:23:36 +0330|
+|[e-mail.py](https://github.com/davoudarsalani/scripts/blob/master/e-mail.py)|56|131|1,364|1.33KB|6|2021-12-09 19:23:36 +0330|
+|[emojis.py](https://github.com/davoudarsalani/scripts/blob/master/emojis.py)|28|71|735|735B|8|2021-12-09 19:23:36 +0330|
+|[gp.py](https://github.com/davoudarsalani/scripts/blob/master/gp.py)|1,180|3,502|37,246|36.37KB|11|2021-12-09 19:23:36 +0330|
+|[jadi.py](https://github.com/davoudarsalani/scripts/blob/master/jadi.py)|86|231|2,919|2.85KB|5|2021-12-09 19:23:36 +0330|
+|[lf.py](https://github.com/davoudarsalani/scripts/blob/master/lf.py)|229|793|11,480|11.21KB|8|2021-12-09 19:23:36 +0330|
+|[password.py](https://github.com/davoudarsalani/scripts/blob/master/password.py)|119|295|2,631|2.57KB|9|2021-12-09 19:23:36 +0330|
+|[record-audio.py](https://github.com/davoudarsalani/scripts/blob/master/record-audio.py)|67|171|1,343|1.31KB|8|2021-12-09 19:23:36 +0330|
+|[record-screen.py](https://github.com/davoudarsalani/scripts/blob/master/record-screen.py)|82|233|1,833|1.79KB|8|2021-12-09 19:23:36 +0330|
+|[record-unlimited.py](https://github.com/davoudarsalani/scripts/blob/master/record-unlimited.py)|91|247|2,881|2.81KB|9|2021-12-09 19:23:36 +0330|
+|[record-video.py](https://github.com/davoudarsalani/scripts/blob/master/record-video.py)|67|171|1,343|1.31KB|8|2021-12-09 19:23:36 +0330|
+|[reminder.py](https://github.com/davoudarsalani/scripts/blob/master/reminder.py)|41|114|1,209|1.18KB|8|2021-12-09 19:23:36 +0330|
+|[screenshot.py](https://github.com/davoudarsalani/scripts/blob/master/screenshot.py)|123|397|4,794|4.68KB|8|2021-12-09 19:23:36 +0330|
+|[split-and-merge.py](https://github.com/davoudarsalani/scripts/blob/master/split-and-merge.py)|285|1,020|10,074|9.84KB|5|2021-12-09 19:23:36 +0330|
+|[weather.py](https://github.com/davoudarsalani/scripts/blob/master/weather.py)|124|358|3,646|3.56KB|10|2021-12-09 19:23:36 +0330|
+|[website-fun.py](https://github.com/davoudarsalani/scripts/blob/master/website-fun.py)|92|230|2,346|2.29KB|5|2021-12-09 19:23:36 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|__total__|4,187|13,495|149,278|145.78KB|135||
-|__average__|220|710|7,856|7.67KB|7||
+|__total__|4,187|13,495|149,278|145.78KB|154||
+|__average__|220|710|7,856|7.67KB|8||
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Total&message=70&labelColor=black&color=blue&style=flat&logo=&logoColor=white)
+[![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)]\
+                      (https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|__total__|10,454|41,502|427,454|417.44KB|552||
-|__average__|149|592|6,106|5.96KB|7||
+|__total__|10,454|41,502|427,454|417.44KB|622||
+|__average__|149|592|6,106|5.96KB|8||
 <br>
 
 __In the tables that come next, there is presented the most frequent words and characters in the scripts above with the exact number of times each of them has been used:__
