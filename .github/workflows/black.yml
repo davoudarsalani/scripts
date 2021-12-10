@@ -12,7 +12,8 @@ jobs:
       shell: bash
       run: |
         pip install black
-        readarray -t text_files < <(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f ! -iname 'thumbnail.jpg' | sort)
+    - name: Checking with black
+        readarray -t text_files < <(find -mindepth 1 -maxdepth 1 -type f ! -iname 'thumbnail.jpg' | sort)
         readarray -t pythons    < <(printf '%s\n' "${text_files[@]}" | \grep -E '\.py$' | sort)
         for p in "${pythons[@]}"; {
           echo "$p"
