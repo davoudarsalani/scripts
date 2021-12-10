@@ -3,8 +3,8 @@
 <div align='center'>
 <img alt='platform' src='https://img.shields.io/static/v1?label=Platform&message=GNU/Linux&labelColor=black&color=grey&style=flat&logo=gnu&logoColor=white'>
 <img alt='total' src='https://img.shields.io/static/v1?label=Total&message=70&labelColor=black&color=grey&style=flat'>
-<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.17MB&labelColor=black&color=grey&style=flat'>
-<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=54&labelColor=black&color=grey&style=flat'>
+<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.28MB&labelColor=black&color=grey&style=flat'>
+<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=75&labelColor=black&color=grey&style=flat'>
 <img alt='last-commit' src='https://img.shields.io/github/last-commit/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 <img alt='commit-activity' src='https://img.shields.io/github/commit-activity/m/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 </div>
@@ -72,8 +72,7 @@
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Python&message=19&labelColor=black&color=blue&style=flat&logo=python&logoColor=white)
-[![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)]\
-                      (https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
+[![Black](https://github.com/davoudarsalani/scripts/actions/workflows/black.yml/badge.svg?branch=master)](https://github.com/davoudarsalani/scripts/actions/workflows/black.yml)
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
@@ -102,8 +101,7 @@
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Total&message=70&labelColor=black&color=blue&style=flat&logo=&logoColor=white)
-[![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)]\
-                      (https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
+
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
