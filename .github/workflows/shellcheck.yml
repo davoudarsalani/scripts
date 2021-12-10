@@ -25,7 +25,9 @@ jobs:
         readarray -t bashes     < <(printf '%s\n' "${text_files[@]}" | \grep -Ev '(\.py|\.md|thumbnail.jpg|commands)$' | sort)  ## commands exceptionally added here
     - name: applying shellcheck
       run: |
+        echo "${#bashes[@]}"
         for b in "${bashes[@]}"; {
+          echo "$b"
           shellcheck --color=always --format=tty "$b"
         }
 
