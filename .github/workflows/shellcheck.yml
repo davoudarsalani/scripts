@@ -20,6 +20,7 @@ jobs:
         tar -xf './sc.tar.xz' -C .
         mv "./shellcheck-${scversion}/shellcheck" './shellcheck'
     - name: Creating an array of bash files
+      shell: bash
       run: |
         readarray -t text_files < <(find -mindepth 1 -maxdepth 1 -type f ! -iname 'thumbnail.jpg' | sort)
         readarray -t bashes     < <(printf '%s\n' "${text_files[@]}" | \grep -Ev '(\.py|\.md|thumbnail.jpg|commands)$' | sort)  ## commands exceptionally added here
