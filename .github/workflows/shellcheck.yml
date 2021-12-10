@@ -1,8 +1,7 @@
 name:
   'Shellcheck'
 on:
-  # push:
-  #   branches: [ main ]
+  push:
   workflow_dispatch:
 
 jobs:
@@ -15,13 +14,15 @@ jobs:
     - name: Check
       uses: davoudarsalani/shellcheck@master
       env:
-        SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162  --color=always
+        SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162 -e SC2015 --color=always
         # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
         # SC2154 --> warning: *** is referenced but not assigned
         # SC2162 --> note: read without -r will mangle backslashes.
+        # SC2015 --> (info): Note that A && B || C is not if-then-else. C may run when A is true.
         # SC2034 --> warning: mem_free appears unused. Verify use (or export if used externally).
         # SC2124 --> warning: Assigning an array to a string! Assign as array, or use * instead of @ to concatenate.
       with:
         ignore_names: commands
+        severity: error
         format: tty
 
