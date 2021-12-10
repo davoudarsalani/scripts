@@ -13,6 +13,7 @@ jobs:
       run: |
         pip install black
     - name: Checking with black
+      run: |
         readarray -t text_files < <(find -mindepth 1 -maxdepth 1 -type f ! -iname 'thumbnail.jpg' | sort)
         readarray -t pythons    < <(printf '%s\n' "${text_files[@]}" | \grep -E '\.py$' | sort)
         for p in "${pythons[@]}"; {
