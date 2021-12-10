@@ -26,7 +26,7 @@ jobs:
         echo "${#bashes[@]}"
         for b in "${bashes[@]}"; {
           echo "$b"
-          shellcheck --color=always --format=tty "$b"
+          # shellcheck --color=always --format=tty "$b"
         }
 
 
