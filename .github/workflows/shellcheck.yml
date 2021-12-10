@@ -26,7 +26,7 @@ jobs:
     - name: applying shellcheck
       run: |
         for b in "${bashes[@]}"; {
-          shellcheck --severity=error --color=always --format=tty "$b"
+          shellcheck --color=always --format=tty "$b"
         }
 
 
