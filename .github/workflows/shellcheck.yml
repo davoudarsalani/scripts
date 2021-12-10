@@ -15,7 +15,7 @@ jobs:
         scversion='stable'
         osvariant='linux'
 
-        curl -Lso "/sc.tar.xz" "${baseurl}/${scversion}/shellcheck-${scversion}.${osvariant}.x86_64.tar.xz"
+        curl -Lso "./sc.tar.xz" "${baseurl}/${scversion}/shellcheck-${scversion}.${osvariant}.x86_64.tar.xz"
 
         tar -xf './sc.tar.xz' -C .
         mv "./shellcheck-${scversion}/shellcheck" './shellcheck'
