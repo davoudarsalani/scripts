@@ -1,0 +1,9 @@
+name: Send SMS
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  send-sms:
+    uses: davoudarsalani/reusables/.github/workflows/send-sms.yml@master
+    secrets:
+      UPFT: ${{ secrets.UPFT }}
