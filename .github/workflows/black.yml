@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install black
+    - name: Installing black
       shell: bash
       run: |
         pip install black
