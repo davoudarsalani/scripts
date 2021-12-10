@@ -4,53 +4,53 @@ on:
   push:
   workflow_dispatch:
 
-jobs:
-  shellcheck:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Installing shellcheck
-      run: |
-        baseurl='https://github.com/koalaman/shellcheck/releases/download'
-        scversion='stable'
-        osvariant='linux'
-
-        curl -Lso "./sc.tar.xz" "${baseurl}/${scversion}/shellcheck-${scversion}.${osvariant}.x86_64.tar.xz"
-
-        tar -xf './sc.tar.xz' -C .
-        mv "./shellcheck-${scversion}/shellcheck" './shellcheck'
-    - name: Creating an array of bash files
-      shell: bash
-      run: |
-        readarray -t text_files < <(find -mindepth 1 -maxdepth 1 -type f ! -iname 'thumbnail.jpg' | sort)
-        readarray -t bashes     < <(printf '%s\n' "${text_files[@]}" | \grep -Ev '(\.py|\.md|thumbnail.jpg|commands)$' | sort)  ## commands exceptionally added here
-        for b in "${bashes[@]}"; {
-          echo "$b"
-          shellcheck --severity=error --color=always --format=tty "$b"
-        }
-
-
-
-
 # jobs:
 #   shellcheck:
-#     name: Shellcheck
-#     # environment: env_name
 #     runs-on: ubuntu-latest
 #     steps:
 #     - uses: actions/checkout@v2
-#     - name: Check
-#       uses: davoudarsalani/shellcheck@master
-#       # env:
-#       #   SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162 -e SC2015 --color=always
-#         # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
-#         # SC2154 --> warning: *** is referenced but not assigned
-#         # SC2162 --> note: read without -r will mangle backslashes.
-#         # SC2015 --> (info): Note that A && B || C is not if-then-else. C may run when A is true.
-#         # SC2034 --> warning: mem_free appears unused. Verify use (or export if used externally).
-#         # SC2124 --> warning: Assigning an array to a string! Assign as array, or use * instead of @ to concatenate.
-#       with:
-#         ignore_names: commands
-#         severity: error
-#         format: tty
+#     - name: Installing shellcheck
+#       run: |
+#         baseurl='https://github.com/koalaman/shellcheck/releases/download'
+#         scversion='stable'
+#         osvariant='linux'
+
+#         curl -Lso "./sc.tar.xz" "${baseurl}/${scversion}/shellcheck-${scversion}.${osvariant}.x86_64.tar.xz"
+
+#         tar -xf './sc.tar.xz' -C .
+#         mv "./shellcheck-${scversion}/shellcheck" './shellcheck'
+#     - name: Creating an array of bash files
+#       shell: bash
+#       run: |
+#         readarray -t text_files < <(find -mindepth 1 -maxdepth 1 -type f ! -iname 'thumbnail.jpg' | sort)
+#         readarray -t bashes     < <(printf '%s\n' "${text_files[@]}" | \grep -Ev '(\.py|\.md|thumbnail.jpg|commands)$' | sort)  ## commands exceptionally added here
+#         for b in "${bashes[@]}"; {
+#           echo "$b"
+#           shellcheck --severity=error --color=always --format=tty "$b"
+#         }
+
+
+
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    # environment: env_name
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check
+      uses: davoudarsalani/shellcheck@master
+      # env:
+      #   SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162 -e SC2015 --color=always
+        # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
+        # SC2154 --> warning: *** is referenced but not assigned
+        # SC2162 --> note: read without -r will mangle backslashes.
+        # SC2015 --> (info): Note that A && B || C is not if-then-else. C may run when A is true.
+        # SC2034 --> warning: mem_free appears unused. Verify use (or export if used externally).
+        # SC2124 --> warning: Assigning an array to a string! Assign as array, or use * instead of @ to concatenate.
+      with:
+        ignore_names: commands
+        severity: error
+        format: tty
 
