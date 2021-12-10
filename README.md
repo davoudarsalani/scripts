@@ -11,8 +11,7 @@
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Bash&message=51&labelColor=black&color=blue&style=flat&logo=gnubash&logoColor=white)
-[![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)]\
-                      (https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
+[![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
