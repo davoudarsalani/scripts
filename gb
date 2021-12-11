@@ -16,31 +16,37 @@ function get_datetime {
             jweekday ) printf '%s\n' "$(jdate +%A)"           ;;
     esac
 }
+
 function heading {
     source "$HOME"/scripts/gb-color
 
     echo -e "$(green "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
+
 function flag {
     source "$HOME"/scripts/gb-color
 
     echo -e "$(purple "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
+
 function action_now {
     source "$HOME"/scripts/gb-color
 
     echo -e "$(green '→') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
+
 function accomplished {
     source "$HOME"/scripts/gb-color
 
     echo -e "$(green '✔') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
+
 function wrap_fzf_choice {
     source "$HOME"/scripts/gb-color
 
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
+
 function choose_file {
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
@@ -54,6 +60,7 @@ function choose_file {
         printf '%s\n' "${item/\~/$HOME}"
     done
 }
+
 function choose_directory {
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
@@ -68,6 +75,7 @@ function choose_directory {
     dir="$(eval "$FZF_ALT_C_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
     printf '%q\n' "${dir/\~/$HOME}"
 }
+
 function pipe_to_fzf {
     ## usages:
     ##   item="$(pipe_to_fzf "${items[@]}")"
@@ -87,6 +95,7 @@ function pipe_to_fzf {
 
     printf '%s\n' "${received[@]}" | fzf --header "$header"
 }
+
 function pipe_to_rofi {
     ## usages:
     ##   item="$(pipe_to_rofi "${items[@]}")"
@@ -117,6 +126,7 @@ function pipe_to_rofi {
 
     printf '%s\n' "${received[@]}" | rofi -theme "$HOME"/.config/rofi/"$theme" -dmenu -i -p "$header"
 }
+
 function pipe_to_dmenu {
     ## usages:
     ##   item="$(pipe_to_dmenu "${items[@]}")"
@@ -147,9 +157,11 @@ function pipe_to_dmenu {
 
     printf '%s\n' "${received[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$header"
 }
+
 function lsblk_full {
     \lsblk -o NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT,OWNER,GROUP,MODE,MAJ:MIN,RM,RO
 }
+
 function mounted_drives {
     if [ "$1" ]; then
         printf '%s\n' "$(df -hT)"
@@ -157,37 +169,46 @@ function mounted_drives {
         printf '%s\n' "$(df -T -x devtmpfs -x tmpfs -x usbfs -x loop)"  ## -x ARG instances help get rid of unnecessary drives
     fi
 }
+
 function get_mountable_umountable {
     readarray -t mountable  < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE 'part $|rom $')
     readarray -t umountable < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i '/tmp/')
 }
+
 function msgn {
     notify-send --urgency=normal "$1" "$2" -i "$3" -t 10000
 }
+
 function msgc {
     notify-send --urgency=critical "$1" "$2" -i "$3"
 }
+
 function copy_pacman_log {
     source "$HOME"/scripts/gb-color
 
     cp /var/log/pacman.log "$HOME"/linux/pacman.log
     msgn "<span color=\"${orange}\">/var/log/pacman.log</span> copied"
 }
+
 function clear_playlist {
     audtool --playlist-clear
 }
+
 function turn_off_shuffle {
     source "$HOME"/scripts/gb-audacious
     [ "$shuffle_status" == 'on'  ] && audtool --playlist-shuffle-toggle
 }
+
 function turn_on_shuffle {
     source "$HOME"/scripts/gb-audacious
     [ "$shuffle_status" == 'off' ] && audtool --playlist-shuffle-toggle
 }
+
 function play_shutdown_track {
     source "$HOME"/scripts/gb-audio
     pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
 }
+
 function day_hour_min_sec {
     local seconds sec min hour day
 
@@ -198,10 +219,12 @@ function day_hour_min_sec {
     day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 ))")"
     (( day == 0 )) && printf '%s\n' "${hour}:${min}:${sec}" || printf '%s\n' "${day}:${hour}:${min}:${sec}"
 }
+
 function clear_clipboard {
     greenclip clear
     msgn 'cleared' '' "$HOME"/linux/themes/greenclip.png
 }
+
 function random_wallpaper {
     local current_wallpaper_file rand_wall
 
@@ -211,6 +234,7 @@ function random_wallpaper {
     printf '%s\n' "${rand_wall##*/}" > "$current_wallpaper_file"
     feh --bg-scale "$rand_wall"
 }
+
 function copy_random_wallpaper_for_startup {
     source "$HOME"/scripts/gb-color
     local rand_wall
@@ -219,6 +243,7 @@ function copy_random_wallpaper_for_startup {
     sudo cp "$rand_wall" /usr/share/wallpapers/startup_background.jpg
     msgn "<span color=\"${orange}\">${rand_wall##*/}</span> copied"
 }
+
 function set_widget {
     ## only the awesome-widgets use this function but it'd better be here (rather than the script itself)
     ## because sometimes it's needed by 0-test
@@ -231,6 +256,7 @@ function set_widget {
 
     awesome-client "${widget}.${attr} = '${value}'"  ## NOTE do NOT change quotes
 }
+
 function get_input {
     source "$HOME"/scripts/gb-color
     local input
@@ -239,6 +265,7 @@ function get_input {
     read -p "$(olive "$@") " input
     printf '%s\n' "$input"
 }
+
 function get_single_input {
     source "$HOME"/scripts/gb-color
     local single_input
@@ -247,16 +274,19 @@ function get_single_input {
     read -p "$(olive "$@") " -n 1 single_input
     printf '%s\n' "$single_input"
 }
+
 function line {
     source "$HOME"/scripts/gb-color
 
     grey "$(printf "%$(tput cols)s\n" | sed "s/ /▬/g")"
 }
+
 function rand_str {
     printf '%s\n' "$(mktemp --dry-run | sed 's/.*\.//g')"  ## returns e.g. leQPAUyfZP
 
     # sed 's/-//g' < /proc/sys/kernel/random/uuid  ## returns e.g. a8a29c0d109a40468051bcbaf70af17e
 }
+
 
  # function find_duplicate_images {
  #     source "$HOME"/scripts/gb-color
@@ -307,6 +337,7 @@ function rand_str {
  #     dur="$(day_hour_min_sec "$SECONDS")"
  #     printf 'Total duration: %s\n' "$dur"
  # }
+
  # function compare_network_speed {
  #    ## this function takes only one arg which can only be either old or new
 
@@ -372,6 +403,7 @@ function rand_str {
  #        printf 'compare\n%s\n' "$msg" >> "$totals_file"
  #    }
 # }
+
 # function convert_Fun_to_lower_size {
 #     declare -a pics
 #
@@ -410,6 +442,7 @@ function rand_str {
 #         sleep 1
 #     }
 # }
+
 # function record_audio {
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
@@ -419,6 +452,7 @@ function rand_str {
 #            -filter_complex amix=inputs=2      \
 #            -t "$1" "$2" 2>/dev/null
 # }
+
 # function record_audio_ul {
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
@@ -427,6 +461,7 @@ function rand_str {
 #            -filter_complex amix=inputs=2 \
 #            "$1" 2>/dev/null
 # }
+
 # function record_screen {
 #     source "$HOME"/scripts/gb-screen
 #     timer "$3" "$6" &
@@ -437,6 +472,7 @@ function rand_str {
 #            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
 #            -t "$1" "$2" 2>/dev/null
 # }
+
 # function record_screen_ul {
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
@@ -447,6 +483,7 @@ function rand_str {
 #            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
 #            "$1" 2>/dev/null
 # }
+
 # function record_video {
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
@@ -457,6 +494,7 @@ function rand_str {
 #            -filter_complex amix=inputs=2 \
 #            -t "$1" "$2" 2>/dev/null
 # }
+
 # function record_video_ul {
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
@@ -466,6 +504,7 @@ function rand_str {
 #            -filter_complex amix=inputs=2 \
 #            "$1" 2>/dev/null
 # }
+
 # function record_mic_mon_on {
 #     source "$HOME"/scripts/gb-audio
 #     unmute_mic
@@ -473,11 +512,13 @@ function rand_str {
 #     unmute_mon
 #     mon_100
 # }
+
 # function record_mon_on {
 #     source "$HOME"/scripts/gb-audio
 #     unmute_mon
 #     mon_100
 # }
+
 # function record_mic_mon_off {
 #     source "$HOME"/scripts/gb-audio
 #     mute_mic

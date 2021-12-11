@@ -2,6 +2,7 @@
 
 ## @last-modified 1400-09-16 11:12:06 +0330 Tuesday
 
+
 from __future__ import unicode_literals
 from dataclasses import dataclass, field
 from datetime import timedelta, datetime as dt
@@ -392,6 +393,7 @@ def main() -> None:
 
 @dataclass
 class Initial:
+
     time: int = field(repr=False, default=get_datetime('jhms'))
     attrs: dict[str, str] = field(repr=False, default_factory=dict)
     urls: list[str] = field(repr=False, default_factory=list)
@@ -463,6 +465,7 @@ class Initial:
             invalid({'GETOPTS ERROR': getopts_error_msg})
 
     def verify_args(self) -> None:
+
         ## https://www.geeksforgeeks.org/python-check-url-string/
         url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
         playlist_id_regex = '^PL'  ## TODO better regex (I don't think - is required after PL)
@@ -547,26 +550,32 @@ class Initial:
         self.dest_dir = if_exists(self.dest_dir)
         mkdir(self.dest_dir)
         chdir(self.dest_dir)
+
         if self.file_type not in ['v', 's', 'vs', 'a', 't', 'o']:
             invalid('Invalid file type')
+
         if self.downloader and (
             (self.file_type in ['v', 's', 'vs', 't', 'a'] and not self.downloader == 'curl')
             or (self.file_type == 'o' and self.downloader not in ['requests', 'wget', 'curl'])
         ):
             invalid(f'invalid downloader for {self.file_type}')
+
         if self.quality not in self.valid_qualities:
             invalid(f'Invalid quality. It has to be one of these: {self.valid_qualities}')
+
         if self.increment:
             try:
                 self.increment = int(self.increment)
             except Exception:
                 invalid('increment should be a number')
+
         try:
             self.retries = int(self.retries)  ## make sure self.retries is an int
             _ = 1 / self.retries  ## make sure self.retries is not 0
             self.retries = abs(self.retries)  ## make sure self.retries is greater than 0
         except Exception:
             invalid('retries should be a number and greater than zero')
+
         if self.when not in ['n', 'h']:
             invalid('Invalid time')
 
@@ -657,6 +666,7 @@ class Initial:
 
 @dataclass
 class Profile:
+
     errors: dict[str, str] = field(repr=False, default_factory=make_errors)
     attempts: list[int] = field(repr=False, default_factory=make_attempts)
     attempt: int = field(repr=False, default=None)
@@ -702,6 +712,7 @@ class Profile:
 
 @dataclass
 class File(Profile):
+
     progress_file_downloaded_raw: int = field(repr=False, default=0)  ## NOTE do NOT replace 0 with None because it'll be later added to in JUMP_4
     progress_file_downloaded: int = field(repr=False, default=None)
     progress_file_downloaded_perc: int = field(repr=False, default=None)
@@ -833,6 +844,7 @@ class File(Profile):
                         for chunk in iter(partial(download_urlopen_response.read, self.chunksize), b''):
                             print(Col.orange(self.progress_info_error_dict), end=endpoint)
                             opened_outputname.write(chunk)
+
             elif Ini.downloader == 'requests':
                 if Ini.tor:
                     Ses.proxies = {'http': tor_proxy, 'https': tor_proxy}
@@ -853,6 +865,7 @@ class File(Profile):
                             for chunk in opened_session.iter_content(chunk_size=self.chunksize):
                                 print(Col.orange(self.progress_info_error_dict), end=endpoint)
                                 opened_outputname.write(chunk)
+
             elif Ini.downloader == 'wget':
 
                 ## https://stackoverflow.com/questions/58125279/python-wget-module-doesnt-show-progress-bar
@@ -878,6 +891,7 @@ class File(Profile):
                     wget_download(url=self.url, out=self.outputname, bar=wget_bar)
                 else:
                     wget_download(url=self.url, out=self.outputname, bar=wget_bar_error)
+
             elif Ini.downloader == 'curl':
                 ## examples: https://www.programcreek.com/python/example/1602/pycurl
                 cc = Curl()  ## curl connection
@@ -918,6 +932,7 @@ class File(Profile):
 
 @dataclass
 class Youtube(Profile):
+
     progress_status: str = field(repr=False, default=None)
     progress_speed_raw: int = field(repr=False, default=None)
     progress_speed: str = field(repr=False, default=None)
@@ -1011,6 +1026,7 @@ class Youtube(Profile):
 
     @duration_wrapper()
     def download(self) -> None:
+
         ## https://stackoverflow.com/questions/18054500/how-to-use-youtube-dl-from-a-python-program
         ## https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
         ## https://github.com/ytdl-org/youtube-dl/blob/3e4cedf9e8cd3157df2457df7274d0c842421945/youtube_dl/YoutubeDL.py#L137-L312 (available options)
@@ -1115,6 +1131,7 @@ class Youtube(Profile):
 
 @dataclass
 class Playlist(Profile):
+
     pl_fullinfo: dict[str, str] = field(repr=False, default_factory=dict)
     pl_urls: list[str] = field(repr=False, default_factory=list)
 
@@ -1215,6 +1232,7 @@ if __name__ == '__main__':
 
     Ini.total_duration = main()
     Ini.report()
+
 
 # warnings = [
 #     'Unable to download thumbnail "https://i.ytimg.com/vi_webp/f_bml-MILAs/maxresdefault.webp": <urlopen error EOF occurred in violation of protocol (_ssl.c:1129)>',

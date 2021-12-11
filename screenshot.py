@@ -49,6 +49,7 @@ if main_item == 'screen 1':
         msgn('screen 1', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 1</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+
 elif main_item == 'screen 2':
     try:
         countdown()
@@ -59,6 +60,7 @@ elif main_item == 'screen 2':
         msgn('screen 2', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 2</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+
 elif main_item == 'screen all':
     try:
         countdown()
@@ -69,6 +71,7 @@ elif main_item == 'screen all':
         msgn('screen all', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen all</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+
 elif main_item == 'current window':
     try:
         countdown()
@@ -82,6 +85,7 @@ elif main_item == 'current window':
         msgn('current window', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">current window</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+
 elif main_item == 'selected area':
     ## https://nitratine.net/blog/post/how-to-get-mouse-clicks-with-python/
     try:
@@ -119,5 +123,6 @@ elif main_item == 'selected area':
         msgn('selected area', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">selected area</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+
 else:
     exit()

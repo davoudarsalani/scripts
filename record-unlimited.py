@@ -30,6 +30,7 @@ def received_ctrl_c(signum: int, stack) -> None:
 
 handler = signal(SIGINT, received_ctrl_c)
 
+
 print(Col.heading(title))
 
 main_items = ['audio', 'screen 1', 'screen 2', 'screen all', 'video']

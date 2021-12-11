@@ -226,6 +226,7 @@ case "$1" in
                 ;;
         esac
         ;;
+
     -u|--uefi )  mode='UEFI (Ermanno Ferrari)'
         fg_color='uefi_fg'
         display_mode
@@ -432,6 +433,7 @@ case "$1" in
                 ;;
         esac
         ;;
+
     -c|--connect )
     cmd="
     iwctl
@@ -445,12 +447,14 @@ case "$1" in
     exit"
     display_cmd "$cmd"
     ;;
+
     -v|--verify )
         runnable='true'
         cmd="
         ls /sys/firmware/efi/efivars 2>/dev/null && printf 'UEFI mode verified: YES\n' || printf 'UEFI mode verified: NO\n'"
         display_cmd "$cmd"
         ;;
+
     * ) display_help
         ;;
 esac

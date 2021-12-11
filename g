@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-19 17:48:55 +0330 Friday
+## @last-modified 1400-09-20 16:53:30 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -13,12 +13,14 @@ function display_help {
     source "$HOME"/scripts/.help
     g_help
 }
+
 function if_locked {
     [ -f "$directory"/.git/index.lock ] && {
         red 'locked'  ## 
         exit
     }
 }
+
 function check_pattern {
     matches="$(find "$directory" -mindepth 1 -iname "$pattern")"   ## -maxdepth 1 is not needed here
     [ "$matches" ] || {
@@ -26,9 +28,11 @@ function check_pattern {
         exit
     }
 }
+
 function if_amend_allowed {
     (( "$(git_commits_ahead "$directory")" == 0 )) && red 'amend not allowed' && exit
 }
+
 function add_to_changes {
     local icon
     declare -a received=( "$@" )
@@ -40,6 +44,7 @@ function add_to_changes {
         changes+=( "${icon}---${member}" )
     }
 }
+
 function if_changed {
     local stts
 
@@ -58,6 +63,7 @@ function if_changed {
         exit
     }
 }
+
 function pipe_to_fzf_locally {
     local fzf_choice short_pwd short_directory
 
@@ -71,6 +77,7 @@ function pipe_to_fzf_locally {
                                            ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
+
 function branch_info {
     local fzf_choice
 
@@ -84,11 +91,13 @@ function branch_info {
                 )"
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
+
 function branches_array {
     declare -a branches_list
     readarray -t branches_list < <(git_branches "$directory")  ## branches
     printf '%s\n' "${branches_list[@]}"
 }
+
 function prompt {
     for _ in "$@"; {
         case "$1" in
@@ -102,6 +111,7 @@ function prompt {
         shift
     }
 }
+
 function get_opt {
     local options
 
@@ -122,24 +132,60 @@ function get_opt {
     done
 }
 
+
 get_opt "$@"
 heading "$title"
 
 readarray -t repositories < <(git_repositories)
-repository="$(pipe_to_fzf "${repositories[@]}" 'help')" && wrap_fzf_choice "$repository" || exit 37
-directory="${repository/\~/$HOME}"
+choice="$(pipe_to_fzf "${repositories[@]}" "setup+push in ${PWD/$HOME/\~}" 'help')" && wrap_fzf_choice "$choice" || exit 37
+directory="${choice/\~/$HOME}"
 
-[ "$repository" == 'help' ] && display_help
+case "$choice" in
+    help ) display_help ;;
+    "setup+push in ${PWD/$HOME/\~}" )
+        test_dir="$PWD"
+        [ -d "$test_dir"/.git ] && {
+            red "${test_dir/$HOME/\~}/.git already exists"
+            exit
+        }
+        start_init="$(get_single_input 'start?')" && printf '\n'
+        case "$start_init" in
+            y ) {
+                    action_now "mkdir ${test_dir}/.github/workflows"
+                    mkdir -p "${test_dir}/.github/workflows"
+                    action_now "create ${test_dir}/.github/workflows/test-workflow.yml"
+                    printf 'name: Test Workflow\n' >> "${test_dir}/.github/workflows/test-workflow.yml"
+                    action_now 'create README.md'
+                    echo "# $test_dir" >> "$test_dir"/README.md
+                    action_now 'init'
+                    git -C "$test_dir" init
+                    action_now 'add all'
+                    git_add_all "$test_dir"
+                    action_now 'commit'
+                    git_commit_with_message "$test_dir" 'initiated'
+                    action_now 'set master'
+                    git -C "$test_dir" branch -M master
+                    action_now "add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git"
+                    git -C "$test_dir" remote add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git
+                    action_now 'push'
+                    git -C "$test_dir" push -u origin master
+                } && accomplished
+            ;;
+        esac
+        exit
+        ;;
+esac
 
 if_locked
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'commits' )
+main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'commits' 'add all, commit updated, push' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     status )
              if_changed
              pipe_to_fzf_locally "${changes[@]/---/' '}" && accomplished ;;
+
     add )
           if_changed
           add_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$add_item" || exit 37
@@ -157,6 +203,7 @@ case "$main_item" in
                         git_add_specific_or_pattern "$directory" "$add_item" && \
                         accomplished "$add_item added" ;;
           esac ;;
+
     commit )
              if_changed
              [ "${sta[0]}" ] || {
@@ -176,6 +223,7 @@ case "$main_item" in
                                 git_commit_with_message "$directory" "$message" && \
                                 accomplished "committed, message: $message" ;;
              esac ;;
+
     add_commit )
                  if_changed
                  add_commit_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all + amend')" && wrap_fzf_choice "$add_commit_item" || exit 37
@@ -203,6 +251,7 @@ case "$main_item" in
                          git_commit_with_message "$directory" "${add_commit_item}: $message" && \
                          accomplished "$add_commit_item added, message: ${add_commit_item}: $message" ;;
                  esac ;;
+
     commit_amend )
                    if_amend_allowed
                    preview_status='hidden'
@@ -217,6 +266,7 @@ case "$main_item" in
                                       git_commit_amend_with_message "$directory" "$message" && \
                                       accomplished "commit amended, message: $message" ;;
                    esac ;;
+
     undo )
            if_changed
            undo_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$undo_item" || exit 37
@@ -234,6 +284,7 @@ case "$main_item" in
                           git_undo_specific_or_pattern "$directory" "$undo_item" && \
                           accomplished "$undo_item undid" ;;
            esac ;;
+
     unstage )
               if_changed
               [ "${sta[0]}" ] || {
@@ -257,12 +308,14 @@ case "$main_item" in
                             git_unstage_specific_or_pattern "$directory" "$unstage_item" && \
                             accomplished "$unstage_item unstaged" ;;
               esac ;;
+
     log )
           IFS=$'\n'
           if_locked
           preview_status='hidden'
           readarray -t log_items < <(git_log "$directory")
           pipe_to_fzf_locally "${log_items[@]}" ;;
+
     push )
            if_locked
            if [ "$(git_remotes "$directory")" ]; then
@@ -291,10 +344,12 @@ case "$main_item" in
            else
                red 'no remote'
            fi ;;
+
     edit )
            if_locked
            git_edit "$directory" && \
            accomplished 'edited' ;;
+
     empty_commit )
                    preview_status='hidden'
                    empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
@@ -308,11 +363,13 @@ case "$main_item" in
                                       git_empty_commit_with_message "$directory" "$message" && \
                                       accomplished "committed empty, message: $message" ;;
                    esac ;;
+
     remove )
              prompt -p
              if_locked
              git_remove "$directory" "$pattern" && \
              accomplished "$pattern removed" ;;
+
     branch )
              preview_status='hidden'
              branch_items=( 'show branches' 'create branch' 'checkout to a branch' 'delete all branches' 'force delete all branches' 'delete a specific branch' 'force delete a specific branch' )
@@ -350,6 +407,7 @@ case "$main_item" in
                                                     git_branch_force_delete_specific "$directory" "$force_delete_branch_item" && \
                                                     accomplished "$force_delete_branch_item branch force deleted" ;;
              esac ;;
+
     tag )
           preview_status='hidden'
           tag_items=( 'show tags' 'show a specific tag' 'create tag' 'create tag + message' 'create tag + message for a specific commit' 'delete all tags' 'delete a specific tag')
@@ -387,9 +445,11 @@ case "$main_item" in
                                         git_tag_delete_specific "$directory" "$tag" && \
                                         accomplished "$tag tag deleted" ;;
           esac ;;
+
     remotes )
               git_remotes && \
               accomplished ;;
+
     revert )
              IFS=$'\n'
              if_locked
@@ -403,13 +463,25 @@ case "$main_item" in
                  y ) git_revert "$directory" "$revert_item" && \
                      accomplished "$revert_item reverted to" ;;
              esac ;;
-    commits )
-               readarray -t dirs_files < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included
 
-               for df in "${dirs_files[@]##*/}"; {
+    commits )
+               readarray -t items < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included
+
+               for df in "${items[@]##*/}"; {
                    printf '%s %s\n' "$(git_touched_count "$directory" "$df")" "$df"
                } | sort --numeric-sort --reverse | column  ## --numeric-sort is for comparing according to string numerical value
                ;;
+
+    'add all, commit updated, push' )
+        if \grep -q 'public' <<< "$directory"; then
+            git_add_all "$directory" && \
+            git_commit_with_message "$directory" 'updated' && \
+            git_push_noproxy "$directory" && \
+            accomplished
+        else
+            red 'public repositories only'
+        fi ;;
+
 esac
 
 exit

@@ -120,6 +120,7 @@ if main_arg == 'chattr':
             except Exception as exc:
                 msgc('ERROR', f'printing lsattr for <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
             sleep(0.1)
+
 elif main_arg == 'trash':
     for f in files:
         try:
@@ -130,6 +131,7 @@ elif main_arg == 'trash':
         except Exception as exc:
             msgc('ERROR', f'trashing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'rm':
     for f in files:
         try:
@@ -142,6 +144,7 @@ elif main_arg == 'rm':
         except Exception as exc:
             msgc('ERROR', f'removing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'mime_type':
     for f in files:
         try:
@@ -151,6 +154,7 @@ elif main_arg == 'mime_type':
         except Exception as exc:
             msgc('ERROR', f'showing mimetype of <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'softlink':
     for f in files:
         try:
@@ -160,6 +164,7 @@ elif main_arg == 'softlink':
         except Exception as exc:
             msgc('ERROR', f'softlinking <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'tar':
     for f in files:
         try:
@@ -169,6 +174,7 @@ elif main_arg == 'tar':
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to tar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'untar':
     for f in files:
         try:
@@ -178,6 +184,7 @@ elif main_arg == 'untar':
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'zip':
     for f in files:
         try:
@@ -194,6 +201,7 @@ elif main_arg == 'zip':
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'unzip':
     for f in files:
         try:
@@ -210,6 +218,7 @@ elif main_arg == 'unzip':
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
+
 elif main_arg == 'unrar':
     for f in files:
         try:

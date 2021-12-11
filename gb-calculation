@@ -33,6 +33,7 @@ function float_pad {
 
     printf '%s.%s\n' "$l" "$r"
 }
+
 function compare_floats {
     ## https://stackoverflow.com/questions/8654051/how-to-compare-two-floating-point-numbers-in-bash
     ## usage: is_smaller="$(compare_floats "$first" '<' "$second")"  ## returns true or false
@@ -54,6 +55,7 @@ function compare_floats {
          '>' ) [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
     esac
 }
+
 function convert_byte {
     ## conversion table:
     ## bytes=2546790
