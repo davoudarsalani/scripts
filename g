@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-17 22:22:50 +0330 Wednesday
+## @last-modified 1400-09-19 17:48:55 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -266,13 +266,11 @@ case "$main_item" in
     push )
            if_locked
            if [ "$(git_remotes "$directory")" ]; then
-               current_branch="$(git_current_branch)"
-               commits_ahead="$(git_commits_ahead "$directory")"
 
                action_now 'updating remote'
-               git -C "$directory" remote -v update
-               ## getting the total number of "different" commits between local and remote (https://stackoverflow.com/questions/3258243/check-if-pull-needed-in-git):
-               commits_behind_ahead="$(git -C "$directory" rev-list HEAD...origin/${current_branch} --count)"
+               commits_ahead="$(git_commits_ahead "$directory")"
+               git_remote_update
+               commits_behind_ahead="$(git_commits_behind_ahead "$directory")"
 
                ## getting commits_behind
                (( commits_behind="commits_behind_ahead - commits_ahead" ))

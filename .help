@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-17 22:23:44 +0330 Wednesday
+## @last-modified 1400-09-19 23:00:58 +0330 Friday
 
 source "$HOME"/scripts/gb-color
 
@@ -80,13 +80,6 @@ down ethernet/wifi connection   $(flag '-c --connection=') connection
 add ip                          $(flag '-i --ip=') ip $(flag '-d --device=') device
 delete all ips                  $(flag '-d --device=') device
 connect to a new wifi network   $(flag '-s --ssid=') ssid $(flag '-p --password=') password"
-exit
-}
-function public_help {
-clear
-printf '%s\n' "\
-$(heading "$title") $(yellow "help")
-$(flag '-i --interactive')"
 exit
 }
 function pulseaudio_help {

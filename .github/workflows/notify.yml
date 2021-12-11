@@ -1,0 +1,11 @@
+name: Notify
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  notify:
+    uses: davoudarsalani/reusables/.github/workflows/notify.yml@master
+    secrets:
+      UPFT: ${{ secrets.UPFT }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
