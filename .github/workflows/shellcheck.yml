@@ -7,8 +7,9 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Check
+    - name: Checkout repo
+      uses: actions/checkout@v2
+    - name: Call shellcheck action
       uses: davoudarsalani/shellcheck@master
       # env:
       #   SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162 -e SC2015 --color=always

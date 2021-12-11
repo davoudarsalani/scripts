@@ -9,11 +9,11 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
-    - name: Seting up python
+    - name: Setting up python
       uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-        architecture: x64
+      # with:
+      #   python-version: 3.9
+      #   architecture: x64
     - name: Installing black
       shell: bash
       run: |
