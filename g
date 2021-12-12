@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-21 14:19:53 +0330 Sunday
+## @last-modified 1400-09-21 23:10:08 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -153,10 +153,8 @@ case "$choice" in
             y ) {
                     action_now "mkdir ${test_dir}/.github/workflows"
                     mkdir -p "${test_dir}/.github/workflows"
-                    action_now "create ${test_dir}/.github/workflows/test-workflow.yml"
-                    printf 'name: Test Workflow\n' >> "${test_dir}/.github/workflows/test-workflow.yml"
                     action_now 'create README.md'
-                    echo "# $test_dir" >> "$test_dir"/README.md
+                    [ -f "$test_dir"/README.md ] || echo "# ${test_dir##*/}" >> "$test_dir"/README.md
                     action_now 'init'
                     git -C "$test_dir" init
                     action_now 'add all'
