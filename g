@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-20 16:53:30 +0330 Saturday
+## @last-modified 1400-09-21 14:19:53 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -115,7 +115,7 @@ function prompt {
 function get_opt {
     local options
 
-    options="$(getopt --longoptions 'help,proxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hnx:m:b:t:c:' --alternative -- "$@")"
+    options="$(getopt --longoptions 'help,proxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hxp:m:b:t:c:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -322,7 +322,11 @@ case "$main_item" in
 
                action_now 'updating remote'
                commits_ahead="$(git_commits_ahead "$directory")"
-               git_remote_update
+               if [ "$proxy" == 'true' ]; then
+                   git_remote_update_proxy "$directory"
+               else
+                   git_remote_update_noproxy "$directory"
+               fi
                commits_behind_ahead="$(git_commits_behind_ahead "$directory")"
 
                ## getting commits_behind
@@ -473,14 +477,17 @@ case "$main_item" in
                ;;
 
     'add all, commit updated, push' )
-        if \grep -q 'public' <<< "$directory"; then
-            git_add_all "$directory" && \
-            git_commit_with_message "$directory" 'updated' && \
-            git_push_noproxy "$directory" && \
-            accomplished
-        else
+        if ! \grep -q 'public' <<< "$directory"; then
             red 'public repositories only'
-        fi ;;
+            exit
+        fi
+
+        if_changed
+        git_add_all "$directory" && \
+        git_commit_with_message "$directory" 'updated' && \
+        git_push_noproxy "$directory" && \
+        accomplished
+    ;;
 
 esac
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-19 17:55:11 +0330 Friday
+## @last-modified 1400-09-21 13:54:33 +0330 Sunday
 
 # dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work
 
@@ -57,6 +57,13 @@ function git_last_commit {
     printf '%s\n' "$(git -C "${1:-.}" log -1 --format=%ci "${2:-.}")"  ## . in "${2:-.}" does nothing but preventing errors if there is no $2 passed
 }
 
+function git_remotes {
+    local rmo
+
+    rmt="$(git -C "${1:-.}" remote -v)"
+    [ "$rmt" ] && printf '%s\n' "$rmt"
+}
+
 function git_repositories {
     ## NOTE cant use FZF_ALT_C_COMMAND because git option in ~/scripts/awesome-widgets apparently can't access it
 
@@ -64,16 +71,9 @@ function git_repositories {
     readarray -t repos < <(find "$HOME" -type d \
                                         ! -path '*.cache*' ! -path '*.venv*' ! -path '*kaddy*' ! -path '*.config*' \
                                         ! -path '*.vim*' ! -path '*go*' ! -path '*trash*' \
-                                          -iname '.git' | sed "s#$HOME#~#")
+                                          -iname '.git' | sed "s#$HOME#~#" | sort)
 
     printf '%s\n' "${repos[@]%/.git}"
-}
-
-function git_remotes {
-    local rmo
-
-    rmt="$(git -C "${1:-.}" remote -v)"
-    [ "$rmt" ] && printf '%s\n' "$rmt"
 }
 
 function git_status {
@@ -172,8 +172,11 @@ function git_push_proxy {
     torsocks git -C "${1:-.}" push || git_push_failed
 }
 
-function git_remote_update {
+function git_remote_update_noproxy {
     git -C "${1:-.}" remote -v update
+}
+function git_remote_update_proxy {
+    torsocks git -C "${1:-.}" remote -v update
 }
 
 function git_revert {
