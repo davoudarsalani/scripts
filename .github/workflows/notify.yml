@@ -4,8 +4,20 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   notify:
-    uses: davoudarsalani/reusables/.github/workflows/notify.yml@master
-    secrets:
-      UPFT: ${{ secrets.UPFT }}
-      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-      TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Notifying
+        uses: davoudarsalani/notify@master
+        with:
+          send_telegram_message: true
+          telegram_message: |
+            ${{ github.event_name }}
+            ${{ github.repository_owner }}
+            ${{ github.repository }}
+            Commit message: ${{ github.event.commits[0].message }}
+            https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
