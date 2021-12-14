@@ -12,7 +12,7 @@ jobs:
       - name: Downloading shellcheck
         shell: bash
         run: |
-          tar_file='sc.tar.xz'
+          tar_file='sh_ch.tar.xz'
           wget -O ./"$tar_file" https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz
           tar -xf ./"$tar_file"
           rm ./"$tar_file"
@@ -26,7 +26,7 @@ jobs:
           for b in "${bashes[@]}"; {
             ./shellcheck-stable/shellcheck --severity=error --color=always "$b"
             # syntax: shellcheck -e SC1091 -e SC2154 -e SC2162 -e SC2015 --color=always
-            #         shellcheck --severity=error --color=always 
+            #         shellcheck --severity=error --color=always
             # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
             # SC2154 --> warning: *** is referenced but not assigned
             # SC2162 --> note: read without -r will mangle backslashes.
@@ -34,25 +34,3 @@ jobs:
             # SC2034 --> warning: mem_free appears unused. Verify use (or export if used externally).
             # SC2124 --> warning: Assigning an array to a string! Assign as array, or use * instead of @ to concatenate.
           }
-
-# jobs:
-#   shellcheck:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v2
-
-#       - name: Call shellcheck action
-#         uses: davoudarsalani/action--shellcheck@master
-#         # env:
-#         #   SHELLCHECK_OPTS: -e SC1091 -e SC2154 -e SC2162 -e SC2015 --color=always
-#           # SC1091 --> (info): Not following: *** was not specified as input (see shellcheck -x).
-#           # SC2154 --> warning: *** is referenced but not assigned
-#           # SC2162 --> note: read without -r will mangle backslashes.
-#           # SC2015 --> (info): Note that A && B || C is not if-then-else. C may run when A is true.
-#           # SC2034 --> warning: mem_free appears unused. Verify use (or export if used externally).
-#           # SC2124 --> warning: Assigning an array to a string! Assign as array, or use * instead of @ to concatenate.
-#         with:
-#           ignore_names: commands
-#           severity: error
-#           format: tty
