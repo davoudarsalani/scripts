@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-22 13:30:00 +0330 Monday
+## @last-modified 1400-09-23 15:12:54 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -165,8 +165,9 @@ case "$choice" in
                     git -C "$test_dir" remote add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git
                     action_now 'create remote and push'
                     printf 'Now run:\n'
-                    printf "  curl -u \"davoudarsalani:GITHUB_TOKEN\" https://api.github.com/user/repos -d '{\"name\":\"%s\"}'\n" "${test_dir##*/}"
-                    printf '  git -C %s push -u origin master\n' "${test_dir/$HOME/\~}"
+                    printf "  1. curl -u \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}' >/dev/null\n" "${test_dir##*/}"
+                    printf "     curl -u \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}' >/dev/null\n" "${test_dir##*/}"
+                    printf '  2. git -C %s push -u origin master\n' "${test_dir/$HOME/\~}"
                 } && accomplished
             ;;
         esac

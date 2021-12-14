@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-23 11:11:52 +0330 Tuesday
+## @last-modified 1400-09-23 11:37:19 +0330 Tuesday
 
 function set_timezone {
     sudo ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
@@ -9,7 +9,7 @@ function set_timezone {
 }
 
 function install_jcal {
-    ## dependencies: automake libtool build-essential libjalali-dev)
+    ## dependencies: automake libtool build-essential libjalali-dev
     git clone https://github.com/ashkang/jcal.git
     cd ./jcal/sources
     ./autogen.sh
