@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Notifying
-        uses: davoudarsalani/notify@master
+        uses: davoudarsalani/action-notify@master
         with:
           send_telegram_message: true
           telegram_message: |
