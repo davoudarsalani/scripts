@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-21 23:10:08 +0330 Sunday
+## @last-modified 1400-09-22 13:30:00 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -137,12 +137,12 @@ get_opt "$@"
 heading "$title"
 
 readarray -t repositories < <(git_repositories)
-choice="$(pipe_to_fzf "${repositories[@]}" "setup+push in ${PWD/$HOME/\~}" 'help')" && wrap_fzf_choice "$choice" || exit 37
+choice="$(pipe_to_fzf "${repositories[@]}" "setup in ${PWD/$HOME/\~}" 'help')" && wrap_fzf_choice "$choice" || exit 37
 directory="${choice/\~/$HOME}"
 
 case "$choice" in
     help ) display_help ;;
-    "setup+push in ${PWD/$HOME/\~}" )
+    "setup in ${PWD/$HOME/\~}" )
         test_dir="$PWD"
         [ -d "$test_dir"/.git ] && {
             red "${test_dir/$HOME/\~}/.git already exists"
@@ -151,8 +151,6 @@ case "$choice" in
         start_init="$(get_single_input 'start?')" && printf '\n'
         case "$start_init" in
             y ) {
-                    action_now "mkdir ${test_dir}/.github/workflows"
-                    mkdir -p "${test_dir}/.github/workflows"
                     action_now 'create README.md'
                     [ -f "$test_dir"/README.md ] || echo "# ${test_dir##*/}" >> "$test_dir"/README.md
                     action_now 'init'
@@ -165,8 +163,10 @@ case "$choice" in
                     git -C "$test_dir" branch -M master
                     action_now "add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git"
                     git -C "$test_dir" remote add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git
-                    action_now 'push'
-                    git -C "$test_dir" push -u origin master
+                    action_now 'create remote and push'
+                    printf 'Now run:\n'
+                    printf "  curl -u \"davoudarsalani:GITHUB_TOKEN\" https://api.github.com/user/repos -d '{\"name\":\"%s\"}'\n" "${test_dir##*/}"
+                    printf '  git -C %s push -u origin master\n' "${test_dir/$HOME/\~}"
                 } && accomplished
             ;;
         esac

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+## @last-modified 1400-09-23 11:01:40 +0330 Tuesday
+
+function set_timezone {
+    sudo ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
+    sudo hwclock --systohc --utc
+    sudo timedatectl set-ntp true
+}
+
+function install_jcall {
+    ## install jcal (dependencies: automake libtool build-essential libjalali-dev)
+    git clone https://github.com/ashkang/jcal.git
+    cd ./jcal/sources
+    ./autogen.sh
+    ./configure
+    make
+    sudo make install
+    sudo /sbin/ldconfig
+}
