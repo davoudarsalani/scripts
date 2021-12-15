@@ -1,4 +1,4 @@
-## @last-modified 1400-09-16 11:15:22 +0330 Tuesday
+## @last-modified 1400-09-24 15:07:51 +0330 Wednesday
 
 # {{{ requirements
 ## for .venv_keylogger: keylogger
@@ -575,7 +575,7 @@ def invalid(text: str) -> None:
     exit(38)
 
 
-def duration(seconds: int) -> str:
+def convert_second(seconds: int) -> str:
     seconds = int(seconds)
     ss = f'{int(seconds % 60):02}'
     mm = f'{int(seconds / 60 % 60):02}'
@@ -602,7 +602,7 @@ def duration_wrapper() -> str:
             end = perf_counter()
             secs = end - start
 
-            return duration(secs)
+            return convert_second(secs)
 
         return wrapper
 
@@ -898,7 +898,7 @@ def timer(suffix: str, timer_secs: int) -> None:
     for i in range(int(timer_secs)):
         current = int(get_datetime('jhms'))
         diff = current - start
-        dur = duration(diff)
+        dur = convert_second(diff)
         hms = f'{record_icon_suffix} {dur}'
         set_widget('record', 'markup', hms)
         sleep(1)
@@ -909,7 +909,7 @@ def uptime() -> str:
         secs = opened_uptime_file.read().strip().split()[0]
         secs = int(float(secs))
 
-    return duration(secs)
+    return convert_second(secs)
 
 
 def open_windows() -> list[str]:

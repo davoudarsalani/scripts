@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-24 10:09:05 +0330 Wednesday
+## @last-modified 1400-09-24 14:10:37 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -163,8 +163,8 @@ case "$choice" in
                     git -C "$test_dir" branch -M master
                     action_now "add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git"
                     git -C "$test_dir" remote add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git
-                    printf "%s  curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}\n" "$(blue 'create remote')" "${test_dir##*/}"
-                    printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}\n" "${test_dir##*/}"
+                    printf "%s  curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "$(blue 'create remote')" "${test_dir##*/}"
+                    printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
                     # printf "              curl -su \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "${test_dir##*/}"
                     # printf "              curl -su \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
                     printf '%s git -C %s push -u origin master\n' "$(blue 'push to remote')" "${test_dir/$HOME/\~}"

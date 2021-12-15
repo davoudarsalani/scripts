@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:12:06 +0330 Tuesday
+## @last-modified 1400-09-24 15:06:01 +0330 Wednesday
 
 
 from __future__ import unicode_literals
@@ -26,7 +26,7 @@ from requests import Session
 from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
-from gp import Color, duration, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
+from gp import Color, convert_second, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
 
 
 def display_help() -> None:
@@ -635,7 +635,7 @@ class Initial:
         mins = int(str(self.happy_hours_start_time)[1:3])  ## 10
         now = dt.now()  ## 2021-08-05 18:55:06.865231
         secsleft = int((timedelta(hours=24) - (now - now.replace(hour=hr, minute=mins, second=0, microsecond=0))).total_seconds() % (24 * 3600))
-        self.wait_duration = duration(secsleft)
+        self.wait_duration = convert_second(secsleft)
 
     def report(self) -> None:
         ## report failures if any
@@ -988,7 +988,7 @@ class Youtube(Profile):
                     video_uploader = video_obj['uploader']  ## 'Walt Disney Animation Studios'
                     video_channel = video_obj['channel']  ## 'Walt Disney Animation Studios'
                     video_duration = video_obj['duration']  ## 41
-                    video_duration = duration(video_duration)  ## 00:00:41
+                    video_duration = convert_second(video_duration)  ## 00:00:41
                     video_view_count = f'{video_obj["view_count"]:,d}'  ## 1,362,401
                     video_like_count = f'{video_obj["like_count"]:,d}'  ## 13,730
                     video_ext = video_obj['ext']  ## mp4
@@ -1050,10 +1050,10 @@ class Youtube(Profile):
                     self.progress_speed = convert_byte(self.progress_speed_raw)
 
                     self.progress_elapsed = int(progress_response['elapsed'])
-                    self.progress_elapsed = duration(self.progress_elapsed)
+                    self.progress_elapsed = convert_second(self.progress_elapsed)
 
                     self.progress_eta = int(progress_response['eta'])
-                    self.progress_eta = duration(self.progress_eta)
+                    self.progress_eta = convert_second(self.progress_eta)
 
                     self.progress_video_raw_size = progress_response['total_bytes']
                     self.progress_video_size = convert_byte(self.progress_video_raw_size)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-24 12:15:58 +0330 Wednesday
+## @last-modified 1400-09-24 20:15:32 +0330 Wednesday
 
 function get_datetime {
     case "$1" in
@@ -209,8 +209,11 @@ function play_shutdown_track {
     pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
 }
 
+function convert_to_second {  ## convert 2021-04-15T11:10:03+0430 to 1618468803
+    printf '%s\n' "$(date -d "$1" '+%s')"
+}
 function convert_second {
-    local seconds sec min hour day mont year
+    local seconds sec min hour day mont year result
 
     seconds="${1%.*}"  ## remove decimal in case arg is a float
     sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
@@ -220,15 +223,34 @@ function convert_second {
     mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
     year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
 
-    if (( year == 0 )) && (( mont == 0 )) && (( day == 0 )); then
-        printf '%s:%s:%s\n' "$hour" "$min" "$sec"
-    elif (( year == 0 )) && (( mont == 0 )); then
-        printf '%s:%s:%s:%s\n' "$day" "$hour" "$min" "$sec"
-    elif   (( year == 0 )); then
-        printf '%s:%s:%s:%s:%s\n' "$mont" "$day" "$hour" "$min" "$sec"
-    else
-        printf '%s:%s:%s:%s:%s:%s\n' "$year" "$mont" "$day" "$hour" "$min" "$sec"
-    fi
+        if (( year == 0 )) && (( mont == 0 )) && (( day == 0 )); then
+            if [ "$2" == 'verbose' ]; then
+                result="$hour hours, $min minutes and $sec seconds"
+            else
+                result="${hour}:${min}:${sec}"
+            fi
+        elif (( year == 0 )) && (( mont == 0 )); then
+            if [ "$2" == 'verbose' ]; then
+                result="$day days, $hour hours, $min minutes and $sec seconds"
+            else
+                result="${day}:${hour}:${min}:${sec}"
+            fi
+        elif   (( year == 0 )); then
+            if [ "$2" == 'verbose' ]; then
+                result="$mont months, $day days, $hour hours, $min minutes and $sec seconds"
+            else
+                result="${mont}:${day}:${hour}:${min}:${sec}"
+            fi
+        else
+            if [ "$2" == 'verbose' ]; then
+                result="$year years, $mont months, $day days, $hour hours, $min minutes and $sec seconds"
+            else
+                result="${year}:${mont}:${day}:${hour}:${min}:${sec}"
+            fi
+        fi
+
+        ## TODO remove plural s when singular
+        printf '%s\n' "$result" | sed 's|, [0-9][0-9] hours.*ago| ago|;s|00 [a-z]\+s, ||g;s|00 [a-z]\+s and ||;s|, \([0-9][0-9] [a-z]\+s ago\)| and \1|;s|and 00 [a-z]\+s ago|ago|'
 }
 
 function clear_clipboard {
