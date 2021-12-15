@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 20:31:54 +0330 Sunday
+## @last-modified 1400-09-24 12:16:14 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -43,7 +43,7 @@ function type_in_vim {
         (( perc="i * 100 / chars_count" ))
         (( remaining_chars="chars_count - i" ))
         eta_mid="$(float_pad "${remaining_chars}*${intervals_middle_member}")"
-        eta_mid_conv="$(day_hour_min_sec "$eta_mid")"
+        eta_mid_conv="$(convert_second "$eta_mid")"
 
         printf '%s %s %s\e[0K\r' "$(green "${i}/${chars_count}")" "$(yellow "${perc}%")" "$(brown "eta: ${eta_mid_conv}")"
 

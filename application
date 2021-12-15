@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 20:09:31 +0330 Sunday
+## @last-modified 1400-09-24 12:15:13 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -121,16 +121,16 @@ case "$main_item" in
              case "$update_item" in
                  pacman ) SECONDS=0
                           sudo pacman -Syu
-                          dur="$(day_hour_min_sec "$SECONDS")"
+                          dur="$(convert_second "$SECONDS")"
                           accomplished "Total duration: $dur" ;;
                  yay ) start="$(get_datetime 'jseconds')"
                        yay --answerdiff None --answerclean All --removemake -Syua
                        end="$(get_datetime 'jseconds')"
-                       dur="$(day_hour_min_sec "$(( "$end" - "$start" ))")"
+                       dur="$(convert_second "$(( "$end" - "$start" ))")"
                        accomplished "Total duration: $dur" ;;
                  'yay + torsocks' ) SECONDS=0
                                     torsocks yay --answerdiff None --answerclean All --removemake -Syua
-                                    dur="$(day_hour_min_sec "$SECONDS")"
+                                    dur="$(convert_second "$SECONDS")"
                                     accomplished "Total duration: $dur" ;;
                  'sync repos' ) sudo pacman -Sy && accomplished ;;
                  'available updates' ) msgn 'synchronizing repositories ...' '' "$HOME"/linux/themes/pacman-w.png
@@ -152,7 +152,7 @@ case "$main_item" in
                  'last update' ) last_update_date="$(grep -E 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/')"  ## 2021-04-15T11:10:03+0430
                                  last_update_sec="$(date -d "$last_update_date" +%s)"  ## <--,     ## convert 2021-04-15T11:10:03+0430 to 1618468803
                                  current_seconds="$(get_datetime 'jseconds')"          ## <--'---  ## only +%s and jseconds (OR seconds) work
-                                 dur="$(day_hour_min_sec "$(( "$current_seconds" - "$last_update_sec" ))")"
+                                 dur="$(convert_second "$(( "$current_seconds" - "$last_update_sec" ))")"
                                  printf 'last update: %s ago (on %s)\n' "$dur" "$last_update_date"
              esac ;;
     systemd ) systemd_items=( 'systemd-analyze' 'systemd-analyze blame' 'reload systemd' 'reload systemd units' )

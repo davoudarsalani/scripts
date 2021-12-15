@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 17:43:26 +0330 Sunday
+## @last-modified 1400-09-24 12:15:58 +0330 Wednesday
 
 function get_datetime {
     case "$1" in
@@ -209,15 +209,26 @@ function play_shutdown_track {
     pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
 }
 
-function day_hour_min_sec {
-    local seconds sec min hour day
+function convert_second {
+    local seconds sec min hour day mont year
 
     seconds="${1%.*}"  ## remove decimal in case arg is a float
     sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
     min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
     hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
-    day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 ))")"
-    (( day == 0 )) && printf '%s\n' "${hour}:${min}:${sec}" || printf '%s\n' "${day}:${hour}:${min}:${sec}"
+    day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 % 30 ))")"
+    mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
+    year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
+
+    if (( year == 0 )) && (( mont == 0 )) && (( day == 0 )); then
+        printf '%s:%s:%s\n' "$hour" "$min" "$sec"
+    elif (( year == 0 )) && (( mont == 0 )); then
+        printf '%s:%s:%s:%s\n' "$day" "$hour" "$min" "$sec"
+    elif   (( year == 0 )); then
+        printf '%s:%s:%s:%s:%s\n' "$mont" "$day" "$hour" "$min" "$sec"
+    else
+        printf '%s:%s:%s:%s:%s:%s\n' "$year" "$mont" "$day" "$hour" "$min" "$sec"
+    fi
 }
 
 function clear_clipboard {
@@ -288,6 +299,24 @@ function rand_str {
 }
 
 
+function set_timezone {
+    sudo ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
+    sudo hwclock --systohc --utc
+    sudo timedatectl set-ntp true
+}
+
+function install_jcal {
+    printf 'Dependencies: automake libtool build-essential libjalali-dev\n\n'
+    git clone https://github.com/ashkang/jcal.git
+    cd ./jcal/sources
+    ./autogen.sh
+    ./configure
+    make
+    sudo make install
+    sudo /sbin/ldconfig
+}
+
+
  # function find_duplicate_images {
  #     source "$HOME"/scripts/gb-color
 
@@ -334,7 +363,7 @@ function rand_str {
  #     green "dups: $dups"
  #     printf '\n'
 
- #     dur="$(day_hour_min_sec "$SECONDS")"
+ #     dur="$(convert_second "$SECONDS")"
  #     printf 'Total duration: %s\n' "$dur"
  # }
 

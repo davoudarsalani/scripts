@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-17 20:05:49 +0330 Wednesday
+## @last-modified 1400-09-24 12:15:32 +0330 Wednesday
 
 threshhold=70
 
@@ -404,7 +404,7 @@ msgn "$text" ;;
            current_date="$(get_datetime 'jymd')"
            current_datetime="$(get_datetime 'jymdhms')"
 
-           idle_file="$HOME"/linux/idle/idle-"$current_date"  ##    ,-- NOTE do NOT use printf '%02d\n' since it causes errors for 07 and 08 in day_hour_min_sec function
+           idle_file="$HOME"/linux/idle/idle-"$current_date"  ##    ,-- NOTE do NOT use printf '%02d\n' since it causes errors for 07 and 08 in convert_second function
            (( idle_secs="$(xprintidle) / 1000" ))             ## <--'-- 103
            perc="$(float_pad "${idle_secs}*100/600" 1 2)"
 
@@ -790,7 +790,7 @@ msgn "$text" ;;
                 order="${position_in_playlist}/${playlist_length}"  ## 1/5
                 [ "$length" ] && time="${current_position}/${length}" || time='0:00/0:00'  ## 2:24/18:54
                 (( bar_position > 99 )) && bar_position=1 || bar_position=0.${bar_position}
-                left="$(day_hour_min_sec "$left_in_seconds")"  ## 00:45:16
+                left="$(convert_second "$left_in_seconds")"  ## 00:45:16
                 ## remove leading 00: if left is less than one hour:
                 [ "${left::3}" == '00:' ] && left="${left:3}"
 

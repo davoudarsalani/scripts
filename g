@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-23 15:12:54 +0330 Tuesday
+## @last-modified 1400-09-24 10:09:05 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -154,20 +154,21 @@ case "$choice" in
                     action_now 'create README.md'
                     [ -f "$test_dir"/README.md ] || echo "# ${test_dir##*/}" >> "$test_dir"/README.md
                     action_now 'init'
-                    git -C "$test_dir" init
+                    git -C "$test_dir" init &>/dev/null
                     action_now 'add all'
                     git_add_all "$test_dir"
-                    action_now 'commit'
-                    git_commit_with_message "$test_dir" 'initiated'
+                    action_now "commit 'initiated'"
+                    git_commit_with_message "$test_dir" 'initiated' &>/dev/null
                     action_now 'set master'
                     git -C "$test_dir" branch -M master
                     action_now "add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git"
                     git -C "$test_dir" remote add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git
-                    action_now 'create remote and push'
-                    printf 'Now run:\n'
-                    printf "  1. curl -u \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}' >/dev/null\n" "${test_dir##*/}"
-                    printf "     curl -u \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}' >/dev/null\n" "${test_dir##*/}"
-                    printf '  2. git -C %s push -u origin master\n' "${test_dir/$HOME/\~}"
+                    printf "%s  curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}\n" "$(blue 'create remote')" "${test_dir##*/}"
+                    printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}\n" "${test_dir##*/}"
+                    # printf "              curl -su \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "${test_dir##*/}"
+                    # printf "              curl -su \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
+                    printf '%s git -C %s push -u origin master\n' "$(blue 'push to remote')" "${test_dir/$HOME/\~}"
+                    printf "%s  curl -X DELETE -H \"Authorization: token \${github_token}\" https://api.github.com/repos/davoudarsalani/%s\n" "$(orange 'remove remote')" "${test_dir##*/}"
                 } && accomplished
             ;;
         esac

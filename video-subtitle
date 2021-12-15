@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 20:33:28 +0330 Sunday
+## @last-modified 1400-09-24 12:16:28 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -113,7 +113,7 @@ case "$main_item" in
                    red 'burn failed'
                }
                (( vid_count++ ))
-               dur="$(day_hour_min_sec "$SECONDS")"
+               dur="$(convert_second "$SECONDS")"
                blue "Video burn duration: $dur"
                line
            }
