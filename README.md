@@ -3,8 +3,8 @@
 <div align='center'>
 <img alt='platform' src='https://img.shields.io/static/v1?label=Platform&message=GNU/Linux&labelColor=black&color=grey&style=flat&logo=gnu&logoColor=white'>
 <img alt='total' src='https://img.shields.io/static/v1?label=Total&message=70&labelColor=black&color=grey&style=flat'>
-<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.52MB&labelColor=black&color=grey&style=flat'>
-<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=94&labelColor=black&color=grey&style=flat'>
+<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.57MB&labelColor=black&color=grey&style=flat'>
+<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=95&labelColor=black&color=grey&style=flat'>
 <img alt='last-commit' src='https://img.shields.io/github/last-commit/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 <img alt='commit-activity' src='https://img.shields.io/github/commit-activity/m/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 </div>
@@ -15,7 +15,7 @@
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[application](https://github.com/davoudarsalani/scripts/blob/master/application)|199|1,276|13,187|12.88KB|12|2021-12-15 12:21:42 +0330|
+|[application](https://github.com/davoudarsalani/scripts/blob/master/application)|199|1,276|13,187|12.88KB|13|2021-12-15 20:51:26 +0330|
 |[arch-install](https://github.com/davoudarsalani/scripts/blob/master/arch-install)|469|1,395|15,809|15.44KB|11|2021-12-11 21:44:55 +0330|
 |[awesome-app-off](https://github.com/davoudarsalani/scripts/blob/master/awesome-app-off)|72|355|3,117|3.04KB|7|2021-12-09 19:23:36 +0330|
 |[awesome-autorun](https://github.com/davoudarsalani/scripts/blob/master/awesome-autorun)|64|222|1,971|1.92KB|8|2021-12-09 19:23:36 +0330|
@@ -31,8 +31,8 @@
 |[ffmpeg](https://github.com/davoudarsalani/scripts/blob/master/ffmpeg)|159|967|11,614|11.34KB|11|2021-12-11 21:44:55 +0330|
 |[fingil](https://github.com/davoudarsalani/scripts/blob/master/fingil)|353|1,418|11,744|11.47KB|7|2021-12-09 19:23:36 +0330|
 |[firewall](https://github.com/davoudarsalani/scripts/blob/master/firewall)|75|292|2,683|2.62KB|9|2021-12-09 19:23:36 +0330|
-|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|498|2,142|24,726|24.15KB|🔺26|2021-12-15 12:21:42 +0330|
-|[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|579|2,264|18,779|18.34KB|15|2021-12-15 12:21:42 +0330|
+|[g](https://github.com/davoudarsalani/scripts/blob/master/g)|498|2,142|24,726|24.15KB|🔺27|2021-12-15 20:51:26 +0330|
+|[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|583|2,286|18,963|18.52KB|16|2021-12-15 20:51:26 +0330|
 |[gb-audacious](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious)|34|140|2,021|1.97KB|8|2021-12-09 19:23:36 +0330|
 |[gb-audio](https://github.com/davoudarsalani/scripts/blob/master/gb-audio)|40|338|2,464|2.41KB|6|2021-12-09 19:23:36 +0330|
 |[gb-calculation](https://github.com/davoudarsalani/scripts/blob/master/gb-calculation)|88|379|3,084|3.01KB|11|2021-12-11 21:44:55 +0330|
@@ -67,8 +67,8 @@
 |[wallpaper](https://github.com/davoudarsalani/scripts/blob/master/wallpaper)|21|66|743|743B|8|2021-12-09 19:23:36 +0330|
 |[website-create-audio-template](https://github.com/davoudarsalani/scripts/blob/master/website-create-audio-template)|77|229|2,503|2.44KB|7|2021-12-09 19:23:36 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|__total__|6,628|28,440|282,956|276.32KB|492||
-|__average__|129|557|5,548|5.42KB|9||
+|__total__|6,632|28,462|283,140|276.50KB|495||
+|__average__|130|558|5,551|5.42KB|9||
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Python&message=19&labelColor=black&color=blue&style=flat&logo=python&logoColor=white)
@@ -79,10 +79,10 @@
 |[checksum.py](https://github.com/davoudarsalani/scripts/blob/master/checksum.py)|80|183|1,801|1.76KB|9|2021-12-09 19:23:36 +0330|
 |[compress-xtract.py](https://github.com/davoudarsalani/scripts/blob/master/compress-xtract.py)|106|258|2,662|2.60KB|9|2021-12-09 19:23:36 +0330|
 |[copy-to-clipboard.py](https://github.com/davoudarsalani/scripts/blob/master/copy-to-clipboard.py)|104|260|2,979|2.91KB|9|2021-12-09 19:23:36 +0330|
-|[download.py](https://github.com/davoudarsalani/scripts/blob/master/download.py)|🔺1,245|🔺4,830|🔺56,042|🔺54.73KB|12|2021-12-11 21:44:55 +0330|
+|[download.py](https://github.com/davoudarsalani/scripts/blob/master/download.py)|🔺1,245|🔺4,830|🔺56,042|🔺54.73KB|13|2021-12-15 20:51:26 +0330|
 |[e-mail.py](https://github.com/davoudarsalani/scripts/blob/master/e-mail.py)|56|131|1,364|1.33KB|6|2021-12-09 19:23:36 +0330|
 |[emojis.py](https://github.com/davoudarsalani/scripts/blob/master/emojis.py)|28|71|735|735B|8|2021-12-09 19:23:36 +0330|
-|[gp.py](https://github.com/davoudarsalani/scripts/blob/master/gp.py)|1,181|3,502|37,273|36.40KB|12|2021-12-11 21:44:55 +0330|
+|[gp.py](https://github.com/davoudarsalani/scripts/blob/master/gp.py)|1,181|3,502|37,273|36.40KB|13|2021-12-15 20:51:26 +0330|
 |[jadi.py](https://github.com/davoudarsalani/scripts/blob/master/jadi.py)|86|231|2,919|2.85KB|🔻5|2021-12-09 19:23:36 +0330|
 |[lf.py](https://github.com/davoudarsalani/scripts/blob/master/lf.py)|238|793|11,489|11.22KB|9|2021-12-11 21:44:55 +0330|
 |[password.py](https://github.com/davoudarsalani/scripts/blob/master/password.py)|119|295|2,631|2.57KB|9|2021-12-09 19:23:36 +0330|
@@ -96,7 +96,7 @@
 |[weather.py](https://github.com/davoudarsalani/scripts/blob/master/weather.py)|124|358|3,646|3.56KB|10|2021-12-09 19:23:36 +0330|
 |[website-fun.py](https://github.com/davoudarsalani/scripts/blob/master/website-fun.py)|92|230|2,346|2.29KB|🔻5|2021-12-09 19:23:36 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|__total__|4,221|13,495|149,370|145.87KB|159||
+|__total__|4,221|13,495|149,370|145.87KB|161||
 |__average__|222|710|7,861|7.68KB|8||
 <br>
 
@@ -105,8 +105,8 @@
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|__total__|10,849|41,935|432,326|422.19KB|651||
-|__average__|154|599|6,176|6.03KB|9||
+|__total__|10,853|41,957|432,510|422.37KB|656||
+|__average__|155|599|6,178|6.03KB|9||
 <br>
 
 __In the tables that come next, there is presented the most frequent words and characters in the scripts above with the exact number of times each of them has been used:__
@@ -116,7 +116,7 @@ __In the tables that come next, there is presented the most frequent words and c
 
 |word|count|word|count|word|count|word|count|word|count|
 |-:|:-|-:|:-|-:|:-|-:|:-|-:|:-|
-|__file__|587|__home__|462|__in__|441|__printf__|434|__self__|392|
+|__file__|587|__home__|462|__in__|441|__printf__|435|__self__|392|
 |__if__|371|__str__|368|__get__|325|__def__|315|__function__|304|
 |__source__|290|__text__|275|__item__|270|__accomplished__|269|__last__|262|
 |__name__|247|__true__|246|__for__|230|__input__|226|__the__|225|
@@ -127,13 +127,13 @@ __In the tables that come next, there is presented the most frequent words and c
 |__getenv__|159|__list__|156|__directory__|154|__dev__|154|__cmd__|153|
 |__gb__|147|__not__|143|__case__|142|__linux__|140|__int__|140|
 |__prompt__|137|__none__|137|__as__|132|__add__|131|__esac__|130|
-|__default__|129|__size__|128|__action__|125|__status__|124|__items__|124|
+|__default__|129|__size__|128|__items__|125|__action__|125|__status__|124|
 |__current__|122|__https__|121|__title__|120|__awk__|120|__with__|117|
-|__base__|113|__remove__|112|__display__|110|__orange__|109|__except__|109|
+|__remove__|113|__base__|113|__display__|110|__orange__|109|__except__|109|
 |__else__|108|__mon__|106|__red__|105|__sudo__|104|__null__|103|
 |__pacman__|102|__temp__|101|__type__|100|__or__|100|__audio__|100|
 |__split__|97|__info__|97|__password__|95|__of__|95|__string__|94|
-|__com__|94|__sed__|92|__check__|92|__arg__|92|__datetime__|91|
+|__com__|94|__sed__|93|__check__|92|__arg__|92|__datetime__|91|
 |__pipe__|88|__modified__|88|__break__|87|__shell__|85|__bash__|85|
 |__commit__|83|__branch__|83|__msgn__|82|__bin__|82|__widget__|81|
 |__false__|81|__url__|80|__header__|80|__time__|78|__opened__|78|
@@ -189,8 +189,8 @@ __In the tables that come next, there is presented the most frequent words and c
 |__downloads__|21|__changes__|21|__bar__|21|__attribution__|21|__test__|20|
 |__retries__|20|__quit__|20|__org__|20|__nmcli__|20|__later__|20|
 |__ii__|20|__dim__|20|__cyan__|20|__bold__|20|__an__|20|
-|__xtract__|19|__xorg__|19|__vids__|19|__sinks__|19|__order__|19|
-|__firefox__|19|__disable__|19|__application__|19|__address__|19|__variable__|18|
+|__xtract__|19|__xorg__|19|__vids__|19|__value__|19|__sinks__|19|
+|__merge__|19|__firefox__|19|__disable__|19|__application__|19|__address__|19|
 |__underline__|18|__torsocks__|18|__stream__|18|__push__|18|__processes__|18|
 |__page__|18|__old__|18|__lsattr__|18|__italic__|18|__global__|18|
 |__connected__|18|__burn__|18|__argv__|18|__append__|18|__amend__|18|
@@ -198,7 +198,7 @@ __In the tables that come next, there is presented the most frequent words and c
 |__resolution__|17|__public__|17|__next__|17|__mp4__|17|__mp3__|17|
 |__lsblk__|17|__ir__|17|__install__|17|__hdd__|17|__gp__|17|
 |__echo__|17|__crc__|17|__but__|17|__blink__|17|__any__|17|
-|__version__|16|__unstage__|16|__ul__|16|__todo__|16|__strikethrough__|16|
+|__version__|16|__unstage__|16|__ul__|16|__strikethrough__|16|__sta__|16|
 </details>
 
 <details>
@@ -206,19 +206,19 @@ __In the tables that come next, there is presented the most frequent words and c
 
 |char|count|char|count|char|count|char|count|char|count|
 |-:|:-|-:|:-|-:|:-|-:|:-|-:|:-|
-|__e__|23,300|__t__|18,221|__i__|14,698|__s__|13,951|__r__|13,923|
-|__n__|13,267|__a__|12,569|__l__|9,966|__c__|9,124|__d__|8,786|
-|__'__|8,558|__"__|7,517|__u__|7,195|_____|7,095|__m__|6,933|
-|__-__|5,754|__g__|4,686|__)__|4,387|__h__|4,334|__$__|3,784|
-|__#__|3,512|__(__|3,478|__/__|3,191|__w__|2,632|__0__|2,590|
-|__b__|2,504|____|2,425|__.__|2,312|__y__|2,236|__v__|2,199|
-|__}__|1,998|__x__|1,823|__,__|1,815|____|1,799|__1__|1,536|
-|__3__|1,213|__&__|1,133|__[__|1,132|__E__|1,084|__>__|1,030|
-|__|__|937|__O__|906|__M__|820|__]__|818|__<__|731|
-|__4__|700|__R__|660|__%__|654|__N__|610|__H__|593|
-|__S__|545|__A__|517|__C__|491|__z__|473|__@__|464|
-|__F__|416|__5__|390|__*__|374|__+__|345|__6__|321|
-|__8__|314|__7__|299|__D__|295|__L__|288|__U__|285|
+|__e__|23,310|__t__|18,225|__i__|14,700|__s__|13,964|__r__|13,927|
+|__n__|13,268|__a__|12,574|__l__|9,969|__c__|9,124|__d__|8,787|
+|__'__|8,562|__"__|7,521|__u__|7,198|_____|7,095|__m__|6,935|
+|__-__|5,757|__g__|4,687|__)__|4,391|__h__|4,335|__$__|3,787|
+|__#__|3,514|__(__|3,482|__/__|3,191|__w__|2,633|__0__|2,595|
+|__b__|2,504|____|2,425|__.__|2,312|__y__|2,236|__v__|2,202|
+|__}__|1,998|__x__|1,823|__,__|1,817|____|1,813|__1__|1,543|
+|__3__|1,215|__[__|1,135|__&__|1,133|__E__|1,084|__>__|1,030|
+|__|__|947|__O__|904|__]__|821|__M__|820|__<__|731|
+|__4__|700|__R__|660|__%__|655|__N__|610|__H__|593|
+|__S__|545|__A__|517|__C__|491|__z__|476|__@__|464|
+|__F__|416|__5__|389|__*__|374|__+__|348|__6__|321|
+|__8__|314|__7__|299|__D__|294|__L__|288|__U__|285|
 |__j__|216|__B__|201|__!__|174|__G__|141|__^__|133|
 |__?__|130|__V__|98|__W__|91|__J__|76|__X__|68|
 </details>

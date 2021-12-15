@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-24 20:15:32 +0330 Wednesday
+## @last-modified 1400-09-24 22:33:13 +0330 Wednesday
 
 function get_datetime {
     case "$1" in
@@ -249,8 +249,12 @@ function convert_second {
             fi
         fi
 
-        ## TODO remove plural s when singular
-        printf '%s\n' "$result" | sed 's|, [0-9][0-9] hours.*ago| ago|;s|00 [a-z]\+s, ||g;s|00 [a-z]\+s and ||;s|, \([0-9][0-9] [a-z]\+s ago\)| and \1|;s|and 00 [a-z]\+s ago|ago|'
+        ## remove items whose values are 00
+        result="$(printf '%s\n' "$result" | \
+            sed 's|, [0-9][0-9] hours.*ago| ago|;s|00 [a-z]\+s, ||g;s|00 [a-z]\+s and ||;s|, \([0-9][0-9] [a-z]\+s ago\)| and \1|;s|and 00 [a-z]\+s ago|ago|')"
+
+        ## remove plural s when value is 01
+        printf '%s\n' "$result" | sed 's|\(01 [a-z]\+\)s |\1 |g;s|\(01 [a-z]\+\)s, |\1, |g;s|\(01 [a-z]\+\)s$|\1|'
 }
 
 function clear_clipboard {
