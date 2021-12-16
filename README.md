@@ -3,8 +3,8 @@
 <div align='center'>
 <img alt='platform' src='https://img.shields.io/static/v1?label=Platform&message=GNU/Linux&labelColor=black&color=grey&style=flat&logo=gnu&logoColor=white'>
 <img alt='total' src='https://img.shields.io/static/v1?label=Total&message=70&labelColor=black&color=grey&style=flat'>
-<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.59MB&labelColor=black&color=grey&style=flat'>
-<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=96&labelColor=black&color=grey&style=flat'>
+<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=3.60MB&labelColor=black&color=grey&style=flat'>
+<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=97&labelColor=black&color=grey&style=flat'>
 <img alt='last-commit' src='https://img.shields.io/github/last-commit/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 <img alt='commit-activity' src='https://img.shields.io/github/commit-activity/m/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 </div>
@@ -32,7 +32,7 @@
 |[fingil](https://github.com/davoudarsalani/scripts/blob/master/fingil)|353|1,418|11,744|11.47KB|7|2021-12-09 19:23:36 +0330|
 |[firewall](https://github.com/davoudarsalani/scripts/blob/master/firewall)|75|292|2,683|2.62KB|9|2021-12-09 19:23:36 +0330|
 |[g](https://github.com/davoudarsalani/scripts/blob/master/g)|498|2,142|24,726|24.15KB|🔺27|2021-12-15 20:51:26 +0330|
-|[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|592|2,334|19,273|18.82KB|17|2021-12-15 22:34:29 +0330|
+|[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|608|2,382|19,751|19.29KB|18|2021-12-15 23:35:14 +0330|
 |[gb-audacious](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious)|34|140|2,021|1.97KB|8|2021-12-09 19:23:36 +0330|
 |[gb-audio](https://github.com/davoudarsalani/scripts/blob/master/gb-audio)|40|338|2,464|2.41KB|6|2021-12-09 19:23:36 +0330|
 |[gb-calculation](https://github.com/davoudarsalani/scripts/blob/master/gb-calculation)|88|379|3,084|3.01KB|11|2021-12-11 21:44:55 +0330|
@@ -67,8 +67,8 @@
 |[wallpaper](https://github.com/davoudarsalani/scripts/blob/master/wallpaper)|21|66|743|743B|8|2021-12-09 19:23:36 +0330|
 |[website-create-audio-template](https://github.com/davoudarsalani/scripts/blob/master/website-create-audio-template)|77|229|2,503|2.44KB|7|2021-12-09 19:23:36 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|__total__|6,641|28,510|283,450|276.81KB|496||
-|__average__|130|559|5,557|5.43KB|9||
+|__total__|6,657|28,558|283,928|277.27KB|497||
+|__average__|130|559|5,567|5.44KB|9||
 <br>
 
 ![table-badge](https://img.shields.io/static/v1?label=Python&message=19&labelColor=black&color=blue&style=flat&logo=python&logoColor=white)
@@ -105,8 +105,8 @@
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|__total__|10,862|42,005|432,820|422.68KB|657||
-|__average__|155|600|6,183|6.04KB|9||
+|__total__|10,878|42,053|433,298|423.14KB|658||
+|__average__|155|600|6,189|6.04KB|9||
 <br>
 
 __In the tables that come next, there is presented the most frequent words and characters in the scripts above with the exact number of times each of them has been used:__
@@ -116,12 +116,12 @@ __In the tables that come next, there is presented the most frequent words and c
 
 |word|count|word|count|word|count|word|count|word|count|
 |-:|:-|-:|:-|-:|:-|-:|:-|-:|:-|
-|__file__|587|__home__|462|__in__|441|__printf__|436|__self__|392|
-|__if__|371|__str__|368|__get__|325|__def__|315|__function__|304|
+|__file__|587|__home__|462|__in__|449|__printf__|437|__self__|392|
+|__if__|371|__str__|368|__get__|325|__def__|315|__function__|305|
 |__source__|290|__text__|275|__item__|270|__accomplished__|269|__last__|262|
 |__name__|247|__true__|246|__for__|230|__input__|226|__the__|225|
-|__git__|220|__grep__|219|__all__|215|__print__|214|__exit__|209|
-|__output__|206|__help__|199|__count__|192|__scripts__|190|__now__|188|
+|__git__|220|__grep__|219|__all__|215|__print__|214|__from__|209|
+|__output__|206|__help__|199|__now__|192|__count__|192|__scripts__|190|
 |__error__|187|__elif__|186|__main__|182|__out__|181|__import__|176|
 |__fzf__|169|__set__|168|__path__|168|__cfg__|168|__and__|168|
 |__getenv__|159|__list__|156|__directory__|154|__dev__|154|__cmd__|153|
@@ -135,20 +135,20 @@ __In the tables that come next, there is presented the most frequent words and c
 |__files__|99|__split__|97|__info__|97|__password__|95|__of__|95|
 |__progress__|94|__com__|94|__check__|92|__arg__|92|__datetime__|91|
 |__pipe__|88|__modified__|88|__break__|87|__shell__|85|__bash__|85|
-|__commit__|83|__branch__|83|__msgn__|82|__bin__|82|__widget__|81|
-|__false__|81|__url__|80|__header__|80|__time__|78|__opened__|78|
+|__staticmethod__|83|__commit__|83|__branch__|83|__msgn__|82|__bin__|82|
+|__screen__|81|__false__|81|__url__|80|__header__|80|__opened__|78|
 |__usr__|77|__pattern__|77|__update__|76|__exc__|76|__device__|76|
 |__do__|75|__sink__|74|__options__|73|__then__|72|__mic__|72|
 |__tor__|71|__tag__|71|__sleep__|70|__new__|70|__env__|70|
 |__mute__|68|__dest__|68|__run__|67|__msg__|67|__shift__|66|
-|__it__|66|__youtube__|65|__up__|65|__try__|65|__note__|65|
-|__removing__|64|__ini__|64|__fg__|63|__cp__|63|__rm__|62|
-|__local__|62|__rofi__|60|__python__|60|__chunk__|60|__seconds__|59|
-|__root__|58|__read__|58|__opt__|58|__jump__|58|__convert__|58|
-|__record__|57|__readarray__|56|__png__|56|__awesome__|56|__suffix__|55|
-|__secs__|54|__full__|54|__be__|53|__aud__|53|__start__|52|
-|__delete__|52|__args__|52|__var__|51|__off__|51|__find__|51|
-|__etc__|51|__create__|51|__copying__|51|__level__|50|__ip__|50|
+|__it__|66|__youtube__|65|__up__|65|__try__|65|__seconds__|65|
+|__line__|65|__removing__|64|__ini__|64|__local__|63|__fg__|63|
+|__rm__|62|__open__|62|__convert__|61|__rofi__|60|__python__|60|
+|__down__|59|__root__|58|__read__|58|__opt__|58|__jump__|58|
+|__start__|57|__record__|57|__readarray__|56|__png__|56|__awesome__|56|
+|__os__|55|__secs__|54|__full__|54|__be__|53|__aud__|53|
+|__ffmpeg__|52|__delete__|52|__args__|52|__var__|51|__off__|51|
+|__field__|51|__etc__|51|__create__|51|__copying__|51|__level__|50|
 |__fi__|50|__download__|50|__zip__|49|__yellow__|49|__wf__|49|
 |__repr__|49|__replace__|49|__msgc__|49|__inpt__|49|__dict__|49|
 |__copy__|49|__connection__|49|__wrap__|48|__sort__|48|__shutdown__|48|
@@ -171,10 +171,10 @@ __In the tables that come next, there is presented the most frequent words and c
 |__bluetooth__|30|__ahead__|30|__xrandr__|29|__song__|29|__group__|29|
 |__wget__|28|__urls__|28|__session__|28|__repos__|28|__remote__|28|
 |__mem__|28|__failed__|28|__bytes__|28|__attempt__|28|__active__|28|
-|__while__|27|__we__|27|__using__|27|__speech__|27|__purple__|27|
-|__conf__|27|__compare__|27|__yay__|26|__unit__|26|__tuesday__|26|
-|__subprocess__|26|__sd__|26|__reboot__|26|__offset__|26|__iname__|26|
-|__github__|26|__exists__|26|__ethernet__|26|__can__|26|__subtitle__|25|
+|__while__|27|__we__|27|__using__|27|__speech__|27|__second__|27|
+|__network__|27|__conf__|27|__compare__|27|__yay__|26|__unit__|26|
+|__sunday__|26|__subprocess__|26|__sd__|26|__reboot__|26|__offset__|26|
+|__headers__|26|__github__|26|__exists__|26|__ethernet__|26|__can__|26|
 |__need__|25|__lines__|25|__has__|25|__grub__|25|__declare__|25|
 |__write__|24|__weather__|24|__wallpaper__|24|__unmute__|24|__tar__|24|
 |__stackoverflow__|24|__pulse__|24|__prefix__|24|__play__|24|__loops__|24|
@@ -206,25 +206,26 @@ __In the tables that come next, there is presented the most frequent words and c
 
 |char|count|char|count|char|count|char|count|char|count|
 |-:|:-|-:|:-|-:|:-|-:|:-|-:|:-|
-|__e__|23,319|__t__|18,229|__i__|14,701|__s__|13,978|__r__|13,929|
-|__n__|13,278|__a__|12,582|__l__|9,971|__c__|9,125|__d__|8,803|
-|__'__|8,580|__"__|7,525|__u__|7,200|_____|7,095|__m__|6,937|
-|__-__|5,762|__g__|4,683|__)__|4,394|__h__|4,334|__$__|3,792|
-|__#__|3,514|__(__|3,485|__/__|3,191|__w__|2,633|__0__|2,599|
-|__b__|2,504|____|2,425|__.__|2,311|__y__|2,236|__v__|2,202|
-|__}__|1,998|____|1,831|__x__|1,823|__,__|1,819|__1__|1,544|
-|__3__|1,215|__[__|1,140|__&__|1,133|__E__|1,084|__>__|1,030|
+|__e__|23,336|__t__|18,253|__i__|14,716|__s__|14,000|__r__|13,945|
+|__n__|13,304|__a__|12,596|__l__|9,973|__c__|9,138|__d__|8,810|
+|__'__|8,585|__"__|7,539|__u__|7,203|_____|7,113|__m__|6,945|
+|__-__|5,771|__g__|4,689|__)__|4,400|__h__|4,335|__$__|3,798|
+|__#__|3,524|__(__|3,491|__/__|3,191|__w__|2,637|__0__|2,612|
+|__b__|2,505|____|2,430|__.__|2,311|__y__|2,236|__v__|2,206|
+|__}__|1,999|____|1,832|__x__|1,823|__,__|1,819|__1__|1,556|
+|__3__|1,216|__[__|1,140|__&__|1,133|__E__|1,084|__>__|1,030|
 |__|__|963|__O__|904|__]__|826|__M__|820|__<__|731|
-|__4__|701|__R__|660|__%__|656|__N__|610|__H__|593|
+|__4__|699|__R__|660|__%__|657|__N__|610|__H__|593|
 |__S__|545|__A__|517|__C__|491|__z__|479|__@__|464|
-|__F__|416|__5__|389|__*__|373|__+__|351|__6__|321|
-|__8__|314|__7__|299|__D__|294|__L__|288|__U__|285|
-|__j__|217|__B__|201|__!__|174|__G__|141|__^__|133|
-|__?__|130|__V__|98|__W__|91|__J__|76|__X__|68|
+|__F__|416|__5__|396|__*__|373|__+__|351|__6__|325|
+|__8__|317|__7__|305|__D__|294|__L__|288|__U__|285|
+|__j__|217|__B__|201|__!__|174|__G__|141|__^__|135|
+|__?__|130|__V__|98|__W__|90|__J__|76|__X__|68|
 </details>
 <br>
 
 <div align='center'>
 <a href='https://github.com/davoudarsalani/scripts#readme'>
-<img alt='top' src='https://img.shields.io/badge/TOP-grey'></a>
+<img alt='top' src='https://img.shields.io/badge/TOP-grey'>
+</a>
 </div>

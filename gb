@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-24 23:33:24 +0330 Wednesday
+## @last-modified 1400-09-25 09:08:20 +0330 Thursday
 
 function get_datetime {
     case "$1" in
@@ -209,9 +209,25 @@ function play_shutdown_track {
     pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
 }
 
+function ago {
+    ## usage:
+    ##     ago "$arg1" "$arg2"
+    ##           ^        ^-- now (in 1556867231 format)
+    ##           '-- start time (in 2019-05-03T07:07:11Z format)
+
+    local start_time_in_seconds now_in_seconds
+
+    ## convert start time from 2019-05-03T07:07:11Z to 1556867231
+    start_time_in_seconds="$(convert_to_second "$1")"
+    now_in_seconds="$2"
+
+    printf '%s ago\n' "$(convert_second "(( now_in_seconds - start_time_in_seconds ))" 'verbose')"
+}
+
 function convert_to_second {  ## convert 2021-04-15T11:10:03+0430 to 1618468803
     printf '%s\n' "$(date -d "$1" '+%s')"
 }
+
 function convert_second {
     local seconds sec min hour day mont year result
 
