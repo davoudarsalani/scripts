@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 15:44:57 +0330 Sunday
+## @last-modified 1400-09-26 11:19:15 +0330 Friday
 
 function float_pad {
     local input desired_l_length desired_r_length float l r r_length lacking_pad
@@ -70,13 +70,13 @@ function convert_byte {
     if (( bytes == 0 )); then
         number=0
         suffix='B'
-    elif (( bytes > 1024000000 )); then
+    elif (( bytes >= 1024000000 )); then
         number="$(float_pad "${bytes}/1024000000" 1 2)"
         suffix='GB'
-    elif (( bytes > 1024000 )); then
+    elif (( bytes >= 1024000 )); then
         number="$(float_pad "${bytes}/1024000" 1 2)"
         suffix='MB'
-    elif (( bytes > 1024 )); then
+    elif (( bytes >= 1024 )); then
         number="$(float_pad "${bytes}/1024" 1 2)"
         suffix='KB'
     else

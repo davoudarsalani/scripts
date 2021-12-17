@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-17 22:34:07 +0330 Wednesday
+## @last-modified 1400-09-25 16:28:15 +0330 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -209,7 +209,7 @@ weather [iii] --->   format=2  >> ☀️ 🌡️e+24°C 🌬️+↓7km/h
 weather [iv]  --->   format=3  >> zahedan: ☀️ +24°C
 weather [v]   --->   format=4  >> zahedan: ☀️ 🌡️ +24°C 🌬️ ↓7km/h
 weather [vi]  --->   format=j1 >> in json format
-                      for parsing the json: format=j1 | jq -rM ."current_condition[0]|(.temp_C)"  ## <--,-- will single quote work too?
+                      for parsing the json: format=j1 | jq -rM .'current_condition[0]|(.temp_C)'  ## <--,-- will single quote work too?
                                                                                                   ##    |-- (https://www.youtube.com/watch?v=_Xm3HYGW3lg)
                                                                                                   ##    |-- NOTE: no space after .
                                                                                                   ##    |-- -r removes quotes, -M gives monochrome output

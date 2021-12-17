@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-25 09:08:20 +0330 Thursday
+## @last-modified 1400-09-25 22:09:22 +0330 Thursday
 
 function get_datetime {
     case "$1" in
@@ -213,19 +213,19 @@ function ago {
     ## usage:
     ##     ago "$arg1" "$arg2"
     ##           ^        ^-- now (in 1556867231 format)
-    ##           '-- start time (in 2019-05-03T07:07:11Z format)
+    ##           '-- start date (in 2019-05-03T07:07:11Z format)
 
-    local start_time_in_seconds now_in_seconds
+    local start_date_in_seconds now_in_seconds
 
     ## convert start time from 2019-05-03T07:07:11Z to 1556867231
-    start_time_in_seconds="$(convert_to_second "$1")"
+    start_date_in_seconds="$(convert_to_second "$1")"
     now_in_seconds="$2"
 
-    printf '%s ago\n' "$(convert_second "(( now_in_seconds - start_time_in_seconds ))" 'verbose')"
+    printf '%s ago\n' "$(convert_second "(( now_in_seconds - start_date_in_seconds ))" 'verbose')"
 }
 
 function convert_to_second {  ## convert 2021-04-15T11:10:03+0430 to 1618468803
-    printf '%s\n' "$(date -d "$1" '+%s')"
+    printf '%s\n' "$(date --date "$1" '+%s')"
 }
 
 function convert_second {
@@ -239,47 +239,52 @@ function convert_second {
     mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
     year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
 
-        if (( year == 0 )) && (( mont == 0 )) && (( day == 0 )); then
-            if [ "$2" == 'verbose' ]; then
-                result="$hour hours, $min minutes and $sec seconds"
-            else
-                result="${hour}:${min}:${sec}"
-            fi
-        elif (( year == 0 )) && (( mont == 0 )); then
-            if [ "$2" == 'verbose' ]; then
-                result="$day days, $hour hours, $min minutes and $sec seconds"
-            else
-                result="${day}:${hour}:${min}:${sec}"
-            fi
-        elif   (( year == 0 )); then
-            if [ "$2" == 'verbose' ]; then
-                result="$mont months, $day days, $hour hours, $min minutes and $sec seconds"
-            else
-                result="${mont}:${day}:${hour}:${min}:${sec}"
-            fi
+    if (( year == 0 )) && (( mont == 0 )) && (( day == 0 )); then
+        if [ "$2" == 'verbose' ]; then
+            result="$hour hours, $min minutes and $sec seconds"
         else
-            if [ "$2" == 'verbose' ]; then
-                result="$year years, $mont months, $day days, $hour hours, $min minutes and $sec seconds"
-            else
-                result="${year}:${mont}:${day}:${hour}:${min}:${sec}"
-            fi
+            result="${hour}:${min}:${sec}"
         fi
+    elif (( year == 0 )) && (( mont == 0 )); then
+        if [ "$2" == 'verbose' ]; then
+            result="$day days, $hour hours, $min minutes and $sec seconds"
+        else
+            result="${day}:${hour}:${min}:${sec}"
+        fi
+    elif (( year == 0 )); then
+        if [ "$2" == 'verbose' ]; then
+            result="$mont months, $day days, $hour hours, $min minutes and $sec seconds"
+        else
+            result="${mont}:${day}:${hour}:${min}:${sec}"
+        fi
+    else
+        if [ "$2" == 'verbose' ]; then
+            result="$year years, $mont months, $day days, $hour hours, $min minutes and $sec seconds"
+        else
+            result="${year}:${mont}:${day}:${hour}:${min}:${sec}"
+        fi
+    fi
 
-        ## remove items whose values are 00, and adjust comma and 'and'
-        result="$(printf '%s\n' "$result" | \
-            sed 's|00 [a-z]\+s, ||g' | \
-            sed 's|00 [a-z]\+s and ||' | \
-            sed 's|00 [a-z]\+s$||' | \
-            sed 's|, \([0-9][0-9] [a-z]\+s \)| and \1|' | \
-            sed 's|and 00 [a-z]\+s ||' | \
-            sed 's| and $||' | \
-            sed 's|, \([0-9][0-9] [a-z]\+\)$| and \1|' | \
-            sed 's| and \([0-9][0-9] [a-z]\+\) and|, \1 and|g' \
-            )"
+    ## remove items whose values are 00, and adjust comma and 'and'
+    ## NOTE the same modifications in here and JUMP_4 are applied in convert_second function in gp.py, so
+    ##      any changes you make here, make aure to update that too
+    result="$(printf '%s\n' "$result" | \
+        sed 's|00 [a-z]\+s, ||g' | \
+        sed 's|00 [a-z]\+s and ||' | \
+        sed 's|00 [a-z]\+s$||' | \
+        sed 's|, \([0-9][0-9] [a-z]\+s \)| and \1|' | \
+        sed 's|and 00 [a-z]\+s ||' | \
+        sed 's| and $||' | \
+        sed 's|, \([0-9][0-9] [a-z]\+\)$| and \1|' | \
+        sed 's| and \([0-9][0-9] [a-z]\+\) and|, \1 and|g' | \
+        sed 's|, \+$||' | \
+        sed 's|, \([0-9][0-9] [a-z]\+s\)$| and \1|' \
+    )"
 
-        ## remove plural s when value is 01
-        result="$(printf '%s\n' "$result" | sed 's|\(01 [a-z]\+\)s |\1 |g;s|\(01 [a-z]\+\)s, |\1, |g;s|\(01 [a-z]\+\)s$|\1|')"
-        printf '%s\n' "$result"
+    ## remove plural s when value is 01 JUMP_4
+    result="$(printf '%s\n' "$result" | sed 's|\(01 [a-z]\+\)s |\1 |g;s|\(01 [a-z]\+\)s, |\1, |g;s|\(01 [a-z]\+\)s$|\1|')"
+
+    printf '%s\n' "$result"
 }
 
 function clear_clipboard {

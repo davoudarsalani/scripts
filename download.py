@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-24 15:06:01 +0330 Wednesday
+## @last-modified 1400-09-26 11:21:08 +0330 Friday
 
 
 from __future__ import unicode_literals
@@ -234,7 +234,7 @@ def make_errors() -> dict[str, str]:
     }
 
 
-def convert_byte(size_in_bytes) -> str:
+def convert_byte(size_in_bytes: int) -> str:
     if size_in_bytes == 0:
         return '0B'
 

@@ -1,4 +1,4 @@
-## @last-modified 1400-09-24 15:07:51 +0330 Wednesday
+## @last-modified 1400-09-25 22:07:34 +0330 Thursday
 
 # {{{ requirements
 ## for .venv_keylogger: keylogger
@@ -575,17 +575,75 @@ def invalid(text: str) -> None:
     exit(38)
 
 
-def convert_second(seconds: int) -> str:
+def ago(start_date: str, now: int):
+    ## start_date is in 2019-05-03T07:07:11Z format
+    ## now is in 1618468803 format
+
+    start_date_in_seconds = convert_to_second(start_date)
+    diff = now - start_date_in_seconds
+
+    return f"{convert_second(diff, 'verbose')} ago"
+
+
+def convert_to_second(fulldate: str) -> int:
+    from datetime import datetime
+
+    return int(datetime.strptime(fulldate, '%Y-%m-%dT%H:%M:%S%Z').timestamp())
+
+
+def convert_second(seconds: int, verbose: bool = False) -> str:
+    from re import sub
+
     seconds = int(seconds)
     ss = f'{int(seconds % 60):02}'
-    mm = f'{int(seconds / 60 % 60):02}'
+    mi = f'{int(seconds / 60 % 60):02}'
     hh = f'{int(seconds / 3600 % 24):02}'
-    dd = f'{int(seconds / 3600 / 24):02}'
+    dd = f'{int(seconds / 3600 / 24 % 30):02}'
+    mo = f'{int(seconds / 3600 / 24 / 30 % 12):02}'
+    yy = f'{int(seconds / 3600 / 24 / 30 / 12):02}'
 
-    if dd == '00':
-        return f'{hh}:{mm}:{ss}'
+    if yy == '00' and mo == '00' and dd == '00':
+        if verbose:
+            result = f'{hh} hours, {mi} minutes and {ss} seconds'
+        else:
+            result = f'{hh}:{mi}:{ss}'
+    elif yy == '00' and mo == '00':
+        if verbose:
+            result = f'{dd} days, {hh} hours, {mi} minutes and {ss} seconds'
+        else:
+            result = f'{dd}:{hh}:{mi}:{ss}'
+    elif yy == '00':
+        if verbose:
+            result = f'{mo} months, {dd} days, {hh} hours, {mi} minutes and {ss} seconds'
+        else:
+            result = f'{mo}:{dd}:{hh}:{mi}:{ss}'
     else:
-        return f'{dd}:{hh}:{mm}:{ss}'
+        if verbose:
+            result = f'{yy} years, {mo} months, {dd} days, {hh} hours, {mi} minutes and {ss} seconds'
+        else:
+            result = f'{yy}:{mo}:{dd}:{hh}:{mi}:{ss}'
+
+    ## remove items whose values are 00, and adjust comma and 'and'
+    ## NOTE the same modifications in here and JUMP_4 are applied in convert_second function in gb, so
+    ##      any changes you make here, make aure to update that too
+    result = sub(r'00 [a-z]+s, ', r'', result)
+    result = sub(r'00 [a-z]+s and ', r'', result)
+    result = sub(r'00 [a-z]+s$', r'', result)
+    result = sub(r', ([0-9][0-9] [a-z]+s )', r' and \1', result)
+    result = sub(r'and 00 [a-z]+s ', r'', result)
+    result = sub(r' and $', r'', result)
+    result = sub(r', ([0-9][0-9] [a-z]+)$', r' and \1', result)
+    result = sub(r' and ([0-9][0-9] [a-z]+) and', r', \1 and', result)
+    result = sub(r', +$', r'', result)
+    result = sub(r', ([0-9][0-9] [a-z]+s)$', r' and \1', result)
+
+    ## remove plural s when value is 01 JUMP_4
+    result = sub(r'(01 [a-z]+)s ', r'\1 ', result)
+    result = sub(r'(01 [a-z]+)s, ', r'\1, ', result)
+    result = sub(r'(01 [a-z]+)s$', r'\1', result)
+
+    ## TODO there are something we can do (like what we do in bash in convert_second function in gb) before we return result
+    return result
 
 
 def duration_wrapper() -> str:

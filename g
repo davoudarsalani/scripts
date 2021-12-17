@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-24 14:10:37 +0330 Wednesday
+## @last-modified 1400-09-26 10:07:56 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -161,14 +161,14 @@ case "$choice" in
                     git_commit_with_message "$test_dir" 'initiated' &>/dev/null
                     action_now 'set master'
                     git -C "$test_dir" branch -M master
-                    action_now "add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git"
-                    git -C "$test_dir" remote add origin https://www.github.com/davoudarsalani/${test_dir##*/}.git
+                    action_now "add origin https://www.github.com/${github_username}/${test_dir##*/}.git"
+                    git -C "$test_dir" remote add origin https://www.github.com/${github_username}/${test_dir##*/}.git
                     printf "%s  curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "$(blue 'create remote')" "${test_dir##*/}"
                     printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
-                    # printf "              curl -su \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "${test_dir##*/}"
-                    # printf "              curl -su \"davoudarsalani:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
+                    # printf "              curl -su \"${github_username}:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "${test_dir##*/}"
+                    # printf "              curl -su \"${github_username}:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
                     printf '%s git -C %s push -u origin master\n' "$(blue 'push to remote')" "${test_dir/$HOME/\~}"
-                    printf "%s  curl -X DELETE -H \"Authorization: token \${github_token}\" https://api.github.com/repos/davoudarsalani/%s\n" "$(orange 'remove remote')" "${test_dir##*/}"
+                    printf "%s  curl -X DELETE -H \"Authorization: token \${github_token}\" https://api.github.com/repos/${github_username}/%s\n" "$(orange 'remove remote')" "${test_dir##*/}"
                 } && accomplished
             ;;
         esac
@@ -319,24 +319,7 @@ case "$main_item" in
     push )
            if_locked
            if [ "$(git_remotes "$directory")" ]; then
-
-               action_now 'updating remote'
-               commits_ahead="$(git_commits_ahead "$directory")"
-               if [ "$proxy" == 'true' ]; then
-                   git_remote_update_proxy "$directory"
-               else
-                   git_remote_update_noproxy "$directory"
-               fi
-               commits_behind_ahead="$(git_commits_behind_ahead "$directory")"
-
-               ## getting commits_behind
-               (( commits_behind="commits_behind_ahead - commits_ahead" ))
-               (( commits_behind > 0 )) && {
-                   red "local is $commits_behind commit behind remote."
-                   red 'pull first.'
-                   exit
-               }
-
+               git_if_behind "$directory"
                if_locked
                if [ "$proxy" == 'true' ]; then
                    git_push_proxy "$directory" && \
@@ -482,6 +465,7 @@ case "$main_item" in
             exit
         fi
 
+        git_if_behind "$directory"
         if_changed
         git_add_all "$directory" && \
         git_commit_with_message "$directory" 'updated' && \
