@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-25 20:58:21 +0330 Thursday
+## @last-modified 1400-09-27 21:01:34 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -194,5 +194,3 @@ case "$main_item" in
                 esac ;;
     help ) display_help ;;
 esac
-
-exit

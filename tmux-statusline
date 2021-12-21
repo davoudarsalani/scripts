@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 19:38:33 +0330 Sunday
+## @last-modified 1400-09-27 21:07:59 +0330 Saturday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
@@ -73,5 +73,3 @@ case "$1" in
                  "$if_status"
           ;;
 esac
-
-exit

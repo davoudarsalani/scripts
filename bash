@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
+## @last-modified 1400-09-27 21:03:06 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -18,5 +18,3 @@ case "$main_item" in
     paths )                         printf '%s\n' "$PATH" && accomplished ;;
     exports )                       export -p && accomplished ;;
 esac
-
-exit

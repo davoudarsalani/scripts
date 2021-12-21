@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 20:32:31 +0330 Sunday
+## @last-modified 1400-09-27 21:08:19 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -59,5 +59,3 @@ case "$main_item" in
                        printf '%s\t\t%s\n' "$(yellow 'e.g.:')" 'useradd -m -g users -G wheel,data,autologin -s /bin/bash/ jack' && accomplished ;;
     help ) display_help ;;
 esac
-
-exit

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-26 10:07:56 +0330 Friday
+## @last-modified 1400-09-28 08:18:56 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -163,8 +163,8 @@ case "$choice" in
                     git -C "$test_dir" branch -M master
                     action_now "add origin https://www.github.com/${github_username}/${test_dir##*/}.git"
                     git -C "$test_dir" remote add origin https://www.github.com/${github_username}/${test_dir##*/}.git
-                    printf "%s  curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "$(blue 'create remote')" "${test_dir##*/}"
-                    printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
+                    printf "%s  curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}' &>/dev/null\n" "$(blue 'create remote')" "${test_dir##*/}"
+                    printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}' &>/dev/null\n" "${test_dir##*/}"
                     # printf "              curl -su \"${github_username}:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "${test_dir##*/}"
                     # printf "              curl -su \"${github_username}:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
                     printf '%s git -C %s push -u origin master\n' "$(blue 'push to remote')" "${test_dir/$HOME/\~}"
@@ -474,8 +474,6 @@ case "$main_item" in
     ;;
 
 esac
-
-exit
 
 ## ,-- git -C "$directory" reset --soft HEAD^ : remove the last one commit but keep all the staged and unstaged files as they were.
 ## |-- git -C "$directory" reset --hard HEAD^ : remove the last one commit and undo also all the staged and instaged files before that. In fact it jumps back to the commit before the last one.

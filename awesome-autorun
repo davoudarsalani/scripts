@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 12:12:25 +0330 Sunday
+## @last-modified 1400-09-27 21:02:49 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -60,5 +60,3 @@ for widget in "${widgets[@]}"; {
 }
 
 msgn ' ' ' ' "$HOME"/linux/themes/ok-w.png
-
-exit

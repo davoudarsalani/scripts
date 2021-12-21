@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 12:33:47 +0330 Sunday
+## @last-modified 1400-09-27 21:06:18 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -27,5 +27,3 @@ msgn 'playing' "<span color=\"${orange}\">${directory}</span>" "$HOME"/linux/the
 readarray -t files < <(find "$HOME"/music/"$directory" -mindepth 1 -type f -iname '*.mp3' | sort)  ## <--,-- -maxdepth 1 is not needed here
 audacious -E "${files[@]}"                                                                         ##    |-- NOTE do NOT add cut -c 3- (it would open multiple error boxes
 update_audacious                                                                                   ##    '-- saying 'Error reading *****. No such file or directory')
-
-exit

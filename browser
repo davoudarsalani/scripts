@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 11:13:34 +0330 Sunday
+## @last-modified 1400-09-27 21:03:23 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -37,5 +37,3 @@ case "$1" in
              * ) qutebrowser "$qb_item" &>/dev/null & ;;
          esac ;;
 esac
-
-exit

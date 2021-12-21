@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 20:27:04 +0330 Sunday
+## @last-modified 1400-09-27 21:06:27 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-network
@@ -96,5 +96,3 @@ ${vpn_devc}     ${vpn_mac}" && accomplished ;;
                                       sudo nmcli device wifi connect "$ssid" password "$password" && accomplished ;;
     help ) display_help ;;
 esac
-
-exit

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
+## @last-modified 1400-09-27 21:06:47 +0330 Saturday
 
 function hi_li {
     eval "$HIGHLIGHT" "$1" 2>/dev/null  ## NOTE do not replace 2 with &
@@ -34,5 +34,3 @@ case "$file_mime_type" in
     */*iso*image)        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
     * )                  printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
 esac
-
-exit

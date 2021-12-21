@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-10 21:48:16 +0330 Wednesday
+## @last-modified 1400-09-27 21:04:15 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -19,5 +19,3 @@ case "$1" in
                       * )    goldendict "$gold_item" &>/dev/null & ;;
                   esac ;;
 esac
-
-exit

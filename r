@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-26 07:51:59 +0330 Friday
+## @last-modified 1400-09-27 21:07:08 +0330 Saturday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
@@ -26,5 +26,3 @@ eval "$RG '$INITIAL_QUERY'" | sed "s#$HOME#~#" | \
                    eval "rg $RG_MATCH_FLAGS" {q} 2>/dev/null' \
         --header "rg in ${PWD/$HOME/\~}" \
         --bind "Return:reload:$RG {q} || true" --phony --query "$INITIAL_QUERY"
-
-exit

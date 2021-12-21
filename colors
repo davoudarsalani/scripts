@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-08 13:04:10 +0330 Monday
+## @last-modified 1400-09-27 21:03:38 +0330 Saturday
 
 ## https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
@@ -49,5 +49,3 @@ case "$main_item" in
                    printf '\n'
                    printf '%s %s\n' "$(yellow Pattern:)" '$(tput bold)$(tput setaf 1) TEXT $(tput sgr 0)' ;;
 esac
-
-exit

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 15:24:38 +0330 Sunday
+## @last-modified 1400-09-27 21:04:33 +0330 Saturday
 
 ## Fingli written by alireza.amirsamimi@gmail.com & https://github.com/alireaza & fzero@rubi.gd
 ## https://github.com/alireza-amirsamimi/fingil
@@ -349,5 +349,3 @@ window_pid="$(xdotool getactivewindow)"  ## get active window PID
 clipboard="$(xclip -o -sel clip)"
 
 xdotool type --delay 400 --window "$window_pid" "$(convert "$clipboard")"
-
-exit

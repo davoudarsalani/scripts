@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
+## @last-modified 1400-09-27 21:07:53 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -26,5 +26,3 @@ case "$main_item" in
                                 tmux kill-session -t "$session" ;;
     'kill tmux' ) tmux kill-server ;;
 esac
-
-exit

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-16 11:12:42 +0330 Tuesday
+## @last-modified 1400-09-27 21:04:25 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -116,8 +116,6 @@ case "$main_item" in
                              ffplay "$camera" ;;
     help )                   display_help ;;
 esac
-
-exit
 
 
 

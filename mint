@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 15:56:32 +0330 Sunday
+## @last-modified 1400-09-27 21:05:49 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -56,5 +56,3 @@ case "$1" in
                   sleep 60
               done ;;
 esac
-
-exit

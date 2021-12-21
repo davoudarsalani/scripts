@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-25 22:09:22 +0330 Thursday
+## @last-modified 1400-09-29 22:46:58 +0330 Monday
 
 function get_datetime {
     case "$1" in
@@ -224,7 +224,7 @@ function ago {
     printf '%s ago\n' "$(convert_second "(( now_in_seconds - start_date_in_seconds ))" 'verbose')"
 }
 
-function convert_to_second {  ## convert 2021-04-15T11:10:03+0430 to 1618468803
+function convert_to_second {
     printf '%s\n' "$(date --date "$1" '+%s')"
 }
 
@@ -285,6 +285,10 @@ function convert_second {
     result="$(printf '%s\n' "$result" | sed 's|\(01 [a-z]\+\)s |\1 |g;s|\(01 [a-z]\+\)s, |\1, |g;s|\(01 [a-z]\+\)s$|\1|')"
 
     printf '%s\n' "$result"
+}
+
+function insert_comma {
+    printf "%'d\n" "$1"
 }
 
 function clear_clipboard {

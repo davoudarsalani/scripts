@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 17:34:55 +0330 Sunday
+## @last-modified 1400-09-27 21:02:23 +0330 Saturday
 
 function display_help {
     cmd="
@@ -459,11 +459,9 @@ case "$1" in
         ;;
 esac
 
-[ "$runnable" == 'true' ] && {
+if [ "$runnable" == 'true' ]; then
     printf '\n'
 
     read -p "Run [N/y]? " run_prompt
     [ "${run_prompt,}" == 'y' ] && eval "$cmd"
-}
-
-exit 0
+fi

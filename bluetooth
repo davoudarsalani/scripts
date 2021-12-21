@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 10:26:48 +0330 Sunday
+## @last-modified 1400-09-27 21:03:15 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-fir-blu-batt
@@ -84,8 +84,6 @@ case "$main_item" in
     enable ) sudo systemctl enable bluetooth && accomplished ;;
     disable ) sudo systemctl disable bluetooth && accomplished ;;
 esac
-
-exit
 
 ## The default group the user must be a member of is lp. You can change it here: sudo "$editor" /etc/dbus-1/system.d/bluetooth.conf
 ## (https://wiki.archlinux.org/index.php/bluetooth)

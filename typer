@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-24 12:16:14 +0330 Wednesday
+## @last-modified 1400-09-27 21:08:12 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -128,5 +128,3 @@ case "$main_item" in
                     type_in_terminal ;;
     help ) display_help ;;
 esac
-
-exit

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-10 20:56:56 +0330 Wednesday
+## @last-modified 1400-09-27 21:08:34 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -17,5 +17,3 @@ case "$1" in
               text="$(printf "current wallpaper:\n<span color=\"%s\">%s</span>" "$orange" "$cur_wall")"
               msgn "$text" ;;
 esac
-
-exit

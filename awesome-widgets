@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-24 12:15:32 +0330 Wednesday
+## @last-modified 1400-09-27 21:02:57 +0330 Saturday
 
 threshhold=70
 
@@ -802,5 +802,3 @@ msgn "$text" ;;
                 ;;
 
 esac
-
-exit

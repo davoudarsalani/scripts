@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 16:11:47 +0330 Sunday
+## @last-modified 1400-09-27 21:06:11 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -94,5 +94,3 @@ esac
 
 ## play audacious if it was playing before the video
 [ "$continue_playing" == 'true' ] && "$HOME"/scripts/awesome-widgets audacious play_pause
-
-exit
