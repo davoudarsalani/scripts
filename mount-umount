@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:05:57 +0330 Saturday
+## @last-modified 1400-10-01 08:23:11 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -15,7 +15,7 @@ function prompt {
     for _ in "$@"; {
         case "$1" in
             -d ) device="${device:-"$(get_input 'Device (e.g. /dev/sdc)')"}" ;;
-            -n ) name="${name:-"$(get_input "Name (e.g. ${USER^^})")"}"      ;;
+            -n ) name="${name:-"$(get_input "Name (e.g. nnnn)")"}"      ;;
         esac
         shift
     }

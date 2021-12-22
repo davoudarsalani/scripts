@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:07:20 +0330 Saturday
+## @last-modified 1400-10-01 08:21:01 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -12,22 +12,22 @@ function display_help {
 }
 
 function upload {
-    scp -r "$@" "${USER}"@sony-"$bed":"$HOME"/downloads && accomplished
+    scp -r "$@" nnnn@sony-"$bed":"$HOME"/downloads && accomplished
 }
 
 function download {
     local all
 
     all="${@:0}"  ## turn array into str because shelccheck said: SC2145 (error): Argument mixes string and array. Use * or separate argument.
-    scp -r "${USER}"@sony-"$bed":"$all" "$HOME"/downloads && accomplished
+    scp -r nnnn@sony-"$bed":"$all" "$HOME"/downloads && accomplished
 }
 
 function connect {
-    ssh -Y "${USER}"@sony-"$bed" && accomplished
+    ssh -Y nnnn@sony-"$bed" && accomplished
 }
 
 function connect_plus_x2x {
-    ssh -Y "${USER}"@sony-"$bed" 'x2x -west -to :0'
+    ssh -Y nnnn@sony-"$bed" 'x2x -west -to :0'
 }
 
 function prompt {

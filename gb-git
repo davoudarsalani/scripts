@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-26 10:15:58 +0330 Friday
+## @last-modified 1400-09-30 13:58:08 +0330 Tuesday
 
-# dest="${1:-.}"  ## NOTE doing this and using -C "$dest" in front of git instances did not work
+# NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
 function if_git {
     git -C "${1:-.}" rev-parse --is-inside-work-tree 2>/dev/null && printf 'true\n' || printf 'false\n'
 }
 
 
-function git_log {
+function git_diff_all {
     printf '%s\n' "$(git -C "${1:-.}" \
-                     log --color --abbrev-commit --date=relative --graph --full-history --all --pretty=oneline \
-                     --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
+                     diff --unified=0 --color=always --src-prefix=1st: --dst-prefix=2nd:)" | less -R
+                                 ## '--,--> --unified=0 makes git show only the modified lines
+                                 ##    '--> --color-words show modified words side-by-side
 }
 
 function git_diff_specific {
@@ -22,11 +23,10 @@ function git_diff_specific {
                                  ##    '--> --color-words show modified words side-by-side
 }
 
-function git_diff_all {
+function git_log {
     printf '%s\n' "$(git -C "${1:-.}" \
-                     diff --unified=0 --color=always --src-prefix=1st: --dst-prefix=2nd:)" | less -R
-                                 ## '--,--> --unified=0 makes git show only the modified lines
-                                 ##    '--> --color-words show modified words side-by-side
+                     log --color --abbrev-commit --date=relative --graph --full-history --all --pretty=oneline \
+                     --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
 }
 
 

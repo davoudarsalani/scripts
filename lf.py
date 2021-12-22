@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:15:34 +0330 Tuesday
+## @last-modified 1400-09-30 22:19:26 +0330 Tuesday
 
 from os import path, getenv, symlink, rename, remove
 from shutil import rmtree
@@ -133,9 +133,18 @@ elif main_arg == 'trash':
         sleep(0.1)
 
 elif main_arg == 'rm':
+    from re import match
+
     for f in files:
         try:
             _, base = path.split(f)
+
+            ## check if thre is literal * in dir/file name
+            ## otherwise every file matching the pattern will be deleted
+            if match(r'.*\*+.*', base):
+                msgc('ERROR', f'<span color=\"{getenv("orange")}\">{base}</span> has special characters', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                exit()
+
             if path.isdir(f):
                 rmtree(f)  ## removes even non-empty directories
             elif path.isfile(f):

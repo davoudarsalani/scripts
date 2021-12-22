@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:02:23 +0330 Saturday
+## @last-modified 1400-10-01 08:22:52 +0330 Wednesday
 
 function display_help {
     cmd="
@@ -47,7 +47,7 @@ function read_user_choice {
     read -p ">>${space}" choice
 }
 
-u="${USER:-nnnn}"
+u='nnnn'
 runnable='false'
 
 case "$1" in

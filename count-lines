@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-29 22:45:59 +0330 Monday
+## @last-modified 1400-09-30 12:00:49 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -13,7 +13,7 @@ for file in "${files[@]}"; {
     case "$mime_type" in
         text/*|application/json|application/csv|message/news )
             lines="$(wc -l < "$file")"
-             printf '%s\t%s\n' "$lines" "$file"
+             printf '%s\t%s\n' "$(insert_comma "$lines")" "$file"
              total+="$lines" ;;
     esac
 }

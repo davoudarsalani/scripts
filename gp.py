@@ -1,4 +1,4 @@
-## @last-modified 1400-09-25 22:07:34 +0330 Thursday
+## @last-modified 1400-10-01 08:25:34 +0330 Wednesday
 
 # {{{ requirements
 ## for .venv_keylogger: keylogger
@@ -625,7 +625,7 @@ def convert_second(seconds: int, verbose: bool = False) -> str:
 
     ## remove items whose values are 00, and adjust comma and 'and'
     ## NOTE the same modifications in here and JUMP_4 are applied in convert_second function in gb, so
-    ##      any changes you make here, make aure to update that too
+    ##      any changes you make here, make sure to update that too
     result = sub(r'00 [a-z]+s, ', r'', result)
     result = sub(r'00 [a-z]+s and ', r'', result)
     result = sub(r'00 [a-z]+s$', r'', result)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:07:46 +0330 Saturday
+## @last-modified 1400-10-01 08:21:16 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -71,7 +71,7 @@ case "$1" in
            if [ "$2" == 'auto' ]; then
               ## this option is called directly by audacious when starting a new song
 
-              directory="${current_song_dir}"  ## /home/${USER}/speech/pargar
+              directory="${current_song_dir}"  ## /home/nnnn/speech/pargar
               directory="${directory##*/}"  ## pargar
            else
                directory="$(pipe_to_rofi "${directories_plus_count[@]}" 'header=speech' 'bg=red')" || exit 37
@@ -81,7 +81,7 @@ case "$1" in
 
            [ -d "$HOME"/speech/"$directory" ] || no_such_dir
 
-           first_file="$(find "$HOME"/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 1)"  ## /home/${USER}/speech/pargar/709.mp3
+           first_file="$(find "$HOME"/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 1)"  ## /home/nnnn/speech/pargar/709.mp3
 
            base="${first_file##*/}"
            no_suffix="${base%.*}"
