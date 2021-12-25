@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:01:34 +0330 Saturday
+## @last-modified 1400-10-04 07:50:55 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -151,7 +151,7 @@ case "$main_item" in
                                        fi ;;
                  'last update' ) last_update_date="$(grep -E 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/')"  ## 2021-04-15T11:10:03+0430
                                  current_seconds="$(get_datetime 'jseconds')"
-                                 dur="$(ago "$last_update_date" "$current_seconds")"
+                                 dur="$(relative_date "$last_update_date" "$current_seconds")"
                                  printf 'last update: %s (on %s)\n' "$dur" "$last_update_date"
              esac ;;
     systemd ) systemd_items=( 'systemd-analyze' 'systemd-analyze blame' 'reload systemd' 'reload systemd units' )

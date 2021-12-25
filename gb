@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-01 08:25:21 +0330 Wednesday
+## @last-modified 1400-10-04 07:51:44 +0330 Saturday
 
 function get_datetime {
     case "$1" in
@@ -209,11 +209,11 @@ function play_shutdown_track {
     pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
 }
 
-function ago {
+function relative_date {
     ## usage:
-    ##     ago "$arg1" "$arg2"
-    ##           ^        ^-- now (in 1556867231 format)
-    ##           '-- start date (in 2019-05-03T07:07:11Z format)
+    ##     relative_date "$arg1" "$arg2"
+    ##                      ^       ^-- now (in 1556867231 format)
+    ##                      '-- start date (in 2019-05-03T07:07:11Z format)
 
     local start_date_in_seconds now_in_seconds
 
@@ -356,24 +356,6 @@ function rand_str {
     printf '%s\n' "$(mktemp --dry-run | sed 's/.*\.//g')"  ## returns e.g. leQPAUyfZP
 
     # sed 's/-//g' < /proc/sys/kernel/random/uuid  ## returns e.g. a8a29c0d109a40468051bcbaf70af17e
-}
-
-
-function set_timezone {
-    sudo ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
-    sudo hwclock --systohc --utc
-    sudo timedatectl set-ntp true
-}
-
-function install_jcal {
-    printf 'Dependencies: automake libtool build-essential libjalali-dev\n\n'
-    git clone https://github.com/ashkang/jcal.git
-    cd ./jcal/sources
-    ./autogen.sh
-    ./configure
-    make
-    sudo make install
-    sudo /sbin/ldconfig
 }
 
 

@@ -1,24 +1,48 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-28 08:18:56 +0330 Sunday
+## @last-modified 1400-10-03 22:40:01 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 source "$HOME"/scripts/gb-git
 
 title="${0##*/}"
-proxy='false'
 
 function display_help {
     source "$HOME"/scripts/.help
     g_help
 }
 
-function if_locked {
-    [ -f "$directory"/.git/index.lock ] && {
-        red 'locked'  ## 
-        exit
+function add_to_changes {
+    local icon member
+    declare -a received=( "$@" )
+
+    icon="${received[0]}"
+    unset 'received[0]'
+
+    for member in "${received[@]}"; {
+        changes+=( "${icon}---${member}" )
     }
+}
+
+function branch_info {
+    local fzf_choice
+
+    export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
+                                         ##        we have to do the sourcing for the very same reason
+    ## no need to --preview-window "$preview_status" because it uses the value set in bahrc in FZF_DEFAULT_OPTS
+    fzf_choice="$(printf '%s\n' "$@" | fzf \
+                  --preview 'source "$HOME"/scripts/gb-git; git_log "${directory2:-.}" \
+                  $(sed s/^..// <<< {} | cut -d " " -f 1)' #| sed 's/^..//' | cut -d " " -f 1
+                  ## ^^ ORIG: --preview 'git -C "${directory2:-.}" log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
+                )"
+    [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
+}
+
+function branches_array {
+    declare -a branches_list
+    readarray -t branches_list < <(git_branches "$directory")  ## branches
+    printf '%s\n' "${branches_list[@]}"
 }
 
 function check_pattern {
@@ -30,18 +54,9 @@ function check_pattern {
 }
 
 function if_amend_allowed {
-    (( "$(git_commits_ahead "$directory")" == 0 )) && red 'amend not allowed' && exit
-}
-
-function add_to_changes {
-    local icon
-    declare -a received=( "$@" )
-
-    icon="${received[0]}"
-    unset 'received[0]'
-
-    for member in "${received[@]}"; {
-        changes+=( "${icon}---${member}" )
+    (( "$(git_commits_ahead "$directory")" == 0 )) && {
+        red 'amend not allowed'
+        exit
     }
 }
 
@@ -64,6 +79,13 @@ function if_changed {
     }
 }
 
+function if_locked {
+    [ -f "$directory"/.git/index.lock ] && {
+        red 'locked'  ## 
+        exit
+    }
+}
+
 function pipe_to_fzf_locally {
     local fzf_choice short_pwd short_directory
 
@@ -76,26 +98,6 @@ function pipe_to_fzf_locally {
                                            --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
                                            ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
-}
-
-function branch_info {
-    local fzf_choice
-
-    export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
-                                         ##        we have to do the sourcing for the very same reason
-    ## no need to --preview-window "$preview_status" because it uses the value set in bahrc in FZF_DEFAULT_OPTS
-    fzf_choice="$(printf '%s\n' "$@" | fzf \
-                  --preview 'source "$HOME"/scripts/gb-git; git_log "${directory2:-.}" \
-                  $(sed s/^..// <<< {} | cut -d " " -f 1)' #| sed 's/^..//' | cut -d " " -f 1
-                  ## ^^ ORIG: --preview 'git -C "${directory2:-.}" log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
-                )"
-    [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
-}
-
-function branches_array {
-    declare -a branches_list
-    readarray -t branches_list < <(git_branches "$directory")  ## branches
-    printf '%s\n' "${branches_list[@]}"
 }
 
 function prompt {
@@ -133,15 +135,17 @@ function get_opt {
 }
 
 
+proxy='false'
+
 get_opt "$@"
 heading "$title"
 
-readarray -t repositories < <(git_repositories)
-choice="$(pipe_to_fzf "${repositories[@]}" "setup in ${PWD/$HOME/\~}" 'help')" && wrap_fzf_choice "$choice" || exit 37
-directory="${choice/\~/$HOME}"
+main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
-case "$choice" in
+case "$main_item" in
     help ) display_help ;;
+
     "setup in ${PWD/$HOME/\~}" )
         test_dir="$PWD"
         [ -d "$test_dir"/.git ] && {
@@ -172,14 +176,25 @@ case "$choice" in
                 } && accomplished
             ;;
         esac
-        exit
-        ;;
+        exit ;;
+
+    config )
+              see_edit="$(pipe_to_fzf_locally 'see' 'edit')" && wrap_fzf_choice "$see_edit" || exit 37
+              case "$see_edit" in
+                  see ) git_config_see ;;
+                  edit ) if_locked
+                         git_edit_config "$directory" && \
+                         accomplished 'edited' ;;
+              esac
+              exit ;;
+
 esac
 
-if_locked
+readarray -t repositories < <(git_repositories)
+choice="$(pipe_to_fzf "${repositories[@]}")" && wrap_fzf_choice "$choice" || exit 37
+directory="${choice/\~/$HOME}"
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'edit' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'commits' 'add all, commit updated, push' )
-main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+if_locked
 
 case "$main_item" in
     status )
@@ -332,11 +347,6 @@ case "$main_item" in
                red 'no remote'
            fi ;;
 
-    edit )
-           if_locked
-           git_edit "$directory" && \
-           accomplished 'edited' ;;
-
     empty_commit )
                    preview_status='hidden'
                    empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
@@ -396,6 +406,8 @@ case "$main_item" in
              esac ;;
 
     tag )
+          yellow_dim 'WARNING: You have to manually push tags by: git -C GITPATH push origin tag TAGNAME'
+
           preview_status='hidden'
           tag_items=( 'show tags' 'show a specific tag' 'create tag' 'create tag + message' 'create tag + message for a specific commit' 'delete all tags' 'delete a specific tag')
           tag_item="$(pipe_to_fzf_locally "${tag_items[@]}")" && wrap_fzf_choice "$tag_item" || exit 37

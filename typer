@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:08:12 +0330 Saturday
+## @last-modified 1400-10-03 21:34:22 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -55,7 +55,7 @@ function type_in_vim {
     accomplished 'Done. Press Ctrl+C in vim to exit'
 }
 
-function type_in_terminal {  ## by Metalx1000 (https://pastebin.com/Uqf6DPmZ)
+function type_in_terminal {
     clear
     while read line; do  ## read file one line at a time
         lines_count="${#line}"
@@ -92,6 +92,7 @@ function get_opt {
         shift
     done
 }
+
 
 get_opt "$@"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-30 13:58:08 +0330 Tuesday
+## @last-modified 1400-10-03 22:30:01 +0330 Friday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -105,14 +105,18 @@ function git_commits_count {
     printf '%s\n' "$(git -C "${1:-.}" rev-list HEAD --count)"
 }
 
+function git_config_edit {
+    git -C "${1:-.}" config -e
+}
+
+function git_config_see {
+    git config --list  ## no need to -C "${1:-.}"
+}
+
 function git_current_branch {
     printf '%s\n' "$(git -C "${1:-.}" branch | sed -n '/\* /s///p')"
     ## OR 1: git -C "${1:-.}" branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/')"
     ##    2: git -C "${1:-.}" rev-parse --abbrev-ref HEAD  ## FIXME only returns HEAD instead of (HEAD detached at 56bb92a) when reverted to a commit
-}
-
-function git_edit {
-    git -C "${1:-.}" config -e
 }
 
 function git_empty_commit {
@@ -124,6 +128,8 @@ function git_empty_commit_with_message {
 }
 
 function git_if_behind {
+    source "$HOME"/scripts/gb-color
+
     action_now 'updating remote'
     commits_ahead="$(git_commits_ahead "${1:-.}")"
     if [ "$proxy" == 'true' ]; then
@@ -136,8 +142,10 @@ function git_if_behind {
     ## getting commits_behind
     (( commits_behind="commits_behind_ahead - commits_ahead" ))
     (( commits_behind > 0 )) && {
-       red "local is $commits_behind commit behind remote."
-       red 'pull first.'
+       local temp_path
+       temp_path="$(printf '%s\n' "${1:-.}" | sed "s|$HOME|\~|")"  ## do NOT replace | with / in sed
+       red "local is $commits_behind commits behind remote."
+       red "try: git -C ${temp_path} pull"
        exit
     }
 }
@@ -152,8 +160,9 @@ function git_last_commit {
 
 function git_push_failed {
     source "$HOME"/scripts/gb-color
+
     red 'push failed.'
-    red 'Try: push -u origin master'
+    red "try: git -C ${1:-.} push -u origin master"
 }
 
 function git_push_noproxy {

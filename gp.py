@@ -1,4 +1,4 @@
-## @last-modified 1400-10-01 08:25:34 +0330 Wednesday
+## @last-modified 1400-10-04 07:52:05 +0330 Saturday
 
 # {{{ requirements
 ## for .venv_keylogger: keylogger
@@ -575,7 +575,7 @@ def invalid(text: str) -> None:
     exit(38)
 
 
-def ago(start_date: str, now: int):
+def relative_date(start_date: str, now: int):
     ## start_date is in 2019-05-03T07:07:11Z format
     ## now is in 1618468803 format
 
@@ -962,12 +962,14 @@ def timer(suffix: str, timer_secs: int) -> None:
         sleep(1)
 
 
-def uptime() -> str:
+def uptime(verbose: bool = False) -> str:
     with open('/proc/uptime', 'r') as opened_uptime_file:
         secs = opened_uptime_file.read().strip().split()[0]
         secs = int(float(secs))
-
-    return convert_second(secs)
+    if verbose:
+        return convert_second(secs, verbose=True)
+    else:
+        return convert_second(secs)
 
 
 def open_windows() -> list[str]:

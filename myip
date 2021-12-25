@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-16 21:54:32 +0330 Tuesday
+## @last-modified 1400-10-01 10:12:27 +0330 Wednesday
 
 cmd='wget -qO - https://api.ipify.org'  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
 ## OR:
     # curl -s http://myip.enix.org/REMOTE_ADDR
-    # curl ipinfo.io
+    # curl -s ipinfo.io
+    # curl -s https://ipinfo.io/[IP OF CHOICE]/geo  ## info about the ip in json
+    # curl -s https://api.ipify.org  ## ?format=json for json
+    # curl -s https://ipify.org  ## for ipv6
 
 printf 'Normal:\n\n'
 eval "$cmd"

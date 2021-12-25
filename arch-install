@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-01 08:22:52 +0330 Wednesday
+## @last-modified 1400-10-02 08:27:12 +0330 Thursday
 
 function display_help {
     cmd="
@@ -272,28 +272,16 @@ case "$1" in
 
                 ## first, type g to create gpt table, then go on to create partitions
 
-                g  create gpt table
-                o  create dos/mbr table
-                n  new partition
-                d  delete partition
-                p  print status
+                g  create gpt table     o  create dos/mbr table     n  new partition
+                d  delete partition     p  print status             w  write
+                a  bootable flag        m  help
                 t  change type (1 for efi, 19 for swap [or 82 !], 83 for linux)
-                w  write
-                a  bootable flag
-                m  help
 
-                ## uefi:
-                ## +512M for size
-                ## ef00 for Hex[!]
-
-                ## swap:
-                ## 8200 for Hex[!]
-
-                ## root:
-                ## leave Hex/GUID line blank as is
-
-                ## home:
-                ## leave Hex/GUID line blank as is
+                ## +512M for size                   <--,-- uefi
+                ## ef00 for Hex[!]                  <--'
+                ## 8200 for Hex[!]                  <-- swap
+                ## leave Hex/GUID line blank as is  <-- root
+                ## leave Hex/GUID line blank as is  <-- home
 
                 sd_1 for uefi
                 sd_2 for swap
@@ -306,14 +294,11 @@ case "$1" in
                 mkfs.ext4 /dev/sd_3
                 mkfs.ext4 /dev/sd_4
 
-                mkdir -p /mnt/boot/efi
-                mount /dev/sd_1 /mnt/boot/efi
-
-                ## mount root:
-                mount /dev/sd_3 /mnt
-
-                mkdir /mnt/home
-                mount /dev/sd_4 /mnt/home"
+                mkdir -p /mnt/boot/efi         <--,-- moutn efi
+                mount /dev/sd_1 /mnt/boot/efi  <--'
+                mount /dev/sd_3 /mnt           <-- mount root
+                mkdir /mnt/home                <--,-- mount home
+                mount /dev/sd_4 /mnt/home      <--'"
                 display_cmd "$cmd"
                 ;;
             2 ) ## JUMP_2
@@ -381,8 +366,8 @@ case "$1" in
             11 ) runnable='true'
                  cmd="
                  grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-                   ## also (by Stephen): the same as above, only with GRUB replaced with ArchLinux
-                   ## also (by Dwix):    grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+                   ## also (by Stephen): --bootloader-id=GRUB
+                   ## also (by Dwix):    [no --efi-directory=/boot/efi] --bootloader-id=grub_uefi --recheck
                  grub-mkconfig -o /boot/grub/grub.cfg"
                  display_cmd "$cmd"
                  ;;
