@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-03 08:25:24 +0330 Friday
+## @last-modified 1400-10-09 10:37:58 +0330 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -53,6 +53,7 @@ add string below the line matching the pattern ---> sed '/PATTERN/a THIS STRING 
 replacing the line matching the pattern        ---> sed '/PATTERN/c THIS STRING WILL REPLACE PATTERN'
 insert string before 3rd line ---> sed '3i\STRING'
 insert string after 3rd line ---> sed '3a\STRING'
+print from pattern to the end of file (inclusive) ---> sed -n '/PATTERN/,$p'
 remove from pattern to the end of file (inclusive) ---> sed '/PATTERN/,$d'
 remove trailing empty lines from file ---> sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba'
 
@@ -228,6 +229,7 @@ turn seconds (obtained with $(date +%s) or printf '%(%s)T\n') into a date format
 uniq lines [i]  ---> | sort --unique
 uniq lines [ii] ---> | sort | uniq
 list fonts ---> fc-list -f '%{file}\n'
+stage only a hunk of a modified file ---> git add -p FILE
 
 baskreference ---> [[ 'this is a random string' =~ ^this\ is\ (.*)\ st(ri)ng$ ]]
                    printf '%s\n' "${BASH_REMATCH[0]}"  ## returns this is a random string

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-03 22:40:01 +0330 Friday
+## @last-modified 1400-10-07 20:16:07 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -140,7 +140,7 @@ proxy='false'
 get_opt "$@"
 heading "$title"
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
+main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'pull' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'garbage clean' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -347,6 +347,17 @@ case "$main_item" in
                red 'no remote'
            fi ;;
 
+    pull )
+           if_locked
+           if [ "$proxy" == 'true' ]; then
+               git_pull_proxy "$directory" && \
+               accomplished 'pulled with proxy'
+           else
+               git_pull_noproxy "$directory" && \
+               accomplished 'pulled without proxy'
+           fi
+    ;;
+
     empty_commit )
                    preview_status='hidden'
                    empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
@@ -462,6 +473,14 @@ case "$main_item" in
                  y ) git_revert "$directory" "$revert_item" && \
                      accomplished "$revert_item reverted to" ;;
              esac ;;
+
+    'garbage clean' )
+        clean_prompt="$(get_single_input 'sure?')" && printf '\n'
+        case "$clean_prompt" in
+            y ) git_garbage_clean "$directory" && \
+                accomplished 'garbage cleaned' ;;
+        esac
+    ;;
 
     commits )
                readarray -t items < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included

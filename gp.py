@@ -1,6 +1,6 @@
-## @last-modified 1400-10-04 07:52:05 +0330 Saturday
+## @last-modified 1400-10-09 10:55:31 +0330 Thursday
 
-# {{{ requirements
+
 ## for .venv_keylogger: keylogger
 ## for .venv: (
 ##   beautifulsoup4
@@ -28,7 +28,7 @@
 ##   [jedi]
 ## )
 
-# {{{ imports
+
 from os import getenv  ## for send_email* functions
 from typing import Any  ## for Audio, get_input, get_single_input, get_last, get_datetime
 

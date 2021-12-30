@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:04:00 +0330 Saturday
+## @last-modified 1400-10-04 10:58:43 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -40,8 +40,8 @@ case "$main_item" in
                             action_now 'copying';  cp -r "$HOME"/.config/awesome/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
     bash )                  cfg_dir='cfg-bash'
                             action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.bashrc                      "$HOME"/linux/"$cfg_dir"
-                                                   cp -r /etc/{bash.bashrc,profile,inputrc} "$HOME"/linux/"$cfg_dir" && accomplished ;;
+                            action_now 'copying';  cp -r "$HOME"/.bashrc                                "$HOME"/linux/"$cfg_dir"
+                                                   cp -r /etc/{bash.bashrc,environment,inputrc,profile} "$HOME"/linux/"$cfg_dir" && accomplished ;;
     tmux )                  cfg_dir='cfg-tmux'
                             action_now 'removing'; cd_and_rm_all_except_path
                             action_now 'copying';  cp -r "$HOME"/.tmux* "$HOME"/linux/"$cfg_dir" && accomplished ;;

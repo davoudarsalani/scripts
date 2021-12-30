@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:07:59 +0330 Saturday
+## @last-modified 1400-10-05 13:19:26 +0330 Sunday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
@@ -25,7 +25,7 @@ case "$1" in
 
           stts="$(git_status "$2")"
           [ "$stts" ] && {
-              if_status='   ⬤ '
+              if_status=' 🔴'
               mod_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ M'))"
               del_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ D'))"
               ren_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ R'))"
