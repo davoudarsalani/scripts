@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-12 16:42:29 +0330 Sunday
+## @last-modified 1400-10-12 16:54:52 +0330 Sunday
 
 ## NOTE this file is used a. for making docker image, and b. in action-jcal
 
@@ -15,16 +15,7 @@ function dl_xtract {
     tar -xf "$temp_dir"/jcal_latest.tar.gz -C "$temp_dir"/sources
 }
 
-printf 'cloning/downloading'
-case "$1" in
-  'clone-github' ) git clone https://github.com/ashkang/jcal.git "$temp_dir" ;;
-  'clone-gnu' ) git clone https://git.savannah.gnu.org/git/jcal.git "$temp_dir" ;;
-  'gnu' ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
-  'askapache' ) dl_xtract 'http://nongnu.askapache.com/jcal/jcal-latest.tar.gz' ;;
-  * ) printf 'wrong source'; exit 1 ;;
-esac
-
-printf 'installing dependencies'
+printf 'installing dependencies\n'
 for dep in automake build-essential libjalali-dev libtool git; {
     [ "$(which "$dep")" ] && continue
     if [ "$is_root" == 'true' ]; then
@@ -34,7 +25,16 @@ for dep in automake build-essential libjalali-dev libtool git; {
     fi
 }
 
-printf 'installing'
+printf 'cloning/downloading\n'
+case "$1" in
+  'clone-github' ) git clone https://github.com/ashkang/jcal.git "$temp_dir" ;;
+  'clone-gnu' ) git clone https://git.savannah.gnu.org/git/jcal.git "$temp_dir" ;;
+  'gnu' ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
+  'askapache' ) dl_xtract 'http://nongnu.askapache.com/jcal/jcal-latest.tar.gz' ;;
+  * ) printf 'wrong source\n'; exit 1 ;;
+esac
+
+printf 'installing\n'
 cd "$temp_dir"/sources || exit 1  ## have to cd because absolute paths won't work
 ./autogen.sh
 ./configure
@@ -42,7 +42,7 @@ make
 make install
 /sbin/ldconfig
 
-printf 'removing junk'
+printf 'removing junk\n'
 if [ "$is_root" == 'true' ]; then
     rm -rf /var/lib/apt/lists/*
 else
