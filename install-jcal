@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 
-[ "$EUID" -eq 0 ] && is_root='true'
+## @last-modified 1400-10-12 16:42:29 +0330 Sunday
+
+## NOTE this file is used a. for making docker image, and b. in action-jcal
+
+## needed because user is root when creating docker image, and non-root in GitHub Actions
+(( EUID == 0 )) && is_root='true'
+
 temp_dir="$(mktemp --directory)"
 
 function dl_xtract {
-    mkdir "$temp_dir"/sources
+    mkdir -p "$temp_dir"/sources
     wget -qO "$temp_dir"/jcal_latest.tar.gz "$1"
     tar -xf "$temp_dir"/jcal_latest.tar.gz -C "$temp_dir"/sources
 }
@@ -19,19 +25,17 @@ case "$1" in
 esac
 
 printf 'installing dependencies'
-for dep in automake build-essential libjalali-dev libtool; {
-    [ "$(which "$dep")" ] || {
-        if [ "$is_root" == 'true' ]; then
-            apt install -y --no-install-recommends "$dep"
-        else
-            sudo apt install -y --no-install-recommends "$dep"
-        fi
-    }
+for dep in automake build-essential libjalali-dev libtool git; {
+    [ "$(which "$dep")" ] && continue
+    if [ "$is_root" == 'true' ]; then
+        apt install -y --no-install-recommends "$dep"
+    else
+        sudo apt install -y --no-install-recommends "$dep"
+    fi
 }
 
 printf 'installing'
-## have to cd because absolute paths won't work
-cd "$temp_dir"/sources || exit 1
+cd "$temp_dir"/sources || exit 1  ## have to cd because absolute paths won't work
 ./autogen.sh
 ./configure
 make
