@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-05 13:19:26 +0330 Sunday
+## @last-modified 1400-10-10 23:16:59 +0330 Friday
 
 case "$1" in
     if_sony ) [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
     if_ssh ) [ "$SSH_CONNECTION" ] && printf 'SSH \n' ;;
     pwd ) printf '%-15s\n' "${2/$HOME/\~}" ;;
-    info ) source "$HOME"/scripts/gb-calculation
+    info ) [ "$2" == "$HOME" ] && printf '%s\n' '--' && exit
+           source "$HOME"/scripts/gb-calculation
 
            size="$(du -bs "$2" | awk '{print $1}')"
            size="$(convert_byte "$size")"
@@ -30,7 +31,8 @@ case "$1" in
               del_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ D'))"
               ren_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ R'))"
               add_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ A'))"
-              unt_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '??'))"
+              unt_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^??'))"
+              upd_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^UU'))"  ## updated but unmerged
               sta_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^[MDAR] '))"
               sta_m_count="$(wc -l < <(printf '%s\n' "$stts" | \grep '^[MDAR][MDAR]'))"
 
@@ -39,6 +41,7 @@ case "$1" in
               (( ren_count   == 0 )) || ren=" Ⓡ $ren_count"
               (( add_count   == 0 )) || add="  $add_count"
               (( unt_count   == 0 )) || unt="  $unt_count"
+              (( upd_count   == 0 )) || upd="  $upd_count"
               (( sta_count   == 0 )) || sta="  $sta_count"
               (( sta_m_count == 0 )) || sta_m="  $sta_m_count"
           }
@@ -46,30 +49,28 @@ case "$1" in
           commits_ahead="$(git_commits_ahead "$2")"
           (( commits_ahead > 0 )) && commits_ahead=" Ⓐ $commits_ahead" || commits_ahead=''  ## 
 
+          current_branch="$(git_current_branch "$2")"
+          branches_count="$(wc -l < <(git_branches_exclude_remote "$2"))"
+          (( branches_count > 1 )) && branch_info=" Ⓑ ${branches_count}@${current_branch}"
+
           remotes="$(git_remotes "$2")"
-          \grep -qi 'github' <<< "$remotes" && logo='  '
+          \grep -qi 'github' <<< "$remotes" && logo=' '
           [ "$remotes" ] || is_local=' LOCAL'
 
-          branches_count="$(wc -l < <(git_branches_exclude_remote "$2"))"
-          (( branches_count > 1 )) && branches_count=" #Ⓑ ${branches_count}" || branches_count=''
-
-          current_branch="$(git_current_branch "$2")"
-          [ "$current_branch" == 'master' ] && current_branch='' || current_branch=" Ⓑ ${current_branch}"
-
           printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
-                 "$commits_count" \
-                 "$mod" \
-                 "$del" \
-                 "$ren" \
-                 "$add" \
-                 "$unt" \
-                 "$sta" \
-                 "$sta_m" \
-                 "$commits_ahead" \
-                 "$logo" \
-                 "$is_local" \
-                 "$branches_count" \
-                 "$current_branch" \
-                 "$if_status"
+              "$commits_count" \
+              "$mod" \
+              "$del" \
+              "$ren" \
+              "$add" \
+              "$unt" \
+              "$upd" \
+              "$sta" \
+              "$sta_m" \
+              "$commits_ahead" \
+              "$branch_info" \
+              "$logo" \
+              "$is_local" \
+              "$if_status"
           ;;
 esac

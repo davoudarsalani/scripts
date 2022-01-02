@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-04 07:51:44 +0330 Saturday
+## @last-modified 1400-10-09 23:11:27 +0330 Thursday
 
 function get_datetime {
     case "$1" in
@@ -93,7 +93,11 @@ function pipe_to_fzf {
         unset 'received[-1]'
     }
 
-    printf '%s\n' "${received[@]}" | fzf --header "$header"
+    if [ "$header" ]; then
+        printf '%s\n' "${received[@]}" | fzf --header "$header"
+    else
+        printf '%s\n' "${received[@]}" | fzf
+    fi
 }
 
 function pipe_to_rofi {

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:15:47 +0330 Tuesday
+## @last-modified 1400-10-10 13:00:58 +0330 Friday
 
 from getopt import getopt
 from os import path
@@ -57,7 +57,7 @@ def generate() -> None:
     u = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     l = u.lower()
     d = '0123456789'
-    s = '!@#$%^-*()_+={}\[\]\|\\;\':\",.<>/?`~'  ## & intentionally excluded to prevent possible shell errors/problems
+    s = '`~!@#$%^-*()_+={}[]|;\':",.<>?'  ## &, \\ and / intentionally excluded to prevent possible shell errors/problems
 
     ## with all the characters
     print('all characters:')

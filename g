@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-07 20:16:07 +0330 Tuesday
+## @last-modified 1400-10-09 16:50:39 +0330 Thursday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -69,12 +69,13 @@ function if_changed {
     readarray -t del   < <(printf '%s\n' "$stts" | \grep '^ D'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${del[@]}"
     readarray -t ren   < <(printf '%s\n' "$stts" | \grep '^ R'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes 'Ⓡ' "${ren[@]}"
     readarray -t add   < <(printf '%s\n' "$stts" | \grep '^ A'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${add[@]}"
-    readarray -t unt   < <(printf '%s\n' "$stts" | \grep '??'            | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${unt[@]}"
+    readarray -t unt   < <(printf '%s\n' "$stts" | \grep '^??'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${unt[@]}"
+    readarray -t upd   < <(printf '%s\n' "$stts" | \grep '^UU'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${upd[@]}"  ## updated but unmerged
     readarray -t sta   < <(printf '%s\n' "$stts" | \grep '^[MDRA] '      | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta[@]}"
     readarray -t sta_m < <(printf '%s\n' "$stts" | \grep '^[MDRA][MDRA]' | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta_m[@]}"
 
     [ "${changes[0]}" ] || {
-        green 'sleeping ...'
+        green 'sleeping'
         exit
     }
 }
@@ -117,12 +118,13 @@ function prompt {
 function get_opt {
     local options
 
-    options="$(getopt --longoptions 'help,proxy,pattern:message:,branch:,tag:,commit-hash:' --options 'hxp:m:b:t:c:' --alternative -- "$@")"
+    options="$(getopt --longoptions 'help,proxy,directory:,pattern:,message:,branch:,tag:,commit-hash:' --options 'hxd:p:m:b:t:c:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
             -h|--help )        display_help            ;;
             -x|--proxy )       proxy='true'            ;;
+            -d|--directory )   shift; directory="$1"   ;;
             -p|--pattern )     shift; pattern="$1"     ;;
             -m|--message )     shift; message="$1"     ;;
             -b|--branch )      shift; branch="$1"      ;;
@@ -190,9 +192,16 @@ case "$main_item" in
 
 esac
 
-readarray -t repositories < <(git_repositories)
-choice="$(pipe_to_fzf "${repositories[@]}")" && wrap_fzf_choice "$choice" || exit 37
-directory="${choice/\~/$HOME}"
+if [ "$directory" ]; then
+    [ "$(if_git "$directory")" == 'true' ] || {
+        red 'no git'
+        exit
+    }
+else
+    readarray -t repositories < <(git_repositories)
+    choice="$(pipe_to_fzf "${repositories[@]}")" && wrap_fzf_choice "$choice" || exit 37
+    directory="${choice/\~/$HOME}"
+fi
 
 if_locked
 
@@ -380,7 +389,7 @@ case "$main_item" in
 
     branch )
              preview_status='hidden'
-             branch_items=( 'show branches' 'create branch' 'checkout to a branch' 'delete all branches' 'force delete all branches' 'delete a specific branch' 'force delete a specific branch' )
+             branch_items=( 'show branches' 'create branch' 'checkout to a branch' 'create branch and chekout to it' 'delete all branches' 'force delete all branches' 'delete a specific branch' 'force delete a specific branch' )
              branch_item="$(pipe_to_fzf_locally "${branch_items[@]}")" && wrap_fzf_choice "$branch_item" || exit 37
 
              case "$branch_item" in
@@ -396,6 +405,11 @@ case "$main_item" in
                                           cd_to_branch_item="$(branch_info "$(branches_array)")"
                                           git_branch_checkout "$directory" "$cd_to_branch_item" && \
                                           accomplished "$cd_to_branch_item branch checkedout to" ;;
+                 'create branch and chekout to it' ) prompt -b
+                                                     if_locked
+                                                     git_branch_create "$directory" "$branch" && \
+                                                     git_branch_checkout "$directory" "$branch" && \
+                                                     accomplished "$branch branch created and checkedout to" ;;
                  'delete all branches' ) if_locked
                                          readarray -t local_branches < <(git_branches_exclude_remote "$directory" | \grep -v 'master')
                                          git_branch_delete_all "$directory" "${local_branches[@]}" && \
@@ -491,6 +505,7 @@ case "$main_item" in
                ;;
 
     'add all, commit updated, push' )
+        [ "$directory" == '.' ] && directory="$PWD"
         if ! \grep -q 'public' <<< "$directory"; then
             red 'public repositories only'
             exit

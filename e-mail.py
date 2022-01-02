@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
+## @last-modified 1400-10-10 12:56:35 +0330 Friday
 
 ## https://stackoverflow.com/questions/953561/check-unread-count-of-gmail-messages-with-python
 
@@ -9,7 +9,7 @@ from os import getenv
 from re import search
 from sys import argv
 
-from gp import get_datetime, set_widget, refresh_icon, save_error
+from gp import set_widget, refresh_icon, save_error
 
 arg = argv[1]
 

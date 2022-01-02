@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
+## @last-modified 1400-10-10 12:57:22 +0330 Friday
 
 from os import getenv
 
 from googleapiclient.discovery import build
-from gp import msgc, get_headers, get_datetime, last_file_exists, save_as_last, save_error, get_last
+from gp import msgc, get_datetime, last_file_exists, save_as_last, save_error, get_last
 
 api_key = getenv('api_jadi')
 channel_id = 'UCgKePkWtPuF36bJy0n2cEMQ'

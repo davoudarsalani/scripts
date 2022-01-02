@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+temp_dir="$(mktemp --directory)"
+
+function dl_xtract {
+    mkdir "$temp_dir"/sources
+    wget -qO "$temp_dir"/jcal_latest.tar.gz "$1"
+    tar -xf "$temp_dir"/jcal_latest.tar.gz -C "$temp_dir"/sources
+}
+
+printf 'cloning/downloading'
+case "$1" in
+  'clone-github' ) git clone https://github.com/ashkang/jcal.git "$temp_dir" ;;
+  'clone-gnu' ) git clone https://git.savannah.gnu.org/git/jcal.git "$temp_dir" ;;
+  'gnu' ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
+  'askapache' ) dl_xtract 'http://nongnu.askapache.com/jcal/jcal-latest.tar.gz' ;;
+  * ) printf 'wrong source'; exit 1 ;;
+esac
+
+printf 'installing dependencies'
+for dep in automake build-essential libjalali-dev libtool; {
+    [ "$(which "$dep")" ] || apt install -y --no-install-recommends "$dep"
+}
+
+printf 'installing'
+## have to cd because absolute paths won't work
+cd "$temp_dir"/sources || exit 1
+./autogen.sh
+./configure
+make
+make install
+/sbin/ldconfig
+
+printf 'removing junk'
+rm -rf /var/lib/apt/lists/*

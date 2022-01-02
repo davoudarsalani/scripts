@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-07 20:15:11 +0330 Tuesday
+## @last-modified 1400-10-09 14:50:36 +0330 Thursday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
 function if_git {
-    git -C "${1:-.}" rev-parse --is-inside-work-tree 2>/dev/null && printf 'true\n' || printf 'false\n'
+    git -C "${1:-.}" rev-parse --is-inside-work-tree &>/dev/null && printf 'true\n' || printf 'false\n'
 }
 
 
@@ -165,9 +165,11 @@ function git_last_commit {
 function git_pull_noproxy {
     git -C "${1:-.}" pull
 }
+
 function git_pull_proxy {
     torsocks git -C "${1:-.}" pull
 }
+
 function git_push_failed {
     source "$HOME"/scripts/gb-color
 
