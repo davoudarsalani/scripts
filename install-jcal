@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-12 18:20:09 +0330 Sunday
+## @last-modified 1400-10-12 18:25:16 +0330 Sunday
 
 ## NOTE this file is used a. for making docker image, and b. in action-jcal
 
@@ -19,10 +19,8 @@ printf 'installing dependencies\n'
 for dep in automake build-essential libjalali-dev libtool; {
     [ "$(which "$dep")" ] && continue
     if [ "$is_root" == 'true' ]; then
-        printf 'installing %s as root\n' "$dep"
         apt install -y --no-install-recommends "$dep"
     else
-        printf 'installing %s as non-root\n' "$dep"
         sudo apt install -y --no-install-recommends "$dep"
     fi
 }
@@ -41,5 +39,10 @@ cd "$temp_dir"/sources || exit 1  ## have to cd because absolute paths won't wor
 ./autogen.sh
 ./configure
 make
-make install
-/sbin/ldconfig
+if [ "$is_root" == 'true' ]; then
+    make install
+    /sbin/ldconfig
+else
+    sudo make install
+    sudo /sbin/ldconfig
+fi
