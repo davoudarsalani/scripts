@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-12 17:21:16 +0330 Sunday
+## @last-modified 1400-10-12 17:56:11 +0330 Sunday
 
 ## NOTE this file is used a. for making docker image, and b. in action-jcal
 
@@ -41,10 +41,3 @@ cd "$temp_dir"/sources || exit 1  ## have to cd because absolute paths won't wor
 make
 make install
 /sbin/ldconfig
-
-printf 'removing junk\n'
-if [ "$is_root" == 'true' ]; then
-    rm -rf /var/lib/apt/lists/*
-else
-    sudo rm -rf /var/lib/apt/lists/*
-fi
