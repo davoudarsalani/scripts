@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+[ "$EUID" -eq 0 ] && is_root='true'
 temp_dir="$(mktemp --directory)"
 
 function dl_xtract {
@@ -19,7 +20,13 @@ esac
 
 printf 'installing dependencies'
 for dep in automake build-essential libjalali-dev libtool; {
-    [ "$(which "$dep")" ] || apt install -y --no-install-recommends "$dep"
+    [ "$(which "$dep")" ] || {
+        if [ "$is_root" == 'true' ]; then
+            apt install -y --no-install-recommends "$dep"
+        else
+            sudo apt install -y --no-install-recommends "$dep"
+        fi
+    }
 }
 
 printf 'installing'
@@ -32,4 +39,8 @@ make install
 /sbin/ldconfig
 
 printf 'removing junk'
-rm -rf /var/lib/apt/lists/*
+if [ "$is_root" == 'true' ]; then
+    rm -rf /var/lib/apt/lists/*
+else
+    sudo rm -rf /var/lib/apt/lists/*
+fi
