@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-12 18:25:16 +0330 Sunday
+## @last-modified 1400-10-14 11:51:52 +0330 Tuesday
 
 ## NOTE this file is used a. for making docker image, and b. in action-jcal
 
@@ -29,8 +29,10 @@ printf 'cloning/downloading\n'
 case "$1" in
   'clone-github' ) git clone https://github.com/ashkang/jcal.git "$temp_dir" ;;
   'clone-gnu' ) git clone https://git.savannah.gnu.org/git/jcal.git "$temp_dir" ;;
-  'gnu' ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
+  'clone-nongnu' ) git clone https://git.savannah.nongnu.org/git/jcal.git "$temp_dir" ;;
   'askapache' ) dl_xtract 'http://nongnu.askapache.com/jcal/jcal-latest.tar.gz' ;;
+  'gnu' ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
+  'nongnu' ) dl_xtract 'http://download.savannah.nongnu.org/releases/jcal/jcal-latest.tar.gz' ;;
   * ) printf 'invalid source\n'; exit 1 ;;
 esac
 
