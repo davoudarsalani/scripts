@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-14 17:15:23 +0330 Tuesday
+## @last-modified 1400-10-15 20:34:57 +0330 Wednesday
 
 ## NOTE this file is used a. for making docker image, and b. in action-jcal
 
 function dl_xtract {
     mkdir -p "$temp_dir"/sources
-    wget -qO "$tar_file" "$1"
+    wget -O "$tar_file" "$1"
     tar -xf "$tar_file" -C "$temp_dir"/sources
     rm "$tar_file"
 }
@@ -14,7 +14,7 @@ function dl_xtract {
 ## needed because user is root when creating docker image, and non-root in GitHub Actions
 (( EUID == 0 )) && is_root='true'
 
-temp_dir="$(mktemp --directory)"
+temp_dir="$(mktemp -d)"  ## NOTE do NOT replace -d with --directory because it wil throw error when run on Alpine
 tar_file="$temp_dir"/jcal_latest.tar.gz
 
 printf 'installing dependencies\n'
@@ -30,11 +30,11 @@ for dep in automake build-essential libjalali-dev libtool; {
 printf 'cloning/downloading\n'
 case "$1" in
   'clone-github' ) git clone https://github.com/ashkang/jcal.git "$temp_dir" ;;
-  'clone-gnu' ) git clone https://git.savannah.gnu.org/git/jcal.git "$temp_dir" ;;
+  'clone-gnu'    ) git clone https://git.savannah.gnu.org/git/jcal.git "$temp_dir" ;;
   'clone-nongnu' ) git clone https://git.savannah.nongnu.org/git/jcal.git "$temp_dir" ;;
-  'askapache' ) dl_xtract 'http://nongnu.askapache.com/jcal/jcal-latest.tar.gz' ;;
-  'gnu' ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
-  'nongnu' ) dl_xtract 'http://download.savannah.nongnu.org/releases/jcal/jcal-latest.tar.gz' ;;
+  'askapache'    ) dl_xtract 'http://nongnu.askapache.com/jcal/jcal-latest.tar.gz' ;;
+  'gnu'          ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
+  'nongnu'       ) dl_xtract 'http://download.savannah.nongnu.org/releases/jcal/jcal-latest.tar.gz' ;;
   * ) printf 'invalid source\n'; exit 1 ;;
 esac
 
