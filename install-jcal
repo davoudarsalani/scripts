@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-15 20:34:57 +0330 Wednesday
+## @last-modified 1400-10-15 23:45:41 +0330 Wednesday
 
-## NOTE this file is used a. for making docker image, and b. in action-jcal
+## NOTE this script is used:
+##      a. for building docker image
+##      b. in action-jcal
 
 function dl_xtract {
     mkdir -p "$temp_dir"/sources
-    wget -O "$tar_file" "$1"
+    wget --tries=inf -O "$tar_file" "$1"  ## 0 or inf for infinite retrying because downloading is sometimes not easy when building images
     tar -xf "$tar_file" -C "$temp_dir"/sources
     rm "$tar_file"
 }
@@ -17,15 +19,21 @@ function dl_xtract {
 temp_dir="$(mktemp -d)"  ## NOTE do NOT replace -d with --directory because it wil throw error when run on Alpine
 tar_file="$temp_dir"/jcal_latest.tar.gz
 
+## INSTALLING-DEPENDENCIES::START
 printf 'installing dependencies\n'
 for dep in automake build-essential libjalali-dev libtool; {
-    [ "$(which "$dep")" ] && continue
-    if [ "$is_root" == 'true' ]; then
-        apt install -y --no-install-recommends "$dep"
-    else
-        sudo apt install -y --no-install-recommends "$dep"
+    [ "$(command -v "$dep")" ] && continue
+
+    if [ "$(command -v apk)" ]; then
+        cmd="apk add --no-cache $dep"
+    elif [ "$(command -v apt)" ]; then
+        cmd="apt install -y --no-install-recommends $dep"
     fi
+
+    [ "$is_root" == 'true' ] || cmd="sudo $cmd"
+    eval "$cmd" || printf 'ERROR installing %s\n' "$dep"
 }
+## INSTALLING-DEPENDENCIES::END
 
 printf 'cloning/downloading\n'
 case "$1" in
@@ -35,7 +43,8 @@ case "$1" in
   'askapache'    ) dl_xtract 'http://nongnu.askapache.com/jcal/jcal-latest.tar.gz' ;;
   'gnu'          ) dl_xtract 'http://download-mirror.savannah.gnu.org/releases/jcal/jcal-latest.tar.gz' ;;
   'nongnu'       ) dl_xtract 'http://download.savannah.nongnu.org/releases/jcal/jcal-latest.tar.gz' ;;
-  * ) printf 'invalid source\n'; exit 1 ;;
+  * ) printf 'invalid source\n'
+      exit 1 ;;
 esac
 
 printf 'installing\n'
