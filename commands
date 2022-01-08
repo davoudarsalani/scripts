@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-09 10:37:58 +0330 Thursday
+## @last-modified 1400-10-15 23:55:18 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -56,6 +56,8 @@ insert string after 3rd line ---> sed '3a\STRING'
 print from pattern to the end of file (inclusive) ---> sed -n '/PATTERN/,$p'
 remove from pattern to the end of file (inclusive) ---> sed '/PATTERN/,$d'
 remove trailing empty lines from file ---> sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba'
+print lines between two PATTERN ---> sed -n '/PATTERN1/,/PATTERN2/p' FILE
+remove lines between two PATTERN ---> sed '/PATTERN1/,/PATTERN2/d' FILE
 
 remove prefix       ---> "${VAR#PREFIX}"   ## "${x#*/}"  turns a/b/c/d  to  b/c/d
 remove long prefix  ---> "${VAR##PREFIX}"  ## "${x##*/}" turns a/b/c/d  to  d      ## JUMP_1
@@ -218,7 +220,6 @@ weather [vi]  --->   format=j1 >> in json format
                                                                                                   ##    \-- to combine: (.temp_C,.humidity)
 weather [vii] ---> curl -s wttr.in/zahedan?format=%t+%h+%p >> +10°C 54% 0.0mm
 
-print lines between two phrases ---> sed -n '/PHRASE1/,/PHRASE2/p' PATH
 get installation date ---> stat / | grep 'Birth'
 get signal names and integers ---> kill -l
 check if array is full  ---> [ "${ARRAY[0]}" ] && ...
