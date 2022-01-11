@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-09 14:50:36 +0330 Thursday
+## @last-modified 1400-10-21 19:47:41 +0330 Tuesday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -216,7 +216,19 @@ function git_repositories {
     printf '%s\n' "${repos[@]%/.git}"
 }
 
-function git_revert {
+function git_reset_hard {
+    git -C "${1:-.}" reset --hard "$2"  ## $2 is commit hash
+}
+
+function git_reset_mixed {
+    git -C "${1:-.}" reset --mixed "$2"  ## $2 is commit hash
+}
+
+function git_reset_soft {
+    git -C "${1:-.}" reset --soft "$2"  ## $2 is commit hash
+}
+
+function git_reset_ {
     git -C "${1:-.}" checkout "$2"  ## $2 is commit hash
 }
 

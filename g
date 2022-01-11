@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-09 16:50:39 +0330 Thursday
+## @last-modified 1400-10-21 19:44:57 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -90,15 +90,23 @@ function if_locked {
 function pipe_to_fzf_locally {
     local fzf_choice short_pwd short_directory
 
+    [ "$multiple" == 'true' ] && multi_arg='--multi'
     short_pwd="${PWD/$HOME/\~}"
     short_directory="${directory/$HOME/\~}"
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
-                                         ##        we have to do the sourcing for the very same reason
+                                    ##        we have to do the sourcing for the very same reason
     fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
                                            --preview-window "$preview_status" \
+                                           ${multi_arg} \
                                            --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
                                            ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
+}
+
+function wrap_fzf_multi {
+    no_sign_arr=( "${@#* }" )  ## remove '[Ⓡ] ' from the beginning
+    colonized="$(printf '%s:' "${no_sign_arr[@]}")"
+    wrap_fzf_choice "$colonized"
 }
 
 function prompt {
@@ -142,7 +150,7 @@ proxy='false'
 get_opt "$@"
 heading "$title"
 
-main_items=( 'status' 'add' 'commit' 'add_commit' 'commit_amend' 'undo' 'unstage' 'log' 'push' 'pull' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'revert' 'garbage clean' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
+main_items=( 'status' 'add (+)' 'commit' 'add_commit (+)' 'commit_amend' 'undo (+)' 'unstage (+)' 'log' 'push' 'pull' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'jump back' 'garbage clean' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -210,11 +218,13 @@ case "$main_item" in
              if_changed
              pipe_to_fzf_locally "${changes[@]/---/' '}" && accomplished ;;
 
-    add )
+    'add (+)' )
           if_changed
-          add_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$add_item" || exit 37
+          IFS=$'\n'
+          multiple='true'
+          add_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${add_items[@]}" || exit 37
 
-          case "$add_item" in
+          case "${no_sign_arr[@]}" in
               pattern ) prompt -p
                         if_locked
                         git_add_specific_or_pattern "$directory" "$pattern" && \
@@ -222,10 +232,12 @@ case "$main_item" in
               all )     if_locked
                         git_add_all "$directory" && \
                         accomplished 'all added' ;;
-              * )       add_item="${add_item:2}"  ## JUMP_1 :2 to remove '[] ' from the beginning
-                        if_locked
-                        git_add_specific_or_pattern "$directory" "$add_item" && \
-                        accomplished "$add_item added" ;;
+              * )       if_locked
+                        for i in "${no_sign_arr[@]}"; {
+                            git_add_specific_or_pattern "$directory" "$i"
+                            accomplished "$i added"
+                            (:)
+                        } ;;
           esac ;;
 
     commit )
@@ -248,11 +260,13 @@ case "$main_item" in
                                 accomplished "committed, message: $message" ;;
              esac ;;
 
-    add_commit )
+    'add_commit (+)' )
                  if_changed
-                 add_commit_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all + amend')" && wrap_fzf_choice "$add_commit_item" || exit 37
+                 IFS=$'\n'
+                 multiple='true'
+                 add_commit_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all + amend') ) && wrap_fzf_multi "${add_commit_items[@]}" || exit 37
 
-                 case "$add_commit_item" in
+                 case "${no_sign_arr[@]}" in
                      pattern ) prompt -p -m
                                if_locked
                                git_add_specific_or_pattern "$directory" "$pattern" && \
@@ -269,11 +283,14 @@ case "$main_item" in
                                      git_commit_amend "$directory" && \
                                      accomplished "all added, commit amended in $editor" ;;
                      * ) prompt -m
-                         add_commit_item="${add_commit_item:2}"  ## JUMP_1 :2 to remove '[] ' from the beginning
                          if_locked
-                         git_add_specific_or_pattern "$directory" "$add_commit_item" && \
-                         git_commit_with_message "$directory" "${add_commit_item}: $message" && \
-                         accomplished "$add_commit_item added, message: ${add_commit_item}: $message" ;;
+                         for i in "${no_sign_arr[@]}"; {
+                            git_add_specific_or_pattern "$directory" "$i"
+                            accomplished "$i added"
+                            (:)
+                         }
+                         git_commit_with_message "$directory" "$colonized $message" && \
+                         accomplished "message: $colonized $message" ;;
                  esac ;;
 
     commit_amend )
@@ -291,11 +308,13 @@ case "$main_item" in
                                       accomplished "commit amended, message: $message" ;;
                    esac ;;
 
-    undo )
+    'undo (+)' )
            if_changed
-           undo_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$undo_item" || exit 37
+           IFS=$'\n'
+           multiple='true'
+           undo_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${undo_items[@]}" || exit 37
 
-           case "$undo_item" in
+           case "${no_sign_arr[@]}" in
                 pattern ) prompt -p
                           if_locked
                           git_undo_specific_or_pattern "$directory" "$pattern" && \
@@ -303,23 +322,27 @@ case "$main_item" in
                 all )     if_locked
                           git_undo_all "$directory" && \
                           accomplished "all undid" ;;
-                * )       undo_item="${undo_item:2}"  ## JUMP_1 :2 to remove '[] ' from the beginning
-                          if_locked
-                          git_undo_specific_or_pattern "$directory" "$undo_item" && \
-                          accomplished "$undo_item undid" ;;
+                * )       if_locked
+                          for i in "${no_sign_arr[@]}"; {
+                              git_undo_specific_or_pattern "$directory" "$i"
+                              accomplished "$i undid"
+                              (:)
+                          } ;;
            esac ;;
 
-    unstage )
+    'unstage (+)' )
               if_changed
               [ "${sta[0]}" ] || {
                   red 'no staged files'
                   exit
               }
-
+              IFS=$'\n'
+              multiple='true'
               preview_status='hidden'
-              unstage_item="$(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all')" && wrap_fzf_choice "$unstage_item" || exit 37
 
-              case "$unstage_item" in
+              unstage_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${unstage_items[@]}" || exit 37
+
+              case "${no_sign_arr[@]}" in
                   pattern ) prompt -p
                             if_locked
                             git_unstage_specific_or_pattern "$directory" "$pattern" && \
@@ -327,10 +350,12 @@ case "$main_item" in
                   all )     if_locked
                             git_unstage_all "$directory" && \
                             accomplished 'all unstaged' ;;  ## unstage all staged files
-                  * )       unstage_item="${unstage_item:2}"  ## JUMP_1 :2 to remove '[] ' from the beginning
-                            if_locked
-                            git_unstage_specific_or_pattern "$directory" "$unstage_item" && \
-                            accomplished "$unstage_item unstaged" ;;
+                  * )       if_locked
+                            for i in "${no_sign_arr[@]}"; {
+                                git_unstage_specific_or_pattern "$directory" "$i"
+                                accomplished "$i unstaged"
+                                (:)
+                            } ;;
               esac ;;
 
     log )
@@ -474,19 +499,34 @@ case "$main_item" in
               git_remotes && \
               accomplished ;;
 
-    revert )
-             IFS=$'\n'
-             if_locked
-             preview_status='hidden'
-             readarray -t revert_items < <(git_log "$directory")
-             revert_item="$(pipe_to_fzf_locally "${revert_items[@]}")" && wrap_fzf_choice "$revert_item" || exit 37
-             revert_item="$(printf '%s\n' "$revert_item" | sed 's/\* \([^ ]\+\) .*/\1/g')"
+    'jump back' )
+        jump_items=( 'reset soft' 'reset mixed' 'reset hard' 'revert' )
+        jump_item="$(pipe_to_fzf_locally "${jump_items[@]}")" && wrap_fzf_choice "$jump_item" || exit 37
 
-             revert_prompt="$(get_single_input "revert to ${revert_item}?")" && printf '\n'
-             case "$revert_prompt" in
-                 y ) git_revert "$directory" "$revert_item" && \
-                     accomplished "$revert_item reverted to" ;;
-             esac ;;
+        if_locked
+        IFS=$'\n'
+        preview_status='hidden'
+        readarray -t log_items < <(git_log "$directory")
+        log_item="$(pipe_to_fzf_locally "${log_items[@]}")" && wrap_fzf_choice "$log_item" || exit 37
+        log_item="$(printf '%s\n' "$log_item" | sed 's/\* \([^ ]\+\) .*/\1/g')"
+
+        jump_prompt="$(get_single_input "$jump_item to ${log_item}?")" && printf '\n'
+        [ "$jump_prompt" == 'y' ] || exit
+
+        case "$jump_item" in
+            'reset soft' )
+                git_reset_soft "$directory" "$log_item" && \
+                accomplished "$log_item reset soft to" ;;
+            'reset mixed' )
+                git_reset_mixed "$directory" "$log_item" && \
+                accomplished "$log_item reset mixed to" ;;
+            'reset hard' )
+                git_reset_hard "$directory" "$log_item" && \
+                accomplished "$log_item reset hard to" ;;
+            revert )
+                git_revert "$directory" "$log_item" && \
+                accomplished "$log_item reverted to" ;;
+        esac ;;
 
     'garbage clean' )
         clean_prompt="$(get_single_input 'sure?')" && printf '\n'

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-18 10:33:41 +0330 Saturday
+## @last-modified 1400-10-18 15:53:04 +0330 Saturday
 
 
 
@@ -40,7 +40,6 @@ CURL_OPTIONS="-s"
 
 HAS_JQ=false
 hash jq >/dev/null 2>&1 && HAS_JQ=true
-
 
 function help {
     version
@@ -125,18 +124,17 @@ function receive_message {
         echo "You need to have jq installed in order to be able to receive messages."
         exit 1
     fi
-    
+
     result=`curl $CURL_OPTIONS $URL$TOKEN/getUpdates?allowed_updates=message`
     log "$result"
     if [ "`jq '.result' <<< "$result"`" = "[]" ]; then
         echo "No recent messages."
         exit 1
     fi
-    
+
     jq -r '.result[-1].message | [(.message_id|tostring), (.from.id|tostring), (.chat.id|tostring), .text] | join(" ")' <<< "$result"
     exit 0
 }
-        
 
 function receive_file {
     if [ "$HAS_JQ" = false ]; then
