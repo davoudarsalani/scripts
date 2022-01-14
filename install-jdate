@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-20 13:52:20 +0330 Monday
+## @last-modified 1400-10-24 21:03:20 +0330 Friday
 
 ## NOTE this script is used:
 ##      a. for building docker image
@@ -16,7 +16,10 @@ function dl_xtract {
 ## needed because user is root when creating docker image, and non-root in GitHub Actions
 (( EUID == 0 )) && is_root='true'
 
-temp_dir="$(mktemp -d)"  ## NOTE do NOT replace -d with --directory because it wil throw error when run on Alpine
+temp_dir="$(mktemp -d jdate_tmp_XXXXXX)"  ## NOTE --,--> Alpine only accepts -d
+                                          ##        |--> Alpine requires at least six Xs
+                                          ##        '--> any modifications you make to the template,
+                                          ##             make sure to do the same in the clean-up section in dockerfiles
 tar_file="$temp_dir"/jcal_latest.tar.gz
 
 ## INSTALLING-DEPENDENCIES::START

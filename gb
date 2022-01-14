@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-09 23:11:27 +0330 Thursday
+## @last-modified 1400-10-24 20:28:36 +0330 Friday
 
 function get_datetime {
     case "$1" in
@@ -362,6 +362,27 @@ function rand_str {
     # sed 's/-//g' < /proc/sys/kernel/random/uuid  ## returns e.g. a8a29c0d109a40468051bcbaf70af17e
 }
 
+function move_old_pkgs {
+    declare -a files uniques repeats
+    declare -i moved=0 keep=3
+    local src_dir uniq count file exceed
+
+    src_dir="$HOME"/linux-pkg
+    readarray -t files < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f ! -iname '*.sig' ! -iname '*:*' | sort)
+    readarray -t uniques < <(printf '%s\n' "${files[@]}" | sed 's|-[0-9]\+[^:]*||g' | sort | uniq --count)
+    for uniq in "${uniques[@]}"; {
+        read count file <<< "$uniq"  ## 8 /home/nnnn/linux-pkg/alsa-card-profiles
+        (( count <= keep )) && continue
+        (( exceed="count - keep" ))  ## 5
+        readarray -t repeats < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "${file##*/}*" ! -iname '*.sig' ! -iname '*:*' | sort)
+        for ((idx=0; idx<${exceed}; idx++)); {
+            mv -v "${repeats[${idx}]}" "$HOME"/trash/old-pkgs
+            ((moved++))
+        }
+    }
+    printf '%s\n' "$moved"
+}
+
 
  # function find_duplicate_images {
  #     source "$HOME"/scripts/gb-color
@@ -499,6 +520,7 @@ function rand_str {
 #         ffmpeg -i "$orig_p" -q:a 1 -y "$new_p" 2>/dev/null
 #     }
 # }
+
 # timer and record_* {{{
 # function timer {
 #     source "$HOME"/scripts/gb-color

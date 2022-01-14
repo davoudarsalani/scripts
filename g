@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-21 19:44:57 +0330 Tuesday
+## @last-modified 1400-10-21 21:57:00 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -150,7 +150,7 @@ proxy='false'
 get_opt "$@"
 heading "$title"
 
-main_items=( 'status' 'add (+)' 'commit' 'add_commit (+)' 'commit_amend' 'undo (+)' 'unstage (+)' 'log' 'push' 'pull' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'jump back' 'garbage clean' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
+main_items=( 'status' 'add [+]' 'commit' 'add_commit [+]' 'commit_amend' 'undo [+]' 'unstage [+]' 'log' 'push' 'pull' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'jump back' 'garbage clean' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -218,7 +218,7 @@ case "$main_item" in
              if_changed
              pipe_to_fzf_locally "${changes[@]/---/' '}" && accomplished ;;
 
-    'add (+)' )
+    'add [+]' )
           if_changed
           IFS=$'\n'
           multiple='true'
@@ -260,11 +260,11 @@ case "$main_item" in
                                 accomplished "committed, message: $message" ;;
              esac ;;
 
-    'add_commit (+)' )
+    'add_commit [+]' )
                  if_changed
                  IFS=$'\n'
                  multiple='true'
-                 add_commit_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all + amend') ) && wrap_fzf_multi "${add_commit_items[@]}" || exit 37
+                 add_commit_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all+amend') ) && wrap_fzf_multi "${add_commit_items[@]}" || exit 37
 
                  case "${no_sign_arr[@]}" in
                      pattern ) prompt -p -m
@@ -277,11 +277,11 @@ case "$main_item" in
                            git_add_all "$directory" && \
                            git_commit_with_message "$directory" "MANY: $message" && \
                            accomplished "all added, message: MANY: $message" ;;
-                     'all + amend' ) if_amend_allowed
-                                     if_locked
-                                     git_add_all "$directory" && \
-                                     git_commit_amend "$directory" && \
-                                     accomplished "all added, commit amended in $editor" ;;
+                     'all+amend' ) if_amend_allowed
+                                   if_locked
+                                   git_add_all "$directory" && \
+                                   git_commit_amend "$directory" && \
+                                   accomplished "all added, commit amended in $editor" ;;
                      * ) prompt -m
                          if_locked
                          for i in "${no_sign_arr[@]}"; {
@@ -308,7 +308,7 @@ case "$main_item" in
                                       accomplished "commit amended, message: $message" ;;
                    esac ;;
 
-    'undo (+)' )
+    'undo [+]' )
            if_changed
            IFS=$'\n'
            multiple='true'
@@ -330,7 +330,7 @@ case "$main_item" in
                           } ;;
            esac ;;
 
-    'unstage (+)' )
+    'unstage [+]' )
               if_changed
               [ "${sta[0]}" ] || {
                   red 'no staged files'
