@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-24 20:28:36 +0330 Friday
+## @last-modified 1400-10-26 08:41:54 +0330 Sunday
 
 function get_datetime {
     case "$1" in
@@ -243,19 +243,20 @@ function convert_second {
     mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
     year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
 
-    if (( year == 0 )) && (( mont == 0 )) && (( day == 0 )); then
+    ## NOTE ints are two-digit so have to use [ -eq ] instead of (( == ))
+    if [ "$year" -eq 0 ] && [ "$mont" -eq 0 ] && [ "$day" -eq 0 ]; then
         if [ "$2" == 'verbose' ]; then
             result="$hour hours, $min minutes and $sec seconds"
         else
             result="${hour}:${min}:${sec}"
         fi
-    elif (( year == 0 )) && (( mont == 0 )); then
+    elif [ "$year" -eq 0 ] && [ "$mont" -eq 0 ]; then
         if [ "$2" == 'verbose' ]; then
             result="$day days, $hour hours, $min minutes and $sec seconds"
         else
             result="${day}:${hour}:${min}:${sec}"
         fi
-    elif (( year == 0 )); then
+    elif [ "$year" -eq 0 ]; then
         if [ "$2" == 'verbose' ]; then
             result="$mont months, $day days, $hour hours, $min minutes and $sec seconds"
         else
