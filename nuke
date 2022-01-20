@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-14 17:32:37 +0330 Sunday
+## @last-modified 1400-10-27 09:10:39 +0330 Monday
 
 ## https://revelry.co/terminal-workflow-fzf/
 ## https://github.com/junegunn/fzf/wiki/examples
@@ -8,10 +8,10 @@
 source "$HOME"/scripts/gb
 
 IFS=$'\n'
-if (( UID == 0 )); then
-    readarray -t processes < <(ps -ef)
-else
+if (( UID > 0 )); then
     readarray -t processes < <(ps -f -u "$UID")
+else
+    readarray -t processes < <(ps -ef)
 fi
 process="$(pipe_to_fzf "${processes[@]}")" && wrap_fzf_choice "$process" || exit 37
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:10:26 +0330 Tuesday
+## @last-modified 1400-10-28 10:09:48 +0330 Tuesday
 
 from getopt import getopt
 from os import path
@@ -18,8 +18,8 @@ def display_help() -> None:
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-i --input=')}
-{Col.flag('-p --password=')}'''
+{Col.flag('-i|--input=')}
+{Col.flag('-p|--password=')}'''
     )
     exit()
 

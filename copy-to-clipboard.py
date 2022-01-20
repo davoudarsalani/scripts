@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:12:19 +0330 Tuesday
+## @last-modified 1400-10-28 10:10:06 +0330 Tuesday
 
 from getopt import getopt
 from os import path, getenv
@@ -19,9 +19,9 @@ def display_help() -> None:
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-s --string=')}
-{Col.flag('-f --file=')}
-{Col.flag('-c --command=')}'''
+{Col.flag('-s|--string=')}
+{Col.flag('-f|--file=')}
+{Col.flag('-c|--command=')}'''
     )
     exit()
 

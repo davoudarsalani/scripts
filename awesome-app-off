@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:02:33 +0330 Saturday
+## @last-modified 1400-10-28 22:23:09 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -11,60 +11,99 @@ function now {
 
     [ "$3" == 'cc' ] && clear_clipboard
     case "$1" in
-        pc ) if   [ "$2" == 'shutdown' ]; then
-                 shutdown -h now
-             elif [ "$2" == 'reboot' ]; then
-                 shutdown -r now
-             fi ;;
-        awesome ) if   [ "$2" == 'quit' ]; then
-                      awesome-client 'awesome.quit()'
-                  elif [ "$2" == 'restart' ]; then
-                      awesome-client 'awesome.restart()'  ## NOTE do NOT remove the () in restart. Originally, () is not required in rc.lua
-                  fi ;;
+        pc )
+            if [ "$2" == 'shutdown' ]; then
+                shutdown -h now
+            elif [ "$2" == 'reboot' ]; then
+                shutdown -r now
+            fi ;;
+        awesome )
+            if [ "$2" == 'quit' ]; then
+                awesome-client 'awesome.quit()'
+            elif [ "$2" == 'restart' ]; then
+                awesome-client 'awesome.restart()'  ## NOTE do NOT remove the () in restart. Originally, () is not required in rc.lua
+            fi ;;
     esac
 }
 
 case "$1" in
     ## app_menu
-    audacious )            audacious &>/dev/null & ;;
-    blueman_applet )       blueman-applet &>/dev/null & ;;
-    blueman_manager )      blueman-manager &>/dev/null & ;;
-    calculator )           gnome-calculator &>/dev/null & ;;
-    chromium )             chromium &>/dev/null & ;;
-    disks )                gnome-disks &>/dev/null & ;;
-    firefox )              firefox &>/dev/null & ;;
-    gedit )                gedit &>/dev/null & ;;
-    gimp )                 gimp &>/dev/null & ;;
-    goldendict )           goldendict &>/dev/null & ;;
-    gparted )              sudo gparted &>/dev/null & ;;
-    gpicview )             gpicview &>/dev/null & ;;
-    kdenlive )             kdenlive &>/dev/null & ;;
-    keepass )              keepass &>/dev/null & ;;
-    kid3 )                 kid3 &>/dev/null & ;;
-    lf )                   "$terminal" -e "lf ${HOME}/downloads/" &>/dev/null & ;;
-    libreoffice )          libreoffice &>/dev/null & ;;
-    lxappearance )         lxappearance &>/dev/null & ;;
-    qutebrowser )          qutebrowser --target tab &>/dev/null & ;;
-    ranger )               "$terminal" -e "ranger ${HOME}/downloads/" &>/dev/null & ;;
-    simplescreenrecorder ) simplescreenrecorder &>/dev/null & ;;
-    terminal )             "$terminal" &>/dev/null ;;
-    terminal_tmux )        if [ "$(pgrep 'tmux')" ]; then
-                               "$terminal" -e 'tmux new' &>/dev/null
-                           else
-                               "$terminal" -e 'tmux new -s 1' &>/dev/null
-                           fi ;;
-    terminal_torsocks )    torsocks "$terminal" &>/dev/null ;;
-    uget )                 uget-gtk &>/dev/null & ;;
-    vlc )                  vlc &>/dev/null & ;;
-    xreader )              xreader &>/dev/null & ;;
+    audacious )
+        audacious &>/dev/null & ;;
+    blueman_applet )
+        blueman-applet &>/dev/null & ;;
+    blueman_manager )
+        blueman-manager &>/dev/null & ;;
+    calculator )
+        gnome-calculator &>/dev/null & ;;
+    chromium )
+        chromium &>/dev/null & ;;
+    disks )
+        gnome-disks &>/dev/null & ;;
+    firefox )
+        firefox &>/dev/null & ;;
+    gedit )
+        gedit &>/dev/null & ;;
+    gimp )
+        gimp &>/dev/null & ;;
+    goldendict )
+        goldendict &>/dev/null & ;;
+    gparted )
+        sudo gparted &>/dev/null & ;;
+    gpicview )
+        gpicview &>/dev/null & ;;
+    kdenlive )
+        kdenlive &>/dev/null & ;;
+    keepass )
+        keepass &>/dev/null & ;;
+    kid3 )
+        kid3 &>/dev/null & ;;
+    lf )
+        "$terminal" -e "lf ${HOME}/downloads/" &>/dev/null & ;;
+    libreoffice )
+        libreoffice &>/dev/null & ;;
+    lxappearance )
+        lxappearance &>/dev/null & ;;
+    qutebrowser )
+        qutebrowser --target tab &>/dev/null & ;;
+    ranger )
+        "$terminal" -e "ranger ${HOME}/downloads/" &>/dev/null & ;;
+    simplescreenrecorder )
+        simplescreenrecorder &>/dev/null & ;;
+    terminal )
+        "$terminal" &>/dev/null ;;
+    terminal_tmux )
+        if [ "$(pgrep 'tmux')" ]; then
+            "$terminal" -e 'tmux new' &>/dev/null
+        else
+            "$terminal" -e 'tmux new -s 1' &>/dev/null
+        fi ;;
+    terminal_torsocks )
+        torsocks "$terminal" &>/dev/null ;;
+    uget )
+        uget-gtk &>/dev/null & ;;
+    vlc )
+        vlc &>/dev/null & ;;
+    xreader )
+        xreader &>/dev/null & ;;
+
     ## off_menu
-    shutdown )                         now pc shutdown ;;
-    'shutdown + clear clipboard' )     now pc shutdown cc ;;
-    reboot )                           now pc reboot ;;
-    'reboot + clear clipboard' )       now pc reboot cc ;;
-    lock )                             dm-tool lock ;;
-    screen_off )                       xset dpms force off ;;
-    'quit awesome' )                   now awesome quit ;;
-    'quit awesome + clear clipboard' ) now awesome quit cc ;;
-    'restart awesome' )                now awesome restart ;;
+    shutdown )
+        now pc shutdown ;;
+    'shutdown + clear clipboard' )
+        now pc shutdown cc ;;
+    reboot )
+        now pc reboot ;;
+    'reboot + clear clipboard' )
+        now pc reboot cc ;;
+    lock )
+        dm-tool lock ;;
+    screen_off )
+        xset dpms force off ;;
+    'quit awesome' )
+        now awesome quit ;;
+    'quit awesome + clear clipboard' )
+        now awesome quit cc ;;
+    'restart awesome' )
+        now awesome restart ;;
 esac

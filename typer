@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-03 21:34:22 +0330 Friday
+## @last-modified 1400-10-29 11:05:01 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -14,17 +14,21 @@ function display_help {
 }
 
 function countdown {
-    for ((i=10; i>0; i--)); {
-        printf '%s\e[0K\r' "$(blue "$i")"
+    [ "$no_countdown" ] && return
+
+    local int
+
+    for ((int=10; int>0; int--)); {
+        printf '%s\e[0K\r' "$(blue "$int")"
         sleep 1
     }
 }
 
 function sleep_now {
-    if [ "$slp" == 'random' ]; then
+    if [ "$interval" == 'random' ]; then
         sleep "${intervals["$(( "$RANDOM" % "$intervals_length" ))"]}"
     else
-        sleep "$slp"
+        sleep "$interval"
     fi
 }
 
@@ -33,22 +37,24 @@ function play_random_key_sound {
 }
 
 function type_in_vim {
+    local chars_count char_idx perc remaining_chars eta_mid eta_mid_conv
+
     chars_count="$(wc -c < "$file")"
     # (( chars_count+=100 ))  ## add 100 just in case
 
     countdown
 
     ## strike keys
-    for ((i=1; i<="$chars_count"; i++)); {
-        (( perc="i * 100 / chars_count" ))
-        (( remaining_chars="chars_count - i" ))
+    for ((char_idx=1; char_idx<="$chars_count"; char_idx++)); {
+        (( perc="char_idx * 100 / chars_count" ))
+        (( remaining_chars="chars_count - char_idx" ))
         eta_mid="$(float_pad "${remaining_chars}*${intervals_middle_member}")"
         eta_mid_conv="$(convert_second "$eta_mid")"
 
-        printf '%s %s %s\e[0K\r' "$(green "${i}/${chars_count}")" "$(yellow "${perc}%")" "$(brown "eta: ${eta_mid_conv}")"
+        printf '%s %s %s\e[0K\r' "$(green "${char_idx}/${chars_count}")" "$(yellow "${perc}%")" "$(brown "eta: ${eta_mid_conv}")"
 
         xdotool key c
-        play_random_key_sound && sleep_now
+        "$play" && sleep_now
     }
     printf '\n'
 
@@ -56,12 +62,16 @@ function type_in_vim {
 }
 
 function type_in_terminal {
+    local lines_count line_idx
+
+    countdown
+
     clear
     while read line; do  ## read file one line at a time
         lines_count="${#line}"
-        for ((i=0; i<"$lines_count"; i++)); {  ## read line one character at a time
-            printf '%s' "${line:$i:1}"  ## NOTE no \n
-            play_random_key_sound && sleep_now
+        for ((line_idx=0; line_idx<"$lines_count"; line_idx++)); {  ## read line one character at a time
+            printf '%s' "${line:$line_idx:1}"  ## NOTE no \n
+            "$play" && sleep_now
         }
         printf '\n'
     done < "$file"
@@ -70,8 +80,10 @@ function type_in_terminal {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -f ) file="${file:-"$(get_input 'File')"}"                           ;;
-            -s ) slp="${slp:-"$(get_input 'Sleep (e.g. 0.2, 1, random, etc)')"}" ;;
+            -f )
+                file="${file:-"$(get_input 'File')"}" ;;
+            -i )
+                interval="${interval:-"$(get_input 'Interval (e.g. 0.2, 1, random, etc)')"}" ;;
         esac
         shift
     }
@@ -80,14 +92,24 @@ function prompt {
 function get_opt {
     local options
 
-    options="$(getopt --longoptions 'help,file:,sleep:' --options 'hf:s:' --alternative -- "$@")"
+    options="$(getopt --longoptions 'help,quiet,no-countdown,file:,interval:' --options 'hqnf:i:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
-            -h|--help )  display_help     ;;
-            -f|--file )  shift; file="$1" ;;
-            -s|--sleep ) shift; slp="$1"  ;;
-            -- )         break            ;;
+            -h|--help )
+                display_help ;;
+            -q|--quiet )
+                is_quiet='true' ;;
+            -n|--no-countdown )
+                no_countdown='true' ;;
+            -f|--file )
+                shift
+                file="$1" ;;
+            -i|--interval )
+                shift
+                interval="$1" ;;
+            -- )
+                break ;;
         esac
         shift
     done
@@ -117,15 +139,19 @@ key_sounds=(
     "$HOME"/linux/sounds/key_press_2_fullbase.wav
 )
 key_sounds_length="${#key_sounds[@]}"
+[ "$is_quiet" == 'true' ] && play=':' || play='play_random_key_sound'
 
 heading "$title"
 
 main_item="$(pipe_to_fzf 'in vim' 'in terminal' 'help')" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    'in vim' ) prompt -f -s
-               type_in_vim ;;
-    'in terminal' ) prompt -f -s
-                    type_in_terminal ;;
-    help ) display_help ;;
+    'in vim' )
+        prompt -f -i
+        type_in_vim ;;
+    'in terminal' )
+        prompt -f -i
+        type_in_terminal ;;
+    help )
+        display_help ;;
 esac

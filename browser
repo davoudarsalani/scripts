@@ -1,39 +1,54 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:03:23 +0330 Saturday
+## @last-modified 1400-10-28 23:30:13 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
 readarray -t bookmarks < <(\grep 'HREF=' "$HOME"/linux/cfg-firefox/bookmarks.html | \grep -vE 'place:parent|place:type' | sed 's/" .*//;s/^.*"//g;s/\/$//g' | sort)
 
 case "$1" in
-    firefox ) ff_items=( 'new page' 'new tab' 'private' 'safe mode' 'preferences' 'tor' "${bookmarks[@]}" )
-              ff_item="$(pipe_to_rofi "${ff_items[@]}" 'header=firefox')" || exit 37
+    firefox )
+        ff_items=( 'new page' 'new tab' 'private' 'safe mode' 'preferences' 'tor' "${bookmarks[@]}" )
+        ff_item="$(pipe_to_rofi "${ff_items[@]}" 'header=firefox')" || exit 37
 
-              case "$ff_item" in
-                  'new page' ) firefox &>/dev/null & ;;
-                  'new tab' ) firefox --new-tab 'https://gitlab.com' &>/dev/null & ;;
-                  private ) firefox --private-window &>/dev/null & ;;
-                  'safe mode' ) firefox --safe-mode &>/dev/null & ;;
-                  preferences ) firefox --preferences &>/dev/null & ;;
-                  tor ) cd "$HOME"/tor-browser_en-US || exit  ## absolute path won't work
-                        ./start-tor-browser.desktop &>/dev/null & ;;
-                  * ) firefox "$ff_item" &>/dev/null & ;;
-              esac ;;
-    chromium ) chr_items=( 'new page' 'new tab' 'private' "${bookmarks[@]}" )
-               chr_item="$(pipe_to_rofi "${chr_items[@]}" 'header=chromium')" || exit 37
+        case "$ff_item" in
+            'new page' )
+                firefox &>/dev/null & ;;
+            'new tab' )
+                firefox --new-tab 'https://gitlab.com' &>/dev/null & ;;
+            private )
+                firefox --private-window &>/dev/null & ;;
+            'safe mode' )
+                firefox --safe-mode &>/dev/null & ;;
+            preferences )
+                firefox --preferences &>/dev/null & ;;
+            tor )
+                cd "$HOME"/tor-browser_en-US || exit  ## absolute path won't work
+                ./start-tor-browser.desktop &>/dev/null & ;;
+            * )
+                firefox "$ff_item" &>/dev/null & ;;
+        esac ;;
+    chromium )
+        chr_items=( 'new page' 'new tab' 'private' "${bookmarks[@]}" )
+        chr_item="$(pipe_to_rofi "${chr_items[@]}" 'header=chromium')" || exit 37
 
-               case "$chr_item" in
-                   'new page' ) chromium &>/dev/null & ;;
-                   'new tab' ) chromium 'https://gitlab.com' &>/dev/null & ;;
-                   private ) chromium --incognito &>/dev/null & ;;
-                   * ) chromium "$chr_item" &>/dev/null & ;;
-               esac ;;
+        case "$chr_item" in
+            'new page' )
+                chromium &>/dev/null & ;;
+            'new tab' )
+                chromium 'https://gitlab.com' &>/dev/null & ;;
+            private )
+                chromium --incognito &>/dev/null & ;;
+            * )
+                chromium "$chr_item" &>/dev/null & ;;
+        esac ;;
     qb ) qb_items=( 'new page' "${bookmarks[@]}" )
          qb_item="$(pipe_to_rofi "${qb_items[@]}" 'header=qutebrowser')" || exit 37
 
          case "$qb_item" in
-             'new page' ) qutebrowser --target tab &>/dev/null & ;;
-             * ) qutebrowser "$qb_item" &>/dev/null & ;;
+             'new page' )
+                qutebrowser --target tab &>/dev/null & ;;
+             * )
+                qutebrowser "$qb_item" &>/dev/null & ;;
          esac ;;
 esac

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-10-10 13:00:58 +0330 Friday
+## @last-modified 1400-10-28 10:11:28 +0330 Tuesday
 
 from getopt import getopt
 from os import path
@@ -19,7 +19,7 @@ def display_help() -> None:
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-l --length=')}'''
+{Col.flag('-l|--length=')}'''
     )
     exit()
 

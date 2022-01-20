@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-09 14:53:59 +0330 Thursday
+## @last-modified 1400-10-28 10:08:18 +0330 Tuesday
 
 source "$HOME"/scripts/gb-color
 
@@ -8,8 +8,8 @@ function application_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-p --package=') package
-$(flag '-u --unit=')    unit"
+$(flag '-p|--package=')
+$(flag '-u|--unit=')"
 exit
 }
 
@@ -17,23 +17,23 @@ function ffmpeg_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-embed subtitle         $(flag '-i --input-file=') input file $(flag '-f --subtitle-file=') subtitle file $(flag '-o --output=') output file
-burn subtitle (increases size) $(flag '-i --input-file=') input file $(flag '-f --subtitle-file=') subtitle file $(flag '-o --output=') output file
-burn embedded subtitle (increases size) $(flag '-i --input-file=') input file $(flag '-d --subtitle-index=') subtitle index $(flag '-o --output=') output file
-sunc audio             $(flag '-i --input-file=') input file $(flag '-x --offset=') offset (e.g. 1.2 or -0.8) $(flag '-o --output=') output file
-sync video             $(flag '-i --input-file=') input file $(flag '-x --offset=') offset (e.g. 1.2 or -0.8) $(flag '-o --output=') output file
-trim                   $(flag '-i --input-file=') input file $(flag '-s --start=') start time (e.g. 00:00:09) $(flag '-e --end=') end time (e.g. 00:18:34) $(flag '-o --output=') output file
-convert                $(flag '-i --input-file=') input file $(flag '-o --output=') output file
-remove audio           $(flag '-i --input-file=') input file $(flag '-o --output=') output file
-replace audio          $(flag '-a --audio-input=') audio input file $(flag '-v --video-input=') video input file $(flag '-o --output=') output file
-screenshot             $(flag '-i --input-file=') input file $(flag '-t --time=') time (e.g. 00:00:09) $(flag '-o --output=') output file
-extract frames         $(flag '-i --input-file=') input file $(flag '-s --start=') start time (e.g. 00:00:09) $(flag '-e --end=') end time (e.g. 00:18:34)
-negate                 $(flag '-i --input-file=') input file $(flag '-o --output=') output file
-reverse                $(flag '-i --input-file=') input file $(flag '-o --output=') output file
-add 0.3 saturation     $(flag '-i --input-file=') input file $(flag '-o --output=') output file
-show streams           $(flag '-i --input-file=') input file
-audio stream to keep   $(flag '-i --input-file=') input file $(flag '-u --audio-stream=') audio stream to keep (e.g. 1) $(flag '-o --output=') output file
-live camera            $(flag '-c --camera=') camera (e.g. /dev/video0)"
+embed subtitle         $(flag '-i|--input-file=') $(flag '-f|--subtitle-file=') $(flag '-o|--output=')
+burn subtitle (NOTE: increases size) $(flag '-i|--input-file=') $(flag '-f|--subtitle-file=') $(flag '-o|--output=')
+burn embedded subtitle (NOTE: increases size) $(flag '-i|--input-file=') $(flag '-d|--subtitle-index=') $(flag '-o|--output=')
+sunc audio             $(flag '-i|--input-file=') $(flag '-x|--offset=') (e.g. 1.2 or -0.8) $(flag '-o|--output=')
+sync video             $(flag '-i|--input-file=') $(flag '-x|--offset=') (e.g. 1.2 or -0.8) $(flag '-o|--output=')
+trim                   $(flag '-i|--input-file=') $(flag '-s|--start=') (e.g. 00:00:09) $(flag '-e|--end=') (e.g. 00:18:34) $(flag '-o|--output=')
+convert                $(flag '-i|--input-file=') $(flag '-o|--output=')
+remove audio           $(flag '-i|--input-file=') $(flag '-o|--output=')
+replace audio          $(flag '-a|--audio-input=') $(flag '-v|--video-input=') $(flag '-o|--output=')
+screenshot             $(flag '-i|--input-file=') $(flag '-t|--time=') (e.g. 00:00:09) $(flag '-o|--output=')
+extract frames         $(flag '-i|--input-file=') $(flag '-s|--start=') (e.g. 00:00:09) $(flag '-e|--end=') (e.g. 00:18:34)
+negate                 $(flag '-i|--input-file=') $(flag '-o|--output=')
+reverse                $(flag '-i|--input-file=') $(flag '-o|--output=')
+add 0.3 saturation     $(flag '-i|--input-file=') $(flag '-o|--output=')
+show streams           $(flag '-i|--input-file=')
+audio stream to keep   $(flag '-i|--input-file=') $(flag '-u|--audio-stream=') (e.g. 1) $(flag '-o|--output=')
+live camera            $(flag '-c|--camera=') (e.g. /dev/video0)"
 exit
 }
 
@@ -41,7 +41,7 @@ function firewall_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-allow app    $(flag '-a --application=') application to allow"
+allow app    $(flag '-a|--application=')"
 exit
 }
 
@@ -49,13 +49,13 @@ function g_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-d --directory=')
-$(flag '-p --pattern=') e.g. '*.py'
-$(flag '-m --message=')
-$(flag '-b --branch=')
-$(flag '-t --tag=')
-$(flag '-c --commit-hash=')
-$(flag '-x --proxy')"  ## ^^ NOTE pattern needs quotes here, but if pattern is entered through get_input in prompt, it won't
+$(flag '-d|--directory=')
+$(flag '-p|--pattern=') (e.g. '*.py')
+$(flag '-m|--message=')
+$(flag '-b|--branch=')
+$(flag '-t|--tag=')
+$(flag '-c|--commit-hash=')
+$(flag '-x|--proxy')"  ## ^^ NOTE pattern needs quotes here, but if pattern is entered through get_input in prompt, it won't
 exit
 }
 
@@ -63,7 +63,7 @@ function mime_type_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-n --name=') dir/file name"
+$(flag '-n|--name=') dir/file name"
 exit
 }
 
@@ -71,9 +71,9 @@ function mount_umount_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-udisksctl mount -b  $(flag '-d --device=') device (e.g. /dev/sdc)
-udisksctl umount -b $(flag '-d --device=') device (e.g. /dev/sdc)
-format usb device   $(flag '-d --device=') device (e.g. /dev/sdc) $(flag '-n --name=') name (e.g. nnnn)"
+udisksctl mount -b  $(flag '-d|--device=') (e.g. /dev/sdc)
+udisksctl umount -b $(flag '-d|--device=') (e.g. /dev/sdc)
+format usb device   $(flag '-d|--device=') (e.g. /dev/sdc) $(flag '-n|--name=') (e.g. nnnn)"
 exit
 }
 
@@ -81,11 +81,11 @@ function network_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-up ethernet/wifi connection     $(flag '-c --connection=') connection
-down ethernet/wifi connection   $(flag '-c --connection=') connection
-add ip                          $(flag '-i --ip=') ip $(flag '-d --device=') device
-delete all ips                  $(flag '-d --device=') device
-connect to a new wifi network   $(flag '-s --ssid=') ssid $(flag '-p --password=') password"
+up ethernet/wifi connection     $(flag '-c|--connection=')
+down ethernet/wifi connection   $(flag '-c|--connection=')
+add ip                          $(flag '-i|--ip=') $(flag '-d|--device=')
+delete all ips                  $(flag '-d|--device=')
+connect to a new wifi network   $(flag '-s|--ssid=') $(flag '-p|--password=')"
 exit
 }
 
@@ -93,7 +93,7 @@ function pulseaudio_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-d --default=') default sink/source index/name"
+$(flag '-d|--default=') default sink/source index/name"
 exit
 }
 
@@ -101,7 +101,7 @@ function sony_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-n --name=') dir/file name"
+$(flag '-n|--name=') dir/file name"
 exit
 }
 
@@ -109,8 +109,10 @@ function typer_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-f --file=')  file
-$(flag '-s --sleep=') sleep (e.g. random, 0.2, 1, etc)"
+$(flag '-f|--file=')
+$(flag '-i|--interval=') (e.g. random, 0.2, 1, etc)
+$(flag '-n|--no-countdown')
+$(flag '-q|--quiet')"
 exit
 }
 
@@ -118,9 +120,9 @@ function user_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-create group               $(flag '-g --group=') group
-add nnnn to a group        $(flag '-g --group=') group
-remove nnnn from a group   $(flag '-g --group=') group"
+create group             $(flag '-g|--group=')
+add nnnn to a group      $(flag '-g|--group=')
+remove nnnn from a group $(flag '-g|--group=')"
 exit
 }
 
@@ -128,7 +130,7 @@ function video_subtitle_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-d --directory=') directory"
+$(flag '-d|--directory=')"
 exit
 }
 
@@ -136,9 +138,9 @@ function website_create_audio_template_help {
 clear
 printf '%s\n' "\
 $(heading "$title") $(yellow "help")
-$(flag '-l --length=')
-$(flag '-d --directory=') (e.g. TOEIC/Level-1 or 6-Minute-English)
-$(flag '-p --per-page=')
-$(flag '-f --destination-file=')"
+$(flag '-l|--length=')
+$(flag '-d|--directory=')
+$(flag '-p|--per-page=')
+$(flag '-f|--destination-file=')"
 exit
 }

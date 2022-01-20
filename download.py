@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-10-10 12:54:38 +0330 Friday
+## @last-modified 1400-10-28 13:48:35 +0330 Tuesday
 
 
 from __future__ import unicode_literals
@@ -33,21 +33,21 @@ def display_help() -> None:
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-s --source=')}a text file e.g. $HOME/downloads/lucy,
-            a url e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg,
-            a youtube playlist id e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu
+{Col.flag('-s|--source=')}a text file (e.g. $HOME/downloads/lucy),
+            a url (e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg),
+            a youtube playlist id (e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu)
             or free
-{Col.flag('-f --file-type=')}{Col.default('[o]')}/v/s/vs/a/t
-{Col.flag('-d --downloader=')}{Col.default('[urlopen]')}/requests/wget/curl for o,
+{Col.flag('-f|--file-type=')}{Col.default('[o]')}/v/s/vs/a/t
+{Col.flag('-d|--downloader=')}{Col.default('[urlopen]')}/requests/wget/curl for o,
                 or {Col.default('[youtube_dl]')}/curl for v/s/vs/a/t
-{Col.flag('-q --quality=')}{Col.default('[22]')}/243/best/etc
-{Col.flag('-i --increment=')}{Col.default('[None]')}/1/24/etc
-{Col.flag('-r --retries=')}{Col.default('[5]')}/3/10/etc
-{Col.flag('-w --when=')}{Col.default('[n]')}/h
-{Col.flag('-t --tor')}
-{Col.flag('-n --no-information')}
-{Col.flag('-v --verbose')}
-{Col.flag('-p --purge')}'''
+{Col.flag('-q|--quality=')}{Col.default('[22]')}/243/best/etc
+{Col.flag('-i|--increment=')}{Col.default('[None]')}/1/24/etc
+{Col.flag('-r|--retries=')}{Col.default('[5]')}/3/10/etc
+{Col.flag('-w|--when=')}{Col.default('[n]')}/h
+{Col.flag('-t|--tor')}
+{Col.flag('-n|--no-information')}
+{Col.flag('-v|--verbose')}
+{Col.flag('-p|--purge')}'''
     )  ## JUMP_1 whatever downloader you add/remove, update the allowed list of downloaders in Ini.verify_args()
     exit()
 
@@ -355,6 +355,7 @@ def main() -> None:
     if item == 'download':
 
         Ini.verify_args()
+        Ini.remove_duplicates()
         savelog_print(f'{Ini}\n', 'blue')
 
         if Ini.is_playlist:
@@ -541,9 +542,6 @@ class Initial:
         else:
             invalid('Source neither exists nor is a valid url')
 
-        ## FIXME find how to remove trailing/leading space self.urls members
-        ## TODO remove repeated urls and print if so
-
         if self.purge:
             self.dest_dir = f'/tmp/purge_{self.time}'
 
@@ -578,6 +576,12 @@ class Initial:
 
         if self.when not in ['n', 'h']:
             invalid('Invalid time')
+
+    def remove_duplicates(self) -> None:
+        dup_urls = self.urls_length - len(set(self.urls))
+        if dup_urls > 0:
+            self.urls = list(dict.fromkeys(self.urls))
+            print(Col.yellow(f'Removed {dup_urls} duplicate(s) from the urls list.'))
 
     def create_current(self, url) -> None:
         global Cur
@@ -810,8 +814,9 @@ class File(Profile):
         self.progress_file_downloaded = convert_byte(self.progress_file_downloaded_raw)
         self.progress_file_downloaded_perc = (self.progress_file_downloaded_raw * 100) / self.file_raw_size
 
-        ## FIXME <--,-- self.progress_file_downloaded_perc exceeds 100. what's more, adding if chunk:
-        ##          '-- at JUMP_2 prevents it from reaching 100, so here's a dirty trick:
+        ## FIXME <--,-- self.progress_file_downloaded_raw and self.progress_file_downloaded_perc exceed self.file_raw_size and 100 respectively.
+        ##          |-- what's more, adding if chunk: at JUMP_2 prevents it from reaching 100.
+        ##          '-- so here's a sloppy trick for now:
         if self.progress_file_downloaded_raw > self.file_raw_size:
             self.progress_file_downloaded = self.file_size
         if self.progress_file_downloaded_perc > 100:
@@ -823,7 +828,7 @@ class File(Profile):
             if not Ini.downloader:
 
                 if Ini.tor:
-                    ## FIXME not tested if proxy really works for urlopen. Needs more tests.
+                    ## TODO not tested if proxy really works for urlopen. Needs more tests.
                     ## https://stackoverflow.com/questions/3168171/how-can-i-open-a-website-with-urllib-via-proxy-in-python
                     ## https://stackoverflow.com/questions/34576665/setting-proxy-to-urllib-request-python3
                     proxy_support = ProxyHandler({'http': tor_proxy, 'https': tor_proxy})

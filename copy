@@ -1,220 +1,194 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-04 10:58:43 +0330 Saturday
+## @last-modified 1400-10-29 22:19:18 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 
 title="${0##*/}"
 
-function cd_and_rm_all_except_path {
+function copy {
     local remove_propmt
 
-    [ -d "$HOME"/linux/"$cfg_dir" ] || {
-        red 'no such cfg-dir'
+    action_now 'removing'
+
+    [ -d "$dest_dir" ] || {
+        red "no such dir as $dest_dir"
         exit
     }
 
-    readarray -t files < <(find "$HOME"/linux/"$cfg_dir" -mindepth 1 -maxdepth 1 ! -iname '*0-path.txt' | sort)
+    readarray -t files < <(find "$dest_dir" -mindepth 1 -maxdepth 1 ! -iname '*0-path.txt' | sort)
     printf '%s\n' "${files[@]##*/}" | column
 
     remove_propmt="$(get_single_input 'Remove these?')" && printf '\n'
     case "$remove_propmt" in
-        y ) rm -rf "${files[@]}" ;;
-        * ) exit ;;
+        y )
+            rm -rf "${files[@]}" ;;
+        * )
+            exit ;;
     esac
+
+    action_now 'copying'
+    cp -r "$@" "$dest_dir" && \
+    accomplished
 }
 
 heading "$title"
 
-main_items=( 'vim' 'awesome' 'bash' 'tmux' 'fzf' 'lf' 'ranger' 'xfce4-terminal' 'cava' 'keepass' 'netrc' 'pacman.conf' 'gtk-2.0' 'gtk-3.0' 'fstab' 'mkinitcpio' '99-sysctl (for swappiness)' 'pacman database' 'dhcpcd' 'xorg.conf' 'xinitrc' 'mirrorlist' '/var/cache/pacman/pkg' 'rofi' 'greenclip' 'grub' 'uget' 'kdenlive' 'mutt' 'lightdm' 'highlight' 'picom' 'kid3' 'audacious' 'vlc' 'irssi' 'git' 'tor' 'kdeconnect' 'torsocks' 'handbrake' 'vsftpd' 'ssh' 'aria2' 'mpv' 'vifm' 'gpicview' 'htop' 'qutebrowser' 'optimus-manager' 'wget' 'firefox')
+main_items=( 'vim' 'awesome' 'bash' 'tmux' 'fzf' 'lf' 'ranger' 'xfce4-terminal' 'cava' 'rofi' 'greenclip' 'grub' 'uget' 'kdenlive' 'mutt' 'lightdm' 'highlight' 'picom' 'kid3' 'audacious' 'vlc' 'irssi' 'git' 'tor' 'kdeconnect' 'torsocks' 'handbrake' 'vsftpd' 'ssh' 'aria2' 'mpv' 'vifm' 'gpicview' 'htop' 'qutebrowser' 'optimus-manager' 'wget' 'netrc' 'pacman.conf' 'gtk-2.0' 'gtk-3.0' 'fstab' 'mkinitcpio' '99-sysctl' 'dhcpcd' 'xorg.conf' 'xinitrc' 'mirrorlist'   'firefox' '/var/cache/pacman/pkg' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+dest_dir="$HOME"/linux/cfg-"$main_item"
 
 case "$main_item" in
-    vim )                   cfg_dir='cfg-vim'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                                                   rm -f "$HOME"/.vim/.netrwhist
-                            action_now 'copying';  cp -r "$HOME"/{.vim,.vimrc} "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    awesome )               cfg_dir='cfg-awesome'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/awesome/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    bash )                  cfg_dir='cfg-bash'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.bashrc                                "$HOME"/linux/"$cfg_dir"
-                                                   cp -r /etc/{bash.bashrc,environment,inputrc,profile} "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    tmux )                  cfg_dir='cfg-tmux'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.tmux* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    fzf )                   cfg_dir='cfg-fzf'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.fzf/ "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    lf )                    cfg_dir='cfg-lf'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/lf/lfrc                 "$HOME"/linux/"$cfg_dir"
-                                                   cp -r "$HOME"/.local/share/lf/{marks,history} "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    ranger )                ## first, check if the version of os python and ranger python are different
-                            ranger_python="$(ranger --version | \grep -i 'python version' | awk '{print $3}')"
-                            os_python="$(python --version | awk '{print $NF}')"
-                            [ "$os_python" == "$ranger_python" ] || {
-                                red "Different python versions. ranger python: ${ranger_python}, os python: ${os_python})"
-                                exit
-                            }
+    vim )
+        copy "$HOME"/{.vim,.vimrc} ;;
+    awesome )
+        copy "$HOME"/.config/awesome/* ;;
+    bash )
+        copy "$HOME"/.bashrc \
+             /etc/{bash.bashrc,environment,inputrc,profile} ;;
+    tmux )
+        copy "$HOME"/.tmux* ;;
+    fzf )
+        copy "$HOME"/.fzf/ ;;
+    lf )
+        copy "$HOME"/.config/lf/lfrc \
+             "$HOME"/.local/share/lf/{marks,history} ;;
+    ranger )
+        ## first, check if the version of os python and ranger python are different
+        ranger_python="$(ranger --version | \grep -i 'python version' | awk '{print $3}')"
+        os_python="$(python --version | awk '{print $NF}')"
+        [ "$os_python" == "$ranger_python" ] || {
+            red "different python versions. ranger python: ${ranger_python}, os python: ${os_python})"
+            exit
+        }
 
-                            ## now check if python version has changed from 3.9.*
-                            regex='3.9.*'
-                            [[ "$os_python" =~ $regex ]] || {
-                                red "python version changed ($os_python)" && exit
-                            }
+        ## now check if python version has changed from 3.9.*
+        regex='3.9.*'
+        [[ "$os_python" =~ $regex ]] || {
+            red "python version changed ($os_python)"
+            exit
+        }
 
-                            cfg_dir='cfg-ranger'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/ranger/{colorschemes,plugins,commands.py,commands_full.py,rc.conf,rifle.conf,scope.sh} "$HOME"/linux/"$cfg_dir"
-                                                   cp -r /usr/lib/python3.9/site-packages/ranger/container/fsobject.py "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    xfce4-terminal )        cfg_dir='cfg-xfce4-terminal'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/xfce4/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    cava )                  cfg_dir='cfg-cava'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/cava/config "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    keepass )               cfg_dir='cfg-keepass'
-                            action_now 'removing skipped'  # cd_and_rm_all_except_path
-                            action_now 'copying';          cp -r "$HOME"/.config/KeePass/KeePass.config.xml "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    netrc )                 cfg_dir='cfg-netrc'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.netrc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    pacman.conf )           cfg_dir='cfg-pacman.conf'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/pacman.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    gtk-2.0 )               cfg_dir='cfg-gtk-2.0'
-                            [ -f "$HOME/.gtkrc-2.0" ] || {
-                                red "${HOME}/.gtkrc-2.0 does not exist!"
-                                exit
-                            }
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.gtkrc-2.0                         "$HOME"/linux/"$cfg_dir"
-                                                   cp -r "$HOME"/.config/gtk-2.0/gtkfilechooser.ini "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    gtk-3.0 )               cfg_dir='cfg-gtk-3.0'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/gtk-3.0/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    fstab )                 cfg_dir='cfg-fstab'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/fstab "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    mkinitcpio )            cfg_dir='cfg-mkinitcpio'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/mkinitcpio.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    99-sysctl )             cfg_dir='cfg-99-sysctl'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/sysctl.d/99-sysctl.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    'pacman database' )     cfg_dir='cfg-pacman-database'
-                            action_now 'removing';    cd_and_rm_all_except_path
-                            action_now 'compressing'; tar -zcf "$HOME"/linux/"$cfg_dir"/pacman_database.tar.bz2 /var/lib/pacman/local 2>/dev/null && accomplished ;;
-    dhcpcd )                cfg_dir='cfg-dhcpcd'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/dhcpcd.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    xorg.conf )             cfg_dir='cfg-xorg.conf'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/X11/xorg.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    xinitrc )               cfg_dir='cfg-xinitrc'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.xinitrc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    mirrorlist )            cfg_dir='cfg-mirrorlist'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/pacman.d/mirrorlist "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    /var/cache/pacman/pkg ) pkgs_count="$(wc -l < <(find /var/cache/pacman/pkg/ -mindepth 1 -maxdepth 1 -type f))"
-                            (( pkgs_count > 0 )) && {
-                                action_now 'copying';  cp   -r /var/cache/pacman/pkg/* "$HOME"/linux-pkg
-                                action_now 'removing'; sudo rm /var/cache/pacman/pkg/* && accomplished
-                            } || red 'Nothing to copy' ;;
-## ----------------------------------------------------------------
-    rofi )                  cfg_dir='cfg-rofi'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/rofi/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    greenclip )             cfg_dir='cfg-greenclip'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/greenclip.toml "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    grub )                  cfg_dir='cfg-grub'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/default/grub "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    uget )                  cfg_dir='cfg-uget'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/uGet/Setting.json "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    kdenlive )              cfg_dir='cfg-kdenlive'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/kdenliverc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    mutt )                  cfg_dir='cfg-mutt'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.muttrc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    lightdm )               cfg_dir='cfg-lightdm'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/lightdm/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    highlight )             cfg_dir='cfg-highlight'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/highlight/anotherdark.theme "$HOME"/linux/"$cfg_dir"
-                                                   cp -r /usr/share/highlight/*                    "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    picom )                 cfg_dir='cfg-picom'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/picom/picom.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    kid3 )                  cfg_dir='cfg-kid3'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/kid3rc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    audacious )             cfg_dir='cfg-audacious'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/audacious/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    vlc )                   cfg_dir='cfg-vlc'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/vlc/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    irssi )                 cfg_dir='cfg-irssi'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.irssi/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    git )                   cfg_dir='cfg-git'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/{.gitconfig,.git-credentials} "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    tor )                   cfg_dir='cfg-tor'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/tor/torrc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    kdeconnect )            cfg_dir='cfg-kdeconnect'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/kdeconnect/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    torsocks )              cfg_dir='cfg-torsocks'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/tor/torsocks.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    handbrake )             cfg_dir='cfg-handbrake'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/ghb/preferences.json "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    vsftpd )                cfg_dir='cfg-vsftpd'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/vsftpd.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    ssh )                   cfg_dir='cfg-ssh'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/ssh/{ssh_config,sshd_config} "$HOME"/linux/"$cfg_dir"
-                                                   cp -r "$HOME"/.ssh/config               "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    aria2 )                 cfg_dir='cfg-aria2'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.aria2/aria2.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    mpv )                   cfg_dir='cfg-mpv'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/mpv/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    vifm )                  cfg_dir='cfg-vifm'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/vifm/* "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    gpicview )              cfg_dir='cfg-gpicview'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/gpicview/gpicview.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    htop )                  cfg_dir='cfg-htop'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/htop/htoprc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    qutebrowser )           cfg_dir='cfg-qutebrowser'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r "$HOME"/.config/qutebrowser/config.py "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    optimus-manager )       cfg_dir='cfg-optimus-manager'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/optimus-manager/optimus-manager.conf    "$HOME"/linux/"$cfg_dir"
-                                                   cp -r /etc/X11/xorg.conf.d/10-optimus-manager.conf "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    wget )                  cfg_dir='cfg-wget'
-                            action_now 'removing'; cd_and_rm_all_except_path
-                            action_now 'copying';  cp -r /etc/wgetrc "$HOME"/linux/"$cfg_dir" && accomplished ;;
-    firefox )               cfg_dir='cfg-firefox'
-                            action_now 'removing chrome dir only'; rm -r "$HOME"/linux/cfg-firefox/chrome  ## exceptionally removing chrome dir only
-                            action_now 'copying';  cp -r "$HOME"/.mozilla/firefox/*.default-release/chrome "$HOME"/linux/"$cfg_dir" && accomplished ;;
+        copy "$HOME"/.config/ranger/{colorschemes,plugins,commands.py,commands_full.py,rc.conf,rifle.conf,scope.sh} \
+             /usr/lib/python3.9/site-packages/ranger/container/fsobject.py ;;
+    xfce4-terminal )
+        copy "$HOME"/.config/xfce4/* ;;
+    cava )
+        copy "$HOME"/.config/cava/config ;;
+    rofi )
+        copy "$HOME"/.config/rofi/* ;;
+    greenclip )
+        copy "$HOME"/.config/greenclip.toml ;;
+    grub )
+        copy /etc/default/grub ;;
+    uget )
+        copy "$HOME"/.config/uGet/Setting.json ;;
+    kdenlive )
+        copy "$HOME"/.config/kdenliverc ;;
+    mutt )
+        copy "$HOME"/.muttrc ;;
+    lightdm )
+        copy /etc/lightdm/* ;;
+    highlight )
+        copy "$HOME"/.config/highlight/anotherdark.theme \
+             /usr/share/highlight/* ;;
+    picom )
+        copy "$HOME"/.config/picom/picom.conf ;;
+    kid3 )
+        copy "$HOME"/.config/kid3rc ;;
+    audacious )
+        copy "$HOME"/.config/audacious/* ;;
+    vlc )
+        copy "$HOME"/.config/vlc/* ;;
+    irssi )
+        copy "$HOME"/.irssi/* ;;
+    git )
+        copy "$HOME"/{.gitconfig,.git-credentials} ;;
+    tor )
+        copy /etc/tor/torrc ;;
+    kdeconnect )
+        copy "$HOME"/.config/kdeconnect/* ;;
+    torsocks )
+        copy /etc/tor/torsocks.conf ;;
+    handbrake )
+        copy "$HOME"/.config/ghb/preferences.json ;;
+    vsftpd )
+        copy /etc/vsftpd.conf ;;
+    ssh )
+        copy /etc/ssh/{ssh_config,sshd_config} \
+             "$HOME"/.ssh/config ;;
+    aria2 )
+        copy "$HOME"/.aria2/aria2.conf ;;
+    mpv )
+        copy "$HOME"/.config/mpv/* ;;
+    vifm )
+        copy "$HOME"/.config/vifm/* ;;
+    gpicview )
+        copy "$HOME"/.config/gpicview/gpicview.conf ;;
+    htop )
+        copy "$HOME"/.config/htop/htoprc ;;
+    qutebrowser )
+        copy "$HOME"/.config/qutebrowser/config.py ;;
+    optimus-manager )
+        copy /etc/optimus-manager/optimus-manager.conf \
+             /etc/X11/xorg.conf.d/10-optimus-manager.conf ;;
+    wget )
+        copy /etc/wgetrc ;;
+    ## os pkgs ----------------------------------------------------------------
+    netrc )
+        copy "$HOME"/.netrc ;;
+    pacman.conf )
+        copy /etc/pacman.conf ;;
+    gtk-2.0 )
+        [ -f "$HOME"/.gtkrc-2.0 ] || {
+            red "${HOME}/.gtkrc-2.0 does not exist"
+            exit
+        }
+
+        copy "$HOME"/.gtkrc-2.0 \
+             "$HOME"/.config/gtk-2.0/gtkfilechooser.ini ;;
+    gtk-3.0 )
+        copy "$HOME"/.config/gtk-3.0/* ;;
+    fstab )
+        copy /etc/fstab ;;
+    mkinitcpio )
+        copy /etc/mkinitcpio.conf ;;
+    99-sysctl )
+        copy /etc/sysctl.d/99-sysctl.conf ;;
+    dhcpcd )
+        copy /etc/dhcpcd.conf ;;
+    xorg.conf )
+        copy /etc/X11/xorg.conf ;;
+    xinitrc )
+        copy "$HOME"/.xinitrc ;;
+    mirrorlist )
+        copy /etc/pacman.d/mirrorlist ;;
+
+
+
+    ## pkgs with exceptional removing/copying procedures -------------------------------
+
+    ## removes chrome dir only
+    firefox )
+        action_now 'removing chrome dir only'
+        rm -r "$dest_dir"/chrome
+        action_now 'copying chrome dir only'
+        cp -r "$HOME"/.mozilla/firefox/*.default-release/chrome "$dest_dir" && accomplished ;;
+
+    ## has a different dest_dir
+    /var/cache/pacman/pkg )
+        dest_dir="$HOME"/linux-pkg
+        readarray -t pkgs < <(find /var/cache/pacman/pkg/ -mindepth 1 -maxdepth 1 -type f)
+        if [ "$pkgs" ]; then
+            action_now 'copying from /var/cache/pacman/pkg'
+            cp -r "${pkgs[@]}" "$dest_dir"
+            action_now 'removing pkgs in /var/cache/pacman/pkg'
+            sudo rm "${pkgs[@]}"
+            action_now 'checking if there are older pkgs to move to trash'
+            move_older_pkgs
+        else
+            red 'nothing to copy'
+        fi && accomplished ;;
 
 esac

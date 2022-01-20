@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:05:24 +0330 Saturday
+## @last-modified 1400-10-29 10:13:20 +0330 Wednesday
 
 case "$1" in
-    rofi ) rofi -show combi & ;;
-    dmenu ) dmenu_run -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p 'dmenu' & ;;
+    rofi )
+        rofi -show combi & ;;
+    dmenu )
+        dmenu_run -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p 'dmenu' & ;;
 esac

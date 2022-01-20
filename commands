@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-15 23:55:18 +0330 Wednesday
+## @last-modified 1400-10-26 22:33:07 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -28,9 +28,13 @@ ctc_msg "$main_item" && accomplished
 exit
 
 COMMANDS:START
-print line 5 [i]  ---> sed '5q;d'
-print line 5 [ii] ---> awk NR==5
+print line 5 [i]   ---> sed '5q;d'
+print line 5 [ii]  ---> sed -n '5p'
+print line 5 [iii] ---> awk NR==5
 print last line ---> sed -e '$!d'
+print from line 11 to line 15 (both inclusive) ---> sed -n '11,15p'
+print from line 11 to the end of file (inclusive) ---> sed -n '11,$p' file
+print line 11 and line 15 ---> sed -n '11p;15p'
 remove first line ---> sed '1d'
 remove last line ---> sed '$d'
 remove lines 1 to 3 ---> sed '1,3d'

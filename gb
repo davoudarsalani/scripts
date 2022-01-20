@@ -1,19 +1,29 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-26 08:41:54 +0330 Sunday
+## @last-modified 1400-10-30 07:46:45 +0330 Thursday
 
 function get_datetime {
     case "$1" in
-            ymdhms )   printf '%(%Y%m%d%H%M%S)T\n'            ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d%H%M%S)"
-            ymd )      printf '%(%Y%m%d)T\n'                  ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d)"
-            hms )      printf '%(%H%M%S)T\n'                  ;; ## PREVIOUSLY: printf '%s\n' "$(date +%H%M%S)"
-            seconds )  printf '%(%s)T\n'                      ;; ## PREVIOUSLY: printf '%s\n' "$(date +%s)"
-            weekday )  printf '%(%A)T\n'                      ;; ## PREVIOUSLY: printf '%s\n' "$(date +%A)"
-            jymdhms )  printf '%s\n' "$(jdate +%Y%m%d%H%M%S)" ;;
-            jymd )     printf '%s\n' "$(jdate +%Y%m%d)"       ;;
-            jhms )     printf '%s\n' "$(jdate +%H%M%S)"       ;;
-            jseconds ) printf '%s\n' "$(jdate +%s)"           ;;
-            jweekday ) printf '%s\n' "$(jdate +%A)"           ;;
+            ymdhms )
+                printf '%(%Y%m%d%H%M%S)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d%H%M%S)"
+            ymd )
+                printf '%(%Y%m%d)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d)"
+            hms )
+                printf '%(%H%M%S)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%H%M%S)"
+            seconds )
+                printf '%(%s)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%s)"
+            weekday )
+                printf '%(%A)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%A)"
+            jymdhms )
+                printf '%s\n' "$(jdate +%Y%m%d%H%M%S)" ;;
+            jymd )
+                printf '%s\n' "$(jdate +%Y%m%d)" ;;
+            jhms )
+                printf '%s\n' "$(jdate +%H%M%S)" ;;
+            jseconds )
+                printf '%s\n' "$(jdate +%s)" ;;
+            jweekday )
+                printf '%s\n' "$(jdate +%A)" ;;
     esac
 }
 
@@ -50,7 +60,7 @@ function wrap_fzf_choice {
 function choose_file {
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
-    ## NOTE used also in ~/.config/lfrc
+    ## NOTE used also in "$HOME"/.config/lfrc
 
     local item
 
@@ -64,13 +74,20 @@ function choose_file {
 function choose_directory {
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
-    ## NOTE used also in ~/.config/lfrc
+    ## NOTE used also in "$HOME"/.config/lfrc
 
-    ## usages:
-    ##   choose_directory
-    ##   choose_directory 'dir_name'  ## to limit the results
+    ## usages: this function can accept two args to limit results
+    ##   dir="$(choose_directory)"
+    ##   dir="$(choose_directory 'git')"
+    ##   dir="$(choose_directory 'git' 'public')"
 
-    local dir
+    local dir git_args
+
+    ## these options are also used in "$HOME"/scripts/awesome-widgets git option
+    git_args=" ! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*' -iname '.git' | sed 's#/\.git##' | sort"
+
+    [ "$1" == 'git' ] && FZF_ALT_C_COMMAND+=" $git_args"  ## display git repositories only
+    [ "$2" ] && FZF_ALT_C_COMMAND+=" | \grep "$2""  ## display specific git repositories only
 
     dir="$(eval "$FZF_ALT_C_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
     printf '%q\n' "${dir/\~/$HOME}"
@@ -236,6 +253,7 @@ function convert_second {
     local seconds sec min hour day mont year result
 
     seconds="${1%.*}"  ## remove decimal in case arg is a float
+
     sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
     min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
     hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
@@ -363,12 +381,15 @@ function rand_str {
     # sed 's/-//g' < /proc/sys/kernel/random/uuid  ## returns e.g. a8a29c0d109a40468051bcbaf70af17e
 }
 
-function move_old_pkgs {
-    declare -a files uniques repeats
-    declare -i moved=0 keep=3
-    local src_dir uniq count file exceed
+function move_older_pkgs {
+    source "$HOME"/scripts/gb-color
+
+    declare -a files uniques repeats to_be_moved
+    declare -i keep=3
+    local src_dir uniq count file exceed idx move_propmt
 
     src_dir="$HOME"/linux-pkg
+    dest_dir="$HOME"/trash/older-pkg
     readarray -t files < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f ! -iname '*.sig' ! -iname '*:*' | sort)
     readarray -t uniques < <(printf '%s\n' "${files[@]}" | sed 's|-[0-9]\+[^:]*||g' | sort | uniq --count)
     for uniq in "${uniques[@]}"; {
@@ -377,128 +398,136 @@ function move_old_pkgs {
         (( exceed="count - keep" ))  ## 5
         readarray -t repeats < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "${file##*/}*" ! -iname '*.sig' ! -iname '*:*' | sort)
         for ((idx=0; idx<${exceed}; idx++)); {
-            mv -v "${repeats[${idx}]}" "$HOME"/trash/old-pkgs
-            ((moved++))
+            to_be_moved+=("${repeats[${idx}]}")
         }
     }
-    printf '%s\n' "$moved"
+
+    if [ "$to_be_moved" ]; then
+        printf '%s\n' "${to_be_moved[@]##*/}" | sort | column
+        move_propmt="$(get_single_input "Move ${#to_be_moved[@]} pkgs?")" && printf '\n'
+        case "$move_propmt" in
+            y ) mv -v "${to_be_moved[@]}" "$dest_dir" ;;
+        esac
+    else
+        red 'nothing to move'
+    fi
 }
 
 
- # function find_duplicate_images {
- #     source "$HOME"/scripts/gb-color
+# function find_duplicate_images {
+#     source "$HOME"/scripts/gb-color
 
- #     declare -a pics
+#     declare -a pics
 
- #     [ "$1" ] || {
- #         red 'arg needed'
- #         exit
- #     }
- #     dest_dir="$1"
- #     [ -d "$dest_dir" ] || {
- #         red 'no such dir'
- #         exit
- #     }
+#     [ "$1" ] || {
+#         red 'arg needed'
+#         exit
+#     }
+#     dest_dir="$1"
+#     [ -d "$dest_dir" ] || {
+#         red 'no such dir'
+#         exit
+#     }
 
- #     SECONDS=0
+#     SECONDS=0
 
- #     readarray -t pics < <(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
- #     dups=''
+#     readarray -t pics < <(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
+#     dups=''
 
- #     for ((i=0; i<"${#pics[@]}"; i++)); {
- #         p1="${pics[$i]}"
+#     for ((i=0; i<"${#pics[@]}"; i++)); {
+#         p1="${pics[$i]}"
 
- #         ## start comparing only if p1 is not already in dups
- #         if_p1_in_dups="$(printf '%s\n' "$dups" | \grep "$p1")"  ## I quoted $p1 and didn't check if it still works
- #         [ "$if_p1_in_dups" ] || {
- #             printf '%s\n' "$p1"
- #             for p2 in "${pics[@]:$i}"; {
- #                 ## prevent comparing with itself
- #                 [ "$p1" == "$p2" ] || {
- #                     difference="$(diff "$p1" "$p2")"
- #                     \grep -q 'differ$' <<< "$difference" || dups+="${p1} = ${p2}, "
- #                 }
- #             }
+#         ## start comparing only if p1 is not already in dups
+#         if_p1_in_dups="$(printf '%s\n' "$dups" | \grep "$p1")"  ## I quoted $p1 and didn't check if it still works
+#         [ "$if_p1_in_dups" ] || {
+#             printf '%s\n' "$p1"
+#             for p2 in "${pics[@]:$i}"; {
+#                 ## prevent comparing with itself
+#                 [ "$p1" == "$p2" ] || {
+#                     difference="$(diff "$p1" "$p2")"
+#                     \grep -q 'differ$' <<< "$difference" || dups+="${p1} = ${p2}, "
+#                 }
+#             }
 
- #             ## write dups already found if any
- #             [ "$dups" ] && green "dups: $dups"
+#             ## write dups already found if any
+#             [ "$dups" ] && green "dups: $dups"
 
- #             grey '-------------------------'
+#             grey '-------------------------'
 
- #         }
- #     }
+#         }
+#     }
 
- #     green "dups: $dups"
- #     printf '\n'
+#     green "dups: $dups"
+#     printf '\n'
 
- #     dur="$(convert_second "$SECONDS")"
- #     printf 'Total duration: %s\n' "$dur"
- # }
+#     dur="$(convert_second "$SECONDS")"
+#     printf 'Total duration: %s\n' "$dur"
+# }
+# }}}
+# function compare_network_speed {
+#    ## this function takes only one arg which can only be either old or new
 
- # function compare_network_speed {
- #    ## this function takes only one arg which can only be either old or new
+#    source "$HOME"/scripts/gb-calculation
+#    source "$HOME"/scripts/gb-color
 
- #    source "$HOME"/scripts/gb-calculation
- #    source "$HOME"/scripts/gb-color
+#    declare -a loop_durs loops_durs
 
- #    declare -a loop_durs loops_durs
+#    durs_file=/tmp/0-durs
+#    totals_file=/tmp/0-totals
+#    loops_count=10
+#    position="$1"
 
- #    durs_file=/tmp/0-durs
- #    totals_file=/tmp/0-totals
- #    loops_count=10
- #    position="$1"
+#    [ "$position" == 'old' ] || [ "$position" == 'new' ] || {
+#        printf '%s\n' "$(red "arg can only be either old or new")"
+#        exit
+#    }
 
- #    [ "$position" == 'old' ] || [ "$position" == 'new' ] || {
- #        printf '%s\n' "$(red "arg can only be either old or new")"
- #        exit
- #    }
+#    ## if position is old it means we want to have a fresh start
+#    ## so let's empty totals_file first
+#    [ "$position" == "old" ] && > "$totals_file"
 
- #    ## if position is old it means we want to have a fresh start
- #    ## so let's empty totals_file first
- #    [ "$position" == "old" ] && > "$totals_file"
+#    for ((i=1; i<="$loops_count"; i++)); {
+#        printf 'loop %s\n' "$i"
+#        > "$durs_file"
+#        for ((j=1; j<="$loops_count"; j++)); {
+#            { time -p "$HOME"/scripts/awesome-widgets network ;} &>>"$durs_file"
+#            printf '\n' >> "$durs_file"
+#            sleep 1
+#        }
 
- #    for ((i=1; i<="$loops_count"; i++)); {
- #        printf 'loop %s\n' "$i"
- #        > "$durs_file"
- #        for ((j=1; j<="$loops_count"; j++)); {
- #            { time -p "$HOME"/scripts/awesome-widgets network ;} &>>"$durs_file"
- #            printf '\n' >> "$durs_file"
- #            sleep 1
- #        }
+#        loop_dur=0
+#        readarray -t loop_durs < <(\grep 'real' "$durs_file" | awk '{print $NF}')
+#        for a_sm in "${loop_durs[@]}"; {
+#            loop_dur="$(float_pad "${loop_dur}+${a_sm}" 1 2)"
+#        }
+#        printf '%s %s\n' "$position" "$loop_dur" >> "$totals_file"
+#    }
 
- #        loop_dur=0
- #        readarray -t loop_durs < <(\grep 'real' "$durs_file" | awk '{print $NF}')
- #        for a_sm in "${loop_durs[@]}"; {
- #            loop_dur="$(float_pad "${loop_dur}+${a_sm}" 1 2)"
- #        }
- #        printf '%s %s\n' "$position" "$loop_dur" >> "$totals_file"
- #    }
+#    loops_dur=0
+#    readarray -t loops_durs < <(\grep "$position" "$totals_file" | awk '{print $NF}')
+#    for a_big in "${loops_durs[@]}"; {
+#        loops_dur="$(float_pad "${loops_dur}+${a_big}" 1 2)"
+#    }
+#    printf '%s = %s\n\n' "$position" "$loops_dur" >> "$totals_file"
 
- #    loops_dur=0
- #    readarray -t loops_durs < <(\grep "$position" "$totals_file" | awk '{print $NF}')
- #    for a_big in "${loops_durs[@]}"; {
- #        loops_dur="$(float_pad "${loops_dur}+${a_big}" 1 2)"
- #    }
- #    printf '%s = %s\n\n' "$position" "$loops_dur" >> "$totals_file"
+#    ## compare
+#    old_loops_total="$(\grep 'old =' "$totals_file" | awk '{print $NF}' 2>/dev/null)"
+#    new_loops_total="$(\grep 'new =' "$totals_file" | awk '{print $NF}' 2>/dev/null)"
 
- #    ## compare
- #    old_loops_total="$(\grep 'old =' "$totals_file" | awk '{print $NF}' 2>/dev/null)"
- #    new_loops_total="$(\grep 'new =' "$totals_file" | awk '{print $NF}' 2>/dev/null)"
-
- #    [ "$new_loops_total" ] && [ "$old_loops_total" ] && {
- #        is_faster="$(compare_floats "$new_loops_total" '<' "$old_loops_total")"
- #        is_slower="$(compare_floats "$new_loops_total" '>' "$old_loops_total")"
- #        if [ "$is_faster" == 'true' ]; then
- #            diff="$(float_pad "${old_loops_total}-${new_loops_total}")"
- #            msg="$diff faster"
- #        elif [ "$is_slower" == 'true' ]; then
- #            diff="$(float_pad "${new_loops_total}-${old_loops_total}")"
- #            msg="$diff slower"
- #        else
- #            msg="$old_loops_total = $new_loops_total"
- #        fi
- #        printf 'compare\n%s\n' "$msg" >> "$totals_file"
- #    }
+#    [ "$new_loops_total" ] && [ "$old_loops_total" ] && {
+#        is_faster="$(compare_floats "$new_loops_total" '<' "$old_loops_total")"
+#        is_slower="$(compare_floats "$new_loops_total" '>' "$old_loops_total")"
+#        if [ "$is_faster" == 'true' ]; then
+#            diff="$(float_pad "${old_loops_total}-${new_loops_total}")"
+#            msg="$diff faster"
+#        elif [ "$is_slower" == 'true' ]; then
+#            diff="$(float_pad "${new_loops_total}-${old_loops_total}")"
+#            msg="$diff slower"
+#        else
+#            msg="$old_loops_total = $new_loops_total"
+#        fi
+#        printf 'compare\n%s\n' "$msg" >> "$totals_file"
+#    }
 # }
 
 # function convert_Fun_to_lower_size {

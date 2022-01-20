@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:06:47 +0330 Saturday
+## @last-modified 1400-10-29 10:50:37 +0330 Wednesday
 
 function hi_li {
     eval "$HIGHLIGHT" "$1" 2>/dev/null  ## NOTE do not replace 2 with &
@@ -14,23 +14,42 @@ attr="$(lsattr "$1" | awk '{print $1}')"
 file_mime_type="$(file --mime-type "$1" -bL)"
 
 case "$file_mime_type" in
-    audio/* )            printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
-    video/* )            printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
-    text/* )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
-    application/json )   printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
-    application/csv )    printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
-    message/news )       printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
-    */octet-stream )     printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
-    application/msword ) printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
-    */*spreadsheet* )    printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
-    */*officedocument* ) printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
-    */pdf)               printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
-    image/* )            printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
-    */*tar )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
-    */gzip )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
-    *bzip2 )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
-    */zip )              printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unzip -l "$1" | sed '1,3d' | awk '{print $4}' | sed '/^$/d' | sort)" ;;
-    */*rar )             printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unrar l "$1" | sed '1,8d' | head -n -3 | awk '{print $NF}' | sort)" ;;
-    */*iso*image)        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
-    * )                  printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    audio/* )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
+    video/* )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
+    text/* )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    application/json )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    application/csv )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    message/news )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(hi_li "$1")" ;;
+    */octet-stream )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    application/msword )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */*spreadsheet* )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */*officedocument* )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */pdf)
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    image/* )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
+    */*tar )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+    */gzip )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+    *bzip2 )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */zip )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unzip -l "$1" | sed '1,3d' | awk '{print $4}' | sed '/^$/d' | sort)" ;;
+    */*rar )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unrar l "$1" | sed '1,8d' | head -n -3 | awk '{print $NF}' | sort)" ;;
+    */*iso*image)
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    * )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
 esac

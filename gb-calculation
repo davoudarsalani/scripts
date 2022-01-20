@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-26 11:19:15 +0330 Friday
+## @last-modified 1400-10-29 10:10:28 +0330 Wednesday
 
 function float_pad {
     local input desired_l_length desired_r_length float l r r_length lacking_pad
@@ -50,39 +50,29 @@ function compare_floats {
 
     ## compare
     case "$oper" in
-         '<' ) [ "$(awk '{printf($1 <  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
-         '=' ) [ "$(awk '{printf($1 == $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
-         '>' ) [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
+         '<' )
+            [ "$(awk '{printf($1 <  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
+         '=' )
+            [ "$(awk '{printf($1 == $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
+         '>' )
+            [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
     esac
 }
 
 function convert_byte {
     ## conversion table:
-    ## bytes=2546790
-    ## B  = "$bytes"               ## 2546790
-    ## KB = "$bytes" / 1024        ## 248720.50KB
-    ## MB = "$bytes" / 1024000     ## 248.72MB
-    ## GB = "$bytes" / 1024000000  ## 00.25GB
+    ## B  = "$1"               ## 2546790
+    ## KB = "$1" / 1024        ## 248720.50KB
+    ## MB = "$1" / 1024000     ## 248.72MB
+    ## GB = "$1" / 1024000000  ## 00.25GB
 
-    local bytes number suffix
-
-    bytes="$1"
-    if (( bytes == 0 )); then
-        number=0
-        suffix='B'
-    elif (( bytes >= 1024000000 )); then
-        number="$(float_pad "${bytes}/1024000000" 1 2)"
-        suffix='GB'
-    elif (( bytes >= 1024000 )); then
-        number="$(float_pad "${bytes}/1024000" 1 2)"
-        suffix='MB'
-    elif (( bytes >= 1024 )); then
-        number="$(float_pad "${bytes}/1024" 1 2)"
-        suffix='KB'
+    if (( "$1" >= 1024000000 )); then
+        printf '%sGB\n' "$(float_pad "${1}/1024000000" 1 2)"
+    elif (( "$1" >= 1024000 )); then
+        printf '%sMB\n' "$(float_pad "${1}/1024000" 1 2)"
+    elif (( "$1" >= 1024 )); then
+        printf '%sKB\n' "$(float_pad "${1}/1024" 1 2)"
     else
-        number="$bytes"
-        suffix='B'
+        printf '%sB\n' "$1"
     fi
-
-    printf '%s%s\n' "$number" "$suffix"
 }

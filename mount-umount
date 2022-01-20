@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-01 08:23:11 +0330 Wednesday
+## @last-modified 1400-10-29 11:13:04 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -14,8 +14,10 @@ function display_help {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -d ) device="${device:-"$(get_input 'Device (e.g. /dev/sdc)')"}" ;;
-            -n ) name="${name:-"$(get_input "Name (e.g. nnnn)")"}"      ;;
+            -d )
+                device="${device:-"$(get_input 'Device (e.g. /dev/sdc)')"}" ;;
+            -n )
+                name="${name:-"$(get_input "Name (e.g. nnnn)")"}" ;;
         esac
         shift
     }
@@ -28,10 +30,16 @@ function get_opt {
     eval set -- "$options"
     while true; do
         case "$1" in
-            -h|--help )   display_help       ;;
-            -d|--device ) shift; device="$1" ;;
-            -n|--name )   shift; name="$1"   ;;
-            -- )          break              ;;
+            -h|--help )
+                display_help ;;
+            -d|--device )
+                shift
+                device="$1" ;;
+            -n|--name )
+                shift
+                name="$1" ;;
+            -- )
+                break ;;
         esac
         shift
     done
@@ -40,53 +48,53 @@ function get_opt {
 get_opt "$@"
 
 case "$1" in
-    mount ) get_mountable_umountable
-            [ "$mountable" ] || {
-                msgn 'nothing to mount'
-                exit
-            }
-            mountable_item="$(pipe_to_rofi "${mountable[@]}" 'header=mountable')" || exit 37
+    mount )
+        get_mountable_umountable
+        [ "$mountable" ] || {
+            msgn 'nothing to mount'
+            exit
+        }
+        mountable_item="$(pipe_to_rofi "${mountable[@]}" 'header=mountable')" || exit 37
 
-            current_datetime="$(get_datetime 'jymdhms')"
-            name="$(printf '%s\n' "$mountable_item" | awk '{print $1}')"  ## sdb1
+        current_datetime="$(get_datetime 'jymdhms')"
+        name="$(printf '%s\n' "$mountable_item" | awk '{print $1}')"  ## sdb1
 
-            function msg_mount_successful {
-                msgn "<span color=\"${orange}\">/dev/${name}</span> mounted at <span color=\"${orange}\">/tmp/${current_datetime}-${name}</span>"
-            }
+        function msg_mount_successful {
+            msgn "<span color=\"${orange}\">/dev/${name}</span> mounted at <span color=\"${orange}\">/tmp/${current_datetime}-${name}</span>"
+        }
 
-            function msg_mount_failed {
-                msgc 'ERROR' "mounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/linux/themes/alert-w.png
-            }
+        function msg_mount_failed {
+            msgc 'ERROR' "mounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/linux/themes/alert-w.png
+        }
 
-            mkdir -p /tmp/"$current_datetime"-"$name"
+        mkdir -p /tmp/"$current_datetime"-"$name"
 
-            if  \grep -q '^sr' <<< "$name"; then
-                sudo mount /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
-            else
-                sudo mount -o umask=000 /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
-            fi
+        if  \grep -q '^sr' <<< "$name"; then
+            sudo mount /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
+        else
+            sudo mount -o umask=000 /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
+        fi ;;
 
-            accomplished ;;
-    umount ) get_mountable_umountable
-             [ "$umountable" ] || {
-                 msgn 'nothing to umount'
-                 exit
-             }
-             umountable_item="$(pipe_to_rofi "${umountable[@]}" 'header=umountable')" || exit 37
+    umount )
+        get_mountable_umountable
+        [ "$umountable" ] || {
+            msgn 'nothing to umount'
+            exit
+        }
+        umountable_item="$(pipe_to_rofi "${umountable[@]}" 'header=umountable')" || exit 37
 
-             name="$(printf '%s\n' "$umountable_item" | awk '{print $1}')"
+        name="$(printf '%s\n' "$umountable_item" | awk '{print $1}')"
 
-             function msg_umount_successful {
-                 msgn "<span color=\"${orange}\">/dev/${name}</span> umounted"
-             }
+        function msg_umount_successful {
+            msgn "<span color=\"${orange}\">/dev/${name}</span> umounted"
+        }
 
-             function msg_umount_failed {
-                 msgc 'ERROR' "umounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/linux/themes/alert-w.png
-             }
+        function msg_umount_failed {
+            msgc 'ERROR' "umounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/linux/themes/alert-w.png
+        }
 
-             sudo umount /dev/"$name" && msg_umount_successful || msg_umount_failed
+        sudo umount /dev/"$name" && msg_umount_successful || msg_umount_failed ;;
 
-             accomplished ;;
 esac
 
 heading "$title"
@@ -95,43 +103,59 @@ main_items=( 'udisksctl mount -b' 'udisksctl unmount -b' 'lsblk' 'blkid and lsbl
 man_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$man_item" in
-    'udisksctl mount -b' ) prompt -d
-                           sudo udisksctl mount -b "$device" && lsblk_full && accomplished "$device mounted" ;;
-    'udisksctl unmount -b' ) prompt -d
-                             sudo udisksctl umount -b "$device" && lsblk_full && accomplished "$device umounted" ;;
-    lsblk ) lsblk_full && accomplished ;;
-    'blkid and lsblk -f' ) sudo blkid
-                           printf '\n'
-                           \lsblk -f && accomplished ;;
-    lsusb ) lsusb && accomplished ;;
-    'lsmod (modules loaded)' ) lsmod && accomplished ;;
-    lspci ) lspci && accomplished ;;
-    'mounted drives' ) printf '%s\n' "$(mounted_drives)" && accomplished ;;
-    'kernel drivers' ) lspci -k && accomplished ;;
-    'remount root partition' ) remount_prompt="$(get_single_input 'You sure?')" && printf '\n'
-                               case "$remount_prompt" in
-                                   y ) mount -o remount,rw / && accomplished ;;
-                               esac ;;
-    mountable ) [ "$mountable" ] && printf '%s\n' "$mountable" && accomplished ;;
-    umountable ) [ "$umountable" ] && printf '%s\n' "$umountable" && accomplished ;;
-    'format usb device' ) prompt -d
-                          sleep 0.5
-                          sudo wipefs --all "$device" && accomplished
-                          printf '+-+-+-+-+-+-+-+-+\n'
-                          read -p '> Creating a new partition table (choose dos). Press any key to continue ...'
-                          sleep 5
-                          sudo cfdisk "$device" && accomplished
-                          sleep 0.5
+    'udisksctl mount -b' )
+        prompt -d
+        sudo udisksctl mount -b "$device" && lsblk_full && accomplished "$device mounted" ;;
+    'udisksctl unmount -b' )
+        prompt -d
+        sudo udisksctl umount -b "$device" && lsblk_full && accomplished "$device umounted" ;;
+    lsblk )
+        lsblk_full && accomplished ;;
+    'blkid and lsblk -f' )
+        sudo blkid
+        printf '\n'
+        \lsblk -f && accomplished ;;
+    lsusb )
+        lsusb && accomplished ;;
+    'lsmod (modules loaded)' )
+        lsmod && accomplished ;;
+    lspci )
+        lspci && accomplished ;;
+    'mounted drives' )
+        printf '%s\n' "$(mounted_drives)" && accomplished ;;
+    'kernel drivers' )
+        lspci -k && accomplished ;;
+    'remount root partition' )
+        remount_prompt="$(get_single_input 'You sure?')" && printf '\n'
+        case "$remount_prompt" in
+            y ) mount -o remount,rw / && accomplished ;;
+        esac ;;
+    mountable )
+        [ "$mountable" ] && printf '%s\n' "$mountable" && accomplished ;;
+    umountable )
+        [ "$umountable" ] && printf '%s\n' "$umountable" && accomplished ;;
+    'format usb device' )
+        prompt -d
+        sleep 0.5
+        sudo wipefs --all "$device" && accomplished
+        printf '+-+-+-+-+-+-+-+-+\n'
+        read -p '> Creating a new partition table (choose dos). Press any key to continue ...'
+        sleep 5
+        sudo cfdisk "$device" && accomplished
+        sleep 0.5
 
-                          filesystem="$(pipe_to_fzf 'ext4' 'vfat')" && wrap_fzf_choice "$filesystem" || exit 37
+        filesystem="$(pipe_to_fzf 'ext4' 'vfat')" && wrap_fzf_choice "$filesystem" || exit 37
 
-                          case "$filesystem" in
-                              ext4 ) device+=1  ## /dev/sdc1
-                                     sudo mkfs.ext4 "$device" && accomplished ;;
-                              vfat ) prompt -n
-                                     device+=1  ## /dev/sdc1
-                                     sudo mkfs.vfat -n "$name" "$device" && accomplished ;;
-                          esac ;;
-    'cat /proc/mounts' ) cat /proc/mounts && accomplished ;;
-    help ) display_help ;;
+        device+=1  ## /dev/sdc1
+        case "$filesystem" in
+            ext4 )
+                sudo mkfs.ext4 "$device" && accomplished ;;
+            vfat )
+                prompt -n
+                sudo mkfs.vfat -n "$name" "$device" && accomplished ;;
+        esac ;;
+    'cat /proc/mounts' )
+        cat /proc/mounts && accomplished ;;
+    help )
+        display_help ;;
 esac

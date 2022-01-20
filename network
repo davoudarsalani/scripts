@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:06:27 +0330 Saturday
+## @last-modified 1400-10-29 11:13:16 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-network
@@ -20,11 +20,16 @@ function add_desired_ip_to_ethernet {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -i ) ip="${ip:-"$(get_input 'ip')"}"                                    ;;
-            -d ) device="${device:-"$(get_input 'Device (e.g. eth0)')"}"            ;;
-            -c ) connection="${connection:-"$(get_input 'Connection (e.g. MOB)')"}" ;;
-            -s ) ssid="${ssid:-"$(get_input 'ssid')"}"                              ;;
-            -p ) password="${password:-"$(get_input 'Password')"}"                  ;;
+            -i )
+                ip="${ip:-"$(get_input 'ip')"}" ;;
+            -d )
+                device="${device:-"$(get_input 'Device (e.g. eth0)')"}" ;;
+            -c )
+                connection="${connection:-"$(get_input 'Connection (e.g. MOB)')"}" ;;
+            -s )
+                ssid="${ssid:-"$(get_input 'ssid')"}" ;;
+            -p )
+                password="${password:-"$(get_input 'Password')"}" ;;
         esac
         shift
     }
@@ -37,15 +42,27 @@ function get_opt {
     eval set -- "$options"
     while true; do
         case "$1" in
-            -h|--help )       display_help           ;;
-            -i|--ip )         shift; ip="$1"         ;;
-            -d|--device )     shift; device="$1"     ;;
-            -c|--connection ) shift; connection="$1" ;;
-            -s|--ssid )       shift; ssid="$1"       ;;
-            -p|--password )   shift; password="$1"   ;;
-            -- )              break                  ;;
+            -h|--help )
+                display_help ;;
+            -i|--ip )
+                shift
+                ip="$1" ;;
+            -d|--device )
+                shift
+                device="$1" ;;
+            -c|--connection )
+                shift
+                connection="$1" ;;
+            -s|--ssid )
+                shift
+                ssid="$1" ;;
+            -p|--password )
+                shift
+                password="$1" ;;
+            -- )
+                break ;;
         esac
-        shift
+ shift
     done
 }
 
@@ -56,8 +73,10 @@ main_items=( 'all' 'status + ip + mac address' 'available wifi access points' "c
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    all ) nmcli connection show && accomplished ;;  ## OR find /sys/class/net -mindepth 1 -maxdepth 1 | sort
-    'status + ip + mac address' ) nmcli device
+    all )
+        nmcli connection show && accomplished ;;  ## OR find /sys/class/net -mindepth 1 -maxdepth 1 | sort
+    'status + ip + mac address' )
+        nmcli device
 printf '%s\n' "------------------------------
 status:
 $(ip link show dev ${eth_devc})
@@ -71,28 +90,47 @@ mac address:
 ${eth_devc} ${eth_mac}
 ${wf_devc}      ${wf_mac}
 ${vpn_devc}     ${vpn_mac}" && accomplished ;;
-    'available wifi access points' ) nmcli device wifi list && accomplished ;;
-    "connect $eth_devc" ) nmcli device connect "$eth_devc" && accomplished ;;        ## OR sudo ip link set "$eth_devc" up
-    "disconnect $eth_devc" ) nmcli device disconnect "$eth_devc" && accomplished ;;  ## OR sudo ip link set "$eth_devc" down
-    "connect $wf_devc" ) nmcli device connect "$wf_devc" && accomplished ;;          ## OR sudo ip link set "$wf_devc" up
-    "disconnect $wf_devc" ) nmcli device disconnect "$wf_devc" && accomplished ;;    ## OR sudo ip link set "$wf_devc" down
-    'up ethernet/wifi connection' ) prompt -c
-                                    nmcli connection up "$connection" && accomplished ;;
-    'down ethernet/wifi connection' ) prompt -c
-                                      nmcli connection down "$connection" && accomplished ;;
-    'turn wifi on' ) nmcli radio wifi on && accomplished ;;
-    'turn wifi off' ) nmcli radio wifi off && accomplished ;;
-    'network controllers' ) lspci -nnk | \grep -iA2 net && accomplished ;;
-    'stored passwords (root only)' ) \grep -iH '^psk=' /etc/NetworkManager/system-connections/* && accomplished ;;
-    'nearby wifi networks' ) nmcli device wifi list && accomplished ;;
-    'add ip to a device' ) prompt -i -d
-                           sudo ip address add "$ip" broadcast + dev "$device" && accomplished ;;
-    "add $desired_eth_ip to $eth_devc" ) add_desired_ip_to_ethernet && accomplished ;;
-    'delete all ips' ) prompt -d
-                       ip address flush dev "$device" && accomplished ;;
-    'enable NetworkManager' ) sudo systemctl enable NetworkManager && accomplished ;;
-    'disable NetworkManager' ) sudo systemctl disable NetworkManager && accomplished ;;
-    'connect to a new wifi network' ) prompt -s -p
-                                      sudo nmcli device wifi connect "$ssid" password "$password" && accomplished ;;
-    help ) display_help ;;
+    'available wifi access points' )
+        nmcli device wifi list && accomplished ;;
+    "connect $eth_devc" )
+        nmcli device connect "$eth_devc" && accomplished ;;        ## OR sudo ip link set "$eth_devc" up
+    "disconnect $eth_devc" )
+        nmcli device disconnect "$eth_devc" && accomplished ;;  ## OR sudo ip link set "$eth_devc" down
+    "connect $wf_devc" )
+        nmcli device connect "$wf_devc" && accomplished ;;          ## OR sudo ip link set "$wf_devc" up
+    "disconnect $wf_devc" )
+        nmcli device disconnect "$wf_devc" && accomplished ;;    ## OR sudo ip link set "$wf_devc" down
+    'up ethernet/wifi connection' )
+        prompt -c
+        nmcli connection up "$connection" && accomplished ;;
+    'down ethernet/wifi connection' )
+        prompt -c
+        nmcli connection down "$connection" && accomplished ;;
+    'turn wifi on' )
+        nmcli radio wifi on && accomplished ;;
+    'turn wifi off' )
+        nmcli radio wifi off && accomplished ;;
+    'network controllers' )
+        lspci -nnk | \grep -iA2 net && accomplished ;;
+    'stored passwords (root only)' )
+        \grep -iH '^psk=' /etc/NetworkManager/system-connections/* && accomplished ;;
+    'nearby wifi networks' )
+        nmcli device wifi list && accomplished ;;
+    'add ip to a device' )
+        prompt -i -d
+        sudo ip address add "$ip" broadcast + dev "$device" && accomplished ;;
+    "add $desired_eth_ip to $eth_devc" )
+        add_desired_ip_to_ethernet && accomplished ;;
+    'delete all ips' )
+        prompt -d
+        ip address flush dev "$device" && accomplished ;;
+    'enable NetworkManager' )
+        sudo systemctl enable NetworkManager && accomplished ;;
+    'disable NetworkManager' )
+        sudo systemctl disable NetworkManager && accomplished ;;
+    'connect to a new wifi network' )
+        prompt -s -p
+        sudo nmcli device wifi connect "$ssid" password "$password" && accomplished ;;
+    help )
+        display_help ;;
 esac

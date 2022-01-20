@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-21 19:47:41 +0330 Tuesday
+## @last-modified 1400-10-29 18:09:21 +0330 Wednesday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -38,14 +38,6 @@ function git_add_specific_or_pattern {
     git -C "${1:-.}" add "$2"  ## $2 is df/pattern
 }
 
-function git_branches {
-    printf '%s\n' "$(git -C "${1:-.}" branch -a --color=always | \grep -v '/HEAD\s' | sed 's/^ \+//'  | sort)"
-}
-
-function git_branch_checkout {
-    git -C "${1:-.}" checkout "$2"  ## $2 is branch
-}
-
 function git_branch_create {
     git -C "${1:-.}" branch "$2"  ## $2 is branch
 }
@@ -64,6 +56,14 @@ function git_branch_force_delete_all {
 
 function git_branch_force_delete_specific {
     git -C "${1:-.}" branch -D "$2"  ## $2 is branch
+}
+
+function git_branch_switch {
+    git -C "${1:-.}" switch "$2"  ## $2 is branch
+}
+
+function git_branches {
+    printf '%s\n' "$(git -C "${1:-.}" branch -a --color=always | \grep -v '/HEAD\s' | sed 's/^ \+//'  | sort)"
 }
 
 function git_branches_exclude_remote {
@@ -204,18 +204,6 @@ function git_remove {
     git -C "${1:-.}" rm -r --cached "$2"  ## $2 is pattern
 }
 
-function git_repositories {
-    ## NOTE cant use FZF_ALT_C_COMMAND because git option in ~/scripts/awesome-widgets apparently can't access it
-
-    declare -a repos
-    readarray -t repos < <(find "$HOME" -type d \
-                                        ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' \
-                                        ! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*' \
-                                          -iname '.git' | sed "s#$HOME#~#" | sort)
-
-    printf '%s\n' "${repos[@]%/.git}"
-}
-
 function git_reset_hard {
     git -C "${1:-.}" reset --hard "$2"  ## $2 is commit hash
 }
@@ -228,7 +216,7 @@ function git_reset_soft {
     git -C "${1:-.}" reset --soft "$2"  ## $2 is commit hash
 }
 
-function git_reset_ {
+function git_revert {
     git -C "${1:-.}" checkout "$2"  ## $2 is commit hash
 }
 

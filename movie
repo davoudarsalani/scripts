@@ -1,17 +1,12 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:06:11 +0330 Saturday
+## @last-modified 1400-10-29 10:31:09 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
 
 function no_such_file {
     msgc 'ERROR' "no such file as <span color=\"${orange}\">\$HOME/movie/${directory}/${movie}</span>" "$HOME"/linux/themes/alert-w.png
-    exit
-}
-
-function no_such_dir {
-    msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/movie/${directory}/${movie}</span>" "$HOME"/linux/themes/alert-w.png
     exit
 }
 
@@ -33,6 +28,30 @@ function success_removing {
 
 function error_removing {
     msgc 'ERROR' "removing <span color=\"${orange}\">${base}</span>" "$HOME"/linux/themes/alert-w.png
+}
+
+function if_empty {  ## JUMP_1 the same used in "$HOME"/scripts/speech
+    local count
+
+    read count directory <<< "$directory"  ## 8 pargar
+
+    ## check if count is an int
+    [ "$count" -eq "$count" ] || {
+        msgc 'ERROR' "<span color=\"${orange}\">${count}</span> is invalid count" "$HOME"/linux/themes/alert-w.png
+        exit
+    }
+
+    (( count > 0 )) || {
+        msgn 'nothing here'
+        exit
+    }
+}
+
+function if_dir {  ## JUMP_1
+    [ -d "$HOME"/movie/"$directory" ] || {
+        msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/movie/${directory}</span>" "$HOME"/linux/themes/alert-w.png
+        exit
+    }
 }
 
 declare -a directories_plus_count
@@ -60,18 +79,18 @@ for tmp_directory in "${directories[@]}"; {
 }
 
 directory="$(pipe_to_rofi "${directories_plus_count[@]}" "header=${title}")" || exit 37
-
-directory="${directory##*' '}"  ## remove count
-
-## pick
-[ -d "$HOME"/movie/"$directory" ] || no_such_dir
+if_empty  ## NOTE if_empty must precede if_dir
+if_dir
 
 case "$1" in
-    random ) movie="$(shuf -n 1 < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
-             movie="${movie##*/}" ;;
-    select ) readarray -t movies < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt' | sort)
-             movie="$(pipe_to_rofi "${movies[@]##*/}" "header=${directory}")" || exit 37 ;;
-    * ) exit ;;  ## NOTE do NOT remove
+    random )
+        movie="$(shuf -n 1 < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
+        movie="${movie##*/}" ;;
+    select )
+        readarray -t movies < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt' | sort)
+        movie="$(pipe_to_rofi "${movies[@]##*/}" "header=${directory}")" || exit 37 ;;
+    * )
+        exit ;;  ## NOTE do NOT remove
 esac
 
 ## play
@@ -82,15 +101,17 @@ vlc -f --play-and-exit -- "$HOME"/movie/"$directory"/"$movie" 2>/dev/null
 
 ## move to WATCHED or remove
 what_to_dos=( '' 'mv to WATCHED' 'remove' )
-what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "header=${movie}" 'bg=red')" # || exit 37  ## the exit is exceptionally commented
+what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "header=${movie}" 'bg=red')"  # || exit 37  ## the exit is exceptionally commented
 
 case "$what_to_do" in
-    'mv to WATCHED' ) [ -d "$HOME"/movie/"$directory"/WATCHED ] || mkdir "$HOME"/movie/"$directory"/WATCHED
-                      mv "$HOME"/movie/"$directory"/"$movie" "$HOME"/movie/"$directory"/WATCHED && success_moving || error_moving ;;
-
-    remove ) rm "$HOME"/movie/"$directory"/"$movie" && success_removing || error_removing ;;
-    # * ) : ;;  ## NOTE do NOT uncomment
+    'mv to WATCHED' )
+        [ -d "$HOME"/movie/"$directory"/WATCHED ] || mkdir "$HOME"/movie/"$directory"/WATCHED
+        mv "$HOME"/movie/"$directory"/"$movie" "$HOME"/movie/"$directory"/WATCHED && success_moving || error_moving ;;
+    remove )
+        rm "$HOME"/movie/"$directory"/"$movie" && success_removing || error_removing ;;
+    # * )  ## NOTE keep commented
+    #     exit ;;
 esac
 
-## play audacious if it was playing before the video
+## play audacious if it was playing before the video was played
 [ "$continue_playing" == 'true' ] && "$HOME"/scripts/awesome-widgets audacious play_pause

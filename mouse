@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-09-27 21:06:02 +0330 Saturday
+## @last-modified 1400-10-29 10:23:17 +0330 Wednesday
 
 x="$(xdotool getmouselocation --shell | \grep -i x | cut -d '=' -f 2)"  ## OR x="$(xdotool getmouselocation | \grep -ioP '(?<=x:).*?(?= y:)')"
 y="$(xdotool getmouselocation --shell | \grep -i y | cut -d '=' -f 2)"  ## OR y="$(xdotool getmouselocation | \grep -ioP '(?<=y:).*?(?= screen:)')"
@@ -11,22 +11,40 @@ y="$(xdotool getmouselocation --shell | \grep -i y | cut -d '=' -f 2)"  ## OR y=
 (( yu="y - 15" ))
 
 case "$1" in
-    l   ) xdotool mousemove "$xl" "$y" ;;
-    r   ) xdotool mousemove "$xr" "$y" ;;
-    u   ) xdotool mousemove "$x" "$yu" ;;
-    d   ) xdotool mousemove "$x" "$yd" ;;
-    su  ) xdotool click 4              ;;
-    sd  ) xdotool click 5              ;;
-    lc  ) xdotool click 1              ;;
-    rc  ) xdotool click 3              ;;
-    mc  ) xdotool click 2              ;;
-    jm  ) xdotool mousemove 683  383   ;;
-    jl  ) xdotool mousemove 20   383   ;;
-    jr  ) xdotool mousemove 1346 383   ;;
-    ju  ) xdotool mousemove 683  40    ;;
-    jd  ) xdotool mousemove 683  746   ;;
-    jlu ) xdotool mousemove 20   40    ;;
-    jld ) xdotool mousemove 20   746   ;;
-    jru ) xdotool mousemove 1346 40    ;;
-    jrd ) xdotool mousemove 1346 746   ;;
+    l )
+        xdotool mousemove "$xl" "$y" ;;
+    r )
+        xdotool mousemove "$xr" "$y" ;;
+    u )
+        xdotool mousemove "$x" "$yu" ;;
+    d )
+        xdotool mousemove "$x" "$yd" ;;
+    su )
+        xdotool click 4 ;;
+    sd )
+        xdotool click 5 ;;
+    lc )
+        xdotool click 1 ;;
+    rc )
+        xdotool click 3 ;;
+    mc )
+        xdotool click 2 ;;
+    jm )
+        xdotool mousemove 683  383 ;;
+    jl )
+        xdotool mousemove 20   383 ;;
+    jr )
+        xdotool mousemove 1346 383 ;;
+    ju )
+        xdotool mousemove 683  40 ;;
+    jd )
+        xdotool mousemove 683  746 ;;
+    jlu )
+        xdotool mousemove 20   40 ;;
+    jld )
+        xdotool mousemove 20   746 ;;
+    jru )
+        xdotool mousemove 1346 40 ;;
+    jrd )
+        xdotool mousemove 1346 746 ;;
 esac

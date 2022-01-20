@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-02 08:27:12 +0330 Thursday
+## @last-modified 1400-10-28 23:16:56 +0330 Tuesday
 
 function display_help {
     cmd="
@@ -51,7 +51,8 @@ u='nnnn'
 runnable='false'
 
 case "$1" in
-    -l|--legacy ) mode='LEGACY'
+    -l|--legacy )
+        mode='LEGACY'
         fg_color='legacy_fg'
         display_mode
         main_items=(
@@ -77,7 +78,8 @@ case "$1" in
         read_user_choice
 
         case "$choice" in
-            0 ) runnable='true'
+            0 )
+                runnable='true'
                 cmd="
                 ## reflector:  ## JUMP_1
                 pacman -Syy
@@ -88,7 +90,8 @@ case "$1" in
                 pacman -Syy"
                 display_cmd "$cmd"
                 ;;
-            1 ) cmd="
+            1 )
+                cmd="
                 lsblk
                 cfdisk /dev/sd_ [choose 'dos']
 
@@ -107,7 +110,8 @@ case "$1" in
                 swapon /dev/sd_3"
                 display_cmd "$cmd"
                 ;;
-            2 ) ## JUMP_2
+            2 )
+                ## JUMP_2
                 runnable='true'
                 cmd="
                 pacstrap /mnt base base-devel linux-lts linux-firmware
@@ -117,17 +121,20 @@ case "$1" in
                 ## lvm2 man-db man-pages mdadm nano netctl perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs"
                 display_cmd "$cmd"
                 ;;
-            3 ) runnable='true'
+            3 )
+                runnable='true'
                 cmd="
                 genfstab -U /mnt >> /mnt/etc/fstab"
                 display_cmd "$cmd"
                 ;;
-            4 ) runnable='true'
+            4 )
+                runnable='true'
                 cmd="
                 arch-chroot /mnt /bin/bash"
                 display_cmd "$cmd"
                 ;;
-            5 ) ## JUMP_4
+            5 )
+                ## JUMP_4
                 runnable='true'
                 cmd="
                 sed -i 's/^#en_US\./en_US\./;s/^#fa_IR /fa_IR /' /etc/locale.gen
@@ -136,7 +143,8 @@ case "$1" in
                 export LANG=en_US.UTF-8"
                 display_cmd "$cmd"
                 ;;
-            6 ) runnable='true'
+            6 )
+                runnable='true'
                 cmd="
                 ## list time zones:
                 # timedatectl list-timezones  ## JUMP_3
@@ -146,88 +154,100 @@ case "$1" in
                 timedatectl set-ntp true"
                 display_cmd "$cmd"
                 ;;
-            7 ) ## JUMP_5
+            7 )
+                ## JUMP_5
                 runnable='true'
                 cmd="
                 printf 'acer\n' > /etc/hostname
                 printf '127.0.0.1  localhost\n::1  localhost\n127.0.1.1  acer.localdomain  acer\n' > /etc/hosts"
                 display_cmd "$cmd"
                 ;;
-            8 ) runnable='true'
+            8 )
+                runnable='true'
                 ## edit next line after pattern using sed (https://unix.stackexchange.com/questions/285160/how-to-edit-next-line-after-pattern-using-sed)
                 cmd="
                 sed -i '$!N;s/^#\(\[multilib\]\n\)#\(Include\)/\1\2/;P;D' /etc/pacman.conf"
                 display_cmd "$cmd"
                 ;;
-            9 ) runnable='true'
+            9 )
+                runnable='true'
                 cmd="
                 pacman -Sy"
                 display_cmd "$cmd"
                 ;;
-            10 ) ## JUMP_6
-                 cmd="
-                 ## method 1 (recommended):
-                 useradd -mG wheel -s /bin/bash $u
-                 EDITOR=vim visudo
-                 ## uncomment/add this line:
-                 # %wheel ALL=(ALL) NOPASSWD: ALL
+            10 )
+                ## JUMP_6
+                cmd="
+                ## method 1 (recommended):
+                useradd -mG wheel -s /bin/bash $u
+                EDITOR=vim visudo
+                ## uncomment/add this line:
+                # %wheel ALL=(ALL) NOPASSWD: ALL
 
-                 ## method 2:
-                 useradd -m -g users -G lp -s /bin/bash $u # also -G lp,autologin,storage,wheel,power
-                 EDITOR=vim visudo
-                 ## add '$u ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
+                ## method 2:
+                useradd -m -g users -G lp -s /bin/bash $u # also -G lp,autologin,storage,wheel,power
+                EDITOR=vim visudo
+                ## add '$u ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
 
-                 ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
-                 useradd -m -g wheel $u
-                 EDITOR=vim visudo
-                 ## add this line:
-                 %wheel ALL=(ALL) NOPASSWD: ALL
-                 ## alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
-                 %wheel ALL=(ALL) ALL
-                 %wheel ALL=(ALL) NOPASSWD: COMMAND_1, COMMAND_2, COMMAND_3"
-                 display_cmd "$cmd"
-                 ;;
-            11 ) cmd="
-                 passwd
-                 passwd $u"
-                 display_cmd "$cmd"
-                 ;;
-            12 ) cmd="
-                 pacman -S bash bash-completion grub
-                 grub-install --recheck --debug --force /dev/sd_
-                 grub-mkconfig -o /boot/grub/grub.cfg"
-                 display_cmd "$cmd"
-                 ;;
-            13 ) cmd="
-                 pacman -S networkmanager network-manager-applet
-                 sudo systemctl enable NetworkManager
+                ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
+                useradd -m -g wheel $u
+                EDITOR=vim visudo
+                ## add this line:
+                %wheel ALL=(ALL) NOPASSWD: ALL
+                ## alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
+                %wheel ALL=(ALL) ALL
+                %wheel ALL=(ALL) NOPASSWD: COMMAND_1, COMMAND_2, COMMAND_3"
+                display_cmd "$cmd"
+                ;;
+            11 )
+                cmd="
+                passwd
+                passwd $u"
+                display_cmd "$cmd"
+                ;;
+            12 )
+                cmd="
+                pacman -S bash bash-completion grub
+                grub-install --recheck --debug --force /dev/sd_
+                grub-mkconfig -o /boot/grub/grub.cfg"
+                display_cmd "$cmd"
+                ;;
+            13 )
+                cmd="
+                pacman -S networkmanager network-manager-applet
+                sudo systemctl enable NetworkManager
 
-                 ## enable ethernet:
-                 sudo systemctl enable dhcpcd
-                 # ip a
-                 sudo systemctl enable dhcpcd@enp4s0f1"
-                 display_cmd "$cmd"
-                 ;;
-            14 ) cmd="
-                 reboot"
-                 display_cmd "$cmd"
-                 ;;
-            15 ) runnable='true'
-                 cmd="
-                 sudo pacman -S xorg xorg-xinit xorg-server xorg-apps xorg-drivers xorg-xkill awesome
-                 # sudo pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
-                 # sudo systemctl enable lightdm.service"
-                 display_cmd "$cmd"
-                 ;;
-            16 ) cmd="
-                 reboot"
-                 ;;
-            * ) not_valid
+                ## enable ethernet:
+                sudo systemctl enable dhcpcd
+                # ip a
+                sudo systemctl enable dhcpcd@enp4s0f1"
+                display_cmd "$cmd"
+                ;;
+            14 )
+                cmd="
+                reboot"
+                display_cmd "$cmd"
+                ;;
+            15 )
+                runnable='true'
+                cmd="
+                sudo pacman -S xorg xorg-xinit xorg-server xorg-apps xorg-drivers xorg-xkill awesome
+                # sudo pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
+                # sudo systemctl enable lightdm.service"
+                display_cmd "$cmd"
+                ;;
+            16 )
+                cmd="
+                reboot"
+                ;;
+            * )
+                not_valid
                 ;;
         esac
         ;;
 
-    -u|--uefi )  mode='UEFI (Ermanno Ferrari)'
+    -u|--uefi )
+        mode='UEFI (Ermanno Ferrari)'
         fg_color='uefi_fg'
         display_mode
         main_items=(
@@ -253,7 +273,8 @@ case "$1" in
         read_user_choice
 
         case "$choice" in
-            0 ) runnable='true'
+            0 )
+                runnable='true'
                 cmd="
                 timedatectl set-ntp true
 
@@ -266,7 +287,8 @@ case "$1" in
                 pacman -Syy"
                 display_cmd "$cmd"
                 ;;
-            1 ) cmd="
+            1 )
+                cmd="
                 lsblk OR lsblk -f
                 gdisk /dev/sd_  <<< NOTE do NOT confuse 'gdisk' with 'fdisk'
 
@@ -301,7 +323,8 @@ case "$1" in
                 mount /dev/sd_4 /mnt/home      <--'"
                 display_cmd "$cmd"
                 ;;
-            2 ) ## JUMP_2
+            2 )
+                ## JUMP_2
                 runnable='true'
                 cmd="
                 pacstrap /mnt base base-devel linux-lts linux-firmware
@@ -311,17 +334,20 @@ case "$1" in
                 ## lvm2 man-db man-pages mdadm nano netctl perl reiserfsprogs s-nail sysfsutils texinfo usbutils vi which xfsprogs"
                 display_cmd "$cmd"
                 ;;
-            3 ) runnable='true'
+            3 )
+                runnable='true'
                 cmd="
                 genfstab -U /mnt >> /mnt/etc/fstab"
                 display_cmd "$cmd"
                 ;;
-            4 ) runnable='true'
+            4 )
+                runnable='true'
                 cmd="
                 arch-chroot /mnt"
                 display_cmd "$cmd"
                 ;;
-            5 ) runnable='true'
+            5 )
+                runnable='true'
                 cmd="
                 ## list time zones:
                 # timedatectl list-timezones  ## JUMP_3
@@ -330,7 +356,8 @@ case "$1" in
                 hwclock --systohc"
                 display_cmd "$cmd"
                 ;;
-            6 ) ## JUMP_4
+            6 )
+                ## JUMP_4
                 runnable='true'
                 cmd="
                 sed -i 's/^#en_US\./en_US\./;s/^#fa_IR /fa_IR /' /etc/locale.gen
@@ -339,99 +366,110 @@ case "$1" in
                 export LANG=en_US.UTF-8"
                 display_cmd "$cmd"
                 ;;
-            7 ) ## JUMP_5
+            7 )
+                ## JUMP_5
                 runnable='true'
                 cmd="
                 printf 'acer\n' > /etc/hostname
                 printf '127.0.0.1  localhost\n::1  localhost\n127.0.1.1  acer.localdomain  acer\n' > /etc/hosts"
                 display_cmd "$cmd"
                 ;;
-            8 ) cmd="
+            8 )
+                cmd="
                 passwd"
                 display_cmd "$cmd"
                 ;;
-            9 ) cmd="
+            9 )
+                cmd="
                 ## NOTE this was NOT mentioned by Ermanno
                 ## Arch Wiki: Creating a new initramfs is usually not required, because mkinitcpio was run on installation of the kernel package with pacstrap.
                 mkinitcpio -P OR mkinitcpio -p linux-lts"
                 display_cmd "$cmd"
                 ;;
-            10 ) runnable='true'
-                 cmd="
-                 pacman -S grub xorg xorg-xinit xorg-server xorg-apps xorg-drivers xorg-xkill awesome bash bash-completion efibootmgr linux-headers
-                 pacman -S networkmanager network-manager-applet nm-connection-editor wireless_tools wpa_supplicant
-                 # pacman -S xdg-utils xdg-user-dirs mtools dosfstools"
-                 display_cmd "$cmd"
-                 ;;
-            11 ) runnable='true'
-                 cmd="
-                 grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-                   ## also (by Stephen): --bootloader-id=GRUB
-                   ## also (by Dwix):    [no --efi-directory=/boot/efi] --bootloader-id=grub_uefi --recheck
-                 grub-mkconfig -o /boot/grub/grub.cfg"
-                 display_cmd "$cmd"
-                 ;;
-            12 ) runnable='true'
-                 cmd="
-                 systemctl enable NetworkManager"
-                 display_cmd "$cmd"
-                 ;;
-            13 ) ## JUMP_6
-                 cmd="
-                 ## method 1 (recommended):
-                 useradd -mG wheel -s /bin/bash $u
-                 EDITOR=vim visudo
-                 ## uncomment/add this line:
-                 # %wheel ALL=(ALL) NOPASSWD: ALL
+            10 )
+                runnable='true'
+                cmd="
+                pacman -S grub xorg xorg-xinit xorg-server xorg-apps xorg-drivers xorg-xkill awesome bash bash-completion efibootmgr linux-headers
+                pacman -S networkmanager network-manager-applet nm-connection-editor wireless_tools wpa_supplicant
+                # pacman -S xdg-utils xdg-user-dirs mtools dosfstools"
+                display_cmd "$cmd"
+                ;;
+            11 )
+                runnable='true'
+                cmd="
+                grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+                  ## also (by Stephen): --bootloader-id=GRUB
+                  ## also (by Dwix):    [no --efi-directory=/boot/efi] --bootloader-id=grub_uefi --recheck
+                grub-mkconfig -o /boot/grub/grub.cfg"
+                display_cmd "$cmd"
+                ;;
+            12 )
+                runnable='true'
+                cmd="
+                systemctl enable NetworkManager"
+                display_cmd "$cmd"
+                ;;
+            13 )
+                ## JUMP_6
+                cmd="
+                ## method 1 (recommended):
+                useradd -mG wheel -s /bin/bash $u
+                EDITOR=vim visudo
+                ## uncomment/add this line:
+                # %wheel ALL=(ALL) NOPASSWD: ALL
 
-                 ## method 2:
-                 useradd -m -g users -G lp -s /bin/bash $u # also -G lp,autologin,storage,wheel,power
-                 EDITOR=vim visudo
-                 ## add '$u ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
+                ## method 2:
+                useradd -m -g users -G lp -s /bin/bash $u # also -G lp,autologin,storage,wheel,power
+                EDITOR=vim visudo
+                ## add '$u ALL=(ALL) NOPASSWD: ALL' under the line 'root = ALL=(ALL) ALL' (without the quotes)
 
-                 ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
-                 useradd -m -g wheel $u
-                 EDITOR=vim visudo
-                 ## add this line:
-                 %wheel ALL=(ALL) NOPASSWD: ALL
-                 ## alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
-                 %wheel ALL=(ALL) ALL
-                 %wheel ALL=(ALL) NOPASSWD: COMMAND_1, COMMAND_2, COMMAND_3"
-                 display_cmd "$cmd"
-                 ;;
-            14 ) cmd="
-                 passwd $u"
-                 display_cmd "$cmd"
-                 ;;
-            15 ) cmd="
-                 exit
-                 umount -a
-                 reboot"
-                 display_cmd "$cmd"
-                 ;;
-            16 ) cmd="
-                 ip a
-                 nmtui"
-                 display_cmd "$cmd"
-                 ;;
-            * ) not_valid
+                ## method 3 (Luke Smith version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
+                useradd -m -g wheel $u
+                EDITOR=vim visudo
+                ## add this line:
+                %wheel ALL=(ALL) NOPASSWD: ALL
+                ## alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
+                %wheel ALL=(ALL) ALL
+                %wheel ALL=(ALL) NOPASSWD: COMMAND_1, COMMAND_2, COMMAND_3"
+                display_cmd "$cmd"
+                ;;
+            14 )
+                cmd="
+                passwd $u"
+                display_cmd "$cmd"
+                ;;
+            15 )
+                cmd="
+                exit
+                umount -a
+                reboot"
+                display_cmd "$cmd"
+                ;;
+            16 )
+                cmd="
+                ip a
+                nmtui"
+                display_cmd "$cmd"
+                ;;
+            * )
+                not_valid
                 ;;
         esac
         ;;
 
     -c|--connect )
-    cmd="
-    iwctl
-    ## list of devices:
-    device list OR station list
-    ## get available networks:
-    station <DEVCICE> get-networks
-    ## connect:
-    station <DEVCICE> connect <SSID>
-    ## enter password and exit
-    exit"
-    display_cmd "$cmd"
-    ;;
+        cmd="
+        iwctl
+        ## list of devices:
+        device list OR station list
+        ## get available networks:
+        station <DEVCICE> get-networks
+        ## connect:
+        station <DEVCICE> connect <SSID>
+        ## enter password and exit
+        exit"
+        display_cmd "$cmd"
+        ;;
 
     -v|--verify )
         runnable='true'
@@ -440,7 +478,8 @@ case "$1" in
         display_cmd "$cmd"
         ;;
 
-    * ) display_help
+    * )
+        display_help
         ;;
 esac
 
