@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-30 07:46:45 +0330 Thursday
+## @last-modified 1400-10-30 18:47:44 +0330 Thursday
 
 function get_datetime {
     case "$1" in
@@ -57,7 +57,7 @@ function wrap_fzf_choice {
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
 
-function choose_file {
+function select_file {
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
     ## NOTE used also in "$HOME"/.config/lfrc
@@ -71,26 +71,28 @@ function choose_file {
     done
 }
 
-function choose_directory {
+function select_directory {
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
     ## NOTE used also in "$HOME"/.config/lfrc
 
     ## usages: this function can accept two args to limit results
-    ##   dir="$(choose_directory)"
-    ##   dir="$(choose_directory 'git')"
-    ##   dir="$(choose_directory 'git' 'public')"
+    ##   dir="$(select_directory)"
+    ##   dir="$(select_directory 'git')"
+    ##   dir="$(select_directory 'git' 'public')"
 
     local dir git_args
 
     ## these options are also used in "$HOME"/scripts/awesome-widgets git option
     git_args=" ! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*' -iname '.git' | sed 's#/\.git##' | sort"
 
-    [ "$1" == 'git' ] && FZF_ALT_C_COMMAND+=" $git_args"  ## display git repositories only
-    [ "$2" ] && FZF_ALT_C_COMMAND+=" | \grep "$2""  ## display specific git repositories only
+    [ "$1" == 'git' ] && {  ## display git repositories only
+        [ "$2" ] && git_args+=" | \grep "$2""  ## display specific git repositories only
+        FZF_ALT_C_COMMAND+=" $git_args"
+    }
 
     dir="$(eval "$FZF_ALT_C_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
-    printf '%q\n' "${dir/\~/$HOME}"
+    [ "$dir" ] && printf '%q\n' "${dir/\~/$HOME}"
 }
 
 function pipe_to_fzf {

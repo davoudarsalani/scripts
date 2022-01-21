@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 18:32:19 +0330 Wednesday
+## @last-modified 1400-10-30 18:43:49 +0330 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -530,7 +530,7 @@ msgn "$text" ;;
         ## FIXME cant use FZF_ALT_C_COMMAND because it is apparently not accessible to this option
         ## FIXME a bit too slow
         ## v-- 1st line of options: synced with the ones for FZF_DEFAULT_COMMAND in /etc/bash.bashrc
-        ## v-- 2nd line of options: synced with the ones for git_args in choose_directory function in "$HOME"/scripts/gb
+        ## v-- 2nd line of options: synced with the ones for git_args in select_directory function in "$HOME"/scripts/gb
         readarray -t all_repos < <(find "$HOME" -type d \
                                      ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' \
                                      ! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*' -iname '.git' | sed 's#/\.git##' | sort)

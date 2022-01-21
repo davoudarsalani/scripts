@@ -1,0 +1,264 @@
+#!/usr/bin/env bash
+
+## @last-modified 1400-10-29 11:24:24 +0330 Wednesday
+
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-color
+
+title="${0##*/}"
+heading "$title"
+
+clr='blue'
+
+main_items=( 'apps' 'add AUR repositories' 'install from AUR' 'fix "error while loading shared libraries: libalpm.so.10"' 'see graphics in arch' 'add host RSA key to your known hosts' 'turn screensaver off and disable DPMS' 'generate xorg.conf' 'git save credentials' 'disable grub countdown' 'firefox settings' 'prevent python from creating __pycache__' 'surfingkeys' 'disable goldendict "full text search"' 'install jcal' 'docker' 'other' )
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+
+case "$main_item" in
+    apps )
+        apps=(
+            'audacious' 'vlc' 'gpicviewgtk3' 'xreader' 'gparted' 'gnomedisks' 'gnomecalculator' 'firefox' 'gedit' 'goldendict' 'lsof' 'keepass'
+            'uget' 'gimp' 'ufw' 'acpi' 'rofi' 'dmenu' 'bluez' 'bluezutils' 'blueman' 'blueztools' 'lxappearance' 'libreofficestill' 'xclip'
+            'openssh' 'ffmpeg' 'xdotool' 'tmux' 'picom' 'fzf' 'networkmanager' 'networkmanagerapplet' 'networkmanageropenvpn' 'openvpn' 'feh'
+            'pulseaudioalsa' 'jq' 'youtubedl' 'curl' 'wget' 'aria2' 'tor' 'torsocks' 'git' 'kdenlive' 'vsftpd' 'docker'
+            'mpv' 'txt2man' 'autoconfarchive' 'w3m' 'highlight' 'mediainfo' 'xf86videointel' 'intel-ucode[+ grub update]' 'ripgrep pulseaudio'
+            'xfce4terminal' 'kvantumqt5' 'imagemagick' 'qutebrowser' 'chromium' 'libvainteldriver' 'nvidialts' 'nvidiautils' 'nvidiasettings'
+            'xf86videointel' 'xprintidle[OR xssstate]' 'pulseaudio-bluetooth[for headset]' 'simplescreenrecorder' 'hddtemp' 'ctags'
+        )
+        maybe_apps=(
+            'unzip' 'zip' 'unrar' 'wmctrl' 'netstatnat' 'handbrake' 'handbrakecli' 'fribidi' 'ranger' 'bc' 'kdeconnect' 'kdeclitools' 'traceroute'
+            'bandwhich' 'pavucontrol' 'alsa-utils' 'dnsmasq' 'irssi' 'gnomescreenshot' 'axel[git version preferrable]' 'kid3'
+        )
+
+        aur_apps=(
+            'yay' 'rofigreenclip' 'obfs4proxy' 'bluezhcitool' 'qt5styleplugins' 'lf' 'ugetintegratorfirefox' 'x2x'
+            'optimus-manager (or *-git) [+ enable optimus-manager.service]'
+        )
+        aur_maybe_apps=( 'optimus-manager-qt' 'kpcli' 'cava' )
+
+        mint_apps=( 'libtool' 'm4' 'automake' 'autoreconf' 'openssh-server' 'x2x' 'xprintidle[OR xssstate]' )
+
+        blue 'Apps'
+        printf '%s\n' "${apps[@]}" | sort | column
+        blue 'Apps (maybe)'
+        printf '%s\n' "${maybe_apps[@]}" | sort | column
+        blue 'AUR'
+        printf '%s\n' "${aur_apps[@]}" | sort | column
+        blue 'AUR (maybe)'
+        printf '%s\n' "${aur_maybe_apps[@]}" | sort | column
+        blue 'Mint'
+        printf '%s\n' "${mint_apps[@]}" | sort | column
+        ;;
+
+    'add AUR repositories' )
+        printf '%s\n' \
+"$("$clr" 'add these lines to /etc/pacman.conf')
+[archlinuxfr]
+SigLevel = Never
+Server = http://repo.archlinux.fr/$arch
+$("$clr" 'then run')
+sudo pacman -Sy"
+        ;;
+
+    'install from AUR' )
+        printf '%s\n' \
+"$(action_now 'method 1: snapshot')
+$("$clr" 'download snapshot from AUR page (the dl link is sth like: https://aur.archlinux.org/cgit/aur.git/snapshot/APPNAME.tar.gz)')
+$("$clr" 'extract the tar.gz file and navigate to the folder containing the PKGBUILD file')
+$("$clr" 'then [the flags were -Acs earlier and I changed them to these (to be the same as Option 2) for an easier install]')
+makepkg -sic
+$("$clr" 'now the package is built')
+$("$clr" 'then')'
+sudo pacman -U FILE.xz
+$("$clr" '-----------------------')
+$(action_now 'method 2: clone (https://www.youtube.com/watch?v=lPTgCajmoLo)')
+$("$clr" 'go to AUR page and clone the git address provided')
+git clone https://aur.archlinux.org/APPNAME.git
+$("$clr" 'cd to the downloaded directory')
+$("$clr" 'run')
+makepkg -sic
+$("$clr" 'then')
+sudo pacman -U FILE.xz"
+        ;;
+
+    'fix "error while loading shared libraries: libalpm.so.10"' )
+        printf '%s\n' \
+"$("$clr" 'navigate to the folder and run')
+sudo pacman -U package-query-1.9-3-x86_64.pkg.tar.xz"
+        ;;
+
+    'see graphics in arch' )
+        printf 'lspci -k | grep -A 2 -E "(VGA|3D)"\n' ;;
+
+    'add host RSA key to your known hosts' )
+        printf '%s\n' \
+"$("$clr" '(https://askubuntu.com/questions/108217/ssh-host-key-verification-failed)')
+ssh-keyscan HOST_IP | tee -a ~/.ssh/known_hosts
+
+$("$clr" 'ceate ssh key')
+ssh-keygen"
+        ;;
+
+    'turn screensaver off and disable DPMS' )
+        printf '%s\n' \
+"$("$clr" '(https://askubuntu.com/questions/216783/ubuntu-12-10-turn-screen-off-when-inactive-for-never-still-turns-off)')
+xset s 0 0  $("$clr" '## OR xset s off')
+
+$("$clr" 'disable DPMS')
+xset -dpms
+
+$("$clr" 'check the results: (the sections "Screen Saver:" and "DPMS (Energy Star)")')
+xset -q"
+        ;;
+
+    'generate xorg.conf' )
+        printf '%s\n' \
+"$("$clr" '(https://wiki.archlinux.org/index.php/Xorg#Configuration)')
+sudo Xorg :0 -configure  $("$clr" '## or use a different display, e.g. :2')
+$("$clr" 'this should create a xorg.conf.new file in /root/. copy that to /etc/X11/ or /etc/')"
+        ;;
+
+    'git save credentials' )
+        printf '%s\n' \
+"$("$clr" '(https://stackoverflow.com/questions/35942754/how-to-save-username-and-password-in-git/45327254)')
+git config --global credential.helper store
+$("$clr" 'the next time git asks for your credentials, it will store them forever')
+
+git config --global user.name 'NAME LAST_NAME'
+git config --global user.email 'EMAIL'"
+        ;;
+
+    'disable grub countdown' )
+        printf '%s\n' \
+"$("$clr" 'in /etc/default/grub, set the GRUB_TIMEOUT to 0 and then run')
+sudo update-grub
+
+$("$clr" 'if you get the error "update-grub: command not found" (https://askubuntu.com/questions/418666/update-grub-command-not-found)')
+$("$clr" 'paste these lines into /usr/sbin/update-grub')
+#!/bin/sh
+set -e
+exec grub-mkconfig -o /boot/grub/grub.cfg \"\$@\"
+$("$clr" 'then')
+sudo chown root:root /usr/sbin/update-grub
+sudo chmod 755 /usr/sbin/update-grub
+$("$clr" 'now you can run')
+sudo update-grub"
+        ;;
+
+    'firefox settings' )
+        printf '%s\n' \
+"$("$clr" 'keep firefox open after closing the last tab')
+about:config > browser.tabs.closeWindowWithLastTab
+$("$clr" 'double click to change the value to False')
+
+$("$clr" 'stop ALT key from showing menu')
+about:config > ui.key.menuAccessKeyFocuses
+$("$clr" 'double click to change the value to False. You can now use ALT+F instead')
+
+$("$clr" 'prevent WebRTC leak')
+about:config > media.peerconnection.enabled
+$("$clr" 'double click to change the value to False. to verify, visit https://hide.me/en/webrtc-leak-test')
+
+$("$clr" 'use customized css in ~/.mozilla/firefox/*.default-release/chrome directory')
+about:config > legacy
+$("$clr" 'double click to change the value to True')"
+        ;;
+
+    'prevent python from creating __pycache__' )
+        printf '%s\n' \
+"$("$clr" '(https://stackoverflow.com/questions/39149313/hiding-pycache-on-linux)')
+$("$clr" 'add PYTHONDONTWRITEBYTECODE=1 to /etc/environment')"
+        ;;
+
+    'surfingkeys' )
+        printf "map('f', 'af');\n" ;;
+
+    'disable goldendict "full text search"' )
+        printf "$("$clr" 'disable "full text search" to prevent cpu overuse')\n" ;;
+
+    'install jcal' )
+        printf '%s\n' "$("$clr" 'Have a look at install-jcal script')"
+    ;;
+
+    docker )
+        printf '%s\n' \
+"sudo systemctl enable docker $("$clr" 'enable service')
+sudo gpasswd -a $USER docker $("$clr" "add $USER to docker group to run docker without sudo")
+
+echo PASSWORD | docker login --username davoudarsalani --password-stdin
+
+$("$clr" 'create a container')
+docker run -t -d --name CNT IMG:TG
+$("$clr" '-p 8080:80 (8080 for host, 80 for container)')
+$("$clr" '-v ~/downloads/src:/tmp/src/ (add :ro after src to make it readonly)')
+$("$clr" '-e MY_ENV_VAR=\"SOME_VALUE\"')
+
+$("$clr" 'run image (automatically removes container when it exits)  ## NOTE no -d. --name CNT not needed')
+docker run --rm -t  IMG:TG [COMMAND]
+docker run --rm -it IMG:TG bash
+
+docker ps -a $("$clr" 'list of containers')
+docker image ls -a $("$clr" 'list of images')
+docker exec -t  CNT [COMMAND] $("$clr" 'run container')
+docker exec -it CNT bash $("$clr" 'enter container')
+docker start/stop CNT $("$clr" 'start/stop container')
+docker rm CNT $("$clr" 'rm container')
+docker rmi -f IMG      $("$clr" '<--,-- rm image')
+docker image rm -f IMG $("$clr" "<--'")
+docker rm -f \$(docker ps -aq) $("$clr" 'rm all containers  ## NOTE do NOT quote $()')
+
+$("$clr" 'build')
+docker build --tag IMG:TG .
+$("$clr" '-f FILE')
+$("$clr" '--no-cache=true')
+$("$clr" '--build-arg VAR=VALUE')
+
+docker system df --verbose
+docker system prune -f
+docker tag IMG:TG davoudarsalani/RPS:TG $("$clr" 'tag for push')"
+        ;;
+
+    other )
+        printf '%s\n' \
+"$("$clr" '- when clock goes out of sync') sudo timedatectl set-ntp true
+$("$clr" '- if no internet after rebooting at the end of a fresh install') systemctl start dhcpcd && dhcpcd
+$("$clr" '- if kpcli stops working after an update, reinstall perl-crypt-rijndael')
+$("$clr" '- check swapiness') cat /proc/sys/vm/swappiness
+$("$clr" '- pulseaudio statrtup command') start-pulseaudio-x11
+$("$clr" '- download everything') wget -prl0 WEBSITE $("$clr" '(p means download everything, r means recursive, l0 means infinite levels deep)')
+$("$clr" '- create openvpn connection') connection import type openvpn file NAME.ovpn
+$("$clr" '- tmux service problematic autorun file (https://bbs.archlinux.org/viewtopic.php?id=196024)') ~/.config/systemd/user/tmux.service
+$("$clr" '- see if on AC or not (1 means on AC, and 0 means on battery)') cat /sys/class/power_supply/ACAD/online
+$("$clr" '- add resolution to screen') xrandr --addmode SCREEN_NAME 1366x768 $("$clr" '(SCREEN_NAME e.g. DP1)')
+$("$clr" '- set screen resolution') xrandr -s 1366x768
+$("$clr" '- split file') split -d -b SIZE_IN_BYTES FILE [OUTPUT]
+$("$clr" '- join parts') cat PART_1 PART_2 ... PART_N > OUTPUT $("$clr" 'OR') cat PART_* > OUTPUT
+$("$clr" '- reboot modem') telnet MODEM_IP
+$("$clr" '  enter username and password and then') reboot
+$("$clr" '- hide txt file in jpg file')
+$("$clr" '  embed') steghide embed -cf JPG_FILE -ef TXT_FILE
+$("$clr" '  extract') steghide extract -sf JPG_FILE
+$("$clr" '  get info on both files without extracting') teghide info JPG_FILE
+$("$clr" '- launch Cisco Anyconnect after installation')
+$("$clr" '  fedora (https://ask.fedoraproject.org/en/question/99266/vpn-cisco-anyconnect-fedora-25-fail/)') sudo dnf install pangox-compat
+$("$clr" '  mint (https://askubuntu.com/questions/864695/cant-install-pangox-compat-with-apt-get)') sudo apt-get install libpangox-1.0-0
+$("$clr" '- make immutable') sudo chattr +i ITEM $("$clr" '<--,-- add -RV if ITEM is s directory')
+$("$clr" '  revert') sudo chattr -i ITEM         $("$clr" "<--'")
+$("$clr" '  see attribute') lsattr ITEM
+$("$clr" '- switch to nvidia using optimus-manager if you do not use a display manager')
+$("$clr" '  (https://github.com/Askannz/optimus-manager/wiki/FAQ,-common-issues,-troubleshooting)')
+$("$clr" '  NOTE: optimus-manager.service should be running')
+$("$clr" '  WARNING: Tried once and logged in to get a black screen')
+$("$clr" '  after X server is started') prime-offload
+$("$clr" '  then') optimus-manager --switch nvidia
+$("$clr" '  after X server has stopped (i.e. machine logges out into tty)') sudo prime-switch
+$("$clr" '  then') startx ~/.xinitrc
+$("$clr" '- fix grub in windows (https://itsfoss.com/no-grub-windows-linux/)') bcdedit /set {bootmgr} path \EFI\ubuntu\grubx64.efi
+$("$clr" '  then restart')
+$("$clr" '  if the above entry didn’t change anything, you can reverse it') bcdedit /deletevalue {bootmgr} path \EFI\ubuntu\grubx64.efi
+
+$("$clr" '- mint: in case of getting returned 126 error when sourcing conf file in tmux (https://github.com/tmux-plugins/tpm/issues/73)') chmod -R ug+x ~/.tmux-plugins/
+$("$clr" '- mint: install libfribidi (http://linuxforlife.ir/index.php/distro/215-2017-04-21-14-36-39)') sudo apt install libfribidi-bin libfribidi0
+" | less -R
+        ;;
+
+esac

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 18:17:16 +0330 Wednesday
+## @last-modified 1400-10-30 23:54:33 +0330 Thursday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -103,6 +103,17 @@ function pipe_to_fzf_locally {
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
 
+function select_hash {
+    local log_item
+    declare -a log_items
+
+    IFS=$'\n'
+    preview_status='hidden'
+    readarray -t log_items < <(git_log "$directory")
+    log_item="$(pipe_to_fzf_locally "${log_items[@]}")" || exit 37  ## wrap_fzf_choice "$log_item" exceptionally skipped
+    printf '%s\n' "$log_item" | sed 's/\* \([^ ]\+\) .*/\1/g'
+}
+
 function wrap_fzf_multi {
     no_sign_arr=( "${@#* }" )  ## remove '[Ⓡ] ' from the beginning
     colonized="$(printf '%s:' "${no_sign_arr[@]}")"
@@ -122,7 +133,11 @@ function prompt {
             -t )
                 tag="${tag:-"$(get_input 'Tag')"}" ;;
             -c )
-                commit_hash="${commit_hash:-"$(get_input 'Commit hash')"}" ;;
+                commit_hash="${commit_hash:-"$(select_hash)"}" || exit 37 ;;  ## exceptionally used select_hash instead of get_input
+            -n )
+                new_name="${new_name:-"$(get_input 'New name')"}" ;;
+            -f )
+                file="${file:-"$(get_input 'File')"}" ;;
         esac
         shift
     }
@@ -131,7 +146,7 @@ function prompt {
 function get_opt {
     local options
 
-    options="$(getopt --longoptions 'help,proxy,directory:,pattern:,message:,branch:,tag:,commit-hash:' --options 'hxd:p:m:b:t:c:' --alternative -- "$@")"
+    options="$(getopt --longoptions 'help,proxy,directory:,pattern:,message:,branch:,tag:,commit-hash:new-name:file:' --options 'hxd:p:m:b:t:c:n:f:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
@@ -157,6 +172,12 @@ function get_opt {
             -c|--commit-hash )
                 shift
                 commit_hash="$1" ;;
+            -n|--new-name )
+                shift
+                new_name="$1" ;;
+            -f|--file )
+                shift
+                file="$1" ;;
             -- )
                 break ;;
         esac
@@ -170,7 +191,7 @@ proxy='false'
 get_opt "$@"
 heading "$title"
 
-main_items=( 'status' 'add [+]' 'commit' 'add_commit [+]' 'commit_amend' 'undo [+]' 'unstage [+]' 'log' 'push' 'pull' 'empty_commit' 'remove' 'branch' 'tag' 'remotes' 'jump back' 'garbage clean' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
+main_items=( 'status' 'add [+]' 'commit' 'add_commit [+]' 'commit_amend' 'empty_commit' 'restore [+]' 'unstage [+]' 'log' 'reflog' 'push' 'pull' 'remove' 'branch' 'tag' 'remotes' 'reset' 'garbage clean' 'source file from a commit' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -230,7 +251,7 @@ if [ "$directory" ]; then
         exit
     }
 else
-    directory="$(choose_directory 'git')" && wrap_fzf_choice "${directory/$HOME/\~}" || exit 37
+    directory="$(select_directory 'git')" && wrap_fzf_choice "${directory/$HOME/\~}" || exit 37
     # directory="${directory/\~/$HOME}"
 fi
 
@@ -342,27 +363,43 @@ case "$main_item" in
                 accomplished "commit amended, message: $message" ;;
         esac ;;
 
-    'undo [+]' )
+    empty_commit )
+        preview_status='hidden'
+        empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
+
+        case "$empty_commit_item" in
+            "open $editor" )
+                if_locked
+                git_empty_commit "$directory" && \
+                accomplished 'committed empty' ;;
+            'write here' )
+                prompt -m
+                if_locked
+                git_empty_commit_with_message "$directory" "$message" && \
+                accomplished "committed empty, message: $message" ;;
+        esac ;;
+
+    'restore [+]' )
         if_changed
         IFS=$'\n'
         multiple='true'
-        undo_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${undo_items[@]}" || exit 37
+        restore_item=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${restore_item[@]}" || exit 37
 
         case "${no_sign_arr[@]}" in
              pattern )
                 prompt -p
                 if_locked
-                git_undo_specific_or_pattern "$directory" "$pattern" && \
-                accomplished "$pattern undid" ;;
+                git_restore_specific_or_pattern "$directory" "$pattern" && \
+                accomplished "$pattern restored" ;;
              all )
                 if_locked
-                git_undo_all "$directory" && \
-                accomplished "all undid" ;;
+                git_restore_all "$directory" && \
+                accomplished "all restored" ;;
              * )
                 if_locked
                 for i in "${no_sign_arr[@]}"; {
-                    git_undo_specific_or_pattern "$directory" "$i"
-                    accomplished "$i undid"
+                    git_restore_specific_or_pattern "$directory" "$i"
+                    accomplished "$i restored"
                     (:)
                 } ;;
         esac ;;
@@ -405,6 +442,13 @@ case "$main_item" in
         readarray -t log_items < <(git_log "$directory")
         pipe_to_fzf_locally "${log_items[@]}" ;;
 
+    reflog )
+        IFS=$'\n'
+        if_locked
+        preview_status='hidden'
+        readarray -t reflog_items < <(git_reflog "$directory")
+        pipe_to_fzf_locally "${reflog_items[@]}" ;;
+
     push )
         if_locked
         if [ "$(git_remotes "$directory")" ]; then
@@ -431,22 +475,6 @@ case "$main_item" in
             accomplished 'pulled without proxy'
         fi ;;
 
-    empty_commit )
-        preview_status='hidden'
-        empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
-
-        case "$empty_commit_item" in
-            "open $editor" )
-                if_locked
-                git_empty_commit "$directory" && \
-                accomplished 'committed empty' ;;
-            'write here' )
-                prompt -m
-                if_locked
-                git_empty_commit_with_message "$directory" "$message" && \
-                accomplished "committed empty, message: $message" ;;
-        esac ;;
-
     remove )
         prompt -p
         if_locked
@@ -455,133 +483,134 @@ case "$main_item" in
 
     branch )
         preview_status='hidden'
-        branch_items=( 'show branches' 'create branch' 'switch to a branch' 'create branch and switch to it' 'delete all branches' 'force delete all branches' 'delete a specific branch' 'force delete a specific branch' )
+        branch_items=( 'show all' 'create' 'switch' 'create and switch' 'rename' 'delete' 'force delete' 'delete all' 'force delete all' )
         branch_item="$(pipe_to_fzf_locally "${branch_items[@]}")" && wrap_fzf_choice "$branch_item" || exit 37
 
         case "$branch_item" in
-            'show branches' )
+            'show all' )
                 if_locked
                 # IFS=$'\n'
-                branch_info "$(branches_array)" && accomplished ;;
-            'create branch' )
+                branch_info "$(branches_array)" && \
+                accomplished ;;
+            'create' )
                 prompt -b
                 if_locked
                 git_branch_create "$directory" "$branch" && \
-                accomplished "$branch branch created" ;;
-            'switch to a branch' )
+                accomplished "$branch created" ;;
+            'switch' )
                 if_locked
                 # IFS=$'\n'
                 cd_to_branch_item="$(branch_info "$(branches_array)")"
                 git_branch_switch "$directory" "$cd_to_branch_item" && \
-                accomplished "$cd_to_branch_item branch switched to" ;;
-            'create branch and switch to it' )
+                accomplished "$cd_to_branch_item switched to" ;;
+            'create and switch' )
                 prompt -b
                 if_locked
                 git_branch_create "$directory" "$branch" && \
                 git_branch_switch "$directory" "$branch" && \
-                accomplished "$branch branch created and switched to" ;;
-            'delete all branches' )
+                accomplished "$branch created and switched to" ;;
+            'rename' )
+                prompt -b -n
                 if_locked
-                readarray -t local_branches < <(git_branches_exclude_remote "$directory" | \grep -v 'master')
-                git_branch_delete_all "$directory" "${local_branches[@]}" && \
-                accomplished 'all branches deleted' ;;
-            'force delete all branches' )
-                if_locked
-                readarray -t local_branches < <(git_branches_exclude_remote "$directory" | \grep -v 'master')
-                git_branch_force_delete_all "$directory" "${local_branches[@]}" && \
-                accomplished 'all branches force deleted' ;;
-            'delete a specific branch' )
+                git_branch_rename "$directory" "$branch" "$new_name" && \
+                accomplished "$branch renamed to $new_name" ;;
+            'delete' )
                 if_locked
                 # IFS=$'\n'
                 delete_branch_item="$(branch_info "$(branches_array | \grep -v 'master')")" && wrap_fzf_choice "$delete_branch_item" || exit 37
                 git_branch_delete_specific "$directory" "$delete_branch_item" && \
-                accomplished "$delete_branch_item branch deleted" ;;
-            'force delete a specific branch' )
+                accomplished "$delete_branch_item deleted" ;;
+            'force delete' )
                 if_locked
                 # IFS=$'\n'
                 force_delete_branch_item="$(branch_info "$(branches_array | \grep -v 'master')")" && wrap_fzf_choice "$force_delete_branch_item" || exit 37
                 git_branch_force_delete_specific "$directory" "$force_delete_branch_item" && \
-                accomplished "$force_delete_branch_item branch force deleted" ;;
+                accomplished "$force_delete_branch_item force deleted" ;;
+            'delete all' )
+                if_locked
+                readarray -t local_branches < <(git_branches_exclude_remote "$directory" | \grep -v 'master')
+                git_branch_delete_all "$directory" "${local_branches[@]}" && \
+                accomplished 'all deleted' ;;
+            'force delete all' )
+                if_locked
+                readarray -t local_branches < <(git_branches_exclude_remote "$directory" | \grep -v 'master')
+                git_branch_force_delete_all "$directory" "${local_branches[@]}" && \
+                accomplished 'all force deleted' ;;
         esac ;;
 
     tag )
-        yellow_dim 'WARNING: You have to manually push tags by: git -C GITPATH push origin tag TAGNAME'
+        yellow_dim 'WARNING: Tags have to be manually pushed by: git -C GITPATH push origin tag TAGNAME'
 
         preview_status='hidden'
-        tag_items=( 'show tags' 'show a specific tag' 'create tag' 'create tag + message' 'create tag + message for a specific commit' 'delete all tags' 'delete a specific tag')
+        tag_items=( 'show' 'show all' 'create' 'create + message' 'create + message for a commit' 'delete' 'delete all' )
         tag_item="$(pipe_to_fzf_locally "${tag_items[@]}")" && wrap_fzf_choice "$tag_item" || exit 37
 
         case "$tag_item" in
-            'show tags' )
-                if_locked
-                git_tag_show_all "$directory" && \
-                accomplished ;;
-            'show a specific tag' )
+            'show' )
                 prompt -t
                 if_locked
                 git_tag_show_specific "$directory" "$tag" && \
-                accomplished "$tag tag shown" ;;
-            'create tag' )
+                accomplished ;;
+            'show all' )
+                if_locked
+                git_tag_show_all "$directory" && \
+                accomplished ;;
+            'create' )
                 prompt -t
                 tag="${tag// /_}"
                 if_locked
                 git_tag_create "$directory" "$tag" && \
-                accomplished "$tag tag created" ;;
-            'create tag + message' )
+                accomplished "$tag created" ;;
+            'create + message' )
                 prompt -t -m
                 tag="${tag// /_}"
                 if_locked
                 git_tag_create_with_message "$directory" "$tag" "$message" && \
-                accomplished "$tag tag created, message: $message" ;;
-            'create tag + message for a specific commit' )
+                accomplished "$tag created, message: $message" ;;
+            'create + message for a commit' )
                 prompt -t -m -c
                 tag="${tag// /_}"
                 if_locked
                 git_tag_create_with_message_for_specific_commit "$directory" "$tag" "$message" "$commit_hash" && \
-                accomplished "$tag tag created, message: ${message}, for commit: $commit_hash" ;;
-            'delete all tags' )
-                if_locked
-                readarray -t all_tags < <(git_tag_show_all "$directory")
-                git_tag_delete_all "$directory" "${all_tags[@]}" && \
-                accomplished 'all tags deleted' ;;
-            'delete a specific tag' )
+                accomplished "$tag created, message: ${message}, for commit: $commit_hash" ;;
+            'delete' )
                 prompt -t
                 if_locked
                 git_tag_delete_specific "$directory" "$tag" && \
-                accomplished "$tag tag deleted" ;;
+                accomplished "$tag deleted" ;;
+            'delete all' )
+                if_locked
+                readarray -t all_tags < <(git_tag_show_all "$directory")
+                git_tag_delete_all "$directory" "${all_tags[@]}" && \
+                accomplished 'all deleted' ;;
         esac ;;
 
     remotes )
         git_remotes && \
         accomplished ;;
 
-    'jump back' )
-        jump_items=( 'reset soft' 'reset mixed' 'reset hard' 'revert' )
+    reset )
+        jump_items=( 'reset soft' 'reset mixed' 'reset hard' 'reset temp' )
         jump_item="$(pipe_to_fzf_locally "${jump_items[@]}")" && wrap_fzf_choice "$jump_item" || exit 37
 
-        if_locked
-        IFS=$'\n'
-        preview_status='hidden'
-        readarray -t log_items < <(git_log "$directory")
-        log_item="$(pipe_to_fzf_locally "${log_items[@]}")" && wrap_fzf_choice "$log_item" || exit 37
-        log_item="$(printf '%s\n' "$log_item" | sed 's/\* \([^ ]\+\) .*/\1/g')"
-
-        jump_prompt="$(get_single_input "$jump_item to ${log_item}?")" && printf '\n'
+        prompt -c
+        jump_prompt="$(get_single_input "$jump_item to ${commit_hash}?")" && printf '\n'
         [ "$jump_prompt" == 'y' ] || exit
 
+        if_locked
         case "$jump_item" in
             'reset soft' )
-                git_reset_soft "$directory" "$log_item" && \
-                accomplished "$log_item reset soft to" ;;
+                git_reset_soft "$directory" "$commit_hash" && \
+                accomplished "$commit_hash reset soft to" ;;
             'reset mixed' )
-                git_reset_mixed "$directory" "$log_item" && \
-                accomplished "$log_item reset mixed to" ;;
+                git_reset_mixed "$directory" "$commit_hash" && \
+                accomplished "$commit_hash reset mixed to" ;;
             'reset hard' )
-                git_reset_hard "$directory" "$log_item" && \
-                accomplished "$log_item reset hard to" ;;
-            revert )
-                git_revert "$directory" "$log_item" && \
-                accomplished "$log_item reverted to" ;;
+                git_reset_hard "$directory" "$commit_hash" && \
+                accomplished "$commit_hash reset hard to" ;;
+            'reset temp' )
+                git_reset_temp "$directory" "$commit_hash" && \
+                accomplished "$commit_hash reset temp to" ;;
         esac ;;
 
     'garbage clean' )
@@ -591,6 +620,13 @@ case "$main_item" in
                 git_garbage_clean "$directory" && \
                 accomplished 'garbage cleaned' ;;
         esac ;;
+
+    'source file from a commit' )
+        prompt -c -f
+        if_locked
+        git_source_file_from_a_commit "$directory" "$commit_hash" "$file" && \
+        accomplished "$file sourced from $commit_hash"
+        ;;
 
     commits )
         readarray -t items < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included

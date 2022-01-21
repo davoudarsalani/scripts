@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 11:02:50 +0330 Wednesday
+## @last-modified 1400-10-30 21:02:30 +0330 Thursday
 
 case "$1" in
     if_sony )
@@ -25,13 +25,18 @@ case "$1" in
     git )
         source "$HOME"/scripts/gb-git
 
+        alert_sign='🔸'  ## 🔴
         [ "$(if_git "$2")" == 'false' ] && exit
 
-        commits_count="Ⓒ $(git_commits_count "$2")"
+        hash_head="$(git_hash_head "$2")"
+        hash_last_commit="$(git_hash_last_commit "$2")"
+        [ "$hash_head" == "$hash_last_commit" ] || head_detached="${alert_sign}${hash_last_commit}"
+
+        commits_count=" C:$(git_commits_count "$2")"  ## Ⓒ
 
         stts="$(git_status "$2")"
         [ "$stts" ] && {
-            if_status=' 🔴'
+            if_status=" $alert_sign"
             mod_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ M'))"
             del_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ D'))"
             ren_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^ R'))"
@@ -39,31 +44,39 @@ case "$1" in
             unt_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^??'))"
             upd_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^UU'))"  ## updated but unmerged
             sta_count="$(wc -l   < <(printf '%s\n' "$stts" | \grep '^[MDAR] '))"
-            sta_m_count="$(wc -l < <(printf '%s\n' "$stts" | \grep '^[MDAR][MDAR]'))"
+            sta_m_count="$(wc -l < <(printf '%s\n' "$stts" | \grep '^[MDAR][MDAR]'))"  ## staged but modified
 
-            (( mod_count   > 0 )) && mod="  $mod_count"
-            (( del_count   > 0 )) && del="  $del_count"
-            (( ren_count   > 0 )) && ren=" Ⓡ $ren_count"
-            (( add_count   > 0 )) && add="  $add_count"
-            (( unt_count   > 0 )) && unt="  $unt_count"
-            (( upd_count   > 0 )) && upd="  $upd_count"
-            (( sta_count   > 0 )) && sta="  $sta_count"
-            (( sta_m_count > 0 )) && sta_m="  $sta_m_count"
+            (( mod_count   > 0 )) && mod=" M:$mod_count"   ## 
+            (( del_count   > 0 )) && del=" D:$del_count"   ## 
+            (( ren_count   > 0 )) && ren=" R:$ren_count"   ## Ⓡ
+            (( add_count   > 0 )) && add=" A:$add_count"   ## 
+            (( unt_count   > 0 )) && unt=" U:$unt_count"   ## 
+            (( upd_count   > 0 )) && upd=" UU:$upd_count"  ## 
+            (( sta_count   > 0 )) && sta=" S:$sta_count"   ## 
+            (( sta_m_count > 0 )) && sta_m=" SM:$sta_m_count"  ## 
         }
 
         commits_ahead="$(git_commits_ahead "$2")"
-        (( commits_ahead > 0 )) && commits_ahead=" Ⓐ $commits_ahead" || commits_ahead=''  ## 
+        (( commits_ahead > 0 )) && commits_ahead=" A:${commits_ahead}" || commits_ahead=''  ## Ⓐ
 
         current_branch="$(git_current_branch "$2")"
         branches_count="$(wc -l < <(git_branches_exclude_remote "$2"))"
-        (( branches_count > 1 )) && branch_info=" Ⓑ ${branches_count}@${current_branch}"
+        (( branches_count > 1 )) && branch_info=" B:${current_branch}:${branches_count}"
 
         remotes="$(git_remotes "$2")"
         \grep -qi 'github' <<< "$remotes" && logo=' '
         [ "$remotes" ] || is_local=' LOCAL'
 
-        printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
+        printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
+            "$hash_head" \
+            "$head_detached" \
             "$commits_count" \
+            "$commits_ahead" \
+            "$branch_info" \
+            "$logo" \
+            "$is_local" \
+            \
+            "$if_status" \
             "$mod" \
             "$del" \
             "$ren" \
@@ -71,11 +84,6 @@ case "$1" in
             "$unt" \
             "$upd" \
             "$sta" \
-            "$sta_m" \
-            "$commits_ahead" \
-            "$branch_info" \
-            "$logo" \
-            "$is_local" \
-            "$if_status"
+            "$sta_m"
         ;;
 esac

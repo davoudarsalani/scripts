@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 10:58:10 +0330 Wednesday
+## @last-modified 1400-10-30 18:45:17 +0330 Thursday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
@@ -10,7 +10,7 @@ source "$HOME"/scripts/gb-color
 title="${0##*/}"
 heading "$title"
 
-cd "$(choose_directory)" 2>/dev/null || exit 37  ## TODO find how to pass $directory to RG in JUMP_1 instead of cding
+cd "$(select_directory)" 2>/dev/null || exit 37  ## TODO find how to pass $directory to RG in JUMP_1 instead of cding
 
 main_item="$(pipe_to_fzf 'all' 'bash' 'python' 'md' 'yaml' "header=rg in ${PWD/$HOME/\~}")" && wrap_fzf_choice "$main_item" || exit 37
 

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+## @last-modified 1400-10-30 13:27:40 +0330 Thursday
+
+\ls $LS_FLAGS "${1/\~/$HOME}"  ## NOTE keep \ls esacped

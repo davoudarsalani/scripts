@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 18:09:21 +0330 Wednesday
+## @last-modified 1400-11-01 08:28:34 +0330 Friday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -25,8 +25,16 @@ function git_diff_specific {
 
 function git_log {
     printf '%s\n' "$(git -C "${1:-.}" \
-                     log --color --abbrev-commit --date=relative --graph --full-history --all --pretty=oneline \
-                     --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
+                     log --color --abbrev-commit --date=relative --full-history --pretty=oneline --all --graph \
+                         --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
+                         ## NOTE nearly share the same options for log as JUMP_1
+}
+
+function git_reflog {
+    printf '%s\n' "$(git -C "${1:-.}" \
+                     reflog --color --abbrev-commit --date=relative --full-history --pretty=oneline \
+                            --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
+                         ## NOTE nearly share the same options for log as JUMP_1
 }
 
 
@@ -35,7 +43,7 @@ function git_add_all {
 }
 
 function git_add_specific_or_pattern {
-    git -C "${1:-.}" add "$2"  ## $2 is df/pattern
+    git -C "${1:-.}" add "$2"  ## $2 is item/pattern
 }
 
 function git_branch_create {
@@ -56,6 +64,10 @@ function git_branch_force_delete_all {
 
 function git_branch_force_delete_specific {
     git -C "${1:-.}" branch -D "$2"  ## $2 is branch
+}
+
+function git_branch_rename {
+    git -C "${1:-.}" branch -m "$2" "$3"  ## $2 and $3 are current and new name of branch
 }
 
 function git_branch_switch {
@@ -131,6 +143,14 @@ function git_garbage_clean {
     git -C "${1:-.}" gc --prune=now --aggressive
 }
 
+function git_hash_head {
+    git -C "${1:-.}" rev-parse --short --verify HEAD
+}
+
+function git_hash_last_commit {
+    git -C "${1:-.}" log --all -1 --format=%h
+}
+
 function git_if_behind {
     source "$HOME"/scripts/gb-color
 
@@ -156,8 +176,8 @@ function git_if_behind {
 
 function git_last_commit {
     ## usage:
-    ##     git_last_commit 'repo_path'            ## returns date/time of last commit in repo
-    ##     git_last_commit 'repo_path' 'df_name'  ## returns date/time df was last committed
+    ##     git_last_commit 'repo_path'         ## returns date/time of last commit in repo
+    ##     git_last_commit 'repo_path' 'item'  ## returns date/time item was last committed
 
     printf '%s\n' "$(git -C "${1:-.}" log -1 --format=%ci "${2:-.}")"  ## . in "${2:-.}" does nothing but preventing errors if there is no $2 passed
 }
@@ -216,8 +236,31 @@ function git_reset_soft {
     git -C "${1:-.}" reset --soft "$2"  ## $2 is commit hash
 }
 
-function git_revert {
+function git_reset_temp {
+    ## this reverts to a commit hash in form of a temporary branch
+    ## named 'HEAD detached at HASH' and switches to it.
+    ## The branch will be automatically deleted after switching back to master [or any other branch !]
+
     git -C "${1:-.}" checkout "$2"  ## $2 is commit hash
+}
+
+function git_restore_all {
+    git -C "${1:-.}" restore .
+    ## PREVIOUSLY: git -C "${1:-.}" checkout -- '*'  ## NOTE do NOT remove ''
+}
+
+function git_restore_specific_or_pattern {
+    git -C "${1:-.}" restore "$2"  ## $2 is item/pattern
+    ## PREVIOUSLY: git -C "${1:-.}" checkout -- "$2"  ## $2 is item/pattern
+}
+
+function git_source_file_from_a_commit {
+    ## Restore a specific revision of the file (as put by https://www.git-tower.com/learn/git/commands/git-restore)
+    ## this function copies a file from a commit (as it was then) to the current commit
+    ## this is useful when we know a time when a file worked well
+    ## and we want to have it now again in the same condition as it was in that commit
+
+    git -C "${1:-.}" restore --source "$2" "$3"  ## $2 and $3 are commit hash and file
 }
 
 function git_status {
@@ -259,18 +302,12 @@ function git_touched_count {
     printf '%s\n' "$(wc -l < <(git -C "${1:-.}" rev-list HEAD "$2"))" ## $2 is dir/file name
 }
 
-function git_undo_all {
-    git -C "${1:-.}" checkout -- '*'  ## NOTE do NOT remove ''
-}
-
-function git_undo_specific_or_pattern {
-    git -C "${1:-.}" checkout -- "$2"  ## $2 is df/pattern
-}
-
 function git_unstage_all {
-    git -C "${1:-.}" reset HEAD --
+    git -C "${1:-.}" restore --staged .
+    ## PREVIOUSLY: git -C "${1:-.}" reset HEAD --
 }
 
 function git_unstage_specific_or_pattern {
-    git -C "${1:-.}" reset HEAD -- "$2"  ## $2 is df/pattern
+    git -C "${1:-.}" restore --staged "$2"  ## $2 is item/pattern
+    ## PREVIOUSLY: git -C "${1:-.}" reset HEAD -- "$2"  ## $2 is item/pattern
 }
