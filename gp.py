@@ -1,4 +1,4 @@
-## @last-modified 1400-10-09 10:55:31 +0330 Thursday
+## @last-modified 1400-11-13 09:43:59 +0330 Wednesday
 
 
 ## for .venv_keylogger: keylogger
@@ -575,12 +575,12 @@ def invalid(text: str) -> None:
     exit(38)
 
 
-def relative_date(start_date: str, now: int):
+def relative_date(start_date: str):
     ## start_date is in 2019-05-03T07:07:11Z format
-    ## now is in 1618468803 format
 
     start_date_in_seconds = convert_to_second(start_date)
-    diff = now - start_date_in_seconds
+    now_in_seconds = get_datetime('seconds')
+    diff = now_in_seconds - start_date_in_seconds
 
     return f"{convert_second(diff, 'verbose')} ago"
 
@@ -623,9 +623,12 @@ def convert_second(seconds: int, verbose: bool = False) -> str:
         else:
             result = f'{yy}:{mo}:{dd}:{hh}:{mi}:{ss}'
 
-    ## remove items whose values are 00, and adjust comma and 'and'
-    ## NOTE the same modifications in here and JUMP_4 are applied in convert_second function in gb, so
-    ##      any changes you make here, make sure to update that too
+    ## NOTE the same modifications in JUMP_4 are applied in
+    ##        1. convert_second function in gb
+    ##        2. 'relative' method of whatever-its-name-is class in models.py in django app
+    ##      so any changes you make here, make sure to update them too
+
+    ## JUMP_4 remove items whose values are 00, and adjust comma and 'and'
     result = sub(r'00 [a-z]+s, ', r'', result)
     result = sub(r'00 [a-z]+s and ', r'', result)
     result = sub(r'00 [a-z]+s$', r'', result)
@@ -637,12 +640,11 @@ def convert_second(seconds: int, verbose: bool = False) -> str:
     result = sub(r', +$', r'', result)
     result = sub(r', ([0-9][0-9] [a-z]+s)$', r' and \1', result)
 
-    ## remove plural s when value is 01 JUMP_4
+    ## JUMP_4 remove plural s when value is 01
     result = sub(r'(01 [a-z]+)s ', r'\1 ', result)
     result = sub(r'(01 [a-z]+)s, ', r'\1, ', result)
     result = sub(r'(01 [a-z]+)s$', r'\1', result)
 
-    ## TODO there are something we can do (like what we do in bash in convert_second function in gb) before we return result
     return result
 
 

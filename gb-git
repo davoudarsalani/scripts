@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-01 08:28:34 +0330 Friday
+## @last-modified 1400-11-01 13:52:39 +0330 Friday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
+
+## %x09 = tab (https://stackoverflow.com/questions/1441010/the-shortest-possible-output-from-git-log-containing-author-and-date)
+##            (https://git-scm.com/docs/pretty-formats)
 
 function if_git {
     git -C "${1:-.}" rev-parse --is-inside-work-tree &>/dev/null && printf 'true\n' || printf 'false\n'
@@ -10,31 +13,35 @@ function if_git {
 
 
 function git_diff_all {
-    printf '%s\n' "$(git -C "${1:-.}" \
-                     diff --unified=0 --color=always --src-prefix=1st: --dst-prefix=2nd:)" | less -R
-                                 ## '--,--> --unified=0 makes git show only the modified lines
-                                 ##    '--> --color-words show modified words side-by-side
+    ## NOTE nearly share the same options for diff as JUMP_2
+    git -C "${1:-.}" diff --unified=0 --color=always --src-prefix=1st: --dst-prefix=2nd: | less -R
+    ## --unified=0 makes git show only the modified lines
+    ## --color-words show modified words side-by-side
 }
 
 function git_diff_specific {
-    printf '%s\n' "$(git -C "${1:-.}" \
-                     diff --unified=0 --color=always --src-prefix=1st: --dst-prefix=2nd: -- "$2" | sed 1,4d)"  ## $2 is dir/file name
-                                 ## '--,--> --unified=0 makes git show only the modified lines
-                                 ##    '--> --color-words show modified words side-by-side
+    ## NOTE nearly share the same options for diff as JUMP_2
+    git -C "${1:-.}" diff --unified=0 --color=always --src-prefix=1st: --dst-prefix=2nd: -- "$2" | sed 1,4d  ## $2 is item name
+    ## --unified=0 makes git show only the modified lines
+    ## --color-words show modified words side-by-side
 }
 
 function git_log {
-    printf '%s\n' "$(git -C "${1:-.}" \
-                     log --color --abbrev-commit --date=relative --full-history --pretty=oneline --all --graph \
-                         --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
-                         ## NOTE nearly share the same options for log as JUMP_1
+    ## NOTE nearly share the same options for log as JUMP_1
+
+
+
+    ## %G?: show "G" for a good (valid) signature, "B" for a bad signature, "U" for a good signature with unknown validity and "N" for no signature
+    git -C "${1:-.}" \
+        log --color --abbrev-commit --full-history --all --graph \
+            --format='%C(always,blue)%h %C(always,magenta)%G? %C(always,bold black)%>(15,trunc)%cr %C(always,green)%<(4,trunc)%cn %C(always,green)%d %C(always,reset)%s'
 }
 
 function git_reflog {
-    printf '%s\n' "$(git -C "${1:-.}" \
-                     reflog --color --abbrev-commit --date=relative --full-history --pretty=oneline \
-                            --pretty=format:'%Cblue%h%Creset %C(bold black)%cr%Creset%C(green)%d%Creset %s')"
-                         ## NOTE nearly share the same options for log as JUMP_1
+    ## NOTE nearly share the same options for log as JUMP_1
+    git -C "${1:-.}" \
+        reflog --color --abbrev-commit --full-history \
+               --format='%C(always,yellow)%h %C(always,magenta)%G? %C(always,bold black)%>(15,trunc)%cr %C(always,green)%<(4,trunc)%cn %C(always,green)%d %C(always,reset)%s'
 }
 
 
@@ -75,11 +82,11 @@ function git_branch_switch {
 }
 
 function git_branches {
-    printf '%s\n' "$(git -C "${1:-.}" branch -a --color=always | \grep -v '/HEAD\s' | sed 's/^ \+//'  | sort)"
+    git -C "${1:-.}" branch -a --color=always | \grep -v '/HEAD\s' | sed 's/^ \+//' | sort
 }
 
 function git_branches_exclude_remote {
-    printf '%s\n' "$(git -C "${1:-.}" branch | sed 's/^ \+//'  | sort)"
+    git -C "${1:-.}" branch | sed 's/^ \+//' | sort
 }
 
 function git_commit_in_editor {
@@ -110,11 +117,15 @@ function git_commits_behind_ahead {
     local current_branch
 
     current_branch="$(git_current_branch "${1:-.}")"
-    printf '%s\n' "$(git -C "${1:-.}" rev-list HEAD...origin/${current_branch} --count)"
+    git -C "${1:-.}" rev-list HEAD...origin/"$current_branch" --count
 }
 
 function git_commits_count {
-    printf '%s\n' "$(git -C "${1:-.}" rev-list HEAD --count)"
+    git -C "${1:-.}" rev-list HEAD --count
+}
+
+function git_commits_count_specific {
+    git -C "${1:-.}" rev-list HEAD --count "$2"  ## $2 is item name
 }
 
 function git_config_edit {
@@ -126,7 +137,7 @@ function git_config_see {
 }
 
 function git_current_branch {
-    printf '%s\n' "$(git -C "${1:-.}" branch | sed -n '/\* /s///p')"
+    git -C "${1:-.}" branch | sed -n '/\* /s///p'
     ## OR 1: git -C "${1:-.}" branch -a 2>/dev/null | sed '/^[^*]/d;s/* \(.*\)/\1/')"
     ##    2: git -C "${1:-.}" rev-parse --abbrev-ref HEAD  ## FIXME only returns HEAD instead of (HEAD detached at 56bb92a) when reverted to a commit
 }
@@ -144,15 +155,17 @@ function git_garbage_clean {
 }
 
 function git_hash_head {
-    git -C "${1:-.}" rev-parse --short --verify HEAD
+    git -C "${1:-.}" log -1 --format=%h
+    ## PREVIOUSLY: git -C "${1:-.}" rev-parse --short --verify HEAD
 }
 
 function git_hash_last_commit {
-    git -C "${1:-.}" log --all -1 --format=%h
+    git -C "${1:-.}" log -1 --format=%h --all
 }
 
 function git_if_behind {
     source "$HOME"/scripts/gb-color
+    local commits_ahead temp_path
 
     action_now 'updating remote'
     commits_ahead="$(git_commits_ahead "${1:-.}")"
@@ -166,11 +179,10 @@ function git_if_behind {
     ## getting commits_behind
     (( commits_behind="commits_behind_ahead - commits_ahead" ))
     (( commits_behind > 0 )) && {
-       local temp_path
-       temp_path="$(printf '%s\n' "${1:-.}" | sed "s|$HOME|\~|")"  ## do NOT replace | with / in sed
+       temp_path="$(printf '%s\n' "${1:-.}" | sed "s|$HOME|\~|")"  ## NOTE do NOT replace | with / in sed
        red "local is $commits_behind commits behind remote."
-       red "try: git -C ${temp_path} pull"
-       exit
+       red "try: git -C $temp_path pull"
+       exit 37
     }
 }
 
@@ -179,7 +191,7 @@ function git_last_commit {
     ##     git_last_commit 'repo_path'         ## returns date/time of last commit in repo
     ##     git_last_commit 'repo_path' 'item'  ## returns date/time item was last committed
 
-    printf '%s\n' "$(git -C "${1:-.}" log -1 --format=%ci "${2:-.}")"  ## . in "${2:-.}" does nothing but preventing errors if there is no $2 passed
+    git -C "${1:-.}" log -1 --format=%ci "${2:-.}"  ## . in "${2:-.}" does nothing but preventing errors if there is no $2 passed
 }
 
 function git_pull_noproxy {
@@ -203,6 +215,14 @@ function git_push_noproxy {
 
 function git_push_proxy {
     torsocks git -C "${1:-.}" push || git_push_failed
+}
+
+function git_relative_head {
+    git -C "${1:-.}" log -1 --format=%cr | sed 's/minute/min/;s/hour/hr/;s/ /-/g'
+}
+
+function git_relative_last_commit {
+    git -C "${1:-.}" log -1 --format=%cr --all | sed 's/minute/min/;s/hour/hr/;s/ /-/g'
 }
 
 function git_remote_update_noproxy {
@@ -296,10 +316,6 @@ function git_tag_show_all {
 
 function git_tag_show_specific {
     git -C "${1:-.}" show "$2"  ## $2 is tag
-}
-
-function git_touched_count {
-    printf '%s\n' "$(wc -l < <(git -C "${1:-.}" rev-list HEAD "$2"))" ## $2 is dir/file name
 }
 
 function git_unstage_all {

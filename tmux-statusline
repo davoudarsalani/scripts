@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-30 21:02:30 +0330 Thursday
+## @last-modified 1400-11-03 08:53:37 +0330 Sunday
 
 case "$1" in
-    if_sony )
-        [ "$HOSTNAME" == 'sony' ] && printf 'SONY \n' ;;
-    if_ssh )
-        [ "$SSH_CONNECTION" ] && printf 'SSH \n' ;;
     pwd )
-        printf '%-15s\n' "${2/$HOME/\~}" ;;
+        printf '%s\n' "${2/$HOME/\~}" ;;  ## '%-15s\n'
     info )
-        [ "$2" == "$HOME" ] && printf '%s\n' '--' && exit
+        [ "$2" == "$HOME" ] && {
+            printf '%s\n' '--'
+            exit
+        }
+
         source "$HOME"/scripts/gb-calculation
 
         size="$(du -bs "$2" | awk '{print $1}')"
@@ -29,8 +29,13 @@ case "$1" in
         [ "$(if_git "$2")" == 'false' ] && exit
 
         hash_head="$(git_hash_head "$2")"
+        relative_head="$(git_relative_head "$2")"
+
         hash_last_commit="$(git_hash_last_commit "$2")"
-        [ "$hash_head" == "$hash_last_commit" ] || head_detached="${alert_sign}${hash_last_commit}"
+        [ "$hash_head" == "$hash_last_commit" ] || {
+            relative_last_commit="$(git_relative_last_commit "$2")"
+            is_head_detached="${alert_sign}${hash_last_commit}(${relative_last_commit})"
+        }
 
         commits_count=" C:$(git_commits_count "$2")"  ## Ⓒ
 
@@ -67,9 +72,10 @@ case "$1" in
         \grep -qi 'github' <<< "$remotes" && logo=' '
         [ "$remotes" ] || is_local=' LOCAL'
 
-        printf '%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
+        printf 'H:%s:%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
             "$hash_head" \
-            "$head_detached" \
+            "$relative_head" \
+            "$is_head_detached" \
             "$commits_count" \
             "$commits_ahead" \
             "$branch_info" \
@@ -86,4 +92,8 @@ case "$1" in
             "$sta" \
             "$sta_m"
         ;;
+    if_sony )
+        [ "$HOSTNAME" == 'acer' ] || printf '%s \n' "${HOSTNAME^^}" ;;
+    if_ssh )
+        [ "$SSH_CONNECTION" ] && printf 'SSH \n' ;;
 esac

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-30 23:54:33 +0330 Thursday
+## @last-modified 1400-11-04 22:55:21 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -54,10 +54,12 @@ function check_pattern {
 }
 
 function if_amend_allowed {
-    (( "$(git_commits_ahead "$directory")" > 0 )) || {
+    ## NOTE used [ var -eq 0 ] instead of (( var == 0 )) because
+    ##      (( var == 0 )) is stupid (i.e. it returns true even if var does not exist)
+    if [ "$(git_commits_ahead "$directory")" -eq 0 ] && [ "$(git_remotes "$directory")" ]; then
         red 'amend not allowed'
         exit
-    }
+    fi
 }
 
 function if_changed {
@@ -74,7 +76,7 @@ function if_changed {
     readarray -t sta   < <(printf '%s\n' "$stts" | \grep '^[MDRA] '      | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta[@]}"
     readarray -t sta_m < <(printf '%s\n' "$stts" | \grep '^[MDRA][MDRA]' | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${sta_m[@]}"
 
-    [ "${changes[0]}" ] || {
+    [ "$changes" ] || {
         green 'sleeping'
         exit
     }
@@ -191,7 +193,7 @@ proxy='false'
 get_opt "$@"
 heading "$title"
 
-main_items=( 'status' 'add [+]' 'commit' 'add_commit [+]' 'commit_amend' 'empty_commit' 'restore [+]' 'unstage [+]' 'log' 'reflog' 'push' 'pull' 'remove' 'branch' 'tag' 'remotes' 'reset' 'garbage clean' 'source file from a commit' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
+main_items=( 'status' 'add [+]' 'commit' 'add+commit [+]' 'commit amend' 'empty commit' 'restore [+]' 'unstage [+]' 'log' 'reflog' 'push' 'pull' 'remove' 'branch' 'tag' 'remotes' 'reset' 'garbage clean' 'source file from a commit' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -289,7 +291,7 @@ case "$main_item" in
 
     commit )
         if_changed
-        [ "${sta[0]}" ] || {
+        [ "$sta" ] || [ "$sta_m" ] || {
             red 'no staged files'
             exit
         }
@@ -309,7 +311,7 @@ case "$main_item" in
                 accomplished "committed, message: $message" ;;
         esac ;;
 
-    'add_commit [+]' )
+    'add+commit [+]' )
         if_changed
         IFS=$'\n'
         multiple='true'
@@ -346,7 +348,7 @@ case "$main_item" in
                 accomplished "message: $colonized $message" ;;
         esac ;;
 
-    commit_amend )
+    'commit amend' )
         if_amend_allowed
         preview_status='hidden'
         commit_amend_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$commit_amend_item" || exit 37
@@ -363,7 +365,7 @@ case "$main_item" in
                 accomplished "commit amended, message: $message" ;;
         esac ;;
 
-    empty_commit )
+    'empty commit' )
         preview_status='hidden'
         empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
 
@@ -406,7 +408,7 @@ case "$main_item" in
 
     'unstage [+]' )
         if_changed
-        [ "${sta[0]}" ] || {
+        [ "$sta" ] || [ "$sta_m" ] || {
             red 'no staged files'
             exit
         }
@@ -500,9 +502,9 @@ case "$main_item" in
             'switch' )
                 if_locked
                 # IFS=$'\n'
-                cd_to_branch_item="$(branch_info "$(branches_array)")"
-                git_branch_switch "$directory" "$cd_to_branch_item" && \
-                accomplished "$cd_to_branch_item switched to" ;;
+                switch_to_branch_item="$(branch_info "$(branches_array)")"
+                git_branch_switch "$directory" "$switch_to_branch_item" && \
+                accomplished "$switch_to_branch_item switched to" ;;
             'create and switch' )
                 prompt -b
                 if_locked
@@ -631,8 +633,8 @@ case "$main_item" in
     commits )
         readarray -t items < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included
 
-        for df in "${items[@]##*/}"; {
-            printf '%s %s\n' "$(git_touched_count "$directory" "$df")" "$df"
+        for item in "${items[@]##*/}"; {
+            printf '%s %s\n' "$(git_commits_count_specific "$directory" "$item")" "$item"
         } | sort --numeric-sort --reverse | column && \
         accomplished ;;  ## --numeric-sort is for comparing according to string numerical value
 

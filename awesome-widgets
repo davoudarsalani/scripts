@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-30 18:43:49 +0330 Thursday
+## @last-modified 1400-11-02 07:58:42 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -529,11 +529,12 @@ msgn "$text" ;;
 
         ## FIXME cant use FZF_ALT_C_COMMAND because it is apparently not accessible to this option
         ## FIXME a bit too slow
-        ## v-- 1st line of options: synced with the ones for FZF_DEFAULT_COMMAND in /etc/bash.bashrc
-        ## v-- 2nd line of options: synced with the ones for git_args in select_directory function in "$HOME"/scripts/gb
-        readarray -t all_repos < <(find "$HOME" -type d \
-                                     ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' \
-                                     ! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*' -iname '.git' | sed 's#/\.git##' | sort)
+        ## v-- 2nd line of options: synced with the ones for FZF_DEFAULT_COMMAND in /etc/bash.bashrc
+        ## v-- 3rd line of options: synced with the ones for FZF_ALT_C_COMMAND_GIT in /etc/bash.bashrc
+        readarray -t all_repos < <(find "$HOME" \
+                                        -type d \
+                                        ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' \
+                                        ! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*' -iname '.git' | sed 's#/\.git##' | sort)
 
         readarray -t non_public_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'public')
         readarray -t public_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'public')

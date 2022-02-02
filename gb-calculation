@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 10:10:28 +0330 Wednesday
+## @last-modified 1400-11-07 23:41:53 +0330 Thursday
 
 function float_pad {
     local input desired_l_length desired_r_length float l r r_length lacking_pad
@@ -60,19 +60,16 @@ function compare_floats {
 }
 
 function convert_byte {
-    ## conversion table:
-    ## B  = "$1"               ## 2546790
-    ## KB = "$1" / 1024        ## 248720.50KB
-    ## MB = "$1" / 1024000     ## 248.72MB
-    ## GB = "$1" / 1024000000  ## 00.25GB
+    local divisor size
 
-    if (( "$1" >= 1024000000 )); then
-        printf '%sGB\n' "$(float_pad "${1}/1024000000" 1 2)"
-    elif (( "$1" >= 1024000 )); then
-        printf '%sMB\n' "$(float_pad "${1}/1024000" 1 2)"
-    elif (( "$1" >= 1024 )); then
-        printf '%sKB\n' "$(float_pad "${1}/1024" 1 2)"
-    else
-        printf '%sB\n' "$1"
-    fi
+    divisor=1024
+    size="$1"
+
+    for unit in B KB MB GB TB PB EB ZB YB; {
+        (( "${size%.*}" < divisor )) && {
+            printf '%s%s\n' "$size" "$unit"
+            break
+        }
+        size="$(float_pad "${size//[a-zA-Z]/}/${divisor}" 1 2)"
+    }
 }

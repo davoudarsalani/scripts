@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-10-28 10:11:28 +0330 Tuesday
+## @last-modified 1400-11-04 13:24:15 +0330 Monday
 
+import string
 from getopt import getopt
 from os import path
 from random import sample
+from re import sub
 from subprocess import run
 from sys import argv
 
-from gp import Color, invalid, fzf, get_input
+from gp import Color, invalid, fzf
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
@@ -19,16 +21,17 @@ def display_help() -> None:
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-l|--length=')}'''
+{Col.flag('-l|--length=')}{Col.default('[30]')}
+{Col.flag('-c|--count=')}{Col.default('[5]')}'''
     )
     exit()
 
 
 def getopts() -> None:
-    global length
+    global length, count
 
     try:
-        duos, duos_long = getopt(script_args, 'hl:', ['help', 'length='])
+        duos, duos_long = getopt(script_args, 'hl:c:', ['help', 'length=', 'count='])
     except Exception as exc:
         invalid(f'{exc!r}')
 
@@ -37,70 +40,45 @@ def getopts() -> None:
             display_help()
         elif opt in ('-l', '--length'):
             length = int(arg)
+        elif opt in ('-c', '--count'):
+            count = int(arg)
 
 
 def prompt(*args: list[str]) -> None:
-    global length
+    global length, count
 
     for arg in args:
         if arg == '-l':
             try:
                 length
             except:
-                try:
-                    length = int(get_input('Length'))
-                except:
-                    invalid('Length should be a number')
+                length = 30
+        elif arg == '-c':
+            try:
+                count
+            except:
+                count = 5
 
 
-def generate() -> None:
-    u = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    l = u.lower()
-    d = '0123456789'
-    s = '`~!@#$%^-*()_+={}[]|;\':",.<>?'  ## &, \\ and / intentionally excluded to prevent possible shell errors/problems
-
-    ## with all the characters
-    print('all characters:')
-    up, lo, di, sy = True, True, True, True
+def generate(uppercase: bool = True, lowercase: bool = True, digits: bool = True, symbols: bool = True) -> None:
     letters = ''
-    if up:
-        letters += u
-    if lo:
-        letters += l
-    if di:
-        letters += d
-    if sy:
-        letters += s
+    if uppercase:
+        letters += string.ascii_uppercase
+    if lowercase:
+        letters += string.ascii_lowercase
+    if digits:
+        letters += string.digits
+    if symbols:
+        puncs = string.punctuation
+        puncs = sub(r'[&/\\]', r'', puncs)  ## removing &, / and \\ to prevent possible shell errors
+        letters += puncs
 
     global length
     if length > len(letters):
-        print(Col.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
+        print(Col.yellow(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
         length = len(letters)
 
-    for x in range(5):
-        password = ''.join(sample(letters, length))
-        print(password)
-
-    print()
-
-    ## with no symbols
-    print('no symbols:')
-    up, lo, di, sy = True, True, True, False
-    letters = ''
-    if up:
-        letters += u
-    if lo:
-        letters += l
-    if di:
-        letters += d
-    if sy:
-        letters += s
-
-    if length > len(letters):
-        print(Col.orange(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
-        length = len(letters)
-
-    for x in range(5):
+    for x in range(count):
         password = ''.join(sample(letters, length))
         print(password)
 
@@ -113,7 +91,10 @@ main_items = ['password', 'help']
 main_item = fzf(main_items)
 
 if main_item == 'password':
-    prompt('-l')
+    prompt('-l', '-c')
+    print('all characters (&, / and \\ excluded):')
     generate()
+    print('\nno symbols:')
+    generate(symbols=False)
 elif main_item == 'help':
     display_help()
