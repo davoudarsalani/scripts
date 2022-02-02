@@ -100,7 +100,7 @@ class SplitAndCombineFiles:
     def get_file_count_from_size(self):
         """This method is to get the file chunk sizes"""
 
-        size = {"B": 1, "KB": 1024, "MB": 1024 ** 2, "GB": 1024 ** 3}
+        size = {"B": 1, "KB": 1024, "MB": 1024**2, "GB": 1024**3}
 
         # get the file zize
         self.f_size = os.path.getsize(self.__input_file_name)
