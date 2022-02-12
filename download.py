@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-10-28 13:48:35 +0330 Tuesday
+## @last-modified 1400-11-15 08:46:59 +0330 Friday
 
 
 from __future__ import unicode_literals
@@ -10,7 +10,6 @@ from functools import partial
 from getopt import getopt
 from glob import glob
 from inspect import stack
-from math import floor, log, pow as math_pow
 from os import path, mkdir, chdir, getenv
 from pathlib import Path
 from random import shuffle
@@ -26,7 +25,7 @@ from requests import Session
 from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
-from gp import Color, convert_second, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
+from gp import Color, convert_byte, convert_second, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
 
 
 def display_help() -> None:
@@ -232,18 +231,6 @@ def make_errors() -> dict[str, str]:
         ## Full: gaierror(-3, 'Temporary failure in name resolution')
         ## ]]
     }
-
-
-def convert_byte(size_in_bytes: int) -> str:
-    if size_in_bytes == 0:
-        return '0B'
-
-    suff = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
-    i = int(floor(log(size_in_bytes, 1024)))
-    p = math_pow(1024, i)
-    conv = f'{float(size_in_bytes / p):.2f}'
-
-    return f'{conv}{suff[i]}'
 
 
 def restart_tor() -> None:

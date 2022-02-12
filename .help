@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-30 23:51:57 +0330 Thursday
+## @last-modified 1400-11-13 12:48:54 +0330 Wednesday
 
 source "$HOME"/scripts/gb-color
 
@@ -96,6 +96,14 @@ clear
 printf '%s\n' \
 "$(heading "$title") $(yellow "help")
 $(flag '-d|--default=') default sink/source index/name"
+exit
+}
+
+function r_help {
+clear
+printf '%s\n' \
+"$(heading "$title") $(yellow "help")
+$(flag '-d|--directory=')"
 exit
 }
 

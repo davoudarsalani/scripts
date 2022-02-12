@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-07 23:41:53 +0330 Thursday
+## @last-modified 1400-11-20 10:52:25 +0330 Wednesday
 
 function float_pad {
     local input desired_l_length desired_r_length float l r r_length lacking_pad
@@ -65,7 +65,7 @@ function convert_byte {
     divisor=1024
     size="$1"
 
-    for unit in B KB MB GB TB PB EB ZB YB; {
+    for unit in B K M G T P E Z Y; {
         (( "${size%.*}" < divisor )) && {
             printf '%s%s\n' "$size" "$unit"
             break

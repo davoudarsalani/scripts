@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-13 09:40:03 +0330 Wednesday
+## @last-modified 1400-11-17 19:51:04 +0330 Sunday
 
 function get_datetime {
     case "$1" in
@@ -231,13 +231,17 @@ function play_shutdown_track {
 
 function relative_date {
     ## usage:
-    ##     relative_date "$arg1"
-    ##                      ^-- start date (in 2019-05-03T07:07:11Z format)
+    ##   relative_date '2019-05-03T07:07:11Z'
+    ##   relative_date 1556867231
 
     local start_date_in_seconds now_in_seconds
 
-    ## convert start time from 2019-05-03T07:07:11Z to 1556867231
-    start_date_in_seconds="$(convert_to_second "$1")"
+    if [ "$1" -eq "$1" ] 2>/dev/null; then
+        start_date_in_seconds="$1"
+    else
+        start_date_in_seconds="$(convert_to_second "$1")"
+    fi
+
     now_in_seconds="$(get_datetime 'seconds')"
 
     printf '%s ago\n' "$(convert_second "(( now_in_seconds - start_date_in_seconds ))" 'verbose')"
@@ -419,53 +423,56 @@ function move_older_pkgs {
 
 
 # function find_duplicate_images {
-#     source "$HOME"/scripts/gb-color
-
-#     declare -a pics
-
 #     [ "$1" ] || {
-#         red 'arg needed'
+#         red 'two args arg needed:'
+#         red "usage: $FUNCNAME SRC_DIR_PATH FILE_EXTENSION (e.g. json)"
 #         exit
 #     }
+
 #     dest_dir="$1"
 #     [ -d "$dest_dir" ] || {
-#         red 'no such dir'
+#         red "no such dir as ${dest_dir}"
 #         exit
 #     }
 
-#     SECONDS=0
+#     dups_file=/tmp/duplicates-"$(date '+%s')"
+#     dups_string=''
+#     declare -A dups_array
 
-#     readarray -t pics < <(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
-#     dups=''
+#     readarray -t files < <(find "$1" -mindepth 1 -type f -iname "*.${2}" | sort)
+#     orig_count="${#files[@]}"
 
-#     for ((i=0; i<"${#pics[@]}"; i++)); {
-#         p1="${pics[$i]}"
+#     for ((idx=0; idx<"${orig_count}"; idx++)); {
+#         f_1="${files[$idx]}"
 
-#         ## start comparing only if p1 is not already in dups
-#         if_p1_in_dups="$(printf '%s\n' "$dups" | \grep "$p1")"  ## I quoted $p1 and didn't check if it still works
-#         [ "$if_p1_in_dups" ] || {
-#             printf '%s\n' "$p1"
-#             for p2 in "${pics[@]:$i}"; {
-#                 ## prevent comparing with itself
-#                 [ "$p1" == "$p2" ] || {
-#                     difference="$(diff "$p1" "$p2")"
-#                     \grep -q 'differ$' <<< "$difference" || dups+="${p1} = ${p2}, "
+#         ## skip comparing if f_1 is already in dups_string
+#         \grep -q "$f_1" <<< "$dups_string" && continue
+
+#         printf '%s/%s %s\n' "$((idx+1))" "${orig_count}" "$f_1"
+#         for f_2 in "${files[@]}"; {
+#             ## prevent comparing with itself
+#             [ "$f_1" == "$f_2" ] || {
+#                 [ "$(diff "$f_1" "$f_2")" ] || {
+#                     printf '%s\n%s removed\n\n' "$f_1" "$f_2" >> "$dups_file"
+#                     dups_string+="${f_1} ${f_2} "
+#                     dups_array+=([${f_1}]="$f_2")
 #                 }
 #             }
-
-#             ## write dups already found if any
-#             [ "$dups" ] && green "dups: $dups"
-
-#             grey '-------------------------'
-
 #         }
+#         unset "files[${idx}]"
+#         (( "${#dups_array[@]}" > 0 )) && printf '  -> %s found\n' "${#dups_array[@]}"
 #     }
 
-#     green "dups: $dups"
-#     printf '\n'
-
-#     dur="$(convert_second "$SECONDS")"
-#     printf 'Total duration: %s\n' "$dur"
+#     ## printf duplicates if any
+#     if (( "${#dups_array[@]}" > 0 )); then  ## NOTE dups_array is an associative array and '[ "$dups_array" ] &&' didn't work to check if it's full
+#         printf '\n\n %s set(s) of duplicates found (file names also saved at %s):\n\n' "${#dups_array[@]}" "$dups_file"
+#         for key in "${!dups_array[@]}"; {
+#             rm "${dups_array[${key}]}"
+#             printf '%s\n%s removed\n\n' "$key" "${dups_array[${key}]}"
+#         }
+#     else
+#         printf '\nok\n'
+#     fi
 # }
 # }}}
 # function compare_network_speed {

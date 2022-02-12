@@ -1,4 +1,4 @@
-## @last-modified 1400-11-13 09:43:59 +0330 Wednesday
+## @last-modified 1400-11-20 10:53:04 +0330 Wednesday
 
 
 ## for .venv_keylogger: keylogger
@@ -575,12 +575,15 @@ def invalid(text: str) -> None:
     exit(38)
 
 
-def relative_date(start_date: str):
-    ## start_date is in 2019-05-03T07:07:11Z format
+def relative_date(start_date) -> str:
+    ## convert start_date to second if not one
+    try:
+        start_date_in_seconds = int(start_date)
+    except ValueError:
+        start_date_in_seconds = convert_to_second(start_date)
 
-    start_date_in_seconds = convert_to_second(start_date)
     now_in_seconds = get_datetime('seconds')
-    diff = now_in_seconds - start_date_in_seconds
+    diff = int(now_in_seconds) - int(start_date_in_seconds)
 
     return f"{convert_second(diff, 'verbose')} ago"
 
@@ -759,6 +762,20 @@ def get_datetime(frmt: str) -> Any:
         output = jdt.now().strftime('%A')
 
     return output
+
+
+def convert_byte(size_in_bytes: int) -> str:
+    from math import floor, log, pow as math_pow
+
+    if size_in_bytes == 0:
+        return '0B'
+
+    suff = ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    i = int(floor(log(size_in_bytes, 1024)))
+    p = math_pow(1024, i)
+    conv = f'{float(size_in_bytes / p):.2f}'
+
+    return f'{conv}{suff[i]}'
 
 
 def if_exists(dest) -> str:

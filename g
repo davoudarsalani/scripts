@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-04 22:55:21 +0330 Monday
+## @last-modified 1400-11-16 22:32:29 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -113,7 +113,7 @@ function select_hash {
     preview_status='hidden'
     readarray -t log_items < <(git_log "$directory")
     log_item="$(pipe_to_fzf_locally "${log_items[@]}")" || exit 37  ## wrap_fzf_choice "$log_item" exceptionally skipped
-    printf '%s\n' "$log_item" | sed 's/\* \([^ ]\+\) .*/\1/g'
+    printf '%s\n' "$log_item" | sed 's/[\*| ]*\(\w\+\) .*/\1/g'  ## previously: sed 's/\* \([^ ]\+\) .*/\1/g' but didn't delete | from the beginning
 }
 
 function wrap_fzf_multi {
