@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 11:00:11 +0330 Wednesday
+## @last-modified 1400-12-29 11:01:44 +0330 Sunday
 
 source "$HOME"/scripts/gb
+
+trap 'exit 0' INT  ## avoid 255 exit code when using options that connect with x2x
 
 title="${0##*/}"
 

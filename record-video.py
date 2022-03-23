@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:16:35 +0330 Tuesday
+## @last-modified 1401-01-01 10:16:51 +0330 Monday
 
 from os import getenv
 
-from gp import Audio, Record, get_datetime, rofi, update_audio, record_icon, set_widget, duration
+from gp import Audio, Record, get_datetime, rofi, update_audio, record_icon, set_widget, convert_second
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
 length = rofi(lengths, 'rec video')
@@ -31,7 +31,7 @@ elif length == '5h':
 else:
     exit()
 
-dur = duration(secs)
+dur = convert_second(secs)
 suffix = 'VID'
 output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
 Aud = Audio()

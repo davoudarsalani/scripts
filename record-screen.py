@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:16:13 +0330 Tuesday
+## @last-modified 1401-01-01 10:16:32 +0330 Monday
 
 from os import getenv
 
-from gp import Screen, Record, Audio, get_datetime, rofi, update_audio, record_icon, set_widget, duration
+from gp import Screen, Record, Audio, get_datetime, rofi, update_audio, record_icon, set_widget, convert_second
 
 S = Screen()
 scr_1_name, scr_1_res, scr_1_x, scr_1_y = S.screen_1()
@@ -36,7 +36,7 @@ elif length == '5h':
 else:
     exit()
 
-dur = duration(secs)
+dur = convert_second(secs)
 screens = ['1', '2', 'all']
 screen = rofi(screens, 'screen')
 if screen == '1':

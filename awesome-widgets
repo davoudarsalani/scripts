@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-20 11:09:46 +0330 Wednesday
+## @last-modified 1400-12-22 09:18:44 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -434,6 +434,9 @@ msgn "$text" ;;
     reputation )
         "$HOME"/scripts/reputation.py ;;
 
+    visits )
+        "$HOME"/scripts/visits.py ;;
+
     youtube )
         source "$HOME"/scripts/gb-screen
 
@@ -671,13 +674,13 @@ msgn "$text" ;;
                 wf_strength="$(tail -n 1 /proc/net/wireless | awk '{print $4}' | tr -d '.')"
                 if   (( wf_strength < -75 )); then wf_conn_color="${orange}"
                 elif (( wf_strength < -50 )); then wf_conn_color="$yellow"
-                elif (( wf_strength < -25 )); then wf_conn_color="$fg_l"
-                elif (( wf_strength <   0 )); then wf_conn_color="$fg_l"
+                elif (( wf_strength < -25 )); then wf_conn_color="$fg_d"
+                elif (( wf_strength <   0 )); then wf_conn_color="$fg_d"
                 else                               wf_conn_color="$purple"
                 fi
 
-                connections_text="<span color=\"${fg_l}\">${vpn_conn}${eth_conn}</span> <span color=\"${wf_conn_color}\">${wf_conn}</span><span color=\"${orange}\">${if_simcard}${if_wf_down}</span>"
-                # connections_text="<span color=\"${fg_l}\">${vpn_conn}${eth_conn} ${wf_conn}</span>"
+                connections_text="<span color=\"${fg_d}\">${vpn_conn}${eth_conn}</span> <span color=\"${wf_conn_color}\">${wf_conn}</span><span color=\"${orange}\">${if_simcard}${if_wf_down}</span>"
+                # connections_text="<span color=\"${fg_d}\">${vpn_conn}${eth_conn} ${wf_conn}</span>"
 
                 ## down/up {{{ https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
                 for interface in 'ethernet' 'wifi'; {
@@ -747,9 +750,9 @@ msgn "$text" ;;
                     ## set down/up color
                     case "$down" in
                         # [0-9][0-9].*K )
-                        #     down_color="$fg_d" ;;  ## 00K-99K
+                        #     down_color="$fg_l" ;;  ## 00K-99K
                         # [1-3][0-9][0-9].*K )
-                        #     down_color="$fg_d" ;;  ## 100K-399K
+                        #     down_color="$fg_l" ;;  ## 100K-399K
                         [4-6][0-9][0-9].*K )
                             down_color="$cyan_dark" ;;  ## 400K-699K
                         [7-9][0-9][0-9].*K )
@@ -757,14 +760,14 @@ msgn "$text" ;;
                         *[MG] )
                             down_color="$green" ;;
                         * )
-                            down_color="$fg_d" ;;
+                            down_color="$fg_l" ;;
                     esac
 
                     case "$up" in
                         # [0-9][0-9].*K )
-                        #     up_color="$fg_d" ;; ## 00K-99K
+                        #     up_color="$fg_l" ;; ## 00K-99K
                         # [1-3][0-9][0-9].*K )
-                        #     up_color="$fg_d" ;; ## 100K-399K
+                        #     up_color="$fg_l" ;; ## 100K-399K
                         [4-6][0-9][0-9].*K )
                             up_color="$cyan_dark" ;;  ## 400K-699K
                         [7-9][0-9][0-9].*K )
@@ -772,7 +775,7 @@ msgn "$text" ;;
                         *[MG] )
                             up_color="$green" ;;
                         * )
-                            up_color="$fg_d" ;;
+                            up_color="$fg_l" ;;
                     esac
 
                     down_up_text+=" <span color=\"${down_color}\">${down}</span> <span color=\"${up_color}\">${up}</span> \

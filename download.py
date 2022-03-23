@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-11-15 08:46:59 +0330 Friday
+## @last-modified 1400-12-23 22:37:59 +0330 Monday
 
 
 from __future__ import unicode_literals
@@ -477,13 +477,16 @@ class Initial:
         ## check if we should download videos from my website
         ## better be placed before the statement that makes sure self.source is not a directory
         elif self.source == 'free':
-            v_dirs = glob(f'{getenv("HOME")}/website/DL/Video/*')
+            v_dirs = glob(f'{getenv("HOME")}/DL/Video/*')
             for v_dir in v_dirs:
                 v_count = len(list(glob(f'{v_dir}/*mp4')))
                 if v_count:
                     for number in range(1, v_count + 1):
-                        _, base = path.split(v_dir)  ## '$HOME/website/DL/Video', 'Sprouts'
+                        _, base = path.split(v_dir)  ## '$HOME/DL/Video', 'Sprouts'
                         self.urls.append(f'https://www.dl.davoudarsalani.ir/DL/Video/{base}/{number:03}.mp4')
+
+            if not self.urls:
+                invalid('nothing to download')
 
             shuffle(self.urls)
 
