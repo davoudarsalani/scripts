@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-20 10:52:25 +0330 Wednesday
+## @last-modified 1401-01-16 21:01:25 +0330 Tuesday
 
 function float_pad {
     local input desired_l_length desired_r_length float l r r_length lacking_pad
@@ -60,16 +60,15 @@ function compare_floats {
 }
 
 function convert_byte {
-    local divisor size
+    local size
 
-    divisor=1024
     size="$1"
 
     for unit in B K M G T P E Z Y; {
-        (( "${size%.*}" < divisor )) && {
+        (( "${size%.*}" < byte_size )) && {
             printf '%s%s\n' "$size" "$unit"
             break
         }
-        size="$(float_pad "${size//[a-zA-Z]/}/${divisor}" 1 2)"
+        size="$(float_pad "${size//[a-zA-Z]/}/${byte_size}" 1 2)"
     }
 }

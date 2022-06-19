@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-26 22:33:07 +0330 Sunday
+## @last-modified 1401-02-19 11:11:20 +0330 Monday
 
 source "$HOME"/scripts/gb
 
@@ -235,6 +235,7 @@ uniq lines [i]  ---> | sort --unique
 uniq lines [ii] ---> | sort | uniq
 list fonts ---> fc-list -f '%{file}\n'
 stage only a hunk of a modified file ---> git add -p FILE
+get tables in a sqlite3 database (in python) ---> cur = conn.execute('SELECT name FROM sqlite_master WHERE type="table";')
 
 baskreference ---> [[ 'this is a random string' =~ ^this\ is\ (.*)\ st(ri)ng$ ]]
                    printf '%s\n' "${BASH_REMATCH[0]}"  ## returns this is a random string

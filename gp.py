@@ -1,4 +1,4 @@
-## @last-modified 1400-11-20 10:53:04 +0330 Wednesday
+## @last-modified 1401-02-06 10:51:07 +0330 Tuesday
 
 
 ## for .venv_keylogger: keylogger
@@ -22,8 +22,10 @@
 ##   requests
 ##   requests[socks]
 ##   tabulate
+##   tinytag
 ##   vext.gi
 ##   wget
+##   wordcloud
 ##   youtube_dl
 ##   [jedi]
 ## )
@@ -598,6 +600,13 @@ def convert_second(seconds: int, verbose: bool = False) -> str:
     from re import sub
 
     seconds = int(seconds)
+
+    if seconds < 1:
+        if verbose:
+            return 'less than a second'
+        else:
+            return '00:00:00'
+
     ss = f'{int(seconds % 60):02}'
     mi = f'{int(seconds / 60 % 60):02}'
     hh = f'{int(seconds / 3600 % 24):02}'

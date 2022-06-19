@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-17 19:51:04 +0330 Sunday
+## @last-modified 1401-02-06 10:56:16 +0330 Tuesday
 
 function get_datetime {
     case "$1" in
@@ -256,64 +256,73 @@ function convert_second {
 
     seconds="${1%.*}"  ## remove decimal in case arg is a float
 
-    sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
-    min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
-    hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
-    day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 % 30 ))")"
-    mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
-    year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
-
-    ## NOTE used [ var -eq 0 ] instead of (( var == 0 )) because
-    ##      1. (( var == 0 )) is stupid (i.e. it returns true even if var does not exist)
-    ##      2. ints here are two-digit and (( var == 0 )) can't handle that
-    if [ "$year" -eq 0 ] && [ "$mont" -eq 0 ] && [ "$day" -eq 0 ]; then
+    if (( seconds < 1 )); then
         if [ "$2" == 'verbose' ]; then
-            result="$hour hours, $min minutes and $sec seconds"
+            result="less than a second"
         else
-            result="${hour}:${min}:${sec}"
-        fi
-    elif [ "$year" -eq 0 ] && [ "$mont" -eq 0 ]; then
-        if [ "$2" == 'verbose' ]; then
-            result="$day days, $hour hours, $min minutes and $sec seconds"
-        else
-            result="${day}:${hour}:${min}:${sec}"
-        fi
-    elif [ "$year" -eq 0 ]; then
-        if [ "$2" == 'verbose' ]; then
-            result="$mont months, $day days, $hour hours, $min minutes and $sec seconds"
-        else
-            result="${mont}:${day}:${hour}:${min}:${sec}"
+            result="00:00:00"
         fi
     else
-        if [ "$2" == 'verbose' ]; then
-            result="$year years, $mont months, $day days, $hour hours, $min minutes and $sec seconds"
+        sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
+        min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
+        hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
+        day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 % 30 ))")"
+        mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
+        year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
+
+        ## NOTE used [ var -eq 0 ] instead of (( var == 0 )) because
+        ##      1. (( var == 0 )) is stupid (i.e. it returns true even if var does not exist)
+        ##      2. ints here are two-digit and (( var == 0 )) can't handle that
+        if [ "$year" -eq 0 ] && [ "$mont" -eq 0 ] && [ "$day" -eq 0 ]; then
+            if [ "$2" == 'verbose' ]; then
+                result="$hour hours, $min minutes and $sec seconds"
+            else
+                result="${hour}:${min}:${sec}"
+            fi
+        elif [ "$year" -eq 0 ] && [ "$mont" -eq 0 ]; then
+            if [ "$2" == 'verbose' ]; then
+                result="$day days, $hour hours, $min minutes and $sec seconds"
+            else
+                result="${day}:${hour}:${min}:${sec}"
+            fi
+        elif [ "$year" -eq 0 ]; then
+            if [ "$2" == 'verbose' ]; then
+                result="$mont months, $day days, $hour hours, $min minutes and $sec seconds"
+            else
+                result="${mont}:${day}:${hour}:${min}:${sec}"
+            fi
         else
-            result="${year}:${mont}:${day}:${hour}:${min}:${sec}"
+            if [ "$2" == 'verbose' ]; then
+                result="$year years, $mont months, $day days, $hour hours, $min minutes and $sec seconds"
+            else
+                result="${year}:${mont}:${day}:${hour}:${min}:${sec}"
+            fi
         fi
+
+
+        ## NOTE the same modifications in JUMP_4 are applied in
+        ##        1. convert_second function in gb.py
+        ##        2. 'relative' method of whatever-its-name-is class in models.py in django app
+        ##      so any changes you make here, make sure to update them too
+
+        ## JUMP_4 remove items whose values are 00, and adjust comma and 'and'
+        result="$(printf '%s\n' "$result" | \
+            sed 's|00 [a-z]\+s, ||g' | \
+            sed 's|00 [a-z]\+s and ||' | \
+            sed 's|00 [a-z]\+s$||' | \
+            sed 's|, \([0-9][0-9] [a-z]\+s \)| and \1|' | \
+            sed 's|and 00 [a-z]\+s ||' | \
+            sed 's| and $||' | \
+            sed 's|, \([0-9][0-9] [a-z]\+\)$| and \1|' | \
+            sed 's| and \([0-9][0-9] [a-z]\+\) and|, \1 and|g' | \
+            sed 's|, \+$||' | \
+            sed 's|, \([0-9][0-9] [a-z]\+s\)$| and \1|' \
+        )"
+
+        ## JUMP_4 remove plural s when value is 01
+        result="$(printf '%s\n' "$result" | sed 's|\(01 [a-z]\+\)s |\1 |g;s|\(01 [a-z]\+\)s, |\1, |g;s|\(01 [a-z]\+\)s$|\1|')"
+
     fi
-
-
-    ## NOTE the same modifications in JUMP_4 are applied in
-    ##        1. convert_second function in gb.py
-    ##        2. 'relative' method of whatever-its-name-is class in models.py in django app
-    ##      so any changes you make here, make sure to update them too
-
-    ## JUMP_4 remove items whose values are 00, and adjust comma and 'and'
-    result="$(printf '%s\n' "$result" | \
-        sed 's|00 [a-z]\+s, ||g' | \
-        sed 's|00 [a-z]\+s and ||' | \
-        sed 's|00 [a-z]\+s$||' | \
-        sed 's|, \([0-9][0-9] [a-z]\+s \)| and \1|' | \
-        sed 's|and 00 [a-z]\+s ||' | \
-        sed 's| and $||' | \
-        sed 's|, \([0-9][0-9] [a-z]\+\)$| and \1|' | \
-        sed 's| and \([0-9][0-9] [a-z]\+\) and|, \1 and|g' | \
-        sed 's|, \+$||' | \
-        sed 's|, \([0-9][0-9] [a-z]\+s\)$| and \1|' \
-    )"
-
-    ## JUMP_4 remove plural s when value is 01
-    result="$(printf '%s\n' "$result" | sed 's|\(01 [a-z]\+\)s |\1 |g;s|\(01 [a-z]\+\)s, |\1, |g;s|\(01 [a-z]\+\)s$|\1|')"
 
     printf '%s\n' "$result"
 }
@@ -397,7 +406,7 @@ function move_older_pkgs {
     local src_dir uniq count file exceed idx move_propmt
 
     src_dir="$HOME"/linux-pkg
-    dest_dir="$HOME"/trash/older-pkg
+    dest_dir="$src_dir"/duplicates
     readarray -t files < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f ! -iname '*.sig' ! -iname '*:*' | sort)
     readarray -t uniques < <(printf '%s\n' "${files[@]}" | sed 's|-[0-9]\+[^:]*||g' | sort | uniq --count)
     for uniq in "${uniques[@]}"; {

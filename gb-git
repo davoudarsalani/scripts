@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-01 13:52:39 +0330 Friday
+## @last-modified 1401-02-28 13:26:41 +0330 Wednesday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -29,8 +29,6 @@ function git_diff_specific {
 function git_log {
     ## NOTE nearly share the same options for log as JUMP_1
 
-
-
     ## %G?: show "G" for a good (valid) signature, "B" for a bad signature, "U" for a good signature with unknown validity and "N" for no signature
     git -C "${1:-.}" \
         log --color --abbrev-commit --full-history --all --graph \
@@ -42,6 +40,12 @@ function git_reflog {
     git -C "${1:-.}" \
         reflog --color --abbrev-commit --full-history \
                --format='%C(always,yellow)%h %C(always,magenta)%G? %C(always,bold black)%>(15,trunc)%cr %C(always,green)%<(4,trunc)%cn %C(always,green)%d %C(always,reset)%s'
+}
+
+function git_show {
+    git -C "${1:-.}" show --unified=0 --color=always "$2"  ## $2 is commit hash
+    ## --unified=0 makes git show only the modified lines
+    ## --color-words show modified words side-by-side
 }
 
 
@@ -93,8 +97,13 @@ function git_commit_in_editor {
     git -C "${1:-.}" commit
 }
 
-function git_commit_amend {
+function git_commit_amend_in_vim {
     git -C "${1:-.}" commit --amend  ## opens editor
+}
+
+function git_commit_amend_auto {
+    ## https://github.com/clokep/dotfiles/blob/main/.gitconfig
+    git -C "${1:-.}" commit --amend -C HEAD  ## opens editor
 }
 
 function git_commit_amend_with_message {

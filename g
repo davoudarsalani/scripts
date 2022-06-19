@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-16 22:32:29 +0330 Saturday
+## @last-modified 1401-02-28 13:25:14 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -97,11 +97,20 @@ function pipe_to_fzf_locally {
     short_directory="${directory/$HOME/\~}"
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
                                     ##        we have to do the sourcing for the very same reason
-    fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
-                                           --preview-window "$preview_status" \
-                                           ${multi_arg} \
-                                           --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
-                                           ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+
+    if [ "$is_log" == 'true' ]; then
+        fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
+                                               --preview-window "$preview_status" \
+                                               ${multi_arg} \
+                                               --preview '(source "$HOME"/scripts/gb-git; git_show "${directory2:-.}" {2})')"
+                                               ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+    else
+        fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
+                                               --preview-window "$preview_status" \
+                                               ${multi_arg} \
+                                               --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
+                                               ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+    fi
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
 
@@ -315,7 +324,7 @@ case "$main_item" in
         if_changed
         IFS=$'\n'
         multiple='true'
-        add_commit_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all+amend') ) && wrap_fzf_multi "${add_commit_items[@]}" || exit 37
+        add_commit_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all+amend(in-vim)' 'all+amend(auto)') ) && wrap_fzf_multi "${add_commit_items[@]}" || exit 37
 
         case "${no_sign_arr[@]}" in
             pattern )
@@ -330,12 +339,18 @@ case "$main_item" in
                 git_add_all "$directory" && \
                 git_commit_with_message "$directory" "MANY: $message" && \
                 accomplished "all added, message: MANY: $message" ;;
-            'all+amend' )
+            'all+amend(in-vim)' )
                 if_amend_allowed
                 if_locked
                 git_add_all "$directory" && \
-                git_commit_amend "$directory" && \
+                git_commit_amend_in_vim "$directory" && \
                 accomplished "all added, commit amended in $editor" ;;
+            'all+amend(auto)' )
+                if_amend_allowed
+                if_locked
+                git_add_all "$directory" && \
+                git_commit_amend_auto "$directory" && \
+                accomplished "all added, commit amended auto" ;;
             * )
                 prompt -m
                 if_locked
@@ -356,7 +371,7 @@ case "$main_item" in
         case "$commit_amend_item" in
             "open $editor" )
                 if_locked
-                git_commit_amend "$directory" && \
+                git_commit_amend_in_vim "$directory" && \
                 accomplished "commit amended in $editor" ;;
             'write here' )
                 prompt -m
@@ -440,6 +455,7 @@ case "$main_item" in
     log )
         IFS=$'\n'
         if_locked
+        is_log='true'
         preview_status='hidden'
         readarray -t log_items < <(git_log "$directory")
         pipe_to_fzf_locally "${log_items[@]}" ;;

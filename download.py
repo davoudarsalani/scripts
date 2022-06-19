@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-12-23 22:37:59 +0330 Monday
+## @last-modified 1401-03-10 17:08:47 +0330 Tuesday
 
 
 from __future__ import unicode_literals
@@ -33,7 +33,7 @@ def display_help() -> None:
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-s|--source=')}a text file (e.g. $HOME/downloads/lucy),
-            a url (e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/Files/Temp/002.jpg),
+            a url (e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/files/temp/002.jpg),
             a youtube playlist id (e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu)
             or free
 {Col.flag('-f|--file-type=')}{Col.default('[o]')}/v/s/vs/a/t
@@ -144,8 +144,8 @@ def make_errors() -> dict[str, str]:
         ## happened when youtube video is private
         ## Full: DownloadError("ERROR: Private video\\nSign in if you\'ve been granted access to this video")
         'HTTPError': 'break',
-        ## happened for o when url (file name part) is misspelled (e.g. https://www.davoudarsalani.ir/Files/Temp/002.jp)
-        ## Full: HTTPError('404 Client Error: Not Found for url: https://www.davoudarsalani.ir/Files/Temp/002.jp')
+        ## happened for o when url (file name part) is misspelled (e.g. https://www.davoudarsalani.ir/files/temp/002.jp)
+        ## Full: HTTPError('404 Client Error: Not Found for url: https://www.davoudarsalani.ir/files/temp/002.jp')
         ##
         ## happened for o when url (file name part) is misspelled (e.g. https://raw.githubusercontent.com/ran.jpg)
         ## Full: <HTTPError 400: 'Bad Request'>
@@ -475,15 +475,15 @@ class Initial:
             self.dest_dir = root_base
 
         ## check if we should download videos from my website
-        ## better be placed before the statement that makes sure self.source is not a directory
+        ## better be placed before the statement that makes sure self.source is not a directory (i.e. JUMP_3)
         elif self.source == 'free':
-            v_dirs = glob(f'{getenv("HOME")}/DL/Video/*')
+            v_dirs = glob(f'{getenv("HOME")}/dl/video/*')
             for v_dir in v_dirs:
                 v_count = len(list(glob(f'{v_dir}/*mp4')))
                 if v_count:
                     for number in range(1, v_count + 1):
-                        _, base = path.split(v_dir)  ## '$HOME/DL/Video', 'Sprouts'
-                        self.urls.append(f'https://www.dl.davoudarsalani.ir/DL/Video/{base}/{number:03}.mp4')
+                        _, base = path.split(v_dir)  ## '$HOME/dl/video', 'sprouts'
+                        self.urls.append(f'https://www.dl.davoudarsalani.ir/dl/video/{base}/{number:03}.mp4')
 
             if not self.urls:
                 invalid('nothing to download')
@@ -492,7 +492,7 @@ class Initial:
 
             self.dest_dir = f'{getenv("HOME")}/downloads/free'
 
-        ## make sure self.source is not a directory
+        ## make sure self.source is not a directory (JUMP_3)
         elif path.isdir(self.source):
             invalid('Source cannot be a directory')
 
@@ -511,7 +511,7 @@ class Initial:
 
                 self.dest_dir = f'{getenv("HOME")}/downloads/{url_id}'
             else:
-                _, source_base = path.split(self.source)  ## 'https://www.davoudarsalani.ir/Files/Temp', '001.jpg'
+                _, source_base = path.split(self.source)  ## 'https://www.davoudarsalani.ir/files/temp', '001.jpg'
                 root_source_base, _ = path.splitext(source_base)  ## '001', '.jpg'
                 self.dest_dir = f'{getenv("HOME")}/downloads/{root_source_base}'
 
@@ -731,7 +731,7 @@ class File(Profile):
         order = calculate_order()
 
         ## get outputname
-        _, base = path.split(url)  ## 'https://www.davoudarsalani.ir/Files/Temp', '001.jpg'
+        _, base = path.split(url)  ## 'https://www.davoudarsalani.ir/files/temp', '001.jpg'
         root_base, ext = path.splitext(base)  ## '001', '.jpg'
         outputname = normalize(root_base)
         outputname = f'{Ini.increment_prefix}{outputname}{ext}'
@@ -881,7 +881,8 @@ class File(Profile):
                     if not continue_without_proxy == 'y':
                         exit()
 
-                ## wget is able to get progress_file_downloaded_raw and self.file_raw_size on the go anyway, but it is better to respect the info already present
+                ## wget is able to get progress_file_downloaded_raw and self.file_raw_size on the go anyway,
+                ## but it is better to respect the info already present
                 if self.file_raw_size_validity:
                     wget_download(url=self.url, out=self.outputname, bar=wget_bar)
                 else:
@@ -892,7 +893,7 @@ class File(Profile):
                 cc = Curl()  ## curl connection
                 cc.setopt(cc.URL, self.url)
                 cc.setopt(cc.CONNECTTIMEOUT, 20)
-                cc.setopt(cc.USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0')  ## get_headers() or hdrs wouldn't work
+                cc.setopt(cc.USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0')  ## NOTE get_headers() or hdrs wouldn't work
                 # cc.setopt(cc.TIMEOUT, 120)
                 # cc.setopt(cc.FOLLOWLOCATION, True)  ## following redirects
 
@@ -969,7 +970,7 @@ class Youtube(Profile):
 
         if Ini.no_information:
             outputname = f'{Ini.increment_prefix}{video_id}'  ## 081-RNMD-WpqCLcAXkJs or WpqCLcAXkJs
-            info = order, time, url, 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', outputname
+            info = order, time, url, 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', 'NOINFO', outputname
         else:
             for self.get_info_attempt in self.attempts:
                 self.should_break = False
@@ -1000,7 +1001,7 @@ class Youtube(Profile):
 
                     method_name = stack()[0][3]
                     analyze(f'{exc!r}', nth_attempt=self.get_info_attempt, class_ins=Cur, caller=method_name)
-                    info = order, time, url, 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', outputname
+                    info = order, time, url, 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', outputname
 
                 if self.should_break:
                     break
