@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-02-22 21:48:12 +0330 Thursday
+## @last-modified 1401-05-23 21:54:43 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -28,6 +28,14 @@ case "$1" in
         [ "$scr_3_name" ] && {
             xrandr --output "$scr_3_name" --off  ## https://superuser.com/questions/618127/disable-unplugged-displays-xrandr
             msgn "turned off <span color=\"${orange}\">screen 3 (${scr_3_name})</span>"
+        } ;;
+
+    move_screen_2_to_left )
+        source "$HOME"/scripts/gb-screen
+
+        [ "$scr_2_name" ] && {
+            xrandr --output "$scr_2_name" --left-of "$scr_1_name"
+            msgn "moved <span color=\"${orange}\">screen 2 (${scr_2_name}) to left</span>"
         } ;;
 
 

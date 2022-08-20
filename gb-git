@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-02-28 13:26:41 +0330 Wednesday
+## @last-modified 1401-05-29 08:58:44 +0330 Saturday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -179,19 +179,19 @@ function git_if_behind {
     action_now 'updating remote'
     commits_ahead="$(git_commits_ahead "${1:-.}")"
     if [ "$proxy" == 'true' ]; then
-       git_remote_update_proxy "${1:-.}"
+        git_remote_update_proxy "${1:-.}"
     else
-       git_remote_update_noproxy "${1:-.}"
+        git_remote_update_noproxy "${1:-.}"
     fi
     commits_behind_ahead="$(git_commits_behind_ahead "${1:-.}")"
 
     ## getting commits_behind
     (( commits_behind="commits_behind_ahead - commits_ahead" ))
     (( commits_behind > 0 )) && {
-       temp_path="$(printf '%s\n' "${1:-.}" | sed "s|$HOME|\~|")"  ## NOTE do NOT replace | with / in sed
-       red "local is $commits_behind commits behind remote."
-       red "try: git -C $temp_path pull"
-       exit 37
+        temp_path="$(printf '%s\n' "${1:-.}" | sed "s|$HOME|\~|")"  ## NOTE do NOT replace | with / in sed
+        red "local is $commits_behind commits behind remote."
+        red "try: git -C $temp_path pull"
+        exit 37
     }
 }
 

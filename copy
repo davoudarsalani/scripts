@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 22:19:18 +0330 Wednesday
+## @last-modified 1401-05-07 16:26:53 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -46,6 +46,7 @@ case "$main_item" in
         copy "$HOME"/.config/awesome/* ;;
     bash )
         copy "$HOME"/.bashrc \
+             "$HOME"/.bash_history \
              /etc/{bash.bashrc,environment,inputrc,profile} ;;
     tmux )
         copy "$HOME"/.tmux* ;;

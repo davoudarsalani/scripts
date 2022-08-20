@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-02-19 11:11:20 +0330 Monday
+## @last-modified 1401-05-16 18:41:23 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -182,6 +182,7 @@ http torsocks ---> http_proxy=socks5://127.0.0.1:9050 torsocks
 toggle keyboard layout ---> setxkbmap -layout us,ir -option grp:caps_toggle
 show swap files ---> swapon --show
 delete duplicate, nonconsecutive and non-empty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq FILE
+delete duplicate lines (https://stackoverflow.com/questions/1444406/how-to-delete-duplicate-lines-in-a-file-without-sorting-it-in-unix) ---> sed -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P'
 open multiple files in vim tabs ---> vim -p FILE1 FILE2 FILE3
 dd pattern ---> sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
 turn off screensaver ---> xset s 0 0 && xset -dpms
