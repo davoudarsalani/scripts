@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-01-16 21:01:25 +0330 Tuesday
+## @last-modified 1401-05-30 08:25:21 +0330 Sunday
 
 function float_pad {
     local input desired_l_length desired_r_length float l r r_length lacking_pad
@@ -22,7 +22,6 @@ function float_pad {
     ## make r have the desired_r_length
     r_length="${#r}"
     if (( desired_r_length > r_length )); then  ## add trailing zeros to r if shorter than desired_r_length
-        lacking_pad
         (( lacking_pad="desired_r_length - r_length" ))
         for ((i=0; i<"$lacking_pad"; i++)); {
             r="${r}0"
