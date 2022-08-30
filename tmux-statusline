@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-03 08:53:37 +0330 Sunday
+## @last-modified 1401-06-08 21:32:34 +0330 Tuesday
 
 case "$1" in
     pwd )
@@ -25,7 +25,7 @@ case "$1" in
     git )
         source "$HOME"/scripts/gb-git
 
-        alert_sign='🔸'  ## 🔴
+        alert_sign='🔸'  ## 🔸🔴
         [ "$(if_git "$2")" == 'false' ] && exit
 
         hash_head="$(git_hash_head "$2")"

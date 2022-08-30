@@ -1,36 +1,59 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-05-30 08:25:21 +0330 Sunday
+## @last-modified 1401-06-04 12:19:42 +0330 Friday
 
 function float_pad {
-    local input desired_l_length desired_r_length float l r r_length lacking_pad
+    local input new_l_length new_r_length floated l r r_length lacking_pad
 
-    input="$1"                  ## an int, float or expression, e.g. 43, 6.82, or "${var}*932/12" (no spaces allowd in expression)
-    desired_l_length="${2:-1}"  ## min   length for l, e.g. 1
-    desired_r_length="${3:-2}"  ## exact length for r, e.g. 2
+    input="$1"              ## an int, floated or expression, e.g. 43, 6.82, or "${var}*932/12" (no spaces allowd in expression)
+    new_l_length="${2:-1}"  ## min   length for l, e.g. 1
+    new_r_length="${3:-2}"  ## exact length for r, e.g. 2
 
-    ## make input a float even if it is an int or an expression (https://www.shell-tips.com/bash/math-arithmetic-calculation)
-    float="$(awk "BEGIN {printf \"%.${desired_r_length}f\n\", $input}")"
+    if [[ "$input" =~ ^[+-]?[0-9]+\.[0-9]*$ ]]; then  ## https://stackoverflow.com/questions/13790763/bash-regex-to-check-floating-point-numbers-from-user-input
+        floated="$input"  ## 43.76
+    else
+        ## make input a float even if it is an int or an expression (https://www.shell-tips.com/bash/math-arithmetic-calculation)
+        ## NOTE this converting should not be applied on $input if it is already a float
+        ##      because it will turn 12.3456 into 12.35 (i.e. will make it rounded)
+        floated="$(awk "BEGIN {printf \"%.${new_r_length}f\n\", $input}")"  ## 43 to 43.00
+    fi
 
     ## separate l and r
-    l="${float%.*}"  ## 8
-    r="${float#*.}"  ## 123
+    l="${floated%.*}"  ## 8
+    r="${floated#*.}"  ## 123
 
-    ## make l have the desired_l_length
-    l="$(printf "%0${desired_l_length}d" "$l")"  ## 8 to 08
+    ## make l have the same length as new_l_length
+    l="$(printf "%0${new_l_length}d" "$l")"  ## 8 to 08
 
-    ## make r have the desired_r_length
+    ## make r have the same length as new_r_length
     r_length="${#r}"
-    if (( desired_r_length > r_length )); then  ## add trailing zeros to r if shorter than desired_r_length
-        (( lacking_pad="desired_r_length - r_length" ))
+    if (( new_r_length > r_length )); then  ## add trailing zeros to r if shorter than new_r_length
+        (( lacking_pad="new_r_length - r_length" ))
         for ((i=0; i<"$lacking_pad"; i++)); {
             r="${r}0"
         }
-    elif (( desired_r_length < r_length )); then  ## purge r if longer than desired_r_length
-        r="${r::$desired_r_length}"
+    elif (( new_r_length < r_length )); then  ## trim r if longer than new_r_length
+        r="${r::$new_r_length}"
     fi
 
-    printf '%s.%s\n' "$l" "$r"
+    if [ "$new_l_length" == 0 ]; then
+        printf '0\n'
+    else
+        if [ "$new_r_length" == 0 ]; then
+            r=""
+        elif [ "$4" == 'keep_zero_right_pad' ]; then
+            r=".${r}"  ## return r as is (i.e. whether it's 345 or 00)
+        else
+            zeros_regex='^0+$'
+            if [[ "$r" =~ $zeros_regex ]]; then
+                r=""  ## return nothing if r is all zeros (e.g. 00)
+            else
+                r=".${r}"
+            fi
+        fi
+
+        printf '%s%s\n' "$l" "$r"
+    fi
 }
 
 function compare_floats {

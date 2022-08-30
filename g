@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-02-28 13:25:14 +0330 Wednesday
+## @last-modified 1401-05-30 21:16:15 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -240,7 +240,7 @@ case "$main_item" in
                 } && accomplished
             ;;
         esac
-        exit ;;
+        exit ;;  ## NOTE do NOT remove exit
 
     config )
         see_edit="$(pipe_to_fzf_locally 'see' 'edit')" && wrap_fzf_choice "$see_edit" || exit 37

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-05-23 21:54:43 +0330 Sunday
+## @last-modified 1401-06-03 12:43:54 +0330 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -721,26 +721,35 @@ msgn "$text" ;;
                     up_total="$(convert_byte "$up")"      ## 4.32G
 
                     ## set total down/up color
-                    if [ "${down_total//[0-9.]}" == 'B' ] || [ "${down_total//[0-9.]}" == 'K' ]; then
-                        down_total_color="$grey_dark"
-                    elif [ "${down_total//[0-9.]}" == 'M' ]; then
-                        if   (( "${down_total%%[A-Z.]*}" < 400       )); then down_total_color="$grey_dark"  ## JUMP_4 %%[A-Z.]* to remove both float (i.e. .56) and unit (i.e. M) at the same time
-                        elif (( "${down_total%%[A-Z.]*}" < 700       )); then down_total_color="$grey"       ## JUMP_4
-                        elif (( "${down_total%%[A-Z.]*}" < byte_size )); then down_total_color="$pink"       ## JUMP_4
+                    usage_low="$grey_dark"
+                    usage_medium="$grey"
+                    usage_high="$pink"
+                    usage_ultrahigh="$red"
+
+                    down_total__int="${down_total%%[A-Z.]*}"  ## 387
+                    down_total__unit="${down_total//[0-9.]}"  ## K
+                    if [ "$down_total__unit" == 'B' ] || [ "$down_total__unit" == 'K' ]; then
+                        down_total_color="$usage_low"
+                    elif [ "$down_total__unit" == 'M' ]; then
+                        if   (( down_total__int < 400       )); then down_total_color="$usage_low"     ## JUMP_4 %%[A-Z.]* to remove both float (i.e. .56) and unit (i.e. M) at the same time
+                        elif (( down_total__int < 700       )); then down_total_color="$usage_medium"  ## JUMP_4
+                        elif (( down_total__int < byte_size )); then down_total_color="$usage_high"    ## JUMP_4
                         fi
-                    elif [ "${down_total//[0-9.]}" == 'G' ]; then
-                        down_total_color="$red"
+                    elif [ "$down_total__unit" == 'G' ]; then
+                        down_total_color="$usage_ultrahigh"
                     fi
 
-                    if [ "${up_total//[0-9.]}" == 'B' ] || [ "${up_total//[0-9.]}" == 'K' ]; then
-                        up_total_color="$grey_dark"
-                    elif [ "${up_total//[0-9.]}" == 'M' ]; then
-                        if   (( "${up_total%%[A-Z.]*}" < 400       )); then up_total_color="$grey_dark"  ## JUMP_4
-                        elif (( "${up_total%%[A-Z.]*}" < 700       )); then up_total_color="$grey"       ## JUMP_4
-                        elif (( "${up_total%%[A-Z.]*}" < byte_size )); then up_total_color="$pink"       ## JUMP_4
+                    up_total__int="${up_total%%[A-Z.]*}"  ## 387
+                    up_total__unit="${up_total//[0-9.]}"  ## K
+                    if [ "$up_total__unit" == 'B' ] || [ "$up_total__unit" == 'K' ]; then
+                        up_total_color="$usage_low"
+                    elif [ "$up_total__unit" == 'M' ]; then
+                        if   (( up_total__int < 400       )); then up_total_color="$usage_low"     ## JUMP_4
+                        elif (( up_total__int < 700       )); then up_total_color="$usage_medium"  ## JUMP_4
+                        elif (( up_total__int < byte_size )); then up_total_color="$usage_high"    ## JUMP_4
                         fi
-                    elif [ "${up_total//[0-9.]}" == 'G' ]; then
-                        up_total_color="$red"
+                    elif [ "$up_total__unit" == 'G' ]; then
+                        up_total_color="$usage_ultrahigh"
                     fi
 
                     ## calculate diff and convert bytes
@@ -750,26 +759,35 @@ msgn "$text" ;;
                     up="$(convert_byte "$up_diff")"       ## 1.31M
 
                     ## set down/up color
-                    if [ "${down//[0-9.]}" == 'B' ]; then
-                        down_color="$fg_l"
-                    elif [ "${down//[0-9.]}" == 'K' ]; then
-                        if   (( "${down%%[A-Z.]*}" < 400       )); then down_color="$fg_l"          ## JUMP_4
-                        elif (( "${down%%[A-Z.]*}" < 700       )); then down_color="$green_darker"  ## JUMP_4
-                        elif (( "${down%%[A-Z.]*}" < byte_size )); then down_color="$green_dark"    ## JUMP_4
+                    speed_low="$fg_l"
+                    speed_medium="$green_darker"
+                    speed_high="$green_dark"
+                    speed_ultrahigh="$green"
+
+                    down__unit="${down//[0-9.]}"  ## K
+                    down__int="${down%%[A-Z.]*}"  ## 387
+                    if [ "$down__unit" == 'B' ]; then
+                        down_color="$speed_low"
+                    elif [ "$down__unit" == 'K' ]; then
+                        if   (( down__int < 400       )); then down_color="$speed_low"     ## JUMP_4
+                        elif (( down__int < 700       )); then down_color="$speed_medium"  ## JUMP_4
+                        elif (( down__int < byte_size )); then down_color="$speed_high"    ## JUMP_4
                         fi
-                    elif [ "${down//[0-9.]}" == 'M' ] || [ "${down//[0-9.]}" == 'G' ]; then
-                        down_color="$green"
+                    elif [ "$down__unit" == 'M' ] || [ "$down__unit" == 'G' ]; then
+                        down_color="$speed_ultrahigh"
                     fi
 
-                    if [ "${up//[0-9.]}" == 'B' ]; then
-                        up_color="$fg_l"
-                    elif [ "${up//[0-9.]}" == 'K' ]; then
-                        if   (( "${up%%[A-Z.]*}" < 400       )); then up_color="$fg_l"          ## JUMP_4
-                        elif (( "${up%%[A-Z.]*}" < 700       )); then up_color="$green_darker"  ## JUMP_4
-                        elif (( "${up%%[A-Z.]*}" < byte_size )); then up_color="$green_dark"    ## JUMP_4
+                    up__unit="${up//[0-9.]}"  ## K
+                    up__int="${up%%[A-Z.]*}"  ## 387
+                    if [ "$up__unit" == 'B' ]; then
+                        up_color="$speed_low"
+                    elif [ "$up__unit" == 'K' ]; then
+                        if   (( up__int < 400       )); then up_color="$speed_low"     ## JUMP_4
+                        elif (( up__int < 700       )); then up_color="$speed_medium"  ## JUMP_4
+                        elif (( up__int < byte_size )); then up_color="$speed_high"    ## JUMP_4
                         fi
-                    elif [ "${up//[0-9.]}" == 'M' ] || [ "${up//[0-9.]}" == 'G' ]; then
-                        up_color="$green"
+                    elif [ "$up__unit" == 'M' ] || [ "$up__unit" == 'G' ]; then
+                        up_color="$speed_ultrahigh"
                     fi
 
                     down_up_text+=" <span color=\"${down_color}\">${down}</span> <span color=\"${up_color}\">${up}</span> \

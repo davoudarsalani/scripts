@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-28 23:16:56 +0330 Tuesday
+## @last-modified 1401-06-08 22:40:02 +0330 Tuesday
 
 function display_help {
     cmd="
@@ -489,3 +489,172 @@ if [ "$runnable" == 'true' ]; then
     read -p "Run [N/y]? " run_prompt
     [ "${run_prompt,}" == 'y' ] && eval "$cmd"
 fi
+
+
+## #!/bin/bash
+##
+## timedatectl set-ntp true [not sure if necessary]
+## pacman -Syy
+## pacman -S reflector
+## reflector -c Iran -a 6 --sort rate --save /etc/pacman.d/mirrorlist
+## pacman -Syy
+##
+## lsblk
+## cfdisk /dev/sdx [choose dos]
+##
+## #expected outcome:
+## sdx1    /       bootable
+## sdx2    /home
+## sdx3    swap
+##
+## mkfs.ext4 /dev/sdx1
+## mount /dev/sdx1 /mnt
+##
+## mkfs.ext4 /dev/sdx2
+## mkdir /mnt/home
+## mount /dev/sdx2 /mnt/home
+##
+## mkswap /dev/sdx3
+## swapon /dev/sdx3
+##
+## pacstrap -i /mnt base base-devel
+
+##   cryptsetup -- indirect dependency of base
+##   device-mapper -- indirect dependency of base
+##   dhcpcd
+##   diffutils
+##   e2fsprogs -- indirect dependency of base
+##   inetutils
+##   jfsutils
+##   less -- indirect dependency of base
+##   linux
+##   linux-firmware
+##   logrotate
+##   lvm2
+##   man-db
+##   man-pages
+##   mdadm
+##   nano
+##   netctl
+##   perl
+##   reiserfsprogs
+##   s-nail
+##   sysfsutils
+##   texinfo
+##   usbutils
+##   vi
+##   which
+##   xfsprogs }}}
+
+##     currentl date: 13990613204649, 20200903204655
+##   autoconf
+##   automake
+##   binutils
+##   bison
+##   fakeroot
+##   file
+##   findutils
+##   flex
+##   gawk
+##   gcc
+##   gettext
+##   grep
+##   groff
+##   gzip
+##   libtool
+##   m4
+##   make
+##   pacman
+##   patch
+##   pkgconf
+##   sed
+##   sudo
+##   texinfo
+##   which }}}
+##
+## genfstab -U /mnt >> /mnt/etc/fstab
+##
+## arch-chroot /mnt /bin/bash
+##
+## vim /etc/locale.gen
+## #Uncomment these:
+## en_US.UTF-8 UTF-8
+## fa_IR UTF-8
+## (save & exit)
+##
+## locale-gen
+## echo LANG=en_US.UTF-8 > /etc/locale.conf
+## export LANG=en_US.UTF-8
+##
+## ln -fs /usr/share/zoneinfo/Asia/Tehran /etc/localtime
+## hwclock --systohc --utc
+##
+## echo acer > /etc/hostname
+##
+## vim /etc/hosts
+## #write these lines in it:
+## 127.0.0.1   localhost
+## ::1         localhost
+## 127.0.1.1   acer.localdomain    acer
+## (save & exit)
+##
+## vim /etc/pacman.conf
+## #uncomment these lines:
+## #[multilib]
+## #Include = /etc/pacman.d/mirrorlist
+## (save & exit)
+##
+## pacman -Sy
+##
+## passwd
+##
+## #------------------------------------
+## # Add user
+##
+## >> method 1:
+## useradd -mG wheel -s /bin/bash nnnn
+## #uncomment this line:
+## # %wheel ALL=(ALL) NOPASSWD: ALL
+##
+## >> {{{ method 2:
+## useradd -m -g users -G lp -s /bin/bash nnnn # also -G lp,autologin,storage,wheel,power
+## EDITOR=vim visudo
+## # add "nnnn ALL=(ALL) NOPASSWD: ALL" under the line "root = ALL=(ALL) ALL") (without the quotes)
+## (save & exit)
+
+## >> {{{ method 3 (Luke version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
+## useradd -m -g wheel nnnn
+##
+##
+## EDITOR=vim visudo
+## # Add this line:
+## %wheel ALL=(ALL) NOPASSWD: ALL
+## # Alternatively, you can have these two lines where you specify the commands to be run without asking for a password:
+## %wheel ALL=(ALL) ALL
+## %wheel ALL=(ALL) NOPASSWD: <command1>, <command2>, <command3>
+
+## (save & exit)
+## #------------------------------------
+##
+## passwd nnnn
+##
+## pacman -S bash bash-completion grub os-prober[only when dual-booting]
+## grub-install --recheck --debug --force /dev/sdx
+## grub-mkconfig -o /boot/grub/grub.cfg
+##
+## pacman -S networkmanager network-manager-applet
+## sudo systemctl enable NetworkManager
+##
+## systemctl enable dhcpcd
+## ip a
+## systemctl enable dhcpcd@enp4s0f1
+##
+## exit
+## reboot
+##
+## sudo pacman -S xorg xorg-xinit xorg-server xorg-apps
+## sudo pacman -S lightdm
+## sudo pacman -S lightdm-gtk-greeter lightdm-gtk-greeter-settings
+## sudo systemctl enable lightdm.service
+##
+## reboot
