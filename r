@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-11-13 12:47:34 +0330 Wednesday
+## @last-modified 1401-06-17 09:27:14 +0330 Thursday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
@@ -41,17 +41,15 @@ heading "$title"
 }
 cd "$directory" || exit  ## TODO find how to pass $directory to RG in JUMP_1 instead of cding
 
-main_item="$(pipe_to_fzf 'all' 'bash' 'python' 'md' 'yaml' "header=rg in ${PWD/$HOME/\~}")" && wrap_fzf_choice "$main_item" || exit 37
+main_item="$(pipe_to_fzf 'all' 'bash' 'python' 'html' "header=rg in ${PWD/$HOME/\~}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     bash )
         RG+=' --type-not py' ;;
     python )
         RG+=' --type py' ;;
-    md )
-        RG+=' --type md' ;;
-    yaml )
-        RG+=' --type yaml' ;;
+    html )
+        RG+=' --type html' ;;
 esac
 
 ## JUMP_1

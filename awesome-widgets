@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-06-03 12:43:54 +0330 Thursday
+## @last-modified 1401-07-15 13:35:33 +0330 Friday
 
 source "$HOME"/scripts/gb
 
 threshhold=70
 
 case "$1" in
-    rand_wall )
+    rand_wall )  ## {{{
         rand_wall_allowed_file=/tmp/rand_wall_allowed
 
         [ -f "$rand_wall_allowed_file" ] && \
@@ -15,43 +15,48 @@ case "$1" in
         [ ! "$(pgrep 'ffmpeg')" ] && \
         ! ps -f -u "$UID" | sed 1d | \grep -qv '\-remote' | \grep -q '[s]implescreenrecorder' && \
         random_wallpaper || touch "$rand_wall_allowed_file" ;;  ## ^^ exceptionally used ps because pgrep cannot find simplescreenrecorder
-
-    jadi )
+    ## }}}
+    jadi )  ## {{{
         "$HOME"/scripts/jadi.py ;;
-
-    restart_picom )
+    ## }}}
+    restart_picom )  ## {{{
         pkill picom && sleep 2 && picom -b ;;
-
-    turn_off_scr_3 )
+    ## }}}
+    turn_off_scr_3 )  ## {{{
         source "$HOME"/scripts/gb-screen
 
         [ "$scr_3_name" ] && {
             xrandr --output "$scr_3_name" --off  ## https://superuser.com/questions/618127/disable-unplugged-displays-xrandr
             msgn "turned off <span color=\"${orange}\">screen 3 (${scr_3_name})</span>"
         } ;;
-
-    move_screen_2_to_left )
+    ## }}}
+    move_screen_2_to_left )  ## {{{
         source "$HOME"/scripts/gb-screen
 
         [ "$scr_2_name" ] && {
             xrandr --output "$scr_2_name" --left-of "$scr_1_name"
             msgn "moved <span color=\"${orange}\">screen 2 (${scr_2_name}) to left</span>"
         } ;;
+    ## }}}
 
-
-    date_jdate )
-        message="$(printf '%s\n%s\n%s' "$(get_datetime 'jweekday')" "$(get_datetime 'ymdhms')" "$(get_datetime 'jymdhms')")"
+    date_jdate )  ## {{{
+        message="$(printf '%s\n\n%s\n%s\n\n%s' \
+                   "$(get_datetime 'jweekday')" \
+                   "$(date  +%Y-%m-%d)" \
+                   "$(jdate +%Y-%m-%d)" \
+                   "$(jdate +%H:%M:%S)"
+                 )"
         msgn "$message" ;;
-
-    weather )
+    ## }}}
+    weather )  ## {{{
         case "$2" in
           update )
             "$HOME"/scripts/weather.py 'update' ;;
           forecast )
             "$HOME"/scripts/weather.py 'forecast' ;;
         esac ;;
-
-    audio )
+    ## }}}
+    audio )  ## {{{
         function update_variables {
             source "$HOME"/scripts/gb-audio
         }
@@ -214,8 +219,8 @@ msgn "$text" ;;
         ## previously: [ "$(printf '%s\n' "$def_sink_name" | \grep '^bluez_sink')" ] && headset_connectivity=' HE'
 
         set_widget 'audio' 'markup' "${vol_level}${vol_on_off} ${mic_level}${mic_on_off} ${mon_level}${mon_on_off} ${states_initials} ${indeces}${headset_connectivity}" ;;
-
-    battery )
+    ## }}}
+    battery )  ## {{{
         source "$HOME"/scripts/gb-fir-blu-batt
 
         if [ "$battery_level" ] && (( battery_level < 15 )); then  ## <--,-- sometimes battery_level is not present and, in spite of that,
@@ -254,8 +259,8 @@ msgn "$text" ;;
         (( battery_temp > threshhold )) && battery_temp="<span color=\"${red}\">${battery_temp}</span>"
 
         set_widget 'battery' 'markup' "${ac_or_dc}${battery_level}${battery_rem}${pref}${battery_temp}°" ;;
-
-    memory_cpu )
+    ## }}}
+    memory_cpu )  ## {{{
         source "$HOME"/scripts/gb-calculation
 
         case "$2" in
@@ -339,8 +344,8 @@ msgn "$text" ;;
 
                 set_widget 'memory_cpu' 'markup' "${mem_perc} ${cpu_perc} ${pref}${cpu_temp}°${cpu_gov}" ;;
         esac ;;
-
-    harddisk )
+    ## }}}
+    harddisk )  ## {{{
         source "$HOME"/scripts/gb-calculation
 
         case "$2" in
@@ -391,18 +396,18 @@ msgn "$text" ;;
 
                 set_widget 'harddisk' 'markup' "${root_used} ${home_used} ${swap_used} ${pref}${hdd_temp}°" ;;
         esac ;;
-
-    # gpu )
+    ## }}}
+    # gpu )  ## {{{
     #     active_gpu="$(optimus-manager --status | \grep 'Current GPU mode' | awk '{print $NF}')"
     #     active_gpu="${active_gpu::1}"
     #     [ "$active_gpu" == 'n' ] && active_gpu="<span color=\"${red}\">${active_gpu}</span>"
     #     set_widget 'gpu' 'markup' "$active_gpu" ;;
-
-    pkg_count )
+    ## }}}
+    pkg_count )  ## {{{
         pkg_count="$(wc -l < <(pacman -Q))"
         set_widget 'pkg_count' 'markup' "$pkg_count" ;;
-
-    processes )
+    ## }}}
+    processes )  ## {{{
         ## get last processes_count
         processes_last_file="$HOME"/scripts/.last/processes
         processes_count_last="$(< "$processes_last_file")" || processes_count_last=0  ## NOTE do NOT add 2>/dev/null
@@ -420,8 +425,8 @@ msgn "$text" ;;
         fi
 
         set_widget 'processes' 'markup' "${pref}${processes_count}" ;;
-
-    idle )
+    ## }}}
+    idle )  ## {{{
         source "$HOME"/scripts/gb-calculation
 
         weekday="$(get_datetime 'jweekday')"
@@ -440,30 +445,50 @@ msgn "$text" ;;
         is_bigger="$(compare_floats "$perc" '>' 90)"
         [ "$is_bigger" == 'true' ] && perc="<span color=\"${red}\">${perc}</span>"
         set_widget 'idle' 'markup' "$perc" ;;
-
-    reputation )
+    ## }}}
+    reputation )  ## {{{
         "$HOME"/scripts/reputation.py ;;
-
-    visits )
+    ## }}}
+    visits )  ## {{{
         "$HOME"/scripts/visits.py ;;
-
-    youtube )
+    ## }}}
+    youtube )  ## {{{
         source "$HOME"/scripts/gb-screen
 
+        ## determine if screen 2 is on right or left of screen 1
+        is_right_of='false'
+        is_left_of='false'
+        reg='^.*\+0\+0.*$'
+        scr_1_info="$(printf '%s\n' "$xrandr_output" | \grep "$scr_1_name")"  ## eDP-1 connected primary 1366x768+1920+0 (normal left inverted right x axis y axis) 344mm x 193mm
+        [[ "$scr_1_info" =~ $reg ]] && is_right_of='true' || is_left_of='true'
+
         cur_scr_index="$(awesome-client 'local awful = require("awful") ; return awful.screen.focused().index' | awk '{print $NF}')"
-        if (( cur_scr_index == 1 )); then
-            (( x="scr_1_x / 2" ))
+
+        ## calculate x
+        if [ "$is_right_of" == 'true' ]; then
+            if (( cur_scr_index == 1 )); then
+                (( x="scr_1_x / 2" ))
+            else
+                (( x="scr_1_x + (scr_2_x / 2)" ))
+            fi
+        elif [ "$is_left_of" == 'true' ]; then
+            if (( cur_scr_index == 1 )); then
+                (( x="scr_2_x + (scr_1_x / 2)" ))
+            else
+                (( x="scr_2_x / 2" ))
+            fi
         else
-            (( x="scr_1_x + (scr_2_x / 2)" ))
+            exit
         fi
         y=300
+
         "$HOME"/scripts/awesome-widgets audacious pause
         xdotool mousemove "$x" "$y"
         sleep 0.1
         xdotool click --repeat 2 --delay 200 1
         msgn 'fullscreen' ;;
-
-    mbl_umbl )
+    ## }}}
+    mbl_umbl )  ## {{{
         get_mountable_umountable
         m_count="${#mountable[@]}";  (( m_count > 0 )) && M="M:${m_count}"
         u_count="${#umountable[@]}"; (( u_count > 0 )) && U="U:${u_count}"
@@ -471,8 +496,8 @@ msgn "$text" ;;
         (( m_count > 0 || u_count > 0 )) && text="<span color=\"${red}\">${M}${seperator}${U}</span>" || text='MU'
 
         set_widget 'mbl_umbl' 'markup' "$text" ;;
-
-    firewall )
+    ## }}}
+    firewall )  ## {{{
         function update_variables {
             source "$HOME"/scripts/gb-fir-blu-batt
         }
@@ -494,8 +519,8 @@ msgn "$text" ;;
             * )
                 set_widget 'firewall' 'markup' "<span color=\"${red}\">FI:OF</span>" ;;
         esac ;;
-
-    bluetooth )
+    ## }}}
+    bluetooth )  ## {{{
         function update_variables {
             source "$HOME"/scripts/gb-fir-blu-batt
         }
@@ -517,37 +542,41 @@ msgn "$text" ;;
             * )
                 set_widget 'bluetooth' 'markup' "<span color=\"${red}\">BL:ON</span>" ;;
         esac ;;
-
-    ymail )
+    ## }}}
+    ymail )  ## {{{
         "$HOME"/scripts/e-mail.py 'ymail' ;;
-
-    gmail )
+    ## }}}
+    gmail )  ## {{{
         sleep 10  ## only to prevent probable collision with ymail
         "$HOME"/scripts/e-mail.py 'gmail' ;;
-
-    status )
+    ## }}}
+    status )  ## {{{
         "$HOME"/scripts/status.py ;;
-
-    webcam )
+    ## }}}
+    webcam )  ## {{{
         webcam_status="$(lsmod | \grep -i '^uvcvideo' | awk '{print $NF}')"
         (( webcam_status > 0 )) && webcam_text="<span color=\"${red}\">WE:ON</span>" || webcam_text='WE'
         set_widget 'webcam' 'markup' "$webcam_text" ;;
-
-    git )
+    ## }}}
+    git )  ## {{{
         source "$HOME"/scripts/gb-git
 
         modified_repos=''
 
         set_widget 'git' 'markup' "$refresh_icon"
 
-        ## FIXME cant use FZF_ALT_C_COMMAND because it is apparently not accessible to this option
+        ## FIXME cant use FZF_DEFAULT_COMMAND and FZF_ALT_C_COMMAND_GIT because they are apparently not accessible to this option
         ## FIXME a bit too slow
-        ## v-- 2nd line of options: synced with the ones for FZF_DEFAULT_COMMAND in /etc/bash.bashrc
-        ## v-- 3rd line of options: synced with the ones for FZF_ALT_C_COMMAND_GIT in /etc/bash.bashrc
-        readarray -t all_repos < <(find "$HOME" \
-                                        -type d \
-                                        ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' \
-                                        ! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*' -iname '.git' | sed 's#/\.git##' | sort)
+
+        ## synced with path flags for FZF_DEFAULT_COMMAND in /etc/bash.bashrc
+        path_flags_1="! -path '*.git/*' ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' ! -path '*trash/*'"
+
+        ## synced with path flags for FZF_ALT_C_COMMAND_GIT in /etc/bash.bashrc
+        path_flags_2="! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*'"
+
+        find_cmd="find "$HOME" -type d $path_flags_1 $path_flags_2 -iname '.git' | sed 's#/\.git##' | sort"
+
+        readarray -t all_repos < <(eval "$find_cmd")
 
         readarray -t non_public_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'public')
         readarray -t public_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'public')
@@ -588,8 +617,8 @@ msgn "$text" ;;
 
         [ "$modified_repos" ] && git_text="<span color=\"${red}\">GI:${modified_repos%,*}</span>" || git_text="GI"  ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)
         set_widget 'git' 'markup' "$git_text" ;;
-
-    clipboard )
+    ## }}}
+    clipboard )  ## {{{
         function check_status {
             if_on="$(pgrep 'greenclip')"
         }
@@ -610,8 +639,8 @@ msgn "$text" ;;
 
         [ "$if_on" ] && clipboard_text='CL' || clipboard_text="<span color=\"${red}\">CL:OF</span>"
         set_widget 'clipboard' 'markup' "$clipboard_text" ;;
-
-    klgr )
+    ## }}}
+    klgr )  ## {{{
        ## append current_datetime to the most recent log
        current_datetime="$(get_datetime 'jymdhms')"
        weekday="$(get_datetime 'jweekday')"
@@ -623,8 +652,8 @@ msgn "$text" ;;
        keylogger_status="$(ps -f -u "$UID" | sed 1d | \grep -v '\-remote' | \grep '[k]eylogger')"
        [ "$keylogger_status" ] && keylogger_text='KE' || keylogger_text="<span color=\"${red}\">KE:OF</span>"
        set_widget 'keylogger' 'markup' "$keylogger_text" ;;
-
-    established )
+    ## }}}
+    established )  ## {{{
         ## we can add sudo in this case to get instances other than the user-related ones:
         estab="$(sudo lsof -i -P -n | \grep 'ESTABLISHED' | awk '{print $1}' | sort --unique)"  ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
         estab_count="$(wc -l < <(printf '%s\n' "${estab:?'NONE'}"))"  ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
@@ -638,8 +667,8 @@ msgn "$text" ;;
                 (( estab_count > 0 )) && message_text="$(printf "<span color=\"%s\">Established</span>\n%s\n" "$orange" "$estab")" || message_text='No established connections'
                 msgn "$message_text" ;;
         esac ;;
-
-    open_ports )
+    ## }}}
+    open_ports )  ## {{{
         ## FIXME
         open_ports="$(sudo lsof -i -P -n | \grep 'LISTEN')"  ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
         open_ports_count="$(wc -l < <(printf '%s\n' "${open_ports:?'NONE'}"))"  ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
@@ -652,8 +681,8 @@ msgn "$text" ;;
                 (( open_ports_count > 0 )) && message_text="$(printf "<span color=\"%s\">Open ports</span>\n%s\n" "$orange" "$open_ports")" || message_text='No open ports'
                 msgn "$message_text" ;;
         esac ;;
-
-    tor )
+    ## }}}
+    tor )  ## {{{
         case "$2" in
             start )
                 sudo systemctl start tor && msgn "<span color=\"${orange}\">tor</span> started"   ;;
@@ -666,8 +695,8 @@ msgn "$text" ;;
         tor_status="$(pgrep 'tor')"  ## why exceptionally used "$(sudo lsof -i -P -n | \grep 'LISTEN' | \grep '^tor')" instead of pgrep?
         [ "$tor_status" ] && tor_status_text="<span color=\"${red}\">TO:ON</span>" || tor_status_text='TO'
         set_widget 'tor' 'markup' "$tor_status_text" ;;
-
-    network )
+    ## }}}
+    network )  ## {{{
         source "$HOME"/scripts/gb-calculation
         source "$HOME"/scripts/gb-network
 
@@ -675,7 +704,7 @@ msgn "$text" ;;
 
         case "$2" in
             usage )
-
+                ## {{{ connections
                 [ "$vpn_info" ] && vpn_conn="[${vpn_conn}] "
                 [ "$wf_conn" == 'MCI' ] && if_simcard=' SIM'
                 [ "$wf_state" == 'connected' ] || if_wf_down=' DOWN'
@@ -691,7 +720,7 @@ msgn "$text" ;;
 
                 connections_text="<span color=\"${fg_d}\">${vpn_conn}${eth_conn}</span> <span color=\"${wf_conn_color}\">${wf_conn}</span><span color=\"${orange}\">${if_simcard}${if_wf_down}</span>"
                 # connections_text="<span color=\"${fg_d}\">${vpn_conn}${eth_conn} ${wf_conn}</span>"
-
+                ## }}}
                 ## down/up {{{ https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
                 for interface in 'ethernet' 'wifi'; {
 
@@ -793,22 +822,45 @@ msgn "$text" ;;
                     down_up_text+=" <span color=\"${down_color}\">${down}</span> <span color=\"${up_color}\">${up}</span> \
 <span color=\"${down_total_color}\">${down_total}</span> <span color=\"${up_total_color}\">${up_total}</span>"   ## 317K 2.31M 4.32G 4.32G
 
-                    }
-
-                    set_widget 'network' 'markup' "${connections_text} ${down_up_text# }"  ## remove leading space
-                    ;;
+                }
+                ## }}}
+                set_widget 'network' 'markup' "${connections_text} ${down_up_text# }"  ## remove leading space
+                ;;
             turn_on_wifi )
                 nmcli radio wifi on ;;
             turn_off_wifi )
                 nmcli radio wifi off ;;
         esac ;;
+    ## }}}
+    ping )  ## {{{
+        ping_failed_file=/tmp/ping_failed
 
-    audacious )
+        [ -f "$ping_failed_file" ] && set_widget 'ping' 'markup' "<span color=\"${red}\">$refresh_icon</span>"  ## exceptionally colored refresh_icon
+
+        ping 8.8.8.8 -c 1 -W 2 &>/dev/null && {
+            stts=''
+            if [ -f "$ping_failed_file" ]; then
+                text="$(printf 'Connected back at\n%s\n' "$(jdate '+%Y-%m-%d %H:%M:%S')")"
+                msgc "$text"
+                rm "$ping_failed_file"
+            fi
+        } || {
+            stts="<span color=\"${red}\">PI</span>"  ##  ◖◗
+            printf '%s\n' "$(get_datetime 'jymdhms')" > "$ping_failed_file"
+        }
+
+        set_widget 'ping' 'markup' "$stts" ;;
+    ## }}}
+    audacious )  ## {{{
         source "$HOME"/scripts/gb-calculation
+        source "$HOME"/scripts/gb-duration
 
         function update_variables {
             source "$HOME"/scripts/gb-audacious
         }
+
+        csols_file="$HOME"/scripts/.last/csols
+        csols_kaddy_file="$HOME"/kaddy/scripts/.last/csols
 
         update_variables
 
@@ -826,7 +878,7 @@ msgn "$text" ;;
             main_window )
                 audtool --mainwin-show ;;  ## OR audacious -H OR audacious -m
             resume )
-                [ "$album" == 'speech' ] && audtool --playback-seek "$(< "$HOME"/scripts/.last/csols)" ;;
+                [ "$album" == 'speech' ] && audtool --playback-seek "$(< "$csols_file")" ;;
             tog_shuff )
                 audtool --playlist-shuffle-toggle ;;
             prev )
@@ -859,7 +911,8 @@ msgn "$text" ;;
         ## save currnt song output length seconds (csols) if speech
         regex='^(playing|paused)$'
         [[ "$play_status" =~ $regex ]] && [ "$album" == 'speech' ] && {
-            printf '%s\n' "$current_position_in_seconds" > "$HOME"/scripts/.last/csols
+            printf '%s\n' "$current_position_in_seconds" > "$csols_file"
+            cp "$csols_file" "$csols_kaddy_file"
             # msgn 'saved csol' "<span color=\"${orange}\">${current_position}</span>"
         }
 
@@ -870,9 +923,8 @@ msgn "$text" ;;
         order="${position_in_playlist}/${playlist_length}"  ## 1/5
         [ "$length" ] && time="${current_position}/${length}" || time='0:00/0:00'  ## 2:24/18:54
         (( bar_position > 99 )) && bar_position=1 || bar_position=0.${bar_position}
-        left="$(convert_second "$left_in_seconds")"  ## 00:45:16
-        ## remove leading 00: if left is less than one hour:
-        [ "${left::3}" == '00:' ] && left="${left:3}"
+        left="$(convert_second "$left_in_seconds")"  ## 01:05:16
+        left="$(shorten_duration "$left")"  ## 1:05:16
 
         text="<span color=\"${grey}\">${pause_text}</span><span color=\"${fg_l}\">${equalizer}</span><span color=\"${fg_d}\">${shuffle_text}</span><span color=\"${fg_l}\">${order}</span> <span color=\"${fg_d}\">${time} -${left}</span> <span color=\"${fg_l}\">${title}</span> <span color=\"${fg_d}\">${album}</span> <span color=\"${fg_l}\">${artist}</span>"
         set_widget 'audacious'     'markup'           "$text"
@@ -880,5 +932,5 @@ msgn "$text" ;;
         set_widget 'audacious_bar' 'color'            "$fg_d"
         awesome-client "audacious_bar.value = ${bar_position}"  ## set_widget doesn't work properly for audacious_bar
         ;;
-
+    ## }}}
 esac

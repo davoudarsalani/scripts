@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-06-08 21:32:34 +0330 Tuesday
+## @last-modified 1401-07-15 10:32:49 +0330 Friday
 
 case "$1" in
     pwd )
         printf '%s\n' "${2/$HOME/\~}" ;;  ## '%-15s\n'
+    if_kaddy )
+        \grep -qi "$HOME/kaddy" <<< "$2" && printf 'KADDY \n' ;;
     info )
-        [ "$2" == "$HOME" ] && {
+        [ "$2" == "$HOME" ] && {  ## OR JUMP_1
             printf '%s\n' '--'
             exit
         }
@@ -22,11 +24,40 @@ case "$1" in
         (( links_count > 0 )) && links_count=" L:${links_count}" || links_count=''
 
         printf '%s %s %s%s\n' "$size" "$directories_count" "$files_count" "$links_count" ;;
+    compare )
+        \grep -Eqi "^$HOME|\~" <<< "$2" && is_in_home='true'
+        [ "$is_in_home" ] || exit
+
+        \grep -qi "^$HOME$" <<< "$2"          && is_home='true'  ## OR [ "$2" == "$HOME" ] && is_home='true' as in JUMP_1
+        \grep -qi "^$HOME/\." <<< "$2"        && is_in_hidden_dir='true'
+        \grep -qi "^$HOME/downloads" <<< "$2" && is_in_downloads='true'
+        \grep -qi "^$HOME/movie" <<< "$2"     && is_in_movie='true'
+        \grep -qi "^$HOME/trash" <<< "$2"     && is_in_trash='true'
+        \grep -qi "^$HOME/kaddy" <<< "$2"     && is_in_kaddy='true'
+
+        if [ ! "$is_home" ] && \
+           [ ! "$is_in_hidden_dir" ] && \
+           [ ! "$is_in_downloads" ] && \
+           [ ! "$is_in_movie" ] && \
+           [ ! "$is_in_trash" ] && \
+           [ ! "$is_in_kaddy" ]; then
+
+            ## ~/scripts -> ~/kaddy/scripts
+            cur_dir_in_kaddy="$(sed -e "s|\($HOME\)/\(\)|\1/kaddy/\2|" <<< "$2")"
+
+            if [ ! -d "$cur_dir_in_kaddy" ]; then
+                printf ' \n'
+            elif [ "$(\diff --brief <(\ls -A "$2") <(\ls -A "$cur_dir_in_kaddy"))" ]; then  ## NOTE do NOT add &>/dev/null to diff
+                printf ' \n'
+            fi
+
+        fi ;;
     git )
         source "$HOME"/scripts/gb-git
 
-        alert_sign='🔸'  ## 🔸🔴
         [ "$(if_git "$2")" == 'false' ] && exit
+
+        alert_sign='🔸'  ## 🔸🔴
 
         hash_head="$(git_hash_head "$2")"
         relative_head="$(git_relative_head "$2")"

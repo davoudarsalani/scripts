@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:16:53 +0330 Tuesday
+## @last-modified 1401-07-10 09:04:12 +0330 Sunday
 
 from os import path, remove, getenv
+
 from gi import require_version
 
 require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from PIL import Image
 from pynput.mouse import Listener
-
 from gp import Screen, get_datetime, rofi, msgn, msgc, countdown
 
 
-def convert_to_jpg(png_image: str) -> None:
+def convert_to_jpg(png_image: str) -> None:  ## {{{
     global output
     im = Image.open(f'{png_image}')
     im = im.convert('RGB')
@@ -25,6 +25,8 @@ def convert_to_jpg(png_image: str) -> None:
     except Exception:
         pass
 
+
+## }}}
 
 main_items = ['screen 1', 'screen 2', 'screen all', 'current window', 'selected area']
 main_item = rofi(main_items, 'screenshot')
@@ -39,7 +41,7 @@ scr_2_name, scr_2_res, scr_2_x, scr_2_y = Scr.screen_2()
 scr_all_res = Scr.screen_all()
 
 ## https://askubuntu.com/questions/1011507/screenshot-of-an-active-application-using-python
-if main_item == 'screen 1':
+if main_item == 'screen 1':  ## {{{
     try:
         countdown()
         window = Gdk.get_default_root_window()
@@ -49,8 +51,8 @@ if main_item == 'screen 1':
         msgn('screen 1', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 1</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-
-elif main_item == 'screen 2':
+## }}}
+elif main_item == 'screen 2':  ## {{{
     try:
         countdown()
         window = Gdk.get_default_root_window()
@@ -60,8 +62,8 @@ elif main_item == 'screen 2':
         msgn('screen 2', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 2</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-
-elif main_item == 'screen all':
+## }}}
+elif main_item == 'screen all':  ## {{{
     try:
         countdown()
         window = Gdk.get_default_root_window()
@@ -71,8 +73,8 @@ elif main_item == 'screen all':
         msgn('screen all', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen all</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-
-elif main_item == 'current window':
+## }}}
+elif main_item == 'current window':  ## {{{
     try:
         countdown()
         window = Gdk.get_default_root_window()
@@ -85,8 +87,8 @@ elif main_item == 'current window':
         msgn('current window', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">current window</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-
-elif main_item == 'selected area':
+## }}}
+elif main_item == 'selected area':  ## {{{
     ## https://nitratine.net/blog/post/how-to-get-mouse-clicks-with-python/
     try:
         ## get x_1 and y_1
@@ -123,6 +125,7 @@ elif main_item == 'selected area':
         msgn('selected area', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
         msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">selected area</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
-
-else:
+## }}}
+else:  ## {{{
     exit()
+## }}}

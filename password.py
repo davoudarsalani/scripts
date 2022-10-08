@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-11-04 13:24:15 +0330 Monday
+## @last-modified 1401-06-15 18:46:45 +0330 Tuesday
 
 import string
 from getopt import getopt
@@ -17,7 +17,7 @@ script_args = argv[1:]
 Col = Color()
 
 
-def display_help() -> None:
+def display_help() -> None:  ## {{{
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
@@ -27,7 +27,8 @@ def display_help() -> None:
     exit()
 
 
-def getopts() -> None:
+## }}}
+def getopts() -> None:  ## {{{
     global length, count
 
     try:
@@ -44,7 +45,8 @@ def getopts() -> None:
             count = int(arg)
 
 
-def prompt(*args: list[str]) -> None:
+## }}}
+def prompt(*args: list[str]) -> None:  ## {{{
     global length, count
 
     for arg in args:
@@ -60,7 +62,8 @@ def prompt(*args: list[str]) -> None:
                 count = 5
 
 
-def generate(uppercase: bool = True, lowercase: bool = True, digits: bool = True, symbols: bool = True) -> None:
+## }}}
+def generate(uppercase: bool = True, lowercase: bool = True, digits: bool = True, symbols: bool = True) -> None:  ## {{{
     letters = ''
     if uppercase:
         letters += string.ascii_uppercase
@@ -82,6 +85,8 @@ def generate(uppercase: bool = True, lowercase: bool = True, digits: bool = True
         password = ''.join(sample(letters, length))
         print(password)
 
+
+## }}}
 
 getopts()
 

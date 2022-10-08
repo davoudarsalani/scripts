@@ -1,33 +1,34 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 10:31:09 +0330 Wednesday
+## @last-modified 1401-07-15 13:55:39 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
+source "$HOME"/scripts/gb-duration
 
 function no_such_file {
-    msgc 'ERROR' "no such file as <span color=\"${orange}\">\$HOME/movie/${directory}/${movie}</span>" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "no such file as <span color=\"${orange}\">${movie_full_path/$HOME/\~}</span>" "$HOME"/linux/themes/alert-w.png
     exit
 }
 
 function success_moving {
     local text
 
-    text="$(printf "moved to <span color=\"%s\">WATCHED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$base")"
+    text="$(printf "moved to <span color=\"%s\">WATCHED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$no_suffix")"
     msgn "$text" '' "$HOME"/linux/themes/delete-w.png
 }
 
 function error_moving {
-    msgc 'ERROR' "moving <span color=\"${orange}\">${base}</span> to <span color=\"${blue}\">WATCHED</span>" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "moving <span color=\"${orange}\">${no_suffix}</span> to <span color=\"${blue}\">WATCHED</span>" "$HOME"/linux/themes/alert-w.png
     # exit  ## exceptionally commented
 }
 
 function success_removing {
-    msgn 'removed' "<span color=\"${red}\"><b>${base}</b></span>" "$HOME"/linux/themes/delete-w.png
+    msgn 'removed' "<span color=\"${red}\"><b>${no_suffix}</b></span>" "$HOME"/linux/themes/delete-w.png
 }
 
 function error_removing {
-    msgc 'ERROR' "removing <span color=\"${orange}\">${base}</span>" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "removing <span color=\"${orange}\">${no_suffix}</span>" "$HOME"/linux/themes/alert-w.png
 }
 
 function if_empty {  ## JUMP_1 the same used in "$HOME"/scripts/speech
@@ -47,14 +48,15 @@ function if_empty {  ## JUMP_1 the same used in "$HOME"/scripts/speech
     }
 }
 
-function if_dir {  ## JUMP_1
+function if_no_dir {  ## JUMP_1
     [ -d "$HOME"/movie/"$directory" ] || {
         msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/movie/${directory}</span>" "$HOME"/linux/themes/alert-w.png
         exit
     }
 }
 
-declare -a directories_plus_count
+declare -i total_duration_second=0
+declare -a directories_plus_count movies_array
 
 [ "$play_status" == 'playing' ] && continue_playing='true' || continue_playing='false'
 
@@ -69,35 +71,55 @@ for tmp_directory in "${directories[@]}"; {
 
     ## decide how many spaces to add
     if (( movies_count < 10 )); then
-        spaces="       "
+        spaces='         '
     elif (( movies_count < 100 )); then
-        spaces="     "
+        spaces='       '
+    elif (( movies_count < 1000 )); then
+        spaces='     '
     else
-        spaces="   "
+        spaces='   '
     fi
     directories_plus_count+=( "${movies_count}${spaces}${tmp_directory##*/}" )
 }
 
 directory="$(pipe_to_rofi "${directories_plus_count[@]}" "header=${title}")" || exit 37
-if_empty  ## NOTE if_empty must precede if_dir
-if_dir
+if_empty  ## NOTE if_empty must precede if_no_dir (i.e. JUMP_2)
+if_no_dir  ## JUMP_2
 
+find_movies_cmd='find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname "*.srt"'
 case "$1" in
     random )
-        movie="$(shuf -n 1 < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
+        movie="$(shuf -n 1 < <(eval "$find_movies_cmd"))"
         movie="${movie##*/}" ;;
     select )
-        readarray -t movies < <(find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt' | sort)
-        movie="$(pipe_to_rofi "${movies[@]##*/}" "header=${directory}")" || exit 37 ;;
+        readarray -t movies < <(eval "$find_movies_cmd" | sort)
+        for m in "${movies[@]}"; {
+            duration_second="$(get_duration "$m" "seconds")"
+            duration="$(get_duration "$m")"
+            short_duration="$(shorten_duration "$duration")"
+            short_duration_and_movie="$(printf '%-11s%s\n' "$short_duration" "${m##*/}")"
+
+            movies_array+=( "$short_duration_and_movie" )
+            total_duration_second+="$duration_second"
+        }
+        total_duration_conv="$(convert_second "$total_duration_second")"
+
+        movie="$(pipe_to_rofi "${movies_array[@]}" "header=${directory} (total: "$total_duration_conv")")" || exit 37
+
+        ## remove duration from beginning
+        movie="$(printf '%s\n' "$movie" | sed 's/^.\+ \+//')" ;;
     * )
         exit ;;  ## NOTE do NOT remove
 esac
 
 ## play
-base="${movie%.*}"
-msgn 'playing' "<span color=\"${orange}\">${base}</span>" "$HOME"/linux/themes/filmroll-w.png
-[ -f "$HOME"/movie/"$directory"/"$movie" ] || no_such_file
-vlc -f --play-and-exit -- "$HOME"/movie/"$directory"/"$movie" 2>/dev/null
+no_suffix="${movie%.*}"
+
+movie_full_path="$HOME"/movie/"$directory"/"$movie"
+[ -f "$movie_full_path" ] || no_such_file
+
+msgn 'playing' "<span color=\"${orange}\">${no_suffix}</span>" "$HOME"/linux/themes/filmroll-w.png
+vlc -f --play-and-exit -- "$movie_full_path" 2>/dev/null
 
 ## move to WATCHED or remove
 what_to_dos=( '' 'mv to WATCHED' 'remove' )
@@ -105,10 +127,12 @@ what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "header=${movie}" 'bg=red')"  # |
 
 case "$what_to_do" in
     'mv to WATCHED' )
-        [ -d "$HOME"/movie/"$directory"/WATCHED ] || mkdir "$HOME"/movie/"$directory"/WATCHED
-        mv "$HOME"/movie/"$directory"/"$movie" "$HOME"/movie/"$directory"/WATCHED && success_moving || error_moving ;;
+        watched_dir="$HOME"/movie/"$directory"/WATCHED
+
+        [ -d "$watched_dir" ] || mkdir "$watched_dir"
+        mv "$movie_full_path" "$watched_dir" && success_moving || error_moving ;;
     remove )
-        rm "$HOME"/movie/"$directory"/"$movie" && success_removing || error_removing ;;
+        rm "$movie_full_path" && success_removing || error_removing ;;
     # * )  ## NOTE keep commented
     #     exit ;;
 esac

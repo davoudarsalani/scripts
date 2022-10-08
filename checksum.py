@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-10-28 10:09:37 +0330 Tuesday
+## @last-modified 1401-06-15 18:44:36 +0330 Tuesday
 
 from getopt import getopt
 from os import path
@@ -14,7 +14,7 @@ script_args = argv[1:]
 Col = Color()
 
 
-def display_help() -> None:
+def display_help() -> None:  ## {{{
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
@@ -24,7 +24,8 @@ file    {Col.flag('-f|--file=')}'''
     exit()
 
 
-def getopts() -> None:
+## }}}
+def getopts() -> None:  ## {{{
     global file, string
 
     try:
@@ -41,7 +42,8 @@ def getopts() -> None:
             file = arg
 
 
-def prompt(*args: list[str]) -> None:
+## }}}
+def prompt(*args: list[str]) -> None:  ## {{{
     global file, string
 
     for arg in args:
@@ -60,6 +62,8 @@ def prompt(*args: list[str]) -> None:
             except:
                 string = get_input('String')
 
+
+## }}}
 
 getopts()
 

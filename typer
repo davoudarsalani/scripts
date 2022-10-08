@@ -8,12 +8,12 @@ source "$HOME"/scripts/gb-calculation
 
 title="${0##*/}"
 
-function display_help {
+function display_help {  ## {{{
     source "$HOME"/scripts/.help
     typer_help
 }
-
-function countdown {
+## }}}
+function countdown {  ## {{{
     [ "$no_countdown" ] && return
 
     local int
@@ -23,20 +23,20 @@ function countdown {
         sleep 1
     }
 }
-
-function sleep_now {
+## }}}
+function sleep_now {  ## {{{
     if [ "$interval" == 'random' ]; then
         sleep "${intervals["$(( "$RANDOM" % "$intervals_length" ))"]}"
     else
         sleep "$interval"
     fi
 }
-
-function play_random_key_sound {
+## }}}
+function play_random_key_sound {  ## {{{
     pacmd play-file "$key_sound" "${key_sounds["$(( "$RANDOM" % "$key_sounds_length" ))"]}" "$def_sink_index"
 }
-
-function type_in_vim {
+## }}}
+function type_in_vim {  ## {{{
     local chars_count char_idx perc remaining_chars eta_mid eta_mid_conv
 
     chars_count="$(wc -c < "$file")"
@@ -60,8 +60,8 @@ function type_in_vim {
 
     accomplished 'Done. Press Ctrl+C in vim to exit'
 }
-
-function type_in_terminal {
+## }}}
+function type_in_terminal {  ## {{{ by Metalx1000 (https://pastebin.com/Uqf6DPmZ)
     local lines_count line_idx
 
     countdown
@@ -76,8 +76,8 @@ function type_in_terminal {
         printf '\n'
     done < "$file"
 }
-
-function prompt {
+## }}}
+function prompt {  ## {{{
     for _ in "$@"; {
         case "$1" in
             -f )
@@ -88,8 +88,8 @@ function prompt {
         shift
     }
 }
-
-function get_opt {
+## }}}
+function get_opt {  ## {{{
     local options
 
     options="$(getopt --longoptions 'help,quiet,no-countdown,file:,interval:' --options 'hqnf:i:' --alternative -- "$@")"
@@ -114,7 +114,7 @@ function get_opt {
         shift
     done
 }
-
+## }}}
 
 get_opt "$@"
 

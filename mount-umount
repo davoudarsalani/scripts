@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 11:13:04 +0330 Wednesday
+## @last-modified 1401-07-12 08:27:09 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -48,7 +48,7 @@ function get_opt {
 get_opt "$@"
 
 case "$1" in
-    mount )
+    mount )  ## {{{
         get_mountable_umountable
         [ "$mountable" ] || {
             msgn 'nothing to mount'
@@ -60,22 +60,61 @@ case "$1" in
         name="$(printf '%s\n' "$mountable_item" | awk '{print $1}')"  ## sdb1
 
         function msg_mount_successful {
-            msgn "<span color=\"${orange}\">/dev/${name}</span> mounted at <span color=\"${orange}\">/tmp/${current_datetime}-${name}</span>"
+            msgn "<span color=\"${orange}\">/dev/${name}</span> mounted at <span color=\"${orange}\">${dest_mount_dir}</span>"
         }
 
         function msg_mount_failed {
-            msgc 'ERROR' "mounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/linux/themes/alert-w.png
+            local exit_stts fail_reason msg_text
+
+            exit_stts="$1"
+            if (( exit_stts == 1 )); then
+                fail_reason='incorrect invocation or permissions'
+            elif (( exit_stts == 2 )); then
+                fail_reason='system error (out of memory, cannot fork, no more loop devices)'
+            elif (( exit_stts == 4 )); then
+                fail_reason='internal mount bug'
+            elif (( exit_stts == 8 )); then
+                fail_reason='user interrupt'
+            elif (( exit_stts == 16 )); then
+                fail_reason='problems writing or locking /etc/mtab'
+            elif (( exit_stts == 32 )); then
+                fail_reason='mount failure'
+            elif (( exit_stts == 64 )); then
+                fail_reason='some mount succeeded'
+            else
+                fail_reason='unknown reason'
+            fi
+
+            msg_text="$(printf "mounting <span color=\"%s\">/dev/%s</span> at <span color=\"%s\">%s</span>\n(%s)\n" "$orange" "$name" "$orange" "$dest_mount_dir" "$fail_reason")"
+            msgc 'ERROR' "$msg_text" "$HOME"/linux/themes/alert-w.png
         }
 
-        mkdir -p /tmp/"$current_datetime"-"$name"
+        dest_mount_dir=/tmp/"$current_datetime"-"$name"
+        [ -d "$dest_mount_dir" ] || mkdir -p "$dest_mount_dir"
 
-        if  \grep -q '^sr' <<< "$name"; then
-            sudo mount /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
+        if \grep -q '^sr' <<< "$name"; then
+            sudo mount /dev/"$name" "$dest_mount_dir"
+
+            exit_status="$?"
+            if (( exit_status == 0 )); then
+                msg_mount_successful
+            else
+                msg_mount_failed "$exit_status"
+            fi
         else
-            sudo mount -o umask=000 /dev/"$name" /tmp/"$current_datetime"-"$name" && msg_mount_successful || msg_mount_failed
-        fi ;;
+            sudo mount -o umask=000 /dev/"$name" "$dest_mount_dir"
 
-    umount )
+            exit_status="$?"
+            if (( exit_status == 0 )); then
+                msg_mount_successful
+            else
+                msg_mount_failed "$exit_status"
+            fi
+        fi
+
+        exit ;;  ## NOTE do NOT comment
+    ## }}}
+    umount )  ## {{{
         get_mountable_umountable
         [ "$umountable" ] || {
             msgn 'nothing to umount'
@@ -93,22 +132,24 @@ case "$1" in
             msgc 'ERROR' "umounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/linux/themes/alert-w.png
         }
 
-        sudo umount /dev/"$name" && msg_umount_successful || msg_umount_failed ;;
+        sudo umount /dev/"$name" && msg_umount_successful || msg_umount_failed
 
+        exit ;;  ## NOTE do NOT comment
+    ## }}}
 esac
 
 heading "$title"
 
 main_items=( 'udisksctl mount -b' 'udisksctl unmount -b' 'lsblk' 'blkid and lsblk -f' 'lsusb' 'lsmod (modules loaded)' 'lspci' 'mounted drives' 'kernel drivers' 'remount root partition' 'mountable' 'umountable' 'format usb device' 'cat /proc/mounts' 'help' )
-man_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
+main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
-case "$man_item" in
+case "$main_item" in
     'udisksctl mount -b' )
         prompt -d
         sudo udisksctl mount -b "$device" && lsblk_full && accomplished "$device mounted" ;;
     'udisksctl unmount -b' )
         prompt -d
-        sudo udisksctl umount -b "$device" && lsblk_full && accomplished "$device umounted" ;;
+        sudo udisksctl unmount -b "$device" && lsblk_full && accomplished "$device umounted" ;;
     lsblk )
         lsblk_full && accomplished ;;
     'blkid and lsblk -f' )

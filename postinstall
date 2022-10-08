@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 11:24:24 +0330 Wednesday
+## @last-modified 1401-07-16 07:30:49 +0330 Saturday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -14,15 +14,15 @@ main_items=( 'apps' 'add AUR repositories' 'install from AUR' 'fix "error while 
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    apps )
+    apps )  ## {{{
         apps=(
             'audacious' 'vlc' 'gpicviewgtk3' 'xreader' 'gparted' 'gnomedisks' 'gnomecalculator' 'firefox' 'gedit' 'goldendict' 'lsof' 'keepass'
             'uget' 'gimp' 'ufw' 'acpi' 'rofi' 'dmenu' 'bluez' 'bluezutils' 'blueman' 'blueztools' 'lxappearance' 'libreofficestill' 'xclip'
             'openssh' 'ffmpeg' 'xdotool' 'tmux' 'picom' 'fzf' 'networkmanager' 'networkmanagerapplet' 'networkmanageropenvpn' 'openvpn' 'feh'
-            'pulseaudioalsa' 'jq' 'youtubedl' 'curl' 'wget' 'aria2' 'tor' 'torsocks' 'git' 'kdenlive' 'vsftpd' 'docker'
-            'mpv' 'txt2man' 'autoconfarchive' 'w3m' 'highlight' 'mediainfo' 'xf86videointel' 'intel-ucode[+ grub update]' 'ripgrep pulseaudio'
+            'pulseaudioalsa' 'jq' 'youtubedl' 'curl' 'wget' 'aria2' 'tor' 'torsocks' 'git' 'kdenlive' 'vsftpd' 'docker' 'mpv' 'txt2man'
+            'autoconfarchive' 'w3m' 'highlight' 'mediainfo' 'xf86videointel' 'intel-ucode[+ grub update]' 'ripgrep' 'pulseaudio'
             'xfce4terminal' 'kvantumqt5' 'imagemagick' 'qutebrowser' 'chromium' 'libvainteldriver' 'nvidialts' 'nvidiautils' 'nvidiasettings'
-            'xf86videointel' 'xprintidle[OR xssstate]' 'pulseaudio-bluetooth[for headset]' 'simplescreenrecorder' 'hddtemp' 'ctags'
+            'xprintidle[OR xssstate]' 'pulseaudio-bluetooth[for headset]' 'simplescreenrecorder' 'hddtemp' 'ctags'
         )
         maybe_apps=(
             'unzip' 'zip' 'unrar' 'wmctrl' 'netstatnat' 'handbrake' 'handbrakecli' 'fribidi' 'ranger' 'bc' 'kdeconnect' 'kdeclitools' 'traceroute'
@@ -33,9 +33,33 @@ case "$main_item" in
             'yay' 'rofigreenclip' 'obfs4proxy' 'bluezhcitool' 'qt5styleplugins' 'lf' 'ugetintegratorfirefox' 'x2x'
             'optimus-manager (or *-git) [+ enable optimus-manager.service]'
         )
-        aur_maybe_apps=( 'optimus-manager-qt' 'kpcli' 'cava' )
+        aur_maybe_apps=(
+            'optimus-manager-qt' 'kpcli' 'cava'
+        )
 
-        mint_apps=( 'libtool' 'm4' 'automake' 'autoreconf' 'openssh-server' 'x2x' 'xprintidle[OR xssstate]' )
+
+        mint_apps=(
+            'audacious' 'vlc' 'goldendict' 'uget' 'ffmpeg' 'tmux' 'fzf' 'jq' 'tor' 'torsocks' 'git' 'highlight' 'mediainfo' 'vim' 'x2x' 'ripgrep'
+            'xprintidle[OR' 'xssstate]' 'xfce4-terminal' 'youtube-dl'
+        )
+        mint_binary_apps=(
+            'lf'  ## copy binary file to /usr/bin/
+        )
+        mint_maybe_apps=(  ## not sure if necessary
+            ## bluetooth
+            'bluezutils' 'blueztools'
+
+            ## intel driver
+            'xf86videointel' 'intel-ucode[+ grub update]'
+
+            ## nvidia
+            'nvidialts' 'nvidiautils' 'nvidiasettings'
+
+            'ctags'
+        )
+        mint_specific_apps=(
+            'libtool' 'm4' 'automake' 'autoconf' 'openssh-server'
+        )
 
         blue 'Apps'
         printf '%s\n' "${apps[@]}" | sort | column
@@ -45,11 +69,20 @@ case "$main_item" in
         printf '%s\n' "${aur_apps[@]}" | sort | column
         blue 'AUR (maybe)'
         printf '%s\n' "${aur_maybe_apps[@]}" | sort | column
+
+        printf '\n'
+
         blue 'Mint'
         printf '%s\n' "${mint_apps[@]}" | sort | column
+        blue 'Mint (binary)'
+        printf '%s\n' "${mint_binary_apps[@]}" | sort | column
+        blue 'Mint (maybe)'
+        printf '%s\n' "${mint_maybe_apps[@]}" | sort | column
+        blue 'Mint (specific)'
+        printf '%s\n' "${mint_specific_apps[@]}" | sort | column
         ;;
-
-    'add AUR repositories' )
+    ## }}}
+    'add AUR repositories' )  ## {{{
         printf '%s\n' \
 "$("$clr" 'add these lines to /etc/pacman.conf')
 [archlinuxfr]
@@ -58,8 +91,8 @@ Server = http://repo.archlinux.fr/$arch
 $("$clr" 'then run')
 sudo pacman -Sy"
         ;;
-
-    'install from AUR' )
+    ## }}}
+    'install from AUR' )  ## {{{
         printf '%s\n' \
 "$(action_now 'method 1: snapshot')
 $("$clr" 'download snapshot from AUR page (the dl link is sth like: https://aur.archlinux.org/cgit/aur.git/snapshot/APPNAME.tar.gz)')
@@ -79,17 +112,17 @@ makepkg -sic
 $("$clr" 'then')
 sudo pacman -U FILE.xz"
         ;;
-
-    'fix "error while loading shared libraries: libalpm.so.10"' )
+    ## }}}
+    'fix "error while loading shared libraries: libalpm.so.10"' )  ## {{{
         printf '%s\n' \
 "$("$clr" 'navigate to the folder and run')
 sudo pacman -U package-query-1.9-3-x86_64.pkg.tar.xz"
         ;;
-
-    'see graphics in arch' )
+    ## }}}
+    'see graphics in arch' )  ## {{{
         printf 'lspci -k | grep -A 2 -E "(VGA|3D)"\n' ;;
-
-    'add host RSA key to your known hosts' )
+    ## }}}
+    'add host RSA key to your known hosts' )  ## {{{
         printf '%s\n' \
 "$("$clr" '(https://askubuntu.com/questions/108217/ssh-host-key-verification-failed)')
 ssh-keyscan HOST_IP | tee -a ~/.ssh/known_hosts
@@ -97,8 +130,8 @@ ssh-keyscan HOST_IP | tee -a ~/.ssh/known_hosts
 $("$clr" 'ceate ssh key')
 ssh-keygen"
         ;;
-
-    'turn screensaver off and disable DPMS' )
+    ## }}}
+    'turn screensaver off and disable DPMS' )  ## {{{
         printf '%s\n' \
 "$("$clr" '(https://askubuntu.com/questions/216783/ubuntu-12-10-turn-screen-off-when-inactive-for-never-still-turns-off)')
 xset s 0 0  $("$clr" '## OR xset s off')
@@ -109,15 +142,15 @@ xset -dpms
 $("$clr" 'check the results: (the sections "Screen Saver:" and "DPMS (Energy Star)")')
 xset -q"
         ;;
-
-    'generate xorg.conf' )
+    ## }}}
+    'generate xorg.conf' )  ## {{{
         printf '%s\n' \
 "$("$clr" '(https://wiki.archlinux.org/index.php/Xorg#Configuration)')
 sudo Xorg :0 -configure  $("$clr" '## or use a different display, e.g. :2')
 $("$clr" 'this should create a xorg.conf.new file in /root/. copy that to /etc/X11/ or /etc/')"
         ;;
-
-    'git save credentials' )
+    ## }}}
+    'git save credentials' )  ## {{{
         printf '%s\n' \
 "$("$clr" '(https://stackoverflow.com/questions/35942754/how-to-save-username-and-password-in-git/45327254)')
 git config --global credential.helper store
@@ -126,8 +159,8 @@ $("$clr" 'the next time git asks for your credentials, it will store them foreve
 git config --global user.name 'NAME LAST_NAME'
 git config --global user.email 'EMAIL'"
         ;;
-
-    'disable grub countdown' )
+    ## }}}
+    'disable grub countdown' )  ## {{{
         printf '%s\n' \
 "$("$clr" 'in /etc/default/grub, set the GRUB_TIMEOUT to 0 and then run')
 sudo update-grub
@@ -143,8 +176,8 @@ sudo chmod 755 /usr/sbin/update-grub
 $("$clr" 'now you can run')
 sudo update-grub"
         ;;
-
-    'firefox settings' )
+    ## }}}
+    'firefox settings' )  ## {{{
         printf '%s\n' \
 "$("$clr" 'keep firefox open after closing the last tab')
 about:config > browser.tabs.closeWindowWithLastTab
@@ -159,27 +192,27 @@ about:config > media.peerconnection.enabled
 $("$clr" 'double click to change the value to False. to verify, visit https://hide.me/en/webrtc-leak-test')
 
 $("$clr" 'use customized css in ~/.mozilla/firefox/*.default-release/chrome directory')
-about:config > legacy
+about:config > toolkit.legacyUserProfileCustomizations.stylesheets  ## previously: legacy
 $("$clr" 'double click to change the value to True')"
         ;;
-
-    'prevent python from creating __pycache__' )
+    ## }}}
+    'prevent python from creating __pycache__' )  ## {{{
         printf '%s\n' \
 "$("$clr" '(https://stackoverflow.com/questions/39149313/hiding-pycache-on-linux)')
 $("$clr" 'add PYTHONDONTWRITEBYTECODE=1 to /etc/environment')"
         ;;
-
-    'surfingkeys' )
+    ## }}}
+    'surfingkeys' )  ## {{{
         printf "map('f', 'af');\n" ;;
-
-    'disable goldendict "full text search"' )
+    ## }}}
+    'disable goldendict "full text search"' )  ## {{{
         printf "$("$clr" 'disable "full text search" to prevent cpu overuse')\n" ;;
-
-    'install jcal' )
+    ## }}}
+    'install jcal' )  ## {{{
         printf '%s\n' "$("$clr" 'Have a look at install-jcal script')"
     ;;
-
-    docker )
+    ## }}}
+    docker )  ## {{{
         printf '%s\n' \
 "sudo systemctl enable docker $("$clr" 'enable service')
 sudo gpasswd -a $USER docker $("$clr" "add $USER to docker group to run docker without sudo")
@@ -216,8 +249,8 @@ docker system df --verbose
 docker system prune -f
 docker tag IMG:TG davoudarsalani/RPS:TG $("$clr" 'tag for push')"
         ;;
-
-    other )
+    ## }}}
+    other )  ## {{{
         printf '%s\n' \
 "$("$clr" '- when clock goes out of sync') sudo timedatectl set-ntp true
 $("$clr" '- if no internet after rebooting at the end of a fresh install') systemctl start dhcpcd && dhcpcd
@@ -260,5 +293,5 @@ $("$clr" '- mint: in case of getting returned 126 error when sourcing conf file 
 $("$clr" '- mint: install libfribidi (http://linuxforlife.ir/index.php/distro/215-2017-04-21-14-36-39)') sudo apt install libfribidi-bin libfribidi0
 " | less -R
         ;;
-
+    ## }}}
 esac

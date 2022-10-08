@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-01 10:12:27 +0330 Wednesday
+## @last-modified 1401-07-10 10:44:53 +0330 Sunday
 
 cmd='wget -qO - https://api.ipify.org'  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
 ## OR:
@@ -16,7 +16,7 @@ printf '\n'
 
 printf '++++++++++++++++++\n'
 
-printf 'Tor\n\n'
+printf 'Tor:\n\n'
 cmd="torsocks $cmd"
 eval "$cmd"
 printf '\n'

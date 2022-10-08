@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-06-08 22:40:02 +0330 Tuesday
+## @last-modified 1401-07-11 08:26:10 +0330 Monday
 
 function display_help {
+    local cmd
+
     cmd="
     -h|--help     help
     -c|--connect  connect to wifi
@@ -31,7 +33,7 @@ function display_mode {
 }
 
 function not_valid {
-    local msg space
+    local msg
 
     ## NOTE do NOT use (( choice == choice )) to check if choice is a number:
     [ "$choice" -eq "$choice" ] 2>/dev/null && msg='out of range' || msg='not valid'
@@ -39,6 +41,8 @@ function not_valid {
 }
 
 function read_user_choice {
+    local space
+
     for ((i=0; i<"${#main_items[@]}"; i++)); {
         (( i < 10 )) && space='  ' || space=' '
         printf '%s%s%s\n' "$("$fg_color" "$i")" "$space" "${main_items[$i]}" | sed 's/\t/  /g'
@@ -51,7 +55,7 @@ u='nnnn'
 runnable='false'
 
 case "$1" in
-    -l|--legacy )
+    -l|--legacy )  ## {{{
         mode='LEGACY'
         fg_color='legacy_fg'
         display_mode
@@ -245,8 +249,8 @@ case "$1" in
                 ;;
         esac
         ;;
-
-    -u|--uefi )
+    ## }}}
+    -u|--uefi )  ## {{{
         mode='UEFI (Ermanno Ferrari)'
         fg_color='uefi_fg'
         display_mode
@@ -456,8 +460,8 @@ case "$1" in
                 ;;
         esac
         ;;
-
-    -c|--connect )
+    ## }}}
+    -c|--connect )  ## {{{
         cmd="
         iwctl
         ## list of devices:
@@ -470,14 +474,14 @@ case "$1" in
         exit"
         display_cmd "$cmd"
         ;;
-
-    -v|--verify )
+    ## }}}
+    -v|--verify )  ## {{{
         runnable='true'
         cmd="
         ls /sys/firmware/efi/efivars 2>/dev/null && printf 'UEFI mode verified: YES\n' || printf 'UEFI mode verified: NO\n'"
         display_cmd "$cmd"
         ;;
-
+    ## }}}
     * )
         display_help
         ;;
@@ -490,7 +494,7 @@ if [ "$runnable" == 'true' ]; then
     [ "${run_prompt,}" == 'y' ] && eval "$cmd"
 fi
 
-
+## {{{ contents of arch-legacy-installation-guide file before turning into this script (providing commands for the legacy mode):
 ## #!/bin/bash
 ##
 ## timedatectl set-ntp true [not sure if necessary]
@@ -518,7 +522,7 @@ fi
 ## swapon /dev/sdx3
 ##
 ## pacstrap -i /mnt base base-devel
-
+## {{{ To be installed manually (https://wiki.archlinux.org/index.php/Talk:Installation_guide#Changes_for_the_base_package):
 ##   cryptsetup -- indirect dependency of base
 ##   device-mapper -- indirect dependency of base
 ##   dhcpcd
@@ -544,8 +548,9 @@ fi
 ##   usbutils
 ##   vi
 ##   which
-##   xfsprogs }}}
-
+##   xfsprogs
+## }}}
+## {{{ packages belonging to base-devel which are currently installed on machine (base base-devel was used during OS installation (installation date: 20190329172200))
 ##     currentl date: 13990613204649, 20200903204655
 ##   autoconf
 ##   automake
@@ -570,7 +575,8 @@ fi
 ##   sed
 ##   sudo
 ##   texinfo
-##   which }}}
+##   which
+## }}}
 ##
 ## genfstab -U /mnt >> /mnt/etc/fstab
 ##
@@ -621,7 +627,7 @@ fi
 ## EDITOR=vim visudo
 ## # add "nnnn ALL=(ALL) NOPASSWD: ALL" under the line "root = ALL=(ALL) ALL") (without the quotes)
 ## (save & exit)
-
+## }}}
 ## >> {{{ method 3 (Luke version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
 ## useradd -m -g wheel nnnn
 ##
@@ -632,7 +638,7 @@ fi
 ## # Alternatively, you can have these two lines where you specify the commands to be run without asking for a password:
 ## %wheel ALL=(ALL) ALL
 ## %wheel ALL=(ALL) NOPASSWD: <command1>, <command2>, <command3>
-
+## }}}
 ## (save & exit)
 ## #------------------------------------
 ##
@@ -658,3 +664,4 @@ fi
 ## sudo systemctl enable lightdm.service
 ##
 ## reboot
+## }}}

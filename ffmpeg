@@ -172,7 +172,7 @@ case "$main_item" in
         display_help ;;
 esac
 
-
+## {{{ notes
 
 ## Add title:
 # -metadata title='my title'

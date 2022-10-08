@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-01 08:17:48 +0330 Wednesday
+## @last-modified 1401-07-11 11:27:28 +0330 Monday
 
-length_in_seconds="$(audtool --current-song-length-seconds)"  ## 3304
-length="$(audtool --current-song-length)"  ## 55:04
+length_in_seconds="$(audtool --current-song-length-seconds)" || length_in_seconds=0  ## 3304
+length="$(audtool --current-song-length)"  ## 5:47
 
 current_position_in_seconds="$(audtool --current-song-output-length-seconds)"  ## 369
 current_position="$(audtool --current-song-output-length)"  ## 5:47
@@ -29,6 +29,11 @@ song_ext="$(audtool --current-song-tuple-data file-ext)"                ## mp3
 shuffle_status="$(audtool --playlist-shuffle-status)"  ## on/off
 play_status="$(audtool --playback-status)"  ## playing/paused
 
-bar_position="$(printf '%02d\n' "$(( "$current_position_in_seconds" * 100 / "$length_in_seconds" ))")"  ## <--,-- 19
-                                                                                                        ##    |-- NOTE do NOT replace printf '%02d\n' with echo
-                                                                                                        ##    '-- otherwise bar will not display amounts properly
+## NOTE if statement to void zero division error in JUMP_1
+if (( length_in_seconds > 0 )); then
+    bar_position="$(printf '%02d\n' "$(( "$current_position_in_seconds" * 100 / "$length_in_seconds" ))")"  ## <--,-- JUMP_1 19
+                                                                                                            ##    |-- NOTE do NOT replace printf '%02d\n' with echo
+                                                                                                            ##    '-- otherwise bar will not display amounts properly
+else
+    bar_position=0
+fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-16 11:16:28 +0330 Tuesday
+## @last-modified 1401-06-15 18:47:07 +0330 Tuesday
 
 from os import getenv, path
 from signal import signal, SIGINT
@@ -14,7 +14,7 @@ Rec = Record()
 Scr = Screen()
 
 
-def received_ctrl_c(signum: int, stack) -> None:
+def received_ctrl_c(signum: int, stack) -> None:  ## {{{
     ## https://stackoverflow.com/questions/52269334/python-trap-routine
     Aud.mic('mute')
     Aud.mic('0')
@@ -29,7 +29,7 @@ def received_ctrl_c(signum: int, stack) -> None:
 
 
 handler = signal(SIGINT, received_ctrl_c)
-
+## }}}
 
 print(Col.heading(title))
 

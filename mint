@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-29 10:15:48 +0330 Wednesday
+## @last-modified 1401-07-15 17:49:25 +0330 Friday
 
 source "$HOME"/scripts/gb
 
@@ -9,7 +9,7 @@ case "$1" in
         source "$HOME"/scripts/gb-audio
         states_initials="${vol_state::1}${mic_state::1}${mon_state::1}"  ## RSI
         indeces="${def_sink_index}${def_source_index}${def_source_mon_index}"  ## 010
-        printf '%s  %s  %s\n' "$vol_level" "$states_initials" "$indeces" ;;
+        printf '%s %s %s %s %s\n' "$vol_level" "$mic_level" "$mon_level" "$states_initials" "$indeces" ;;
     vol_30 )
         source "$HOME"/scripts/gb-audio
         pactl set-sink-volume "$def_sink_index" 30% ;;
@@ -45,10 +45,12 @@ case "$1" in
         ## ping and send messages if unsuccessful
         output="$(ping -c 1 4.2.2.4 2>&1)"
         \grep -qi 'network is unreachable' <<< "$output" && {
-            for ((i=1; i<=10; i++)); {
-                msgn "$output"
-                sleep 0.1
-            }
+            msgn "$output"
+            ## or display msg multiple times:
+            # for ((i=1; i<=5; i++)); {
+            #     msgn "$output"
+            #     sleep 0.1
+            # }
         } ;;
     firefox_whatsapp )
         firefox --new-tab 'https://web.whatsapp.com' ;;

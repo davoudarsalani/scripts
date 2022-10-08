@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-28 22:23:09 +0330 Tuesday
+## @last-modified 1401-07-10 09:02:18 +0330 Sunday
 
 source "$HOME"/scripts/gb
 
@@ -27,7 +27,7 @@ function now {
 }
 
 case "$1" in
-    ## app_menu
+    ## {{{ app_menu
     audacious )
         audacious &>/dev/null & ;;
     blueman_applet )
@@ -86,8 +86,9 @@ case "$1" in
         vlc &>/dev/null & ;;
     xreader )
         xreader &>/dev/null & ;;
+    ## }}}
 
-    ## off_menu
+    ## {{{ off_menu
     shutdown )
         now pc shutdown ;;
     'shutdown + clear clipboard' )
@@ -106,4 +107,5 @@ case "$1" in
         now awesome quit cc ;;
     'restart awesome' )
         now awesome restart ;;
+    ## }}}
 esac

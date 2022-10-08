@@ -54,7 +54,7 @@ main_items=( 'install' 'remove' 'packages' 'clear cache and clipboard' 'update' 
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    install )
+    install )  ## {{{
         install_items=( 'pacman' 'yay' 'yay + torsocks' 'local' 'download (no install)' 'reinstall all packages' 'lts kernel & header' 'search: normal' 'search: detailed summary' 'search: in local repository' )
         install_item="$(pipe_to_fzf "${install_items[@]}")" && wrap_fzf_choice "$install_item" || exit 37
 
@@ -97,8 +97,8 @@ case "$main_item" in
             'search: in local repository' )
                 pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro pacman -Qs && accomplished ;;
         esac ;;
-
-    remove )
+    ## }}}
+    remove )  ## {{{
         remove_items=( 'normal' 'with all dependencies' 'forceful' 'yay' 'latest kernel' )
         remove_item="$(pipe_to_fzf "${remove_items[@]}")" && wrap_fzf_choice "$remove_item" || exit 37
 
@@ -114,8 +114,8 @@ case "$main_item" in
             'remove latest kernel' )
                 sudo pacman -R linux && accomplished ;;
         esac ;;
-
-    packages )
+    ## }}}
+    packages )  ## {{{
         packages_items=( 'count' 'names' 'AUR packages' 'pacman tools' 'system stats (using yay)' )
         packages_item="$(pipe_to_fzf "${packages_items[@]}")" && wrap_fzf_choice "$packages_item" || exit 37
 
@@ -132,8 +132,8 @@ case "$main_item" in
             'system stats (using yay)' )
                 yay -Ps && accomplished ;;
         esac ;;
-
-    'clear cache and clipboard' )
+    ## }}}
+    'clear cache and clipboard' )  ## {{{
         action_now 'clearing clipboard'
         clear_clipboard
         action_now "cache size: $(du -sh /var/cache/pacman/pkg/)"  ## installed apps database dir: var/lib/pacman/
@@ -162,8 +162,8 @@ case "$main_item" in
             y ) reboot ;;
         esac
         accomplished ;;
-
-    update )
+    ## }}}
+    update )  ## {{{
         update_items=( 'pacman' 'yay' 'yay + torsocks' 'sync repos' 'available updates' 'last update' )
         update_item="$(pipe_to_fzf "${update_items[@]}")" && wrap_fzf_choice "$update_item" || exit 37
 
@@ -208,8 +208,8 @@ case "$main_item" in
                 dur="$(relative_date "$last_update_date")"
                 printf 'last update: %s (on %s)\n' "$dur" "$last_update_date"
         esac ;;
-
-    systemd )
+    ## }}}
+    systemd )  ## {{{
         systemd_items=( 'systemd-analyze' 'systemd-analyze blame' 'reload systemd' 'reload systemd units' )
         systemd_item="$(pipe_to_fzf "${systemd_items[@]}")" && wrap_fzf_choice "$systemd_item" || exit 37
 
@@ -223,8 +223,8 @@ case "$main_item" in
             'reload systemd units' )
                 systemctl daemon-reload && accomplished ;;  ## a reboot might be required
         esac ;;
-
-    systemctl )
+    ## }}}
+    systemctl )  ## {{{
         systemctl_items=( 'status' 'services' 'running units' 'failed units' 'start a unit' 'stop a unit' 'restart a unit' 'unit status' 'reload configuration' 'check if enabled' 'enable' 'disable' 'mask' 'unmask' )
         systemctl_item="$(pipe_to_fzf "${systemctl_items[@]}")" && wrap_fzf_choice "$systemctl_item" || exit 37
 
@@ -268,8 +268,8 @@ case "$main_item" in
                 prompt -u
                 sudo systemctl unmask "$unit" && accomplished ;;
         esac ;;
-
-    help )
+    ## }}}
+    help )  ## {{{
         display_help ;;
-
+    ## }}}
 esac

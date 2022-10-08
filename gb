@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-02-06 10:56:16 +0330 Tuesday
+## @last-modified 1401-07-15 08:29:28 +0330 Friday
 
-function get_datetime {
+function get_datetime {  ## {{{
     case "$1" in
             ymdhms )
                 printf '%(%Y%m%d%H%M%S)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d%H%M%S)"
@@ -26,38 +26,38 @@ function get_datetime {
                 printf '%s\n' "$(jdate +%A)" ;;
     esac
 }
-
-function heading {
+## }}}
+function heading {  ## {{{
     source "$HOME"/scripts/gb-color
 
     echo -e "$(green "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
-
-function flag {
+## }}}
+function flag {  ## {{{
     source "$HOME"/scripts/gb-color
 
     echo -e "$(purple "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
-
-function action_now {
+## }}}
+function action_now {  ## {{{
     source "$HOME"/scripts/gb-color
 
     echo -e "$(green '→') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
-
-function accomplished {
+## }}}
+function accomplished {  ## {{{
     source "$HOME"/scripts/gb-color
 
     echo -e "$(green '✔') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
-
-function wrap_fzf_choice {
+## }}}
+function wrap_fzf_choice {  ## {{{
     source "$HOME"/scripts/gb-color
 
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
-
-function select_file {
+## }}}
+function select_file {  ## {{{
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
     ## NOTE used also in "$HOME"/.config/lfrc
@@ -70,8 +70,8 @@ function select_file {
         printf '%s\n' "${item/\~/$HOME}"
     done
 }
-
-function select_directory {
+## }}}
+function select_directory {  ## {{{
     ## NOTE stolen from "$HOME"/.fzf/shell/key-bindings.bash with modifications
     ##      any change you make here, make sure to apply the changes there too
     ## NOTE used also in "$HOME"/.config/lfrc
@@ -91,8 +91,8 @@ function select_directory {
     dir="$(eval "$FZF_ALT_C_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
     [ "$dir" ] && printf '%q\n' "${dir/\~/$HOME}"
 }
-
-function pipe_to_fzf {
+## }}}
+function pipe_to_fzf {  ## {{{
     ## usages:
     ##   item="$(pipe_to_fzf "${items[@]}")"
     ##   item="$(pipe_to_fzf "${items[@]}" 'header=my header')"
@@ -115,8 +115,8 @@ function pipe_to_fzf {
         printf '%s\n' "${received[@]}" | fzf
     fi
 }
-
-function pipe_to_rofi {
+## }}}
+function pipe_to_rofi {  ## {{{
     ## usages:
     ##   item="$(pipe_to_rofi "${items[@]}")"
     ##   item="$(pipe_to_rofi "${items[@]}" 'header=my header' 'bg=red')"  ## NOTE header comes first
@@ -146,8 +146,8 @@ function pipe_to_rofi {
 
     printf '%s\n' "${received[@]}" | rofi -theme "$HOME"/.config/rofi/"$theme" -dmenu -i -p "$header"
 }
-
-function pipe_to_dmenu {
+## }}}
+function pipe_to_dmenu {  ## {{{
     ## usages:
     ##   item="$(pipe_to_dmenu "${items[@]}")"
     ##   item="$(pipe_to_dmenu "${items[@]}" 'header=my header' 'bg=red')"  ## NOTE header comes first
@@ -177,59 +177,59 @@ function pipe_to_dmenu {
 
     printf '%s\n' "${received[@]}" | dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$header"
 }
-
-function lsblk_full {
+## }}}
+function lsblk_full {  ## {{{
     \lsblk -o NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT,OWNER,GROUP,MODE,MAJ:MIN,RM,RO
 }
-
-function mounted_drives {
+## }}}
+function mounted_drives {  ## {{{
     if [ "$1" ]; then
         printf '%s\n' "$(df -hT)"
     else
         printf '%s\n' "$(df -T -x devtmpfs -x tmpfs -x usbfs -x loop)"  ## -x ARG instances help get rid of unnecessary drives
     fi
 }
-
-function get_mountable_umountable {
+## }}}
+function get_mountable_umountable {  ## {{{
     readarray -t mountable  < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE 'part $|rom $')
     readarray -t umountable < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i '/tmp/')
 }
-
-function msgn {
+## }}}
+function msgn {  ## {{{
     notify-send --urgency=normal "$1" "$2" -i "$3" -t 10000
 }
-
-function msgc {
+## }}}
+function msgc {  ## {{{
     notify-send --urgency=critical "$1" "$2" -i "$3"
 }
-
-function copy_pacman_log {
+## }}}
+function copy_pacman_log {  ## {{{
     source "$HOME"/scripts/gb-color
 
     cp /var/log/pacman.log "$HOME"/linux/pacman.log
     msgn "<span color=\"${orange}\">/var/log/pacman.log</span> copied"
 }
-
-function clear_playlist {
+## }}}
+function clear_playlist {  ## {{{
     audtool --playlist-clear
 }
-
-function turn_off_shuffle {
+## }}}
+function turn_off_shuffle {  ## {{{
     source "$HOME"/scripts/gb-audacious
     [ "$shuffle_status" == 'on'  ] && audtool --playlist-shuffle-toggle
 }
-
-function turn_on_shuffle {
+## }}}
+function turn_on_shuffle {  ## {{{
     source "$HOME"/scripts/gb-audacious
     [ "$shuffle_status" == 'off' ] && audtool --playlist-shuffle-toggle
 }
-
-function play_shutdown_track {
+## }}}
+function play_shutdown_track {  ## {{{
     source "$HOME"/scripts/gb-audio
     pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
 }
-
-function relative_date {
+## }}}
+function relative_date {  ## {{{
     ## usage:
     ##   relative_date '2019-05-03T07:07:11Z'
     ##   relative_date 1556867231
@@ -246,12 +246,12 @@ function relative_date {
 
     printf '%s ago\n' "$(convert_second "(( now_in_seconds - start_date_in_seconds ))" 'verbose')"
 }
-
-function convert_to_second {
+## }}}
+function convert_to_second {  ## {{{ convert 2021-04-15T11:10:03+0430 to 1618468803
     printf '%s\n' "$(date --date "$1" '+%s')"
 }
-
-function convert_second {
+## }}}
+function convert_second {  ## {{{
     local seconds sec min hour day mont year result
 
     seconds="${1%.*}"  ## remove decimal in case arg is a float
@@ -326,17 +326,17 @@ function convert_second {
 
     printf '%s\n' "$result"
 }
-
-function insert_comma {
+## }}}
+function insert_comma {  ## {{{
     printf "%'d\n" "$1"
 }
-
-function clear_clipboard {
+## }}}
+function clear_clipboard {  ## {{{
     greenclip clear
     msgn 'cleared' '' "$HOME"/linux/themes/greenclip.png
 }
-
-function random_wallpaper {
+## }}}
+function random_wallpaper {  ## {{{
     local current_wallpaper_file rand_wall
 
     current_wallpaper_file=/tmp/current_wallpaper
@@ -345,8 +345,8 @@ function random_wallpaper {
     printf '%s\n' "${rand_wall##*/}" > "$current_wallpaper_file"
     feh --bg-scale "$rand_wall"
 }
-
-function copy_random_wallpaper_for_startup {
+## }}}
+function copy_random_wallpaper_for_startup {  ## {{{
     source "$HOME"/scripts/gb-color
     local rand_wall
 
@@ -354,8 +354,8 @@ function copy_random_wallpaper_for_startup {
     sudo cp "$rand_wall" /usr/share/wallpapers/startup_background.jpg
     msgn "<span color=\"${orange}\">${rand_wall##*/}</span> copied"
 }
-
-function set_widget {
+## }}}
+function set_widget {  ## {{{
     ## only the awesome-widgets use this function but it'd better be here (rather than the script itself)
     ## because sometimes it's needed by 0-test
 
@@ -367,8 +367,8 @@ function set_widget {
 
     awesome-client "${widget}.${attr} = '${value}'"  ## NOTE do NOT change quotes
 }
-
-function get_input {
+## }}}
+function get_input {  ## {{{
     source "$HOME"/scripts/gb-color
     local input
 
@@ -376,8 +376,8 @@ function get_input {
     read -p "$(olive "$@") " input
     printf '%s\n' "$input"
 }
-
-function get_single_input {
+## }}}
+function get_single_input {  ## {{{
     source "$HOME"/scripts/gb-color
     local single_input
 
@@ -385,28 +385,28 @@ function get_single_input {
     read -p "$(olive "$@") " -n 1 single_input
     printf '%s\n' "$single_input"
 }
-
-function line {
+## }}}
+function line {  ## {{{
     source "$HOME"/scripts/gb-color
 
     grey "$(printf "%$(tput cols)s\n" | sed "s/ /▬/g")"
 }
-
-function rand_str {
+## }}}
+function rand_str {  ## {{{
     printf '%s\n' "$(mktemp --dry-run | sed 's/.*\.//g')"  ## returns e.g. leQPAUyfZP
 
     # sed 's/-//g' < /proc/sys/kernel/random/uuid  ## returns e.g. a8a29c0d109a40468051bcbaf70af17e
 }
-
-function move_older_pkgs {
+## }}}
+function remove_older_pkgs {  ## {{{
     source "$HOME"/scripts/gb-color
 
-    declare -a files uniques repeats to_be_moved
+    local src_dir src_kaddy_dir uniq count file exceed idx remove_propmt
+    declare -a files uniques repeats to_be_removed
     declare -i keep=3
-    local src_dir uniq count file exceed idx move_propmt
 
     src_dir="$HOME"/linux-pkg
-    dest_dir="$src_dir"/duplicates
+    src_kaddy_dir="$HOME"/kaddy/linux-pkg
     readarray -t files < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f ! -iname '*.sig' ! -iname '*:*' | sort)
     readarray -t uniques < <(printf '%s\n' "${files[@]}" | sed 's|-[0-9]\+[^:]*||g' | sort | uniq --count)
     for uniq in "${uniques[@]}"; {
@@ -415,23 +415,105 @@ function move_older_pkgs {
         (( exceed="count - keep" ))  ## 5
         readarray -t repeats < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "${file##*/}*" ! -iname '*.sig' ! -iname '*:*' | sort)
         for ((idx=0; idx<${exceed}; idx++)); {
-            to_be_moved+=("${repeats[${idx}]}")
+            to_be_removed+=( "${repeats[${idx}]}" )
         }
     }
 
-    if [ "$to_be_moved" ]; then
-        printf '%s\n' "${to_be_moved[@]##*/}" | sort | column
-        move_propmt="$(get_single_input "Move ${#to_be_moved[@]} pkgs?")" && printf '\n'
-        case "$move_propmt" in
-            y ) mv -v "${to_be_moved[@]}" "$dest_dir" ;;
+    if [ "$to_be_removed" ]; then
+        printf '%s\n' "${to_be_removed[@]##*/}" | sort | column
+        remove_propmt="$(get_single_input "remove ${#to_be_removed[@]} pkgs?")" && printf '\n'
+        case "$remove_propmt" in
+            y )
+                action_now "removing from $src_dir"
+                rm -v "${to_be_removed[@]}"
+
+                action_now "removing from $src_kaddy_dir"
+                rm -v "${to_be_removed[@]/$src_dir/$src_kaddy_dir}"
+                ;;
         esac
     else
-        red 'nothing to move'
+        red 'nothing to remove'
     fi
 }
+## }}}
+function expand_ips_from_ranges {  ## {{{
+    source "$HOME"/scripts/gb-color
+    local ip1 ip2 dest_file ip1_4_new
+    local ip1_1 ip1_2 ip1_3 ip1_4 ip2_1 ip2_2 ip2_3 ip2_4
 
+    [ "$3" ] || {
+        red "args needed"
+        red "USAGE: $FUNCNAME <IP1> <IP2> ~/downloads/ip_ranges.py "
+        exit
+    }
 
-# function find_duplicate_images {
+    [ -f "$3" ] || {
+        red "$3 already exists"
+        exit
+    }
+
+    ip1="$1"
+    ip2="$2"
+    dest_file="$3"
+
+    ip1_1="$( printf '%s\n' "$ip1" | cut -f 1 -d '.' )"
+    ip1_2="$( printf '%s\n' "$ip1" | cut -f 2 -d '.' )"
+    ip1_3="$( printf '%s\n' "$ip1" | cut -f 3 -d '.' )"
+    ip1_4="$( printf '%s\n' "$ip1" | cut -f 4 -d '.' )"
+
+    ip2_1="$( printf '%s\n' "$ip2" | cut -f 1 -d '.' )"
+    ip2_2="$( printf '%s\n' "$ip2" | cut -f 2 -d '.' )"
+    ip2_3="$( printf '%s\n' "$ip2" | cut -f 3 -d '.' )"
+    ip2_4="$( printf '%s\n' "$ip2" | cut -f 4 -d '.' )"
+
+    printf 'ips = {\n' > "$dest_file"
+    while (( ip1_3 <= ip2_3 )); do
+        ip1_4_new="$ip1_4"
+        while (( ip1_4_new <= ip2_4 )); do
+            # printf '%s %s\n' "$ip1_3" "$ip1_4_new"
+            printf "\t'%s.%s.%s.%s',\n" "$ip1_1" "$ip1_2" "$ip1_3" "$ip1_4_new" >> "$dest_file"
+            ((ip1_4_new++))
+        done
+        ((ip1_3++))
+    done
+    printf '}\n' >> "$dest_file"
+}
+## }}}
+function create_timeline_thumbnails {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    local src_dir src_dir_base dest_dir vid_base vid_name
+    declare -a vids
+
+    [ "$1" ] || {
+        red "arg needed"
+        red "USAGE: $FUNCNAME ~/dl/video/bright-side"
+        exit
+    }
+
+    [ -d "$1" ] || {
+        red "$1 does not exist"
+        exit
+    }
+
+    src_dir="$1"
+    src_dir_base="${src_dir##*/}"
+    dest_dir=~/website/static/files/page/video/00-timeline-thumbnail/"$src_dir_base"
+    [ -d "$dest_dir" ] || \mkdir "$dest_dir"
+
+    readarray -t vids < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "*.mp4" | sort)
+    for v in "${vids[@]}"; {
+        vid_base="${v##*/}"  ## 003.mp4
+        printf '%s\n' "$vid_base"
+        vid_name="${vid_base%%.*}"  ## 003
+
+        ## https://www.youtube.com/watch?v=ZeNyjnneq_w
+        ffmpeg -i "$v" -vf fps=1/10,scale=120:-1 "$dest_dir"/timeline-thumbnail-"${vid_name}"-%03d.webp 2>/dev/null
+    }
+}
+## }}}
+
+# function find_duplicate_images {  ## {{{
 #     [ "$1" ] || {
 #         red 'two args arg needed:'
 #         red "usage: $FUNCNAME SRC_DIR_PATH FILE_EXTENSION (e.g. json)"
@@ -484,7 +566,7 @@ function move_older_pkgs {
 #     fi
 # }
 # }}}
-# function compare_network_speed {
+# function compare_network_speed {  ## {{{
 #    ## this function takes only one arg which can only be either old or new
 
 #    source "$HOME"/scripts/gb-calculation
@@ -549,30 +631,9 @@ function move_older_pkgs {
 #        printf 'compare\n%s\n' "$msg" >> "$totals_file"
 #    }
 # }
-
-# function convert_Fun_to_lower_size {
-#     declare -a pics
-#
-#     old_fun="$HOME"/website/Files/Fun
-#     new_fun="$HOME"/downloads/New_Fun
-#     if [ -d "$new_fun" ]; then
-#         rm "$new_fun"/*
-#     else
-#         mkdir "$new_fun"
-#     fi
-
-#     readarray -t pics < <(find "$old_fun" -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
-
-#     for p in "${pics[@]##*/}"; {
-#         printf '%s\n' "$p"
-#         orig_p="$old_fun"/"$p"
-#         new_p="$new_fun"/"$p"
-#         ffmpeg -i "$orig_p" -q:a 1 -y "$new_p" 2>/dev/null
-#     }
-# }
-
+## }}}
 # timer and record_* {{{
-# function timer {
+# function timer {  ## {{{
 #     source "$HOME"/scripts/gb-color
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
@@ -589,8 +650,8 @@ function move_older_pkgs {
 #         sleep 1
 #     }
 # }
-
-# function record_audio {
+## }}}
+# function record_audio {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     timer "$3" "$4" &
@@ -599,8 +660,8 @@ function move_older_pkgs {
 #            -filter_complex amix=inputs=2      \
 #            -t "$1" "$2" 2>/dev/null
 # }
-
-# function record_audio_ul {
+## }}}
+# function record_audio_ul {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
@@ -608,8 +669,8 @@ function move_older_pkgs {
 #            -filter_complex amix=inputs=2 \
 #            "$1" 2>/dev/null
 # }
-
-# function record_screen {
+## }}}
+# function record_screen {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     timer "$3" "$6" &
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
@@ -619,8 +680,8 @@ function move_older_pkgs {
 #            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
 #            -t "$1" "$2" 2>/dev/null
 # }
-
-# function record_screen_ul {
+## }}}
+# function record_screen_ul {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
@@ -630,8 +691,8 @@ function move_older_pkgs {
 #            -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 -pix_fmt yuv420p \
 #            "$1" 2>/dev/null
 # }
-
-# function record_video {
+## }}}
+# function record_video {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     timer "$3" "$4" &
@@ -641,8 +702,8 @@ function move_older_pkgs {
 #            -filter_complex amix=inputs=2 \
 #            -t "$1" "$2" 2>/dev/null
 # }
-
-# function record_video_ul {
+## }}}
+# function record_video_ul {  ## {{{
 #     source "$HOME"/scripts/gb-screen
 #     source "$HOME"/scripts/gb-audio
 #     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
@@ -651,25 +712,27 @@ function move_older_pkgs {
 #            -filter_complex amix=inputs=2 \
 #            "$1" 2>/dev/null
 # }
-
-# function record_mic_mon_on {
+## }}}
+# function record_mic_mon_on {  ## {{{
 #     source "$HOME"/scripts/gb-audio
 #     unmute_mic
 #     mic_25
 #     unmute_mon
 #     mon_100
 # }
-
-# function record_mon_on {
+## }}}
+# function record_mon_on {  ## {{{
 #     source "$HOME"/scripts/gb-audio
 #     unmute_mon
 #     mon_100
 # }
-
-# function record_mic_mon_off {
+## }}}
+# function record_mic_mon_off {  ## {{{
 #     source "$HOME"/scripts/gb-audio
 #     mute_mic
 #     mic_0
 #     mute_mon
 #     mon_0
 # }
+## }}}
+## }}}

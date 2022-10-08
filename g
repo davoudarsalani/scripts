@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-05-30 21:16:15 +0330 Sunday
+## @last-modified 1401-07-07 23:00:48 +0330 Thursday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -8,12 +8,12 @@ source "$HOME"/scripts/gb-git
 
 title="${0##*/}"
 
-function display_help {
+function display_help {  ## {{{
     source "$HOME"/scripts/.help
     g_help
 }
-
-function add_to_changes {
+## }}}
+function add_to_changes {  ## {{{
     local icon member
     declare -a received=( "$@" )
 
@@ -24,8 +24,8 @@ function add_to_changes {
         changes+=( "${icon}---${member}" )
     }
 }
-
-function branch_info {
+## }}}
+function branch_info {  ## {{{ https://revelry.co/terminal-workflow-fzf/
     local fzf_choice
 
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
@@ -38,22 +38,22 @@ function branch_info {
                 )"
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
-
-function branches_array {
+## }}}
+function branches_array {  ## {{{
     declare -a branches_list
     readarray -t branches_list < <(git_branches "$directory")  ## branches
     printf '%s\n' "${branches_list[@]}"
 }
-
-function check_pattern {
+## }}}
+function check_pattern {  ## {{{  JUMP_4
     matches="$(find "$directory" -mindepth 1 -iname "$pattern")"   ## -maxdepth 1 is not needed here
     [ "$matches" ] || {
         red 'no such pattern'
         exit
     }
 }
-
-function if_amend_allowed {
+## }}}
+function if_amend_allowed {  ## {{{
     ## NOTE used [ var -eq 0 ] instead of (( var == 0 )) because
     ##      (( var == 0 )) is stupid (i.e. it returns true even if var does not exist)
     if [ "$(git_commits_ahead "$directory")" -eq 0 ] && [ "$(git_remotes "$directory")" ]; then
@@ -61,8 +61,8 @@ function if_amend_allowed {
         exit
     fi
 }
-
-function if_changed {
+## }}}
+function if_changed {  ## {{{
     local stts
 
     changes=()  ## NOTE do NOT use declare -a changes since declare makes changes a local variable
@@ -81,15 +81,15 @@ function if_changed {
         exit
     }
 }
-
-function if_locked {
+## }}}
+function if_locked {  ## {{{
     [ -f "$directory"/.git/index.lock ] && {
         red 'locked'  ## 
         exit
     }
 }
-
-function pipe_to_fzf_locally {
+## }}}
+function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
     local fzf_choice short_pwd short_directory
 
     [ "$multiple" == 'true' ] && multi_arg='--multi'
@@ -113,8 +113,8 @@ function pipe_to_fzf_locally {
     fi
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
-
-function select_hash {
+## }}}
+function select_hash {  ## {{{
     local log_item
     declare -a log_items
 
@@ -124,14 +124,14 @@ function select_hash {
     log_item="$(pipe_to_fzf_locally "${log_items[@]}")" || exit 37  ## wrap_fzf_choice "$log_item" exceptionally skipped
     printf '%s\n' "$log_item" | sed 's/[\*| ]*\(\w\+\) .*/\1/g'  ## previously: sed 's/\* \([^ ]\+\) .*/\1/g' but didn't delete | from the beginning
 }
-
-function wrap_fzf_multi {
+## }}}
+function wrap_fzf_multi {  ## {{{
     no_sign_arr=( "${@#* }" )  ## remove '[Ⓡ] ' from the beginning
     colonized="$(printf '%s:' "${no_sign_arr[@]}")"
     wrap_fzf_choice "$colonized"
 }
-
-function prompt {
+## }}}
+function prompt {  ## {{{
     for _ in "$@"; {
         case "$1" in
             -p )
@@ -153,8 +153,8 @@ function prompt {
         shift
     }
 }
-
-function get_opt {
+## }}}
+function get_opt {  ## {{{
     local options
 
     options="$(getopt --longoptions 'help,proxy,directory:,pattern:,message:,branch:,tag:,commit-hash:new-name:file:' --options 'hxd:p:m:b:t:c:n:f:' --alternative -- "$@")"
@@ -195,21 +195,21 @@ function get_opt {
  shift
     done
 }
-
+## }}}
 
 proxy='false'
 
 get_opt "$@"
 heading "$title"
 
-main_items=( 'status' 'add [+]' 'commit' 'add+commit [+]' 'commit amend' 'empty commit' 'restore [+]' 'unstage [+]' 'log' 'reflog' 'push' 'pull' 'remove' 'branch' 'tag' 'remotes' 'reset' 'garbage clean' 'source file from a commit' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
+main_items=( 'status' 'add [+]' 'commit' 'add+commit [+]' 'commit amend' 'empty commit' 'restore [+]' 'unstage [+]' 'delete untracked [+]' 'log' 'reflog' 'push' 'pull' 'remove' 'branch' 'tag' 'remotes' 'reset' 'garbage clean' 'source file from a commit' 'commits' 'config' 'add all, commit updated, push' "setup in ${PWD/$HOME/\~}" 'help' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
-    help )
+    help )  ## {{{
         display_help ;;
-
-    "setup in ${PWD/$HOME/\~}" )
+    ## }}}
+    "setup in ${PWD/$HOME/\~}" )  ## {{{
         test_dir="$PWD"
         [ -d "$test_dir"/.git ] && {
             red "${test_dir/$HOME/\~}/.git already exists"
@@ -241,8 +241,8 @@ case "$main_item" in
             ;;
         esac
         exit ;;  ## NOTE do NOT remove exit
-
-    config )
+    ## }}}
+    config )  ## {{{
         see_edit="$(pipe_to_fzf_locally 'see' 'edit')" && wrap_fzf_choice "$see_edit" || exit 37
         case "$see_edit" in
             see )
@@ -253,7 +253,7 @@ case "$main_item" in
                 accomplished 'edited' ;;
         esac
         exit ;;
-
+    ## }}}
 esac
 
 if [ "$directory" ]; then
@@ -269,11 +269,11 @@ fi
 if_locked
 
 case "$main_item" in
-    status )
+    status )  ## {{{
         if_changed
         pipe_to_fzf_locally "${changes[@]/---/' '}" && accomplished ;;
-
-    'add [+]' )
+    ## }}}
+    'add [+]' )  ## {{{
         if_changed
         IFS=$'\n'
         multiple='true'
@@ -297,8 +297,8 @@ case "$main_item" in
                     (:)
                 } ;;
         esac ;;
-
-    commit )
+    ## }}}
+    commit )  ## {{{
         if_changed
         [ "$sta" ] || [ "$sta_m" ] || {
             red 'no staged files'
@@ -319,8 +319,8 @@ case "$main_item" in
                 git_commit_with_message "$directory" "$message" && \
                 accomplished "committed, message: $message" ;;
         esac ;;
-
-    'add+commit [+]' )
+    ## }}}
+    'add+commit [+]' ) ## {{{
         if_changed
         IFS=$'\n'
         multiple='true'
@@ -362,8 +362,8 @@ case "$main_item" in
                 git_commit_with_message "$directory" "$colonized $message" && \
                 accomplished "message: $colonized $message" ;;
         esac ;;
-
-    'commit amend' )
+    ## }}}
+    'commit amend' )  ## {{{
         if_amend_allowed
         preview_status='hidden'
         commit_amend_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$commit_amend_item" || exit 37
@@ -379,8 +379,8 @@ case "$main_item" in
                 git_commit_amend_with_message "$directory" "$message" && \
                 accomplished "commit amended, message: $message" ;;
         esac ;;
-
-    'empty commit' )
+    ## }}}
+    'empty commit' )  ## {{{ commit with nothing staged
         preview_status='hidden'
         empty_commit_item="$(pipe_to_fzf_locally "open $editor" 'write here')" && wrap_fzf_choice "$empty_commit_item" || exit 37
 
@@ -395,8 +395,8 @@ case "$main_item" in
                 git_empty_commit_with_message "$directory" "$message" && \
                 accomplished "committed empty, message: $message" ;;
         esac ;;
-
-    'restore [+]' )
+    ## }}}
+    'restore [+]' )  ## {{{
         if_changed
         IFS=$'\n'
         multiple='true'
@@ -420,8 +420,8 @@ case "$main_item" in
                     (:)
                 } ;;
         esac ;;
-
-    'unstage [+]' )
+    ## }}}
+    'unstage [+]' )  ## {{{
         if_changed
         [ "$sta" ] || [ "$sta_m" ] || {
             red 'no staged files'
@@ -451,23 +451,57 @@ case "$main_item" in
                     (:)
                 } ;;
         esac ;;
+    ## }}}
+    'delete untracked [+]' )  ## {{{
+        if_changed
+        [ "$unt" ] || {
+            red 'no untracked files'
+            exit
+        }
+        IFS=$'\n'
+        multiple='true'
+        preview_status='hidden'
 
-    log )
+        untracked_items=( $(pipe_to_fzf_locally "${unt[@]/---/' '}" 'all') ) && wrap_fzf_multi "${untracked_items[@]}" || exit 37  ## NOTE JUMP_1 exceptionally removed pattern from options
+
+        case "${no_sign_arr[@]}" in
+            # pattern )  ## JUMP_1 exceptionally commented this option because
+            #            ##        the pattern used in JUMP_2 should be a regex pattern (e.g. .*py or ^.*py$)
+            #            ##        while pattern used in JUMP_4 (i.e. check_pattern function) is a glob
+            #     prompt -p
+            #     for u in "${unt[@]}"; {
+            #         if [[ "$u" =~ $pattern ]]; then  ## JUMP_2
+            #             rm -rv "$directory"/"$u"
+            #             (:)
+            #         fi
+            #     } && \
+            #     accomplished "$pattern deleted" ;;
+            all )
+                rm -rv "${unt[@]}" && \
+                accomplished 'all deleted' ;;
+            * )
+                for i in "${no_sign_arr[@]}"; {
+                    rm -rv "$directory"/"$i"
+                    (:)
+                } ;;
+        esac ;;
+    ## }}}
+    log )  ## {{{
         IFS=$'\n'
         if_locked
         is_log='true'
         preview_status='hidden'
         readarray -t log_items < <(git_log "$directory")
         pipe_to_fzf_locally "${log_items[@]}" ;;
-
-    reflog )
+    ## }}}
+    reflog )  ## {{{
         IFS=$'\n'
         if_locked
         preview_status='hidden'
         readarray -t reflog_items < <(git_reflog "$directory")
         pipe_to_fzf_locally "${reflog_items[@]}" ;;
-
-    push )
+    ## }}}
+    push )  ## {{{
         if_locked
         if [ "$(git_remotes "$directory")" ]; then
             git_if_behind "$directory"
@@ -482,8 +516,8 @@ case "$main_item" in
         else
             red 'no remote'
         fi ;;
-
-    pull )
+    ## }}}
+    pull )  ## {{{
         if_locked
         if [ "$proxy" == 'true' ]; then
             git_pull_proxy "$directory" && \
@@ -492,14 +526,14 @@ case "$main_item" in
             git_pull_noproxy "$directory" && \
             accomplished 'pulled without proxy'
         fi ;;
-
-    remove )
+    ## }}}
+    remove )  ## {{{
         prompt -p
         if_locked
         git_remove "$directory" "$pattern" && \
         accomplished "$pattern removed" ;;
-
-    branch )
+    ## }}}
+    branch )  ## {{{
         preview_status='hidden'
         branch_items=( 'show all' 'create' 'switch' 'create and switch' 'rename' 'delete' 'force delete' 'delete all' 'force delete all' )
         branch_item="$(pipe_to_fzf_locally "${branch_items[@]}")" && wrap_fzf_choice "$branch_item" || exit 37
@@ -555,8 +589,8 @@ case "$main_item" in
                 git_branch_force_delete_all "$directory" "${local_branches[@]}" && \
                 accomplished 'all force deleted' ;;
         esac ;;
-
-    tag )
+    ## }}}
+    tag )  ## {{{
         yellow_dim 'WARNING: Tags have to be manually pushed by: git -C GITPATH push origin tag TAGNAME'
 
         preview_status='hidden'
@@ -602,12 +636,12 @@ case "$main_item" in
                 git_tag_delete_all "$directory" "${all_tags[@]}" && \
                 accomplished 'all deleted' ;;
         esac ;;
-
-    remotes )
+    ## }}}
+    remotes )  ## {{{
         git_remotes && \
         accomplished ;;
-
-    reset )
+    ## }}}
+    reset )  ## {{{
         jump_items=( 'reset soft' 'reset mixed' 'reset hard' 'reset temp' )
         jump_item="$(pipe_to_fzf_locally "${jump_items[@]}")" && wrap_fzf_choice "$jump_item" || exit 37
 
@@ -630,31 +664,31 @@ case "$main_item" in
                 git_reset_temp "$directory" "$commit_hash" && \
                 accomplished "$commit_hash reset temp to" ;;
         esac ;;
-
-    'garbage clean' )
+    ## }}}
+    'garbage clean' )  ## {{{
         clean_prompt="$(get_single_input 'sure?')" && printf '\n'
         case "$clean_prompt" in
             y )
                 git_garbage_clean "$directory" && \
                 accomplished 'garbage cleaned' ;;
         esac ;;
-
-    'source file from a commit' )
+    ## }}}
+    'source file from a commit' )  ## {{{
         prompt -c -f
         if_locked
         git_source_file_from_a_commit "$directory" "$commit_hash" "$file" && \
         accomplished "$file sourced from $commit_hash"
         ;;
-
-    commits )
+    ## }}}
+    commits )  ## {{{ tell how many times items have been commited (https://github.com/terminalforlife/BashConfig/blob/master/source/.bash_functions)
         readarray -t items < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included
 
         for item in "${items[@]##*/}"; {
             printf '%s %s\n' "$(git_commits_count_specific "$directory" "$item")" "$item"
         } | sort --numeric-sort --reverse | column && \
         accomplished ;;  ## --numeric-sort is for comparing according to string numerical value
-
-    'add all, commit updated, push' )
+    ## }}}
+    'add all, commit updated, push' )  ## {{{
         [ "$directory" == '.' ] && directory="$PWD"
         if ! \grep -q 'public' <<< "$directory"; then
             red 'public repositories only'
@@ -667,5 +701,5 @@ case "$main_item" in
         git_commit_with_message "$directory" 'updated' && \
         git_push_noproxy "$directory" && \
         accomplished ;;
-
+    ## }}}
 esac

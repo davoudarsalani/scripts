@@ -1,6 +1,6 @@
-## @last-modified 1401-02-06 10:51:07 +0330 Tuesday
+## @last-modified 1401-07-13 08:52:19 +0330 Wednesday
 
-
+## {{{ requirements
 ## for .venv_keylogger: keylogger
 ## for .venv: (
 ##   beautifulsoup4
@@ -29,13 +29,14 @@
 ##   youtube_dl
 ##   [jedi]
 ## )
-
-
+## }}}
+## {{{ imports
 from os import getenv  ## for send_email* functions
 from typing import Any  ## for Audio, get_input, get_single_input, get_last, get_datetime
 
-
-class Color:
+## }}}
+class Color:  ## {{{
+    ## {{{
     @staticmethod
     def red(text: str) -> str:
         return f'\033[00;49;031m{text}\033[0m'
@@ -80,6 +81,8 @@ class Color:
     def olive(text: str) -> str:
         return f'\033[38;05;064m{text}\033[0m'
 
+    ## }}}
+    ## {{{ bold
     @staticmethod
     def red_bold(text: str) -> str:
         return f'\033[01;49;031m{text}\033[0m'
@@ -112,6 +115,8 @@ class Color:
     def grey_bold(text: str) -> str:
         return f'\033[01;49;090m{text}\033[0m'
 
+    ## }}}
+    ## {{{ dim
     @staticmethod
     def red_dim(text: str) -> str:
         return f'\033[02;49;031m{text}\033[0m'
@@ -144,6 +149,8 @@ class Color:
     def grey_dim(text: str) -> str:
         return f'\033[02;49;090m{text}\033[0m'
 
+    ## }}}
+    ## {{{ italic
     @staticmethod
     def red_italic(text: str) -> str:
         return f'\033[03;49;031m{text}\033[0m'
@@ -176,6 +183,8 @@ class Color:
     def grey_italic(text: str) -> str:
         return f'\033[03;49;090m{text}\033[0m'
 
+    ## }}}
+    ## {{{ underline
     @staticmethod
     def red_underline(text: str) -> str:
         return f'\033[04;49;031m{text}\033[0m'
@@ -208,6 +217,8 @@ class Color:
     def grey_underline(text: str) -> str:
         return f'\033[04;49;090m{text}\033[0m'
 
+    ## }}}
+    ## {{{ blink
     @staticmethod
     def red_blink(text: str) -> str:
         return f'\033[05;49;031m{text}\033[0m'
@@ -240,6 +251,8 @@ class Color:
     def grey_blink(text: str) -> str:
         return f'\033[05;49;090m{text}\033[0m'
 
+    ## }}}
+    ## {{{ bg
     @staticmethod
     def red_bg(text: str) -> str:
         return f'\033[07;49;031m{text}\033[0m'
@@ -284,6 +297,8 @@ class Color:
     def olive_bg(text: str) -> str:
         return f'\033[48;05;064m{text}\033[0m'
 
+    ## }}}
+    ## {{{ strikethrough
     @staticmethod
     def red_strikethrough(text: str) -> str:
         return f'\033[09;49;031m{text}\033[0m'
@@ -316,6 +331,7 @@ class Color:
     def grey_strikethrough(text: str) -> str:
         return f'\033[09;49;090m{text}\033[0m'
 
+    ## }}}
     def heading(self, text: str) -> str:
         return self.green(text)
 
@@ -329,7 +345,8 @@ class Color:
         return self.white_dim(text)
 
 
-class Audio:
+## }}}
+class Audio:  ## {{{
     @staticmethod
     def vol(arg: str) -> Any:
         from re import match
@@ -430,7 +447,8 @@ class Audio:
             run(f'pactl set-source-volume {index} 100%', shell=True)
 
 
-class Screen:
+## }}}
+class Screen:  ## {{{
     @staticmethod
     def screen_1() -> tuple[str, str, int, int]:
         from subprocess import check_output
@@ -482,7 +500,8 @@ class Screen:
         return scr_all_res
 
 
-class Record:
+## }}}
+class Record:  ## {{{
     from halo import Halo
 
     def __init__(self):
@@ -550,7 +569,8 @@ class Record:
         )
 
 
-def fzf(items: list[str], header: str = '') -> str:
+## }}}
+def fzf(items: list[str], header: str = '') -> str:  ## {{{
     from os import getenv
     from pyfzf.pyfzf import FzfPrompt
 
@@ -572,12 +592,14 @@ def fzf(items: list[str], header: str = '') -> str:
         exit(38)
 
 
-def invalid(text: str) -> None:
+## }}}
+def invalid(text: str) -> None:  ## {{{
     print(Color().red(text))
     exit(38)
 
 
-def relative_date(start_date) -> str:
+## }}}
+def relative_date(start_date) -> str:  ## {{{
     ## convert start_date to second if not one
     try:
         start_date_in_seconds = int(start_date)
@@ -590,13 +612,15 @@ def relative_date(start_date) -> str:
     return f"{convert_second(diff, 'verbose')} ago"
 
 
-def convert_to_second(fulldate: str) -> int:
+## }}}
+def convert_to_second(fulldate: str) -> int:  ## {{{ convert 2021-04-15T11:10:03+0430 to 1618468803
     from datetime import datetime
 
     return int(datetime.strptime(fulldate, '%Y-%m-%dT%H:%M:%S%Z').timestamp())
 
 
-def convert_second(seconds: int, verbose: bool = False) -> str:
+## }}}
+def convert_second(seconds: int, verbose: bool = False) -> str:  ## {{{
     from re import sub
 
     seconds = int(seconds)
@@ -660,7 +684,8 @@ def convert_second(seconds: int, verbose: bool = False) -> str:
     return result
 
 
-def duration_wrapper() -> str:
+## }}}
+def duration_wrapper() -> str:  ## {{{ TODO is str correct for outputs?
     from typing import Callable
 
     def dec(func: Callable) -> str:
@@ -681,7 +706,8 @@ def duration_wrapper() -> str:
     return dec
 
 
-def get_headers() -> dict[str, str]:
+## }}}
+def get_headers() -> dict[str, str]:  ## {{{
     return {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -692,7 +718,8 @@ def get_headers() -> dict[str, str]:
     }
 
 
-def get_width() -> int:
+## }}}
+def get_width() -> int:  ## {{{
     from shutil import get_terminal_size
 
     return get_terminal_size()[0]
@@ -701,13 +728,15 @@ def get_width() -> int:
     # return subprocess.check_output('tput cols', shell=True, universal_newlines=True).strip()
 
 
-def get_input(prompt: str) -> Any:
+## }}}
+def get_input(prompt: str) -> Any:  ## {{{
     answer = input(Color().ask(f'{prompt} '))
     if answer:
         return answer
 
 
-def get_single_input(prompt: str) -> Any:
+## }}}
+def get_single_input(prompt: str) -> Any:  ## {{{ https://stackoverflow.com/questions/510357/how-to-read-a-single-character-from-the-user
     def _find_getch() -> Any:
         from sys import stdin
         from termios import tcgetattr, tcsetattr, TCSADRAIN
@@ -745,7 +774,8 @@ def get_single_input(prompt: str) -> Any:
     '''
 
 
-def get_datetime(frmt: str) -> Any:
+## }}}
+def get_datetime(frmt: str) -> Any:  ## {{{
     from datetime import datetime as dt
     from jdatetime import datetime as jdt
 
@@ -773,8 +803,12 @@ def get_datetime(frmt: str) -> Any:
     return output
 
 
-def convert_byte(size_in_bytes: int) -> str:
+## }}}
+def convert_byte(size_in_bytes: int) -> str:  ## {{{ https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
     from math import floor, log, pow as math_pow
+    from re import compile as re_compile, match, sub
+
+    reg = '^[0-9]+\.00$'
 
     if size_in_bytes == 0:
         return '0B'
@@ -784,10 +818,15 @@ def convert_byte(size_in_bytes: int) -> str:
     p = math_pow(1024, i)
     conv = f'{float(size_in_bytes / p):.2f}'
 
+    ## remove trailing 00
+    if match(reg, conv):
+        conv = sub('\.00$', '', conv)
+
     return f'{conv}{suff[i]}'
 
 
-def if_exists(dest) -> str:
+## }}}
+def if_exists(dest) -> str:  ## {{{
     from os import path
 
     append_index = 2
@@ -799,7 +838,8 @@ def if_exists(dest) -> str:
     return dest
 
 
-def last_file_exists(last_file) -> bool:
+## }}}
+def last_file_exists(last_file) -> bool:  ## {{{
     from os import path
 
     condition = [path.exists(last_file)]
@@ -807,28 +847,32 @@ def last_file_exists(last_file) -> bool:
     return all(condition)
 
 
-def get_last(last_file) -> Any:
+## }}}
+def get_last(last_file) -> Any:  ## {{{
     with open(last_file, 'r') as opened_last_file:
         output = opened_last_file.read().splitlines()[-1]
 
     return output
 
 
-def save_as_last(last_file, text) -> None:
+## }}}
+def save_as_last(last_file, text) -> None:  ## {{{
     current_datetime = get_datetime('jymdhms')
     weekday = get_datetime('jweekday')
     with open(last_file, 'w') as opened_last_file:
         opened_last_file.write(f'{current_datetime}\t{weekday}\n{text}\n')
 
 
-def save_error(error_file, text) -> None:
+## }}}
+def save_error(error_file, text) -> None:  ## {{{
     current_datetime = get_datetime('jymdhms')
     weekday = get_datetime('jweekday')
     with open(error_file, 'w') as opened_error_file:
         opened_error_file.write(f'{current_datetime}\t{weekday}\n{text}\n')
 
 
-def msgn(message: str, title: str = '', icon: str = '', duration: int = 10) -> None:
+## }}}
+def msgn(message: str, title: str = '', icon: str = '', duration: int = 10) -> None:  ## {{{
     ## https://notify2.readthedocs.io/en/latest/#notify2.Notification.set_urgency
     ## also have a look at https://www.devdungeon.com/content/desktop-notifications-linux-python
     import notify2
@@ -841,7 +885,8 @@ def msgn(message: str, title: str = '', icon: str = '', duration: int = 10) -> N
     notify2.uninit()
 
 
-def msgc(message: str, title: str = '', icon: str = '') -> None:
+## }}}
+def msgc(message: str, title: str = '', icon: str = '') -> None:  ## {{{
     ## https://notify2.readthedocs.io/en/latest/#notify2.Notification.set_urgency
     ## also have a look at https://www.devdungeon.com/content/desktop-notifications-linux-python
     import notify2
@@ -853,7 +898,8 @@ def msgc(message: str, title: str = '', icon: str = '') -> None:
     notify2.uninit()
 
 
-def countdown(start: int = 5) -> None:
+## }}}
+def countdown(start: int = 5) -> None:  ## {{{
     from time import sleep
 
     for i in range(start, 0, -1):
@@ -862,13 +908,15 @@ def countdown(start: int = 5) -> None:
     sleep(1)
 
 
-def centralize(text: str, wrapper: str = ' ') -> str:
+## }}}
+def centralize(text: str, wrapper: str = ' ') -> str:  ## {{{
     width = get_width()
 
     return text.center(width, wrapper)
 
 
-def dmenu(items: list[str] = [], title: str = '', fg: str = '') -> str:
+## }}}
+def dmenu(items: list[str] = [], title: str = '', fg: str = '') -> str:  ## {{{ Docs: https://dmenu.readthedocs.io/en/latest/
     from os import getenv
     import dmenu
 
@@ -894,7 +942,8 @@ def dmenu(items: list[str] = [], title: str = '', fg: str = '') -> str:
         exit(38)
 
 
-def rofi(items: list[str] = [], title: str = '', fg: str = '') -> str:
+## }}}
+def rofi(items: list[str] = [], title: str = '', fg: str = '') -> str:  ## {{{
     from os import getenv
     from subprocess import check_output
 
@@ -912,7 +961,8 @@ def rofi(items: list[str] = [], title: str = '', fg: str = '') -> str:
         exit(38)
 
 
-def get_password(prompt: str) -> str:
+## }}}
+def get_password(prompt: str) -> str:  ## {{{ https://linuxhint.com/python-getpass-module/
     from getpass import getpass
 
     while len(password := getpass(prompt=Color().ask(prompt))) < 1:
@@ -921,7 +971,8 @@ def get_password(prompt: str) -> str:
     return password
 
 
-def remove_leading_zeros(number: int) -> int:
+## }}}
+def remove_leading_zeros(number: int) -> int:  ## {{{
     from re import sub
 
     number = str(number)
@@ -930,7 +981,8 @@ def remove_leading_zeros(number: int) -> int:
     return number
 
 
-def remove_trailing_slash(string: str) -> str:
+## }}}
+def remove_trailing_slash(string: str) -> str:  ## {{{
     from re import sub
 
     string = str(string)
@@ -939,7 +991,8 @@ def remove_trailing_slash(string: str) -> str:
     return string
 
 
-def set_widget(widget: str, attr: str, value: str) -> None:
+## }}}
+def set_widget(widget: str, attr: str, value: str) -> None:  ## {{{
     from os import getenv
     from subprocess import check_output, run
 
@@ -954,28 +1007,33 @@ def set_widget(widget: str, attr: str, value: str) -> None:
     run(f'echo "{widget}:set_{attr}(\'{value}\')" | awesome-client', shell=True)
 
 
-def record_icon() -> str:
+## }}}
+def record_icon() -> str:  ## {{{
     return 'RE'
 
 
-def refresh_icon() -> str:
+## }}}
+def refresh_icon() -> str:  ## {{{
     from os import getenv
 
     return getenv('refresh_icon')
 
 
-def def_video_dev() -> str:
+## }}}
+def def_video_dev() -> str:  ## {{{
     return '/dev/video0'
 
 
-def update_audio() -> None:
+## }}}
+def update_audio() -> None:  ## {{{
     from os import getenv
     from subprocess import run
 
     run(f'{getenv("HOME")}/scripts/awesome-widgets audio', shell=True)
 
 
-def timer(suffix: str, timer_secs: int) -> None:
+## }}}
+def timer(suffix: str, timer_secs: int) -> None:  ## {{{
     from time import sleep
 
     start = int(get_datetime('jhms'))
@@ -990,7 +1048,8 @@ def timer(suffix: str, timer_secs: int) -> None:
         sleep(1)
 
 
-def uptime(verbose: bool = False) -> str:
+## }}}
+def uptime(verbose: bool = False) -> str:  ## {{{
     with open('/proc/uptime', 'r') as opened_uptime_file:
         secs = opened_uptime_file.read().strip().split()[0]
         secs = int(float(secs))
@@ -1000,7 +1059,8 @@ def uptime(verbose: bool = False) -> str:
         return convert_second(secs)
 
 
-def open_windows() -> list[str]:
+## }}}
+def open_windows() -> list[str]:  ## {{{
     from Xlib import display
 
     screen = display.Display().screen()
@@ -1014,7 +1074,8 @@ def open_windows() -> list[str]:
     return names
 
 
-def send_email(subject: str, body: str, sender: str = getenv('email1'), receiver: str = getenv('email2')) -> None:
+## }}}
+def send_email(subject: str, body: str, sender: str = getenv('email1'), receiver: str = getenv('email2')) -> None:  ## {{{
     ## https://realpython.com/python-send-email/
     from os import getenv
     from smtplib import SMTP_SSL
@@ -1040,7 +1101,8 @@ def send_email(subject: str, body: str, sender: str = getenv('email1'), receiver
             msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
 
-def send_email_with_attachment(subject: str, body: str, attachment: str, sender: str = getenv('email1'), receiver: str = getenv('email2')) -> None:
+## }}}
+def send_email_with_attachment(subject: str, body: str, attachment: str, sender: str = getenv('email1'), receiver: str = getenv('email2')) -> None:  ## {{{
     ## https://realpython.com/python-send-email/
     from email import encoders
     from email.mime.base import MIMEBase
@@ -1097,7 +1159,8 @@ def send_email_with_attachment(subject: str, body: str, attachment: str, sender:
             msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
 
 
-def hash_string(string: str) -> str:
+## }}}
+def hash_string(string: str) -> str:  ## {{{
     from hashlib import sha1, sha256, sha512, md5
 
     string = f'{string}\n'
@@ -1109,7 +1172,8 @@ def hash_string(string: str) -> str:
     return f'string\t{string}sha1\t{sha1_hash}\nsha256\t{sha256_hash}\nsha512\t{sha512_hash}\nmd5\t{md5_hash}'
 
 
-def hash_file(file: str) -> str:
+## }}}
+def hash_file(file: str) -> str:  ## {{{
     from hashlib import sha1, sha256, sha512, md5
 
     with open(file, 'r') as opened_file:
@@ -1122,7 +1186,8 @@ def hash_file(file: str) -> str:
     return f'file\t{file}\nsha1\t{sha1_hash}\nsha256\t{sha256_hash}\nsha512\t{sha512_hash}\nmd5\t{md5_hash}'
 
 
-def garbage() -> None:
+## }}}
+def garbage() -> None:  ## {{{
     from random import randbytes
     from time import sleep
 
@@ -1132,7 +1197,8 @@ def garbage() -> None:
         sleep(0.01)
 
 
-def to_seconds(dur: str) -> int:
+## }}}
+def to_seconds(dur: str) -> int:  ## {{{ https://stackoverflow.com/questions/16742381/how-to-convert-youtube-api-duration-to-seconds/49976787#49976787
     '''converts youtube api duration (e.g. PT1H25M41S) to seconds (e.g. 5141)'''
     from re import match
 
@@ -1148,7 +1214,8 @@ def to_seconds(dur: str) -> int:
     return hours * 3600 + minutes * 60 + seconds
 
 
-def if_tor() -> None:
+## }}}
+def if_tor() -> None:  ## {{{ https://tor.stackexchange.com/questions/19858/how-to-check-if-tor-socks-proxy-is-working-programatically-python
     import socket
     import sys
 
@@ -1166,13 +1233,14 @@ def if_tor() -> None:
         print(Color().red(f'{exc!r}'))
 
 
+## }}}
 ###########################
-def compress_tar(inpt: str) -> None:
+def compress_tar(inpt: str) -> None:  ## {{{
     from os import path, chdir, listdir
     from tarfile import open as tarfile_open
 
     inpt = remove_trailing_slash(inpt)
-    root, base = path.split(inpt)
+    base = path.basename(inpt)
 
     dest_dir = root
     dest_tar = f'{base}.tar'
@@ -1187,7 +1255,8 @@ def compress_tar(inpt: str) -> None:
             opened_new_tarfile.add(base)
 
 
-def xtract_tar(inpt: str) -> None:
+## }}}
+def xtract_tar(inpt: str) -> None:  ## {{{
     from os import path, mkdir
     from tarfile import open as tarfile_open
 
@@ -1200,14 +1269,15 @@ def xtract_tar(inpt: str) -> None:
         opened_cur_tarfile.extractall(dest_dir)
 
 
-def compress_zip(inpt: str, password: str = '') -> None:
+## }}}
+def compress_zip(inpt: str, password: str = '') -> None:  ## {{{
     from os import chdir, path, listdir
     import shutil
     from zipfile import ZipFile, ZIP_DEFLATED
     from pyminizip import compress
 
     inpt = remove_trailing_slash(inpt)
-    root, base = path.split(inpt)
+    base = path.basename(inpt)
     dest_dir = root
     chdir(dest_dir)
     if password == '':
@@ -1232,7 +1302,8 @@ def compress_zip(inpt: str, password: str = '') -> None:
         compress(inpt, None, dest_zip, password, 5)
 
 
-def xtract_zip(inpt: str, password: str = '') -> None:
+## }}}
+def xtract_zip(inpt: str, password: str = '') -> None:  ## {{{
     from os import path, mkdir
     from zipfile import ZipFile
 
@@ -1250,7 +1321,8 @@ def xtract_zip(inpt: str, password: str = '') -> None:
             opened_cur_zipfile.extractall(dest_dir)
 
 
-def xtract_rar(inpt: str, password: str = '') -> None:
+## }}}
+def xtract_rar(inpt: str, password: str = '') -> None:  ## {{{
     from os import path, mkdir, chdir
     from rarfile import RarFile
 
@@ -1267,3 +1339,6 @@ def xtract_rar(inpt: str, password: str = '') -> None:
         with RarFile(inpt, 'r') as opened_cur_rarfile:
             opened_cur_rarfile.extractall(pwd=password)
     ## previously: subprocess.run(f'unrar x {inpt} 1>/dev/null', shell=True)
+
+
+## }}}

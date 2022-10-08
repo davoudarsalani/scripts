@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-05-07 16:26:53 +0330 Friday
+## @last-modified 1401-07-15 08:30:29 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -118,7 +118,7 @@ case "$main_item" in
         copy /etc/vsftpd.conf ;;
     ssh )
         copy /etc/ssh/{ssh_config,sshd_config} \
-             "$HOME"/.ssh/config ;;
+             "$HOME"/.ssh/{config,id_rsa*,known_hosts*} ;;
     aria2 )
         copy "$HOME"/.aria2/aria2.conf ;;
     mpv )
@@ -180,14 +180,17 @@ case "$main_item" in
     ## has a different dest_dir
     /var/cache/pacman/pkg )
         dest_dir="$HOME"/linux-pkg
+        dest_kaddy_dir="$HOME"/kaddy/linux-pkg
         readarray -t pkgs < <(find /var/cache/pacman/pkg/ -mindepth 1 -maxdepth 1 -type f)
         if [ "$pkgs" ]; then
-            action_now 'copying from /var/cache/pacman/pkg'
+            action_now "copying from /var/cache/pacman/pkg to $dest_dir"
             cp -r "${pkgs[@]}" "$dest_dir"
+            action_now "copying from /var/cache/pacman/pkg to $dest_kaddy_dir"
+            cp -r "${pkgs[@]}" "$dest_kaddy_dir"
             action_now 'removing pkgs in /var/cache/pacman/pkg'
             sudo rm "${pkgs[@]}"
-            action_now 'checking if there are older pkgs to move to trash'
-            move_older_pkgs
+            action_now 'checking if there are older pkgs to remove'
+            remove_older_pkgs
         else
             red 'nothing to copy'
         fi && accomplished ;;
