@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/video-subtitle
+##    https://davoudarsalani.ir
+
 ## @last-modified 1400-10-29 11:09:20 +0330 Wednesday
 
 source "$HOME"/scripts/gb

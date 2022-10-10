@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/.help
+##    https://davoudarsalani.ir
+
 ## @last-modified 1400-11-13 12:48:54 +0330 Wednesday
 
 source "$HOME"/scripts/gb-color

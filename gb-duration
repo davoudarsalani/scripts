@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/gb-duration
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-10 16:26:23 +0330 Sunday
 
 function get_duration {

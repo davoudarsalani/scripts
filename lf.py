@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-## @last-modified 1401-07-13 08:55:24 +0330 Wednesday
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/lf.py
+##    https://davoudarsalani.ir
+
+## @last-modified 1401-07-18 14:24:39 +0330 Monday
 
 from os import path, getenv, symlink, rename, remove, getcwd
 from re import sub
@@ -10,7 +15,22 @@ from sys import argv
 from time import sleep
 
 from magic import Magic
-from gp import msgn, msgc, get_datetime, get_single_input, invalid, get_password, fzf, compress_tar, compress_zip, xtract_tar, xtract_zip, xtract_rar
+from gp import (
+    msgn,
+    msgc,
+    get_datetime,
+    get_single_input,
+    invalid,
+    get_password,
+    fzf,
+    compress_tar,
+    compress_gz,
+    compress_zip,
+    xtract_tar,
+    xtract_gz,
+    xtract_zip,
+    xtract_rar,
+)
 
 script_args = argv[1:]
 main_arg = script_args[0]
@@ -203,14 +223,14 @@ elif main_arg == 'tar':  ## {{{
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to tar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
-elif main_arg == 'untar':  ## {{{
+elif main_arg == 'gz':  ## {{{
     for f in files:
         try:
             base = path.basename(f)
-            xtract_tar(f)
-            msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
+            compress_gz(f)
+            msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to gz')
         except Exception as exc:
-            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to gz\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'zip':  ## {{{
@@ -228,6 +248,26 @@ elif main_arg == 'zip':  ## {{{
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to zip')
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        sleep(0.1)
+## }}}
+elif main_arg == 'untar':  ## {{{
+    for f in files:
+        try:
+            base = path.basename(f)
+            xtract_tar(f)
+            msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
+        except Exception as exc:
+            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        sleep(0.1)
+## }}}
+elif main_arg == 'ungz':  ## {{{
+    for f in files:
+        try:
+            base = path.basename(f)
+            xtract_gz(f)
+            msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
+        except Exception as exc:
+            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'unzip':  ## {{{

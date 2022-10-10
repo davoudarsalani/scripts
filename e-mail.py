@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/e-mail.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1400-10-10 12:56:35 +0330 Friday
 
 ## https://stackoverflow.com/questions/953561/check-unread-count-of-gmail-messages-with-python

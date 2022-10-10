@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
-## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/split-and-merge.py
+##    https://davoudarsalani.ir
 
-## by https://github.com/roshanok/SplitAndCompile
+## @last-modified 1401-07-18 11:46:56 +0330 Monday
+
+## Original script by roshanok (https://github.com/roshanok/SplitAndCompile)
 
 import os, sys, re
 

@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/checksum.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-06-15 18:44:36 +0330 Tuesday
 
 from getopt import getopt

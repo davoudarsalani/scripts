@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/gb-audacious
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-11 11:27:28 +0330 Monday
 
 length_in_seconds="$(audtool --current-song-length-seconds)" || length_in_seconds=0  ## 3304

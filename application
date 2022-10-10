@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/application
+##    https://davoudarsalani.ir
+
 ## @last-modified 1400-11-13 09:41:02 +0330 Wednesday
 
 source "$HOME"/scripts/gb

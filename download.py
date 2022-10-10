@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/download.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-13 08:51:03 +0330 Wednesday
 
 ## {{{ imports

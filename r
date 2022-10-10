@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-06-17 09:27:14 +0330 Thursday
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/r
+##    https://davoudarsalani.ir
+
+## @last-modified 1401-07-17 11:35:02 +0330 Sunday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
@@ -56,6 +61,6 @@ esac
 INITIAL_QUERY=''
 eval "$RG '$INITIAL_QUERY'" | sed "s#$HOME#~#" | \
     fzf --preview 'eval "$HIGHLIGHT" {-1} 2>/dev/null | \
-                   eval "rg $RG_MATCH_FLAGS" {q} 2>/dev/null' \
+                   eval "\rg $RG_MATCH_FLAGS" {q} 2>/dev/null' \
         --header "rg in ${PWD/$HOME/\~}" \
         --bind "Return:reload:$RG {q} || true" --phony --query "$INITIAL_QUERY"

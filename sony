@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/sony
+##    https://davoudarsalani.ir
+
 ## @last-modified 1400-12-29 11:01:44 +0330 Sunday
 
 source "$HOME"/scripts/gb

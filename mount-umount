@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/mount-umount
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-12 08:27:09 +0330 Tuesday
 
 source "$HOME"/scripts/gb

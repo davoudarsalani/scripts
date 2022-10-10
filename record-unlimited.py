@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/record-unlimited.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-06-15 18:47:07 +0330 Tuesday
 
 from os import getenv, path

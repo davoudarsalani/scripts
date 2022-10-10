@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/weather.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
 
 from os import getenv

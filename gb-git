@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/gb-git
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-13 08:28:20 +0330 Wednesday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work

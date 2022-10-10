@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/jadi.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1400-10-10 12:57:22 +0330 Friday
 
 from os import getenv

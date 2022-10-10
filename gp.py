@@ -1,4 +1,9 @@
-## @last-modified 1401-07-13 08:52:19 +0330 Wednesday
+## @last-modified 1401-07-18 14:29:50 +0330 Monday
+
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/gp.py
+##    https://davoudarsalani.ir
 
 ## {{{ requirements
 ## for .venv_keylogger: keylogger
@@ -1240,11 +1245,11 @@ def compress_tar(inpt: str) -> None:  ## {{{
     from tarfile import open as tarfile_open
 
     inpt = remove_trailing_slash(inpt)
-    base = path.basename(inpt)
-
+    root, base = path.split(inpt)
     dest_dir = root
-    dest_tar = f'{base}.tar'
     chdir(dest_dir)
+    dest_tar = f'{base}.tar'
+
     if path.isdir(inpt):
         with tarfile_open(dest_tar, 'w') as opened_new_tarfile:
             chdir(base)
@@ -1256,17 +1261,19 @@ def compress_tar(inpt: str) -> None:  ## {{{
 
 
 ## }}}
-def xtract_tar(inpt: str) -> None:  ## {{{
-    from os import path, mkdir
-    from tarfile import open as tarfile_open
+def compress_gz(inpt: str) -> None:  ## {{{ https://stackoverflow.com/questions/8156707/gzip-a-file-in-python
+    from os import path, chdir, listdir
+    from gzip import open as gzip_open
 
     inpt = remove_trailing_slash(inpt)
-    root_base, _ = path.splitext(inpt)
-    dest_dir = root_base
-    mkdir(dest_dir)
+    root, base = path.split(inpt)
+    dest_dir = root
+    chdir(dest_dir)
+    dest_gz = f'{base}.gz'
 
-    with tarfile_open(inpt) as opened_cur_tarfile:
-        opened_cur_tarfile.extractall(dest_dir)
+    with open(inpt, 'rb') as f_in:
+        with gzip_open(dest_gz, 'wb') as f_out:
+            f_out.writelines(f_in)
 
 
 ## }}}
@@ -1277,9 +1284,10 @@ def compress_zip(inpt: str, password: str = '') -> None:  ## {{{
     from pyminizip import compress
 
     inpt = remove_trailing_slash(inpt)
-    base = path.basename(inpt)
+    root, base = path.split(inpt)
     dest_dir = root
     chdir(dest_dir)
+
     if password == '':
         dest_zip = f'{base}.zip'
         if path.isdir(inpt):
@@ -1300,6 +1308,39 @@ def compress_zip(inpt: str, password: str = '') -> None:  ## {{{
             invalid('Files only. Currently, cannot create password-protected dirs.')
         dest_zip = f'{inpt}.zip'
         compress(inpt, None, dest_zip, password, 5)
+
+
+## }}}
+def xtract_tar(inpt: str) -> None:  ## {{{
+    from os import path, mkdir
+    from tarfile import open as tarfile_open
+
+    inpt = remove_trailing_slash(inpt)
+    root_base, _ = path.splitext(inpt)
+    dest_dir = root_base
+    mkdir(dest_dir)
+
+    with tarfile_open(inpt) as opened_cur_tarfile:
+        opened_cur_tarfile.extractall(dest_dir)
+
+
+## }}}
+def xtract_gz(inpt: str) -> None:  ## {{{ https://stackoverflow.com/questions/31028815/how-to-unzip-gz-file-using-python
+    from gzip import open as gzip_open
+    from os import path, mkdir
+    from shutil import copyfileobj
+
+    inpt = remove_trailing_slash(inpt)
+    root_base, _ = path.splitext(inpt)
+    dest_dir = root_base
+    mkdir(dest_dir)
+
+    base = path.basename(dest_dir)
+    dest = f'{dest_dir}/{base}'
+
+    with gzip_open(inpt, 'rb') as f_in:
+        with open(dest, 'wb') as f_out:
+            copyfileobj(f_in, f_out)
 
 
 ## }}}

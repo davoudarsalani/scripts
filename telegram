@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
-## @last-modified 1400-10-27 10:13:18 +0330 Monday
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/telegram
+##    https://davoudarsalani.ir
 
-## By: https://github.com/fabianonline/telegram.sh
+## @last-modified 1401-07-18 11:43:22 +0330 Monday
+
+## Original script by fabianonline (https://github.com/fabianonline/telegram.sh)
 
 ## {{{
 ## This program is free software: you can redistribute it and/or modify

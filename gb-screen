@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/gb-screen
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-11 09:31:09 +0330 Monday
 
 xrandr_output="$(xrandr)"

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-15 10:32:49 +0330 Friday
 
 case "$1" in

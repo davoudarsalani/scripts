@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/password.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-06-15 18:46:45 +0330 Tuesday
 
 import string

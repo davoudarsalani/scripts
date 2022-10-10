@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-## @last-modified 1401-07-07 23:00:48 +0330 Thursday
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/g
+##    https://davoudarsalani.ir
+
+## @last-modified 1401-07-17 11:39:31 +0330 Sunday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -235,7 +240,7 @@ case "$main_item" in
                     printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}' &>/dev/null\n" "${test_dir##*/}"
                     # printf "              curl -su \"${github_username}:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "${test_dir##*/}"
                     # printf "              curl -su \"${github_username}:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}'\n" "${test_dir##*/}"
-                    printf '%s git -C %s push -u origin master\n' "$(blue 'push to remote')" "${test_dir/$HOME/\~}"
+                    printf '%s git -C %s push --set-upstream origin master\n' "$(blue 'push to remote')" "${test_dir/$HOME/\~}"  ## --set-upstream or -u
                     printf "%s  curl -X DELETE -H \"Authorization: token \${github_token}\" https://api.github.com/repos/${github_username}/%s\n" "$(orange 'remove remote')" "${test_dir##*/}"
                 } && accomplished
             ;;

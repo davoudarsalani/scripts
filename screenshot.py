@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/screenshot.py
+##    https://davoudarsalani.ir
+
 ## @last-modified 1401-07-10 09:04:12 +0330 Sunday
 
 from os import path, remove, getenv
