@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-15 13:35:33 +0330 Friday
+## @last-modified 1401-07-22 18:19:38 +0330 Friday
 
 source "$HOME"/scripts/gb
 
@@ -378,12 +378,6 @@ msgn "$text" ;;
                 swap_geater="$(compare_floats "$swap_used" '>' "$threshhold")"
                 [ "$swap_geater" == 'true' ] && swap_used="<span color=\"${red}\">${swap_used}</span>"
 
-                ## this is execptionally needed here because sometimes the swap_used in bytes is so small
-                ## that it becomes 0.00 after being converted by float_pad. If so, it's better to display it as 0:
-                swap_still_zero="$(compare_floats "$swap_used" '=' 0)"
-                [ "$swap_still_zero" == 'true' ] && swap_used=0
-
-
                 hdd_temp_last_file="$HOME"/scripts/.last/hdd_temp
                 hdd_temp_last="$(< "$hdd_temp_last_file")" || hdd_temp_last=0  ## NOTE do NOT add 2>/dev/null
                 hdd_temp="$(sudo hddtemp /dev/sda --numeric)"
@@ -441,10 +435,6 @@ msgn "$text" ;;
         idle_file="$HOME"/linux/idle/idle-"$current_date"  ##    ,-- NOTE do NOT use printf '%02d\n' since it causes errors for 07 and 08 in convert_second function
         (( idle_secs="$(xprintidle) / 1000" ))             ## <--'-- 103
         perc="$(float_pad "${idle_secs}*100/600" 1 2)"
-
-        ## it's better to display perc as 0 if it is 0.00
-        perc_is_zero="$(compare_floats "$perc" '=' 0)"
-        [ "$perc_is_zero" == 'true' ] && perc=0
 
         printf '%s\t%s\t%s\n' "$current_datetime" "$weekday" "$perc" >> "$idle_file"
         is_bigger="$(compare_floats "$perc" '>' 90)"
@@ -574,7 +564,7 @@ msgn "$text" ;;
         ## FIXME a bit too slow
 
         ## synced with path flags for FZF_DEFAULT_COMMAND in /etc/bash.bashrc
-        path_flags_1="! -path '*.git/*' ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' ! -path '*trash/*'"
+        path_flags_1="! -path '*.git/*' ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' ! -path '*trash/*' 2>/dev/null"
 
         ## synced with path flags for FZF_ALT_C_COMMAND_GIT in /etc/bash.bashrc
         path_flags_2="! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*'"
@@ -690,11 +680,13 @@ msgn "$text" ;;
     tor )  ## {{{
         case "$2" in
             start )
-                sudo systemctl start tor && msgn "<span color=\"${orange}\">tor</span> started"   ;;
+                sudo systemctl start tor && msgn "<span color=\"${orange}\">tor</span> started" ;;
             stop )
-                sudo systemctl stop tor && msgn "<span color=\"${orange}\">tor</span> stopped"   ;;
+                sudo systemctl stop tor && msgn "<span color=\"${orange}\">tor</span> stopped" ;;
             restart )
                 sudo systemctl restart tor && msgn "<span color=\"${orange}\">tor</span> restarted" ;;
+            is-tor )
+                "$HOME"/scripts/is-tor 'msg' ;;
         esac
 
         tor_status="$(pgrep 'tor')"  ## why exceptionally used "$(sudo lsof -i -P -n | \grep 'LISTEN' | \grep '^tor')" instead of pgrep?
@@ -865,7 +857,6 @@ msgn "$text" ;;
         }
 
         csols_file="$HOME"/scripts/.last/csols
-        csols_kaddy_file="$HOME"/kaddy/scripts/.last/csols
 
         update_variables
 
@@ -917,7 +908,6 @@ msgn "$text" ;;
         regex='^(playing|paused)$'
         [[ "$play_status" =~ $regex ]] && [ "$album" == 'speech' ] && {
             printf '%s\n' "$current_position_in_seconds" > "$csols_file"
-            cp "$csols_file" "$csols_kaddy_file"
             # msgn 'saved csol' "<span color=\"${orange}\">${current_position}</span>"
         }
 

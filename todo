@@ -5,16 +5,17 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/todo
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-15 09:24:24 +0330 Friday
+## @last-modified 1401-07-19 09:59:11 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
 function cp_file_to_kaddy {
-    cp "$file" "$kaddy_file"
+    cp "$todo_file" "$todo_kaddy_file"
 }
-file="$HOME"/todo/todo
-kaddy_file="$HOME"/kaddy/todo/todo
-readarray -t content < "$file"
+
+todo_file="$HOME"/todo/todo
+todo_kaddy_file="$(get_kaddy_counterpart "$todo_file")"
+readarray -t content < "$todo_file"
 
 main_items=( 'ADD' 'REMOVE' 'EMPTY' '' "${content[@]}" )
 main_item="$(pipe_to_rofi "${main_items[@]}" 'header=todo')" || exit 37
@@ -25,10 +26,10 @@ case "$main_item" in
         add_item="$(pipe_to_rofi "${add_items[@]}" 'header=add')" || exit 37
 
         ## exit if it already exists
-        \grep -qw "$add_item" "$file" && msgc 'ERROR' "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/linux/themes/alert-w.png && exit
+        \grep -qw "$add_item" "$todo_file" && msgc 'ERROR' "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/linux/themes/alert-w.png && exit
 
         {
-            printf '%s\n' "$add_item" >> "$file"
+            printf '%s\n' "$add_item" >> "$todo_file"
             cp_file_to_kaddy
         } && msgn "added <span color=\"${orange}\">${add_item}</span>" ;;
     REMOVE )
@@ -41,7 +42,7 @@ case "$main_item" in
         remove_item="$(pipe_to_rofi "${content[@]}" 'header=remove' 'bg=red')" || exit 37
 
         {
-            sed -i "/^$remove_item$/d" "$file"  ## NOTE do NOT replace " with ' in sed
+            sed -i "/^$remove_item$/d" "$todo_file"  ## NOTE do NOT replace " with ' in sed
             cp_file_to_kaddy
         } && msgn "removed <span color=\"${red}\">${remove_item}</span>" ;;
     EMPTY )
@@ -51,7 +52,7 @@ case "$main_item" in
         case "$empty_item" in
             yes )
                 {
-                    : > "$file"
+                    : > "$todo_file"
                     cp_file_to_kaddy
                 } && msgn 'emptied' ;;
         esac ;;

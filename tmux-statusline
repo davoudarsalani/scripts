@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-15 10:32:49 +0330 Friday
+## @last-modified 1401-07-22 16:11:33 +0330 Friday
 
 case "$1" in
     pwd )
@@ -47,15 +47,34 @@ case "$1" in
            [ ! "$is_in_trash" ] && \
            [ ! "$is_in_kaddy" ]; then
 
+            source "$HOME"/scripts/gb
+            source "$HOME"/scripts/gb-git
+
             ## ~/scripts -> ~/kaddy/scripts
-            cur_dir_in_kaddy="$(sed -e "s|\($HOME\)/\(\)|\1/kaddy/\2|" <<< "$2")"
+            kaddy_counterpart="$(get_kaddy_counterpart "$2")"
 
-            if [ ! -d "$cur_dir_in_kaddy" ]; then
-                printf ' \n'
-            elif [ "$(\diff --brief <(\ls -A "$2") <(\ls -A "$cur_dir_in_kaddy"))" ]; then  ## NOTE do NOT add &>/dev/null to diff
-                printf ' \n'
+            if [ ! -d "$kaddy_counterpart" ]; then
+                ## if current directory has no counterpart in kaddy
+                no_counterpart='NO-KADDY-COUNTERPART '
+                printf '%s\n' "$no_counterpart"
+            else
+
+                ## JUMP_1 the same structure in compare-home-with-kaddy script
+                ## if hashes of HEAD in current directory and kaddy counterpart are different
+                if [ "$(if_git "$2")" == 'true' ]; then
+                    [ "$(git_hash_head "$2")" == "$(git_hash_head "$kaddy_counterpart")" ] || {
+                        head_='HEAD '
+                    }
+                fi
+
+                ## JUMP_1 the same structure in compare-home-with-kaddy script
+                ## if list of files/directories in current directory is different from the one in kaddy
+                if [ "$(\diff --brief <(\ls -A "$2") <(\ls -A "$kaddy_counterpart"))" ]; then  ## NOTE do NOT add &>/dev/null to diff
+                    ls_='LS '
+                fi
+
+                printf '%s%s\n' "$head_" "$ls_"
             fi
-
         fi ;;
     git )
         source "$HOME"/scripts/gb-git

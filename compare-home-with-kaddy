@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/compare-home-with-kaddy
+##    https://davoudarsalani.ir
+
+## @last-modified 1401-07-22 16:19:44 +0330 Friday
+
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-color
+source "$HOME"/scripts/gb-git
+
+title="${0##*/}"
+heading "$title"
+
+readarray -t kaddy_directories < <(find "$HOME"/kaddy -mindepth 1 -maxdepth 1 -type d ! -path '*lost+found*' | sort)
+
+## calculate the length of longest member
+# declare -i longest=-1
+# for d in "${kaddy_directories[@]}"; {
+#     d_base="${d##*/}"
+#     d_base_length="${#d_base}"
+#     (( d_base_length > longest )) && longest="$d_base_length"
+# }
+
+for kaddy_dir in "${kaddy_directories[@]}"; {
+    base="${kaddy_dir##*/}"
+    home_dir="$HOME"/"$base"
+
+    head_difference='    '
+    ls_difference='  '
+
+    ## JUMP_1 the same structure in tmux-statusline script
+    ## if hashes of HEAD in home_dir and kaddy_dir are different
+    if [ "$(if_git "$home_dir")" == 'true' ]; then
+        [ "$(git_hash_head "$home_dir")" == "$(git_hash_head "$kaddy_dir")" ] || {
+            head_difference='HEAD'
+        }
+    fi
+
+    ## JUMP_1 the same structure in tmux-statusline script
+    ## if list of files/directories in home_dir is different from kaddy_dir
+    if [ "$(\diff --brief <(\ls -A "$home_dir") <(\ls -A "$kaddy_dir"))" ]; then  ## NOTE do NOT add &>/dev/null to diff
+        ls_difference='LS'
+    fi
+
+    if [ "$head_difference" == 'HEAD' ] || [ "$ls_difference" == 'LS' ]; then
+        printf "%s %s %s\n" "$(red "$head_difference")" "$(red "$ls_difference")" "$(blue "$base")"
+    fi
+
+    unset head_difference ls_difference
+}

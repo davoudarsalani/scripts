@@ -1,4 +1,4 @@
-## @last-modified 1401-07-18 14:29:50 +0330 Monday
+## @last-modified 1401-07-22 00:15:08 +0330 Friday
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
@@ -1308,6 +1308,23 @@ def compress_zip(inpt: str, password: str = '') -> None:  ## {{{
             invalid('Files only. Currently, cannot create password-protected dirs.')
         dest_zip = f'{inpt}.zip'
         compress(inpt, None, dest_zip, password, 5)
+
+
+## }}}
+def compress_rar(inpt: str, set_password: bool = False) -> None:  ## {{{ FIXME find a pythonic way to create rar file
+    from os import path, chdir
+    from subprocess import run
+
+    inpt = remove_trailing_slash(inpt)
+    root, base = path.split(inpt)
+    dest_dir = root
+    chdir(dest_dir)
+    dest_rar = f'{base}.rar'
+
+    if set_password:
+        run(f'rar a -p {dest_rar} {base}', shell=True)
+    else:
+        run(f'rar a {dest_rar} {base}', shell=True)
 
 
 ## }}}

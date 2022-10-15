@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/speech
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-15 13:49:18 +0330 Friday
+## @last-modified 1401-07-19 09:55:56 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -102,7 +102,7 @@ case "$1" in
         if_no_dir  ## JUMP_4
 
         first_file="$(find "$HOME"/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 1)"  ## /home/nnnn/speech/pargar/709.mp3
-        first_kaddy_file="${first_file/$HOME/$HOME\/kaddy}"  ## /home/nnnn/kaddy/speech/pargar/709.mp3
+        first_kaddy_file="$(get_kaddy_counterpart "$first_file")"  ## /home/nnnn/kaddy/speech/pargar/709.mp3
 
         base="${first_file##*/}"
         no_suffix="${base%.*}"
@@ -111,7 +111,7 @@ case "$1" in
         [ "$current_song" == "$first_file" ] && exit
 
         listened_dir="$HOME"/speech/"$directory"/LISTENED
-        listened_kaddy_dir="$HOME"/kaddy/speech/"$directory"/LISTENED
+        listened_kaddy_dir="$(get_kaddy_counterpart "$listened_dir")"
 
         [ -d "$listened_dir" ] || mkdir "$listened_dir"
         [ -d "$listened_kaddy_dir" ] || mkdir "$listened_kaddy_dir"

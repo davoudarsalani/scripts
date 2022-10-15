@@ -5,27 +5,26 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/mint
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-15 17:49:25 +0330 Friday
+## @last-modified 1401-07-20 10:04:40 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
 case "$1" in
-    vol_level )
+    audio_levels )
         source "$HOME"/scripts/gb-audio
-        states_initials="${vol_state::1}${mic_state::1}${mon_state::1}"  ## RSI
-        indeces="${def_sink_index}${def_source_index}${def_source_mon_index}"  ## 010
-        printf '%s %s %s %s %s\n' "$vol_level" "$mic_level" "$mon_level" "$states_initials" "$indeces" ;;
+        printf '%s %s %s\n' "$vol_level" "$mic_level" "$mon_level" ;;
     vol_30 )
         source "$HOME"/scripts/gb-audio
         pactl set-sink-volume "$def_sink_index" 30% ;;
     cpu_temp )
-        read -a temps_arr < <(sensors | \grep '^Core' | awk '{print $3}' | sed 's/+\([0-9]\+\).*/\1/g')  ## exceptionally used sensors (only for sony)
-        arr_length="${#temps_arr[@]}"
-        (( arr_length < 2 )) && if_one_cpu=" [${arr_length} CPU ONLY]"
-        ## turn array into str for it to be able to be used in JUMP_1 calculation:
-        temps_str="${temps_arr[@]:0}"
-        (( total_temp="${temps_str// /+}" ))  ## JUMP_1
-        (( average="total_temp / arr_length" ))
+        temps="$(sensors | \grep '^Core' | awk '{print $3}' | sed 's/+\([0-9]\+\).*/\1/g' | xargs)"  ## exceptionally used sensors (only for sony)
+        cpu_count="$(wc -l < <(sed 's/ /\n/' <<< "$temps"))"
+
+        (( cpu_count < 2 )) && if_one_cpu=" [${cpu_count} CPU ONLY]"
+
+        (( total_temp="${temps// /+}" ))
+        (( average="total_temp / cpu_count" ))
+
         printf '%s°%s\n' "$average" "$if_one_cpu" ;;
     idle )
         source "$HOME"/scripts/gb-calculation
@@ -37,26 +36,11 @@ case "$1" in
         (( idle_secs="$(xprintidle) / 1000" ))
         perc="$(float_pad "${idle_secs}*100/3600" 1 2)"
 
-        ## it's better to display perc as 0 if it is 0.00
-        perc_is_zero="$(compare_floats "$perc" '=' 0)"
-        [ "$perc_is_zero" == 'true' ] && perc=0
-
         printf '%s\t%s\t%s\n' "$current_datetime" "$weekday" "$perc" >> "$idle_file"
         printf '%s\n' "$perc" ;;
     network )
         source "$HOME"/scripts/gb-network
-        printf '%s   %s\n' "$eth_conn" "$wf_conn"
-
-        ## ping and send messages if unsuccessful
-        output="$(ping -c 1 4.2.2.4 2>&1)"
-        \grep -qi 'network is unreachable' <<< "$output" && {
-            msgn "$output"
-            ## or display msg multiple times:
-            # for ((i=1; i<=5; i++)); {
-            #     msgn "$output"
-            #     sleep 0.1
-            # }
-        } ;;
+        printf '%s  %s\n' "$eth_conn" "$wf_conn" ;;
     firefox_whatsapp )
         firefox --new-tab 'https://web.whatsapp.com' ;;
     if_uget )

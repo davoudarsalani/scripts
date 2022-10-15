@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/commands
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-05-16 18:41:23 +0330 Sunday
+## @last-modified 1401-07-22 10:49:09 +0330 Friday
 
 source "$HOME"/scripts/gb
 
@@ -83,6 +83,8 @@ replace prefix      ---> "${VAR/#PREFIX/SUBSTITUTE}"
 
 reverse-case first character ---> "${VAR~}"
 reverse-case all characters  ---> "${VAR~~}"
+reverse order of lines (CAUTION: may cause blank lines to be deleted) [i]  ---> sed '1!G;h;$!d'
+reverse order of lines (CAUTION: may cause blank lines to be deleted) [ii] ---> sed -n '1!G;h;$p'
 replace all the initial occurences of a string [i]  --> sed 's/^STRING*/SUBSTITUTE/'
 replace all the initial occurences of a string [ii] --> sed 's/^\(STRING\)*/SUBSTITUTE/'
 remove after the last occurrence of a character [i]   ---> sed 's/\(.*\)CHAR.*/\1/'

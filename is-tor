@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/is-tor
+##    https://davoudarsalani.ir
+
+## @last-modified 1401-07-22 18:41:36 +0330 Friday
+
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-color
+
+title="${0##*/}"
+heading "$title"
+
+declare -i attempts=10
+
+[ "$1" == 'msg' ] && msgn "<span color=\"${orange}\">is-tor</span> checking"
+
+## https://tor.stackexchange.com/questions/12678/how-to-check-if-tor-is-working-and-debug-the-problem-on-cli
+false
+for ((a=1; a<="$attempts"; a++)); {
+    if (( $? != 0 )); then  ## JUMP_1
+
+        ## NOTE keep this block inside JUMP_1 if statement
+        if (( a > 1 )); then
+            if [ "$1" == 'msg' ]; then
+                msgn "<span color=\"${orange}\">is-tor</span> attempt ${a}/${attempts}"
+            else
+                printf 'attempt %s/%s\n' "$a" "$attempts"
+            fi
+        fi
+
+        ## use either of these to avoid DNS leaks:
+        ##   a. -x socks5h://127.0.0.1:9050
+        ##   b. --socks5-hostname localhost:9050
+        ## NOTE do NOT add --connect-timeout 10
+        json_output="$(curl -x socks5h://127.0.0.1:9050 -s https://check.torproject.org/api/ip)"  ## {"IsTor":true,"IP":"YOUR-IP"}
+
+        istor="$(jq -rM .'IsTor' <<< "$json_output")"  ## true
+        ip="$(jq -rM .'IP' <<< "$json_output")"
+
+        if [ "$istor" == 'true' ]; then
+            if [ "$1" == 'msg' ]; then
+                msgn "<span color=\"${green}\">✔</span> <span color=\"${orange}\">is-tor</span> = true (ip: "$ip")"
+            else
+                accomplished "true (ip: "$ip")"
+            fi
+        else
+            false
+        fi
+    fi
+}
+
+## previously:
+## https://sylvaindurand.org/use-tor-with-python/
+# curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.torproject.org/ | cat | \grep -m 1 Congratulations | xargs

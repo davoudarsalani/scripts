@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/copy
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-15 08:30:29 +0330 Friday
+## @last-modified 1401-07-22 16:03:01 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -185,12 +185,12 @@ case "$main_item" in
     ## has a different dest_dir
     /var/cache/pacman/pkg )
         dest_dir="$HOME"/linux-pkg
-        dest_kaddy_dir="$HOME"/kaddy/linux-pkg
+        dest_kaddy_dir="$(get_kaddy_counterpart "$dest_dir")"
         readarray -t pkgs < <(find /var/cache/pacman/pkg/ -mindepth 1 -maxdepth 1 -type f)
         if [ "$pkgs" ]; then
-            action_now "copying from /var/cache/pacman/pkg to $dest_dir"
+            action_now "copying from /var/cache/pacman/pkg to ${dest_dir/$HOME/\~}"
             cp -r "${pkgs[@]}" "$dest_dir"
-            action_now "copying from /var/cache/pacman/pkg to $dest_kaddy_dir"
+            action_now "copying from /var/cache/pacman/pkg to ${dest_kaddy_dir/$HOME/\~}"
             cp -r "${pkgs[@]}" "$dest_kaddy_dir"
             action_now 'removing pkgs in /var/cache/pacman/pkg'
             sudo rm "${pkgs[@]}"

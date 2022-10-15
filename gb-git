@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/gb-git
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-13 08:28:20 +0330 Wednesday
+## @last-modified 1401-07-20 23:59:37 +0330 Wednesday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -220,7 +220,7 @@ function git_push_failed { ## {{{
     source "$HOME"/scripts/gb-color
 
     red 'push failed.'
-    red "try: git -C ${1:-.} push -u origin master"
+    red "try: git -C ${1:-.} push --set-upstream origin master"  ## --set-upstream or -u
 }
 ## }}}
 function git_push_noproxy {  ## {{{

@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/lf.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-18 14:24:39 +0330 Monday
+## @last-modified 1401-07-22 00:08:25 +0330 Friday
 
 from os import path, getenv, symlink, rename, remove, getcwd
 from re import sub
@@ -26,6 +26,7 @@ from gp import (
     compress_tar,
     compress_gz,
     compress_zip,
+    compress_rar,
     xtract_tar,
     xtract_gz,
     xtract_zip,
@@ -145,7 +146,7 @@ if main_arg == 'chattr':  ## {{{
 elif main_arg == 'trash':  ## {{{
     trash_dir = f'{getenv("HOME")}/trash'
 
-    ## exit if aleady in trash_dir
+    ## exit if already in trash_dir
     if getcwd() == trash_dir:
         msgc('ERROR', f'file(s)/dir(s) already in {sub(getenv("HOME"), "~", trash_dir)}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         exit()
@@ -155,7 +156,6 @@ elif main_arg == 'trash':  ## {{{
             base = path.basename(f)
             new_base = f'{get_datetime("jymdhms")}-{base}'
             new_name = f'{trash_dir}/{new_base}'
-            msgn(new_name)
 
             if path.exists(new_name):
                 msgc(
@@ -204,10 +204,17 @@ elif main_arg == 'mime_type':  ## {{{
         sleep(0.1)
 ## }}}
 elif main_arg == 'softlink':  ## {{{
+    dest_dir = f'{getenv("HOME")}/downloads'
+
+    ## exit if already in dest_dir
+    if getcwd() == dest_dir:
+        msgc('ERROR', f'file(s)/dir(s) already in {sub(getenv("HOME"), "~", dest_dir)}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        exit()
+
     for f in files:
         try:
             base = path.basename(f)
-            symlink(f, f'{getenv("HOME")}/downloads/{base}')
+            symlink(f, f'{dest_dir}/{base}')
             msgn('softlinekd', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'softlinking <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
@@ -248,6 +255,22 @@ elif main_arg == 'zip':  ## {{{
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to zip')
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        sleep(0.1)
+## }}}
+elif main_arg == 'rar':  ## {{{
+    for f in files:
+        try:
+            base = path.basename(f)
+            use_password = get_single_input('Use password (y/n)?')
+            if use_password == 'y':
+                compress_rar(f, set_password=True)
+            elif use_password == 'n':
+                compress_rar(f)
+            else:
+                invalid('Wrong choice')
+            msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to rar')
+        except Exception as exc:
+            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to rar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'untar':  ## {{{

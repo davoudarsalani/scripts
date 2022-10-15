@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/g
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-17 11:39:31 +0330 Sunday
+## @last-modified 1401-07-22 11:49:40 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -614,19 +614,19 @@ case "$main_item" in
                 accomplished ;;
             'create' )
                 prompt -t
-                tag="${tag// /_}"
+                tag="${tag//[ -]/_}"  ## JUMP_5
                 if_locked
                 git_tag_create "$directory" "$tag" && \
                 accomplished "$tag created" ;;
             'create + message' )
                 prompt -t -m
-                tag="${tag// /_}"
+                tag="${tag//[ -]/_}"  ## JUMP_5
                 if_locked
                 git_tag_create_with_message "$directory" "$tag" "$message" && \
                 accomplished "$tag created, message: $message" ;;
             'create + message for a commit' )
                 prompt -t -m -c
-                tag="${tag// /_}"
+                tag="${tag//[ -]/_}"  ## JUMP_5
                 if_locked
                 git_tag_create_with_message_for_specific_commit "$directory" "$tag" "$message" "$commit_hash" && \
                 accomplished "$tag created, message: ${message}, for commit: $commit_hash" ;;
