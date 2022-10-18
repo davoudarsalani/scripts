@@ -2,10 +2,10 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/sony
+##    https://github.com/davoudarsalani/scripts/blob/master/dell
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-12-29 11:01:44 +0330 Sunday
+## @last-modified 1401-07-26 09:47:33 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -15,26 +15,33 @@ title="${0##*/}"
 
 function display_help {
     source "$HOME"/scripts/.help
-    sony_help
+    dell_help
 }
 
 function upload {
-    scp -r "$@" nnnn@sony-"$bed":"$HOME"/downloads && accomplished
+    scp -r "$@" nnnn@dell-"$bed":"$HOME"/downloads && accomplished
 }
 
 function download {
     local all
 
     all="${@:0}"  ## turn array into str because shelccheck said: SC2145 (error): Argument mixes string and array. Use * or separate argument.
-    scp -r nnnn@sony-"$bed":"$all" "$HOME"/downloads && accomplished
+    scp -r nnnn@dell-"$bed":"$all" "$HOME"/downloads && accomplished
 }
 
 function connect {
-    ssh -Y nnnn@sony-"$bed" && accomplished
+    ssh -Y nnnn@dell-"$bed" && accomplished
 }
 
 function connect_plus_x2x {
-    ssh -Y nnnn@sony-"$bed" 'x2x -west -to :0'
+    ssh -Y nnnn@dell-"$bed" 'x2x -west -to :0'
+}
+
+function rsync_ {
+    ## NOTE remove trailing slash
+    source_dir="${source_dir%/}"
+
+    rsync -a --progress --delete "$source_dir" nnnn@dell-"$bed":
 }
 
 function prompt {
@@ -68,7 +75,22 @@ function get_opt {
 get_opt "$@"
 heading "$title"
 
-main_items=( 'ethernet connect + x2x' 'ethernet connect' 'ethernet download' 'ethernet upload' 'wifi connect + x2x' 'wifi connect' 'wifi download' 'wifi upload' 'help' )
+main_items=(
+    'ethernet connect + x2x'
+    'ethernet connect'
+    'ethernet download'
+    'ethernet upload'
+    'ethernet rsync ~/linux'
+    'ethernet rsync ~/scripts'
+    'wifi connect + x2x'
+    'wifi connect'
+    'wifi download'
+    'wifi upload'
+    'wifi rsync ~/linux'
+    'wifi rsync ~/scripts'
+    'help'
+)
+
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -86,6 +108,14 @@ case "$main_item" in
         prompt -n
         bed='ethernet'
         upload "$name" ;;
+    'ethernet rsync ~/linux' )
+        bed='ethernet'
+        source_dir="$HOME"/linux  ## NOTE JUMP_1 no trailing slash
+        rsync_ ;;
+    'ethernet rsync ~/scripts' )
+        bed='ethernet'
+        source_dir="$HOME"/scripts  ## JUMP_1
+        rsync_ ;;
 
     'wifi connect + x2x' )
         bed='wifi'
@@ -101,6 +131,14 @@ case "$main_item" in
         prompt -n
         bed='wifi'
         upload "$name" ;;
+    'wifi rsync ~/linux' )
+        bed='wifi'
+        source_dir="$HOME"/linux  ## JUMP_1
+        rsync_ ;;
+    'wifi rsync ~/scripts' )
+        bed='wifi'
+        source_dir="$HOME"/scripts  ## JUMP_1
+        rsync_ ;;
     help )
         display_help ;;
 esac

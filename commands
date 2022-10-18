@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/commands
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 10:49:09 +0330 Friday
+## @last-modified 1401-07-23 10:33:43 +0330 Saturday
 
 source "$HOME"/scripts/gb
 
@@ -191,7 +191,6 @@ show swap files ---> swapon --show
 delete duplicate, nonconsecutive and non-empty lines from a file ---> vim -esu NONE '+g/\v^(.+)$\_.{-}^\1$/d' +wq FILE
 delete duplicate lines (https://stackoverflow.com/questions/1444406/how-to-delete-duplicate-lines-in-a-file-without-sorting-it-in-unix) ---> sed -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P'
 open multiple files in vim tabs ---> vim -p FILE1 FILE2 FILE3
-dd pattern ---> sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
 turn off screensaver ---> xset s 0 0 && xset -dpms
 expand alias in script: ---> shopt -s expand_aliases (put it at the top of script)
 stop pop sound ---> add 'options snd-hda-intel power_save=0 power_save_controller=N' to the end of /etc/modprobe.d/alsa-base.conf

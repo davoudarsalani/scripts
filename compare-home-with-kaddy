@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/compare-home-with-kaddy
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 16:19:44 +0330 Friday
+## @last-modified 1401-07-26 09:05:43 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -14,7 +14,7 @@ source "$HOME"/scripts/gb-git
 title="${0##*/}"
 heading "$title"
 
-readarray -t kaddy_directories < <(find "$HOME"/kaddy -mindepth 1 -maxdepth 1 -type d ! -path '*lost+found*' | sort)
+readarray -t kaddy_directories < <(find "$HOME"/kaddy -mindepth 1 -maxdepth 1 -type d | sort)  ## ! -path '*lost+found*'
 
 ## calculate the length of longest member
 # declare -i longest=-1

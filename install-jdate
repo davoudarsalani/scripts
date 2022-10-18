@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/install-jdate
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-11 10:55:08 +0330 Monday
+## @last-modified 1401-07-26 10:16:14 +0330 Tuesday
 
 ## NOTE this script is used:
 ##      a. for building docker image
@@ -34,6 +34,7 @@ printf 'installing dependencies\n'
 for dep in automake build-essential libjalali-dev libtool; {
     [ "$(command -v "$dep")" ] && continue
 
+    ## [CHECKING_HOST]
     if [ "$(command -v apk)" ]; then
         cmd="apk add --no-cache $dep"
     elif [ "$(command -v apt)" ]; then

@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+## By Davoud Arsalani
+##    https://github.com/davoudarsalani/scripts
+##    https://github.com/davoudarsalani/scripts/blob/master/kaddyify
+##    https://davoudarsalani.ir
+
+## @last-modified 1401-07-26 09:05:17 +0330 Tuesday
+
+source "$HOME"/scripts/gb
+source "$HOME"/scripts/gb-color
+
+## --dry-run -v     perform a trial run with no changes made (-v is added by me)
+## --delete         remove files on remote not present on local
+## --progress       show progress during transfer
+## -P               same as --partial --progress
+
+## on ssh:
+## NOTE dont forget to remove trailing slash
+# rsync -a --progress --delete ~/scripts nnnn@IP:~/scripts
+
+title="${0##*/}"
+
+function display_help {
+    source "$HOME"/scripts/.help
+    kaddyify_help
+}
+
+function get_opt {
+    local options
+
+    options="$(getopt --longoptions 'help,sync,diff' --options 'hsd' --alternative -- "$@")"
+    eval set -- "$options"
+    while true; do
+        case "$1" in
+            -h|--help )
+                display_help ;;
+            -s|--sync )
+                shift
+                flags='-a --progress --delete'
+                break ;;  ## JUMP_1 exceptionally using break
+            -d|--diff )
+                shift
+                ## https://unix.stackexchange.com/questions/57305/rsync-compare-directories
+                ## -v not needed
+                flags='-ai --dry-run'  ## -ai OR -ri
+                break ;;  ## JUMP_1
+            -- )
+                break ;;
+        esac
+        shift
+    done
+}
+
+home_kaddy_dir="$HOME"/kaddy
+
+get_opt "$@"
+heading "$title"
+
+[ ! "$1" ] || [ ! "$flags" ] && display_help
+
+readarray -t kaddy_directories < <(find "$home_kaddy_dir" -mindepth 1 -maxdepth 1 -type d | sort)  ## ! -path '*lost+found*'
+
+for kaddy_dir in "${kaddy_directories[@]}"; {
+    base="${kaddy_dir##*/}"
+
+    ## NOTE remove trailing slash
+    ##      important because we want the directory itself
+    ##      to be synced/copeid to destination
+    ##      rather than its content
+    base="${base%/}"
+
+    home_dir="$HOME"/"$base"
+
+    blue "${home_dir/$HOME/\~}"
+
+    ## NOTE keep $flags unquoted
+    rsync $flags "$home_dir" "$home_kaddy_dir" | \grep -v 'sending incremental file list'
+}

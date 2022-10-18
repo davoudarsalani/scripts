@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/mint
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-20 10:04:40 +0330 Wednesday
+## @last-modified 1401-07-26 09:39:02 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -17,7 +17,9 @@ case "$1" in
         source "$HOME"/scripts/gb-audio
         pactl set-sink-volume "$def_sink_index" 30% ;;
     cpu_temp )
-        temps="$(sensors | \grep '^Core' | awk '{print $3}' | sed 's/+\([0-9]\+\).*/\1/g' | xargs)"  ## exceptionally used sensors (only for sony)
+        ## exceptionally used sensors (only for mint)
+        temps="$(sensors | \grep '^Core' | awk '{print $3}' | sed 's/+\([0-9]\+\).*/\1/g' | xargs)"
+
         cpu_count="$(wc -l < <(sed 's/ /\n/' <<< "$temps"))"
 
         (( cpu_count < 2 )) && if_one_cpu=" [${cpu_count} CPU ONLY]"

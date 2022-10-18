@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/.help
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-11-13 12:48:54 +0330 Wednesday
+## @last-modified 1401-07-26 09:48:20 +0330 Tuesday
 
 source "$HOME"/scripts/gb-color
 
@@ -66,6 +66,15 @@ $(flag '-f|--file')"  ## ^^ NOTE pattern needs quotes here, but if pattern is en
 exit
 }
 ## }}}
+function kaddyify_help {  ## {{{
+clear
+printf '%s\n' \
+"$(heading "$title") $(yellow "help")
+$(flag '-d|--diff')
+$(flag '-s|--sync')"
+exit
+}
+## }}}
 function mime_type_help {  ## {{{
 clear
 printf '%s\n' \
@@ -112,7 +121,7 @@ $(flag '-d|--directory=')"
 exit
 }
 ## }}}
-function sony_help {  ## {{{
+function dell_help {  ## {{{
 clear
 printf '%s\n' \
 "$(heading "$title") $(yellow "help")

@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 16:11:33 +0330 Friday
+## @last-modified 1401-07-26 09:58:56 +0330 Tuesday
 
 case "$1" in
     pwd )
@@ -147,7 +147,8 @@ case "$1" in
             "$sta" \
             "$sta_m"
         ;;
-    if_sony )
+    if_dell )
+        ## [CHECKING_HOST]
         [ "$HOSTNAME" == 'acer' ] || printf '%s \n' "${HOSTNAME^^}" ;;
     if_ssh )
         [ "$SSH_CONNECTION" ] && printf 'SSH \n' ;;

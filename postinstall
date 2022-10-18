@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/postinstall
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-16 09:37:28 +0330 Saturday
+## @last-modified 1401-07-25 13:11:51 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -25,9 +25,12 @@ case "$main_item" in
             'uget' 'gimp' 'ufw' 'acpi' 'rofi' 'dmenu' 'bluez' 'bluezutils' 'blueman' 'blueztools' 'lxappearance' 'libreofficestill' 'xclip'
             'openssh' 'ffmpeg' 'xdotool' 'tmux' 'picom' 'fzf' 'networkmanager' 'networkmanagerapplet' 'networkmanageropenvpn' 'openvpn' 'feh'
             'pulseaudioalsa' 'jq' 'youtubedl' 'curl' 'wget' 'aria2' 'tor' 'torsocks' 'git' 'kdenlive' 'vsftpd' 'docker' 'mpv' 'txt2man'
-            'autoconfarchive' 'w3m' 'highlight' 'mediainfo' 'xf86videointel' 'intel-ucode[+ grub update]' 'ripgrep' 'pulseaudio'
-            'xfce4terminal' 'kvantumqt5' 'imagemagick' 'qutebrowser' 'chromium' 'libvainteldriver' 'nvidialts' 'nvidiautils' 'nvidiasettings'
-            'xprintidle[OR xssstate]' 'pulseaudio-bluetooth[for headset]' 'simplescreenrecorder' 'hddtemp' 'ctags'
+            'autoconfarchive' 'w3m' 'highlight' 'mediainfo' 'xf86videointel' 'intel-ucode[+ grub update]' 'ripgrep' 'pulseaudio' 'chromium'
+            'xfce4terminal' 'kvantumqt5' 'imagemagick' 'qutebrowser' 'libvainteldriver' 'nvidialts' 'nvidiautils' 'nvidiasettings' 'hddtemp'
+            'rsync' 'xprintidle[OR xssstate]' 'pulseaudio-bluetooth[for headset]' 'simplescreenrecorder' 'ctags'
+
+            ## install from source
+            'jcal'
         )
         maybe_apps=(
             'unzip' 'zip' 'unrar' 'wmctrl' 'netstatnat' 'handbrake' 'handbrakecli' 'fribidi' 'ranger' 'bc' 'kdeconnect' 'kdeclitools' 'traceroute'
@@ -38,14 +41,17 @@ case "$main_item" in
             'yay' 'rofigreenclip' 'obfs4proxy' 'bluezhcitool' 'qt5styleplugins' 'lf' 'ugetintegratorfirefox' 'x2x'
             'optimus-manager (or *-git) [+ enable optimus-manager.service]'
         )
-        aur_maybe_apps=(
+        aur_maybe_apps=(  ## not sure if necessary
             'optimus-manager-qt' 'kpcli' 'cava'
         )
 
 
         mint_apps=(
             'audacious' 'vlc' 'goldendict' 'uget' 'ffmpeg' 'tmux' 'fzf' 'jq' 'tor' 'torsocks' 'obfs4proxy' 'git' 'highlight' 'mediainfo' 'vim' 'x2x'
-            'ripgrep' 'xprintidle[OR' 'xssstate]' 'xfce4-terminal' 'youtube-dl'
+            'ripgrep' 'xprintidle[OR' 'xssstate]' 'chromium' 'xfce4-terminal' 'youtube-dl'
+
+            ## install from source (or use install-jdate script)
+            'jcal'
         )
         mint_binary_apps=(
             'lf'  ## copy binary file to /usr/bin/
@@ -60,10 +66,13 @@ case "$main_item" in
             ## nvidia
             'nvidialts' 'nvidiautils' 'nvidiasettings'
 
-            'ctags'
+            'ctags' 'libfribidi-bin' 'libfribidi0'
         )
         mint_specific_apps=(
             'libtool' 'm4' 'automake' 'autoconf' 'openssh-server'
+
+            ## for jcal
+            'automake' 'build-essential' 'libjalali-dev' 'libtool'
         )
 
         blue 'Apps'
@@ -293,9 +302,20 @@ $("$clr" '  then') startx ~/.xinitrc
 $("$clr" '- fix grub in windows (https://itsfoss.com/no-grub-windows-linux/)') bcdedit /set {bootmgr} path \EFI\ubuntu\grubx64.efi
 $("$clr" '  then restart')
 $("$clr" '  if the above entry didn’t change anything, you can reverse it') bcdedit /deletevalue {bootmgr} path \EFI\ubuntu\grubx64.efi
+$("$clr" '- dd') sudo dd if=****.iso of=/dev/sd* status=progress bs=4M && sync
+$("$clr" '- shred')
+$("$clr" '  shred file') shred -vzu -n 5 FILE
+$("$clr" '    -v') stands for verbose.
+$("$clr" '    -z') replace the final pass with zeros to hide shredding.
+$("$clr" '    -u') remove the file after shredding.
+$("$clr" '    -n') number of passes (default is 3).
+$("$clr" '  shred disk/partition') shred -vfz -n 5 PATH
+$("$clr" '    -v') stands for verbose.
+$("$clr" '    -f') force the write permissions if missing.
+$("$clr" '    -z') write zeros in the final pass.
+$("$clr" '    -n') number of passes (default is 3).
 
 $("$clr" '- mint: in case of getting returned 126 error when sourcing conf file in tmux (https://github.com/tmux-plugins/tpm/issues/73)') chmod -R ug+x ~/.tmux-plugins/
-$("$clr" '- mint: install libfribidi (http://linuxforlife.ir/index.php/distro/215-2017-04-21-14-36-39)') sudo apt install libfribidi-bin libfribidi0
 " | less -R
         ;;
     ## }}}
