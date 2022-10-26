@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/compress-xtract.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:45:41 +0330 Tuesday
+## @last-modified 1401-08-03 09:52:20 +0330 Tuesday
 
 from getopt import getopt
 from os import path
@@ -56,14 +56,14 @@ def prompt(*args: list[str]) -> None:  ## {{{
             try:
                 inpt
             except:
-                inpt = get_input('Input')
+                inpt = get_input('input')
             if not path.exists(f'{inpt}'):
-                invalid('No such file/dir')
+                invalid(f'{inpt} does not exist')
         elif arg == '-p':
             try:
                 password
             except:
-                password = get_password('Password ')
+                password = get_password('password ')
 
 
 ## }}}
@@ -82,7 +82,7 @@ elif main_item == 'untar':
     prompt('-i')
     xtract_tar(inpt)
 elif main_item == 'zip':
-    use_password = get_single_input('Use password (y/n)?')
+    use_password = get_single_input('use password (y/n)?')
     if use_password == 'y':
         prompt('-i', '-p')
         compress_zip(inpt, password)
@@ -90,9 +90,9 @@ elif main_item == 'zip':
         prompt('-i')
         compress_zip(inpt)
     else:
-        invalid('Wrong choice')
+        invalid('wrong choice')
 elif main_item == 'unzip':
-    has_password = get_single_input('Has password (y/n)?')
+    has_password = get_single_input('has password (y/n)?')
     if has_password == 'y':
         prompt('-i', '-p')
         xtract_zip(inpt, password)
@@ -100,9 +100,9 @@ elif main_item == 'unzip':
         prompt('-i')
         xtract_zip(inpt)
     else:
-        invalid('Wrong choice')
+        invalid('wrong choice')
 elif main_item == 'unrar':
-    has_password = get_single_input('Has password (y/n)?')
+    has_password = get_single_input('has password (y/n)?')
     if has_password == 'y':
         prompt('-i', '-p')
         xtract_rar(inpt, password)
@@ -110,6 +110,6 @@ elif main_item == 'unrar':
         prompt('-i')
         xtract_rar(inpt)
     else:
-        invalid('Wrong choice')
+        invalid('wrong choice')
 elif main_item == 'help':
     display_help()

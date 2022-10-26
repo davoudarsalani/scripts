@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/bluetooth
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 10:33:45 +0330 Wednesday
+## @last-modified 1401-08-03 09:21:00 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-fir-blu-batt
@@ -17,7 +17,7 @@ function update_bluetooth {
 }
 
 function get_mac {
-    mac="$(get_input 'Device mac address')"
+    mac="$(get_input 'device mac address')"
 }
 
 heading "$title"
@@ -49,7 +49,7 @@ case "$main_item" in
     'controller information' )
         bluetoothctl show "$def_ctrlr_mac" && accomplished ;;
     'select default controller' )
-        mac="$(get_input 'Mac address [!! or name]')"
+        mac="$(get_input 'mac address [!! or name]')"
         bluetoothctl select "$mac" && accomplished ;;
     'available/paired devices' )
         printf 'available:\t%s\n' "$(bluetoothctl devices)"

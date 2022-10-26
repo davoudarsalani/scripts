@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/copy
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 16:03:01 +0330 Friday
+## @last-modified 1401-08-03 09:22:44 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -25,7 +25,7 @@ function copy {
     readarray -t files < <(find "$dest_dir" -mindepth 1 -maxdepth 1 ! -iname '*0-path.txt' | sort)
     printf '%s\n' "${files[@]##*/}" | column
 
-    remove_propmt="$(get_single_input 'Remove these?')" && printf '\n'
+    remove_propmt="$(get_single_input 'remove these?')" && printf '\n'
     case "$remove_propmt" in
         y )
             rm -rf "${files[@]}" ;;

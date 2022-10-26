@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/video-subtitle
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 11:09:20 +0330 Wednesday
+## @last-modified 1401-08-03 09:38:06 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -23,7 +23,7 @@ function prompt {
     for _ in "$@"; {
         case "$1" in
             -d )
-                dir="${dir:-"$(get_input 'Directory')"}"
+                dir="${dir:-"$(get_input 'directory')"}"
                 [ -d "$dir" ] || {
                     red 'no such dir'
                     exit
@@ -60,7 +60,7 @@ main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" ||
 
 case "$main_item" in
     "replace ' ', ---, -_-, !, %, & and ," )
-        replaced_en="$(get_single_input ' Have you replaced .en.vtt with .vtt?')" && printf '\n'
+        replaced_en="$(get_single_input ' have you replaced .en.vtt with .vtt?')" && printf '\n'
         [ "$replaced_en" == 'y' ] || exit  ## NOTE do NOT remove
 
         prompt -d

@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/record-audio.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:46:53 +0330 Tuesday
+## @last-modified 1401-08-03 09:48:09 +0330 Tuesday
 
 from os import getenv
 
@@ -53,7 +53,7 @@ elif need_mic == 'no':
     Aud.mon('unmute')
     Aud.mon('100')
 else:
-    exit()
+    invalid('invalid answer')
 
 update_audio()
 

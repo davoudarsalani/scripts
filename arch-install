@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/arch-install
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-11 08:26:10 +0330 Monday
+## @last-modified 1401-07-26 16:04:15 +0330 Tuesday
 
 function display_help {
     local cmd
@@ -325,7 +325,7 @@ case "$1" in
                 mkfs.ext4 /dev/sd_3
                 mkfs.ext4 /dev/sd_4
 
-                mkdir -p /mnt/boot/efi         <--,-- moutn efi
+                mkdir -p /mnt/boot/efi         <--,-- mount efi
                 mount /dev/sd_1 /mnt/boot/efi  <--'
                 mount /dev/sd_3 /mnt           <-- mount root
                 mkdir /mnt/home                <--,-- mount home

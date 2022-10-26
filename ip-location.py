@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/ip-location.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-10 09:03:36 +0330 Sunday
+## @last-modified 1401-08-03 09:29:17 +0330 Tuesday
 
 from getopt import getopt
 from json import dumps
@@ -55,7 +55,7 @@ def prompt(*args: list[str]) -> None:  ## {{{
             try:
                 ip
             except:
-                ip = get_input('IP')
+                ip = get_input('ip')
 
 
 ## }}}

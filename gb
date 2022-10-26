@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/gb
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 10:41:17 +0330 Friday
+## @last-modified 1401-08-02 06:54:57 +0330 Monday
 
 function get_datetime {  ## {{{
     case "$1" in
@@ -434,10 +434,10 @@ function remove_older_pkgs {  ## {{{
         remove_propmt="$(get_single_input "remove ${#to_be_removed[@]} pkgs?")" && printf '\n'
         case "$remove_propmt" in
             y )
-                action_now "removing from $src_dir"
+                action_now "removing from ${src_dir/$HOME/\~}"
                 rm -v "${to_be_removed[@]}"
 
-                action_now "removing from $src_kaddy_dir"
+                action_now "removing from ${src_kaddy_dir/$HOME/\~}"
                 rm -v "${to_be_removed[@]/$src_dir/$src_kaddy_dir}"
                 ;;
         esac
@@ -489,6 +489,8 @@ function expand_ips_from_ranges {  ## {{{
     printf '}\n' >> "$dest_file"
 }
 ## }}}
+
+## for website:
 function create_timeline_thumbnails {  ## {{{
     source "$HOME"/scripts/gb-color
 
@@ -519,6 +521,62 @@ function create_timeline_thumbnails {  ## {{{
 
         ## https://www.youtube.com/watch?v=ZeNyjnneq_w
         ffmpeg -i "$v" -vf fps=1/10,scale=120:-1 "$dest_dir"/timeline-thumbnail-"${vid_name}"-%03d.webp 2>/dev/null
+    }
+}
+## }}}
+function create_waveform_v2 {  ## {{{
+    source "$HOME"/scripts/gb-color
+
+    ## [CHECKING_OS]
+    [ "$(command -v apt)" ] || {
+        red 'can be run only on mint at the moment'
+        red 'due to troubles installing dependencies'
+        exit
+    }
+
+    local type_ ext src_dir d_base f_base dest_media dest_png dest_js
+    local -a dirs_ files
+
+    type_='audio'  ## audio/dictionary/video
+    ext='.mp3'  ## .mp3/.mp4
+
+    src_dir="$HOME"/dl/"$type_"
+
+    readarray -t dirs_ < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type d | sort)
+
+    for d in "${dirs_[@]}"; {
+        d_base="${d##*/}"  ## 6-minute-english
+        printf '%s\n' "$d_base"
+
+        readarray -t files < <(find "$src_dir"/"$d_base" -mindepth 1 -maxdepth 1 -type f -iname "*$ext" | sort)
+
+        for f in "${files[@]}"; {
+            f_base="${f##*/}"  ## 001.mp3
+            dest_media="$HOME"/website/static/files/page/"$type_"/00-waveform/waveform--"$d_base"-v2-"$f_base"
+            dest_png="${dest_media/$ext/.png}"
+            dest_js="${dest_media/$ext/.js}"
+
+            ## create waveform (https://github.com/andrewrk/waveform)
+            ## (flags for creating json containing levels:
+            ##   --wjs-width 840
+            ##   --wjs-precision 4
+            ##   --waveformjs "$dest_js")
+            "$HOME"/linux/sources/waveform/waveform \
+                --png-width 840 \
+                --png-height 128 \
+                --png-color-center ffffffff \
+                --png-color-outer ffffffff \
+                --png "$dest_png" \
+                \
+                "$f"
+
+            ## convert png to webp
+            ## NOTE if statement because some audio files are empty
+            ##      leading to the creation of no dest_png in the previous step
+            if [ -f "$dest_png" ]; then
+                ffmpeg -i "$dest_png" "${dest_png/.png/.webp}" 2>/dev/null
+            fi
+        }
     }
 }
 ## }}}

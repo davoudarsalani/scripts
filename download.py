@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/download.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-13 08:51:03 +0330 Wednesday
+## @last-modified 1401-08-03 09:45:28 +0330 Tuesday
 
 ## {{{ imports
 from __future__ import unicode_literals
@@ -478,7 +478,7 @@ class Initial:  ## {{{
         playlist_id_regex = '^PL'  ## TODO better regex (I don't think - is required after PL)
 
         if not self.source:
-            self.source = get_input('Source')
+            self.source = get_input('source')
 
         ## check if self.source is a file
         if path.isfile(self.source):
@@ -488,7 +488,7 @@ class Initial:  ## {{{
                 lines = opened_source.read().splitlines()  ## OR: opened_source.readlines()
             self.urls = list(filter(lambda line: not line.startswith('#') and line, lines))
             if not self.urls:
-                invalid('Source contains no downloadable urls')
+                invalid('source contains no downloadable urls')
 
             root_base, _ = path.splitext(self.source)  ## $HOME/downloads/lucy, .txt
             self.dest_dir = root_base
@@ -513,7 +513,7 @@ class Initial:  ## {{{
 
         ## make sure self.source is not a directory (JUMP_3)
         elif path.isdir(self.source):
-            invalid('Source cannot be a directory')
+            invalid('source cannot be a directory')
 
         ## check if self.source is a url
         elif match(url_regex, self.source):
@@ -545,11 +545,11 @@ class Initial:  ## {{{
             ## create self.urls list from Pla.pl_urls which is s list
             self.urls = list(filter(lambda line: not line.startswith('#') and line, Pla.pl_urls))
             if not self.urls:
-                invalid('No urls extracted from playlist id')
+                invalid('no urls extracted from playlist id')
             self.dest_dir = f'{getenv("HOME")}/downloads/{normalize(self.source)}'
 
         else:
-            invalid('Source neither exists nor is a valid url')
+            invalid('source neither exists nor is a valid url')
 
         if self.purge:
             self.dest_dir = f'/tmp/purge_{self.time}'
@@ -560,7 +560,7 @@ class Initial:  ## {{{
         ## }}}
         ## {{{ file_type
         if self.file_type not in ['v', 's', 'vs', 'a', 't', 'o']:
-            invalid('Invalid file type')
+            invalid('invalid file type')
         ## }}}
         ## {{{ downloader JUMP_1
         if self.downloader and (
@@ -571,7 +571,7 @@ class Initial:  ## {{{
         ## }}}
         ## {{{ quality
         if self.quality not in self.valid_qualities:
-            invalid(f'Invalid quality. It has to be one of these: {self.valid_qualities}')
+            invalid(f'invalid quality. It has to be one of these: {self.valid_qualities}')
         ## }}}
         ## {{{ increment
         if self.increment:
@@ -590,7 +590,7 @@ class Initial:  ## {{{
         ## }}}
         ## {{{ when
         if self.when not in ['n', 'h']:
-            invalid('Invalid time')
+            invalid('invalid time')
         ## }}}
 
     ## }}}
@@ -932,7 +932,7 @@ class File(Profile):  ## {{{
                 if Ini.tor:
                     ## FIXME find how to set proxy for wget
                     ## JUMP_6 FIXME it prompts for every url
-                    continue_without_proxy = get_single_input('Setting tor for wget for o is not possible at the moment. Continue without proxy?')
+                    continue_without_proxy = get_single_input('setting tor for wget for o is not possible at the moment. continue without proxy?')
                     if not continue_without_proxy == 'y':
                         exit()
 
@@ -1149,7 +1149,7 @@ class Youtube(Profile):  ## {{{
             ##          '-- axel throws 'DownloadError('ERROR: axel exited with code 1')' for v, vs and a but works well for s and t
             ## JUMP_6 FIXME it prompts for every url
             continue_with_default_downloader = get_single_input(
-                'Setting downloader other than curl for v/s/vs/a/t is not possible at the moment. Continue with default downloader (i.e. youtube_dl)?'
+                'setting downloader other than curl for v/s/vs/a/t is not possible at the moment. continue with default downloader (i.e. youtube_dl)?'
             )
             if not continue_with_default_downloader == 'y':
                 exit()

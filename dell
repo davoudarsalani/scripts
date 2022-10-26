@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/dell
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-26 09:47:33 +0330 Tuesday
+## @last-modified 1401-08-03 10:23:25 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -19,18 +19,22 @@ function display_help {
 }
 
 function upload {
-    scp -r "$@" nnnn@dell-"$bed":"$HOME"/downloads && accomplished
+    scp -r "$@" nnnn@dell-"$bed":"$HOME"/downloads && \
+    accomplished
 }
 
 function download {
-    local all
+    # local all
+    # all="${@:0}"  ## turn array into str because shelcheck said:
+    #               ## SC2145 (error): Argument mixes string and array. Use * or separate argument.
 
-    all="${@:0}"  ## turn array into str because shelccheck said: SC2145 (error): Argument mixes string and array. Use * or separate argument.
-    scp -r nnnn@dell-"$bed":"$all" "$HOME"/downloads && accomplished
+    scp -r nnnn@dell-"$bed":"$@" "$HOME"/downloads && \
+    accomplished
 }
 
 function connect {
-    ssh -Y nnnn@dell-"$bed" && accomplished
+    ssh -Y nnnn@dell-"$bed" && \
+    accomplished
 }
 
 function connect_plus_x2x {
@@ -41,13 +45,13 @@ function rsync_ {
     ## NOTE remove trailing slash
     source_dir="${source_dir%/}"
 
-    rsync -a --progress --delete "$source_dir" nnnn@dell-"$bed":
+    rsync --archive --progress --delete "$source_dir" nnnn@dell-"$bed":
 }
 
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -n ) name="${name:-"$(get_input 'Dir/file name')"}" ;;
+            -n ) name="${name:-"$(get_input 'directory/file name')"}" ;;
         esac
         shift
     }
@@ -82,12 +86,14 @@ main_items=(
     'ethernet upload'
     'ethernet rsync ~/linux'
     'ethernet rsync ~/scripts'
+    'ethernet rsync ~/website'
     'wifi connect + x2x'
     'wifi connect'
     'wifi download'
     'wifi upload'
     'wifi rsync ~/linux'
     'wifi rsync ~/scripts'
+    'wifi rsync ~/website'
     'help'
 )
 
@@ -116,6 +122,10 @@ case "$main_item" in
         bed='ethernet'
         source_dir="$HOME"/scripts  ## JUMP_1
         rsync_ ;;
+    'ethernet rsync ~/website' )
+        bed='ethernet'
+        source_dir="$HOME"/website  ## JUMP_1
+        rsync_ ;;
 
     'wifi connect + x2x' )
         bed='wifi'
@@ -138,6 +148,10 @@ case "$main_item" in
     'wifi rsync ~/scripts' )
         bed='wifi'
         source_dir="$HOME"/scripts  ## JUMP_1
+        rsync_ ;;
+    'wifi rsync ~/website' )
+        bed='wifi'
+        source_dir="$HOME"/website  ## JUMP_1
         rsync_ ;;
     help )
         display_help ;;

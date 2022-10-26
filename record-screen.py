@@ -5,16 +5,16 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/record-screen.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:47:00 +0330 Tuesday
+## @last-modified 1401-08-03 13:02:12 +0330 Tuesday
 
 from os import getenv
 
 from gp import Screen, Record, Audio, get_datetime, rofi, update_audio, record_icon, set_widget, convert_second
 
-S = Screen()
-scr_1_name, scr_1_res, scr_1_x, scr_1_y = S.screen_1()
-scr_2_name, scr_2_res, scr_2_x, scr_2_y = S.screen_2()
-scr_all_res = S.screen_all()
+Scr = Screen()
+scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset = Scr.screen_1()
+scr_2_name, scr_2_res, scr_2_x, scr_2_y, scr_2_x_offset, scr_2_y_offset = Scr.screen_2()
+scr_all_res = Scr.screen_all()
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
 length = rofi(lengths, 'rec screen')
@@ -45,9 +45,9 @@ dur = convert_second(secs)
 screens = ['1', '2', 'all']
 screen = rofi(screens, 'screen')
 if screen == '1':
-    x_offset, resolution, suffix = 0, scr_1_res, 'SCR-1'
+    x_offset, resolution, suffix = scr_1_x_offset, scr_1_res, 'SCR-1'
 elif screen == '2':
-    x_offset, resolution, suffix = scr_1_x, scr_2_res, 'SCR-2'
+    x_offset, resolution, suffix = scr_2_x_offset, scr_2_res, 'SCR-2'
 elif screen == 'all':
     x_offset, resolution, suffix = 0, scr_all_res, 'SCR-ALL'
 else:
@@ -68,7 +68,7 @@ elif need_mic == 'no':
     Aud.mon('unmute')
     Aud.mon('100')
 else:
-    exit()
+    invalid('invalid answer')
 
 update_audio()
 

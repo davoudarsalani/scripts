@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/mime-type
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 10:14:28 +0330 Wednesday
+## @last-modified 1401-08-03 09:30:40 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -19,7 +19,7 @@ function display_help {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -n ) name="${name:-"$(get_input 'Dir/fie name')"}" ;;
+            -n ) name="${name:-"$(get_input 'directory/fie name')"}" ;;
         esac
         shift
     }

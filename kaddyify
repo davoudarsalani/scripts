@@ -5,19 +5,18 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/kaddyify
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-26 09:05:17 +0330 Tuesday
+## @last-modified 1401-07-26 15:34:12 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
 
-## --dry-run -v     perform a trial run with no changes made (-v is added by me)
-## --delete         remove files on remote not present on local
-## --progress       show progress during transfer
-## -P               same as --partial --progress
-
-## on ssh:
-## NOTE dont forget to remove trailing slash
-# rsync -a --progress --delete ~/scripts nnnn@IP:~/scripts
+## --archive, -a            archive mode is -rlptgoD (no -A,-X,-U,-N,-H)
+## --recursive, -r          recurse into directories
+## --progress               show progress during transfer
+## -P                       same as --partial --progress
+## --delete                 remove files on remote not present on local
+## --dry-run -v, -n -v      perform a trial run with no changes made (-v is added by me)
+## --itemize-changes, -i    output a change-summary for all updates
 
 title="${0##*/}"
 
@@ -37,13 +36,13 @@ function get_opt {
                 display_help ;;
             -s|--sync )
                 shift
-                flags='-a --progress --delete'
+                flags='--archive --progress --delete'
                 break ;;  ## JUMP_1 exceptionally using break
             -d|--diff )
                 shift
                 ## https://unix.stackexchange.com/questions/57305/rsync-compare-directories
-                ## -v not needed
-                flags='-ai --dry-run'  ## -ai OR -ri
+                ## -v not needed here
+                flags='--archive --itemize-changes --dry-run'  ## --archive OR --recursive
                 break ;;  ## JUMP_1
             -- )
                 break ;;
@@ -77,3 +76,36 @@ for kaddy_dir in "${kaddy_directories[@]}"; {
     ## NOTE keep $flags unquoted
     rsync $flags "$home_dir" "$home_kaddy_dir" | \grep -v 'sending incremental file list'
 }
+
+## Explanation of each bit position and value in rsync's output:
+## (https://stackoverflow.com/questions/4493525/what-does-f-mean-in-rsync-logs)
+##
+## YXcstpoguax  path/to/file
+## |||||||||||
+## ||||||||||╰- x: The extended attribute information changed
+## |||||||||╰-- a: The ACL information changed
+## ||||||||╰--- u: The u slot is reserved for future use
+## |||||||╰---- g: Group is different
+## ||||||╰----- o: Owner is different
+## |||||╰------ p: Permission are different
+## ||||╰------- t: Modification time is different
+## |||╰-------- s: Size is different
+## ||╰--------- c: Different checksum (for regular files), or changed value (for symlinks, devices, and special files)
+## ||
+## |╰----------    file type:
+## |            f: for a file,
+## |            d: for a directory,
+## |            L: for a symlink,
+## |            D: for a device,
+## |            S: for a special file (e.g. named sockets and fifos)
+## |
+## ╰-----------    type of update being done:
+##              <: file is being transferred to the remote host (sent)
+##              >: file is being transferred to the local host (received)
+##              c: local change/creation for the item, such as:
+##                 - the creation of a directory
+##                 - the changing of a symlink,
+##                 - etc.
+##              h: the item is a hard link to another item (requires --hard-links).
+##              .: the item is not being updated (though it might have attributes that are being modified)
+##              *: means that the rest of the itemized-output area contains a message (e.g. "deleting")

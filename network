@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/network
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 11:13:16 +0330 Wednesday
+## @last-modified 1401-08-03 09:33:21 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-network
@@ -28,13 +28,13 @@ function prompt {
             -i )
                 ip="${ip:-"$(get_input 'ip')"}" ;;
             -d )
-                device="${device:-"$(get_input 'Device (e.g. eth0)')"}" ;;
+                device="${device:-"$(get_input 'device (e.g. eth0)')"}" ;;
             -c )
-                connection="${connection:-"$(get_input 'Connection (e.g. MOB)')"}" ;;
+                connection="${connection:-"$(get_input 'connection (e.g. MOB)')"}" ;;
             -s )
                 ssid="${ssid:-"$(get_input 'ssid')"}" ;;
             -p )
-                password="${password:-"$(get_input 'Password')"}" ;;
+                password="${password:-"$(get_input 'password')"}" ;;
         esac
         shift
     }

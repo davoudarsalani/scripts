@@ -5,17 +5,17 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/mint
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-26 09:39:02 +0330 Tuesday
+## @last-modified 1401-07-28 14:51:58 +0330 Thursday
 
 source "$HOME"/scripts/gb
 
 case "$1" in
     audio_levels )
         source "$HOME"/scripts/gb-audio
-        printf '%s %s %s\n' "$vol_level" "$mic_level" "$mon_level" ;;
-    vol_30 )
-        source "$HOME"/scripts/gb-audio
-        pactl set-sink-volume "$def_sink_index" 30% ;;
+        [ "$vol_mute_status" == 'yes' ] && vol_on_off=':OF'
+        [ "$mic_mute_status" == 'no' ] && mic_on_off=':ON'
+        [ "$mon_mute_status" == 'no' ] && mon_on_off=':ON'
+        printf '%s%s %s%s %s%s\n' "$vol_level" "$vol_on_off" "$mic_level" "$mic_on_off" "$mon_level" "$mon_on_off" ;;
     cpu_temp )
         ## exceptionally used sensors (only for mint)
         temps="$(sensors | \grep '^Core' | awk '{print $3}' | sed 's/+\([0-9]\+\).*/\1/g' | xargs)"
@@ -42,7 +42,7 @@ case "$1" in
         printf '%s\n' "$perc" ;;
     network )
         source "$HOME"/scripts/gb-network
-        printf '%s  %s\n' "$eth_conn" "$wf_conn" ;;
+        printf '%s %s\n' "$eth_conn" "$wf_conn" ;;
     firefox_whatsapp )
         firefox --new-tab 'https://web.whatsapp.com' ;;
     if_uget )

@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/application
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-11-13 09:41:02 +0330 Wednesday
+## @last-modified 1401-08-03 09:23:24 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -22,9 +22,9 @@ function prompt {
     for _ in "$@"; {
         case "$1" in
             -p )
-                package="${package:-"$(get_input 'Package name')"}" ;;
+                package="${package:-"$(get_input 'package name')"}" ;;
             -u )
-                unit="${unit:-"$(get_input 'Unit name')"}" ;;
+                unit="${unit:-"$(get_input 'unit name')"}" ;;
         esac
         shift
     }
@@ -76,18 +76,18 @@ case "$main_item" in
             'download (no install)' )
                 pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Sw && accomplished ;;
             'reinstall all packages' )
-                reinstall_prompt="$(get_single_input 'You sure?')" && printf '\n'
+                reinstall_prompt="$(get_single_input 'you sure?')" && printf '\n'
                 case "$reinstall_prompt" in
                     y ) sudo pacman -Qnq | pacman -S - && accomplished ;;
                 esac ;;
             'lts kernel & header' )
-                start_prompt="$(get_single_input 'Start?')" && printf '\n'
+                start_prompt="$(get_single_input 'start?')" && printf '\n'
                 case "$start_prompt" in
                     y )
                         action_now 'Installing'
                         sudo pacman -S --needed linux-lts linux-lts-headers
                         printf '\n'
-                        update_prompt="$(get_single_input 'Update bootloader?')" && printf '\n'
+                        update_prompt="$(get_single_input 'update bootloader?')" && printf '\n'
                         case "$update_prompt" in
                             y )
                                 action_now 'Updating bootloader'
@@ -148,7 +148,7 @@ case "$main_item" in
         readarray -t orphans < <(sudo pacman -Qtdq)  ## is sudo needed?
         if [ "$orphans" ]; then
             printf '%s\n' "${orphans[@]}" | sort | column
-            remove_orphans="$(get_single_input "Remove "${#orphans[@]}" orphans?")" && printf '\n'
+            remove_orphans="$(get_single_input "remove "${#orphans[@]}" orphans?")" && printf '\n'
             case "$remove_orphans" in
                 y )
                     sudo pacman -Rns "${orphans[@]}" --noconfirm ;;
@@ -162,7 +162,7 @@ case "$main_item" in
         rm -rf "$HOME"/.cache
 
         printf '\n'
-        reboot_prompt="$(get_single_input "Reboot?")" && printf '\n'
+        reboot_prompt="$(get_single_input "reboot?")" && printf '\n'
         case "$reboot_prompt" in
             y ) reboot ;;
         esac

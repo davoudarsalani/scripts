@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/g
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 11:49:40 +0330 Friday
+## @last-modified 1401-08-03 09:28:31 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -140,20 +140,20 @@ function prompt {  ## {{{
     for _ in "$@"; {
         case "$1" in
             -p )
-                pattern="${pattern:-"$(get_input 'Pattern (e.g. *.py)')"}"  ## NOTE pattern does NOT need quotes here, but if pattern is passed as arg, it will
+                pattern="${pattern:-"$(get_input 'pattern (e.g. *.py)')"}"  ## NOTE pattern does NOT need quotes here, but if pattern is passed as arg, it will
                 check_pattern ;;
             -m )
-                message="${message:-"$(get_input 'Message')"}" ;;
+                message="${message:-"$(get_input 'message')"}" ;;
             -b )
-                branch="${branch:-"$(get_input 'Branch')"}" ;;
+                branch="${branch:-"$(get_input 'branch')"}" ;;
             -t )
-                tag="${tag:-"$(get_input 'Tag')"}" ;;
+                tag="${tag:-"$(get_input 'tag')"}" ;;
             -c )
                 commit_hash="${commit_hash:-"$(select_hash)"}" || exit 37 ;;  ## exceptionally used select_hash instead of get_input
             -n )
-                new_name="${new_name:-"$(get_input 'New name')"}" ;;
+                new_name="${new_name:-"$(get_input 'new name')"}" ;;
             -f )
-                file="${file:-"$(get_input 'File')"}" ;;
+                file="${file:-"$(get_input 'file')"}" ;;
         esac
         shift
     }

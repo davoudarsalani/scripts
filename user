@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/user
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 11:06:21 +0330 Wednesday
+## @last-modified 1401-08-03 09:37:47 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -20,7 +20,7 @@ function display_help {
 function prompt {
     for _ in "$@"; {
         case "$1" in
-            -g ) group="${group:-"$(get_input 'Group')"}" ;;
+            -g ) group="${group:-"$(get_input 'group')"}" ;;
         esac
         shift
     }

@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/postinstall
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-25 13:11:51 +0330 Monday
+## @last-modified 1401-07-27 09:24:59 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -73,6 +73,9 @@ case "$main_item" in
 
             ## for jcal
             'automake' 'build-essential' 'libjalali-dev' 'libtool'
+
+            ## for waveform (https://github.com/andrewrk/waveform)
+            'libgroove-dev' 'libpng-dev' 'zlib [!!]'
         )
 
         blue 'Apps'

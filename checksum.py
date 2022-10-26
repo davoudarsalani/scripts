@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/checksum.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:44:36 +0330 Tuesday
+## @last-modified 1401-08-03 09:44:05 +0330 Tuesday
 
 from getopt import getopt
 from os import path
@@ -56,16 +56,16 @@ def prompt(*args: list[str]) -> None:  ## {{{
             try:
                 file
             except:
-                file = get_input('File')
-            if not path.exists(f'{file}'):
-                invalid('No such file')
-            if path.isdir(f'{file}'):
-                invalid('Files only')
+                file = get_input('file')
+            if not path.exists(file):
+                invalid(f'{file} does not exist')
+            if path.isdir(file):
+                invalid('files only')
         elif arg == '-s':
             try:
                 string
             except:
-                string = get_input('String')
+                string = get_input('string')
 
 
 ## }}}

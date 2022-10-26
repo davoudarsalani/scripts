@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/lf.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 00:08:25 +0330 Friday
+## @last-modified 1401-08-03 09:53:14 +0330 Tuesday
 
 from os import path, getenv, symlink, rename, remove, getcwd
 from re import sub
@@ -244,14 +244,14 @@ elif main_arg == 'zip':  ## {{{
     for f in files:
         try:
             base = path.basename(f)
-            use_password = get_single_input('Use password (y/n)?')
+            use_password = get_single_input('use password (y/n)?')
             if use_password == 'y':
-                password = get_password('Password ')
+                password = get_password('password ')
                 compress_zip(f, password)
             elif use_password == 'n':
                 compress_zip(f)
             else:
-                invalid('Wrong choice')
+                invalid('wrong choice')
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to zip')
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
@@ -261,13 +261,13 @@ elif main_arg == 'rar':  ## {{{
     for f in files:
         try:
             base = path.basename(f)
-            use_password = get_single_input('Use password (y/n)?')
+            use_password = get_single_input('use password (y/n)?')
             if use_password == 'y':
                 compress_rar(f, set_password=True)
             elif use_password == 'n':
                 compress_rar(f)
             else:
-                invalid('Wrong choice')
+                invalid('wrong choice')
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to rar')
         except Exception as exc:
             msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to rar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
@@ -297,14 +297,14 @@ elif main_arg == 'unzip':  ## {{{
     for f in files:
         try:
             base = path.basename(f)
-            has_password = get_single_input('Has password (y/n)?')
+            has_password = get_single_input('has password (y/n)?')
             if has_password == 'y':
-                password = get_password('Password ')
+                password = get_password('password ')
                 xtract_zip(f, password)
             elif has_password == 'n':
                 xtract_zip(f)
             else:
-                invalid('Wrong choice')
+                invalid('wrong choice')
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
@@ -314,15 +314,15 @@ elif main_arg == 'unrar':  ## {{{
     for f in files:
         try:
             base = path.basename(f)
-            has_password = get_single_input('Has password (y/n)?')
+            has_password = get_single_input('has password (y/n)?')
             if has_password == 'y':
-                password = get_password('Password ')
+                password = get_password('password ')
                 xtract_rar(f, password)
                 pass
             elif has_password == 'n':
                 xtract_rar(f)
             else:
-                invalid('Wrong choice')
+                invalid('wrong choice')
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
             msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')

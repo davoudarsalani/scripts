@@ -1,4 +1,4 @@
-## @last-modified 1401-07-22 00:15:08 +0330 Friday
+## @last-modified 1401-08-03 13:15:51 +0330 Tuesday
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
@@ -459,40 +459,48 @@ class Screen:  ## {{{
         from subprocess import check_output
 
         scr_1 = check_output('xrandr | grep -iw connected | grep -i primary', shell=True, universal_newlines=True).strip()
-        scr_1_name, *junk = scr_1.split()
-        scr_1_res, *junk = scr_1.split()[3].split('+')
-        scr_1_x, scr_1_y = scr_1_res.split('x')
+        scr_1_name, *_ = scr_1.split()  ## eDP-1
+        scr_1_res_total = scr_1.split()[3]  ## 1366x768+1920+0
+        scr_1_res, *_ = scr_1_res_total.split('+')  ## 1366x768
+        scr_1_x, scr_1_y = scr_1_res.split('x')  ## 1366 768
+        scr_1_x_offset, scr_1_y_offset = scr_1_res_total.split('+')[1:]  ## 1920 0
 
-        return scr_1_name, scr_1_res, scr_1_x, scr_1_y
+        return scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset
 
     @staticmethod
     def screen_2() -> tuple[str, str, int, int]:
         from subprocess import check_output
 
         scr_2 = check_output('xrandr | grep -iw connected | grep -vi primary | sed "1q;d"', shell=True, universal_newlines=True).strip()
-        scr_2_name, *junk = scr_2.split()
-        scr_2_res, *junk = scr_2.split()[2].split('+')
+        scr_2_name, *_ = scr_2.split()
+        scr_2_res_total = scr_2.split()[2]
+        scr_2_res, *_ = scr_2_res_total.split('+')
         scr_2_x, scr_2_y = scr_2_res.split('x')
+        scr_2_x_offset, scr_2_y_offset = scr_2_res_total.split('+')[1:]
 
-        return scr_2_name, scr_2_res, scr_2_x, scr_2_y
+        return scr_2_name, scr_2_res, scr_2_x, scr_2_y, scr_2_x_offset, scr_2_y_offset
 
     @staticmethod
     def screen_3() -> tuple[str, str, int, int]:
         from subprocess import check_output
 
         scr_3 = check_output('xrandr | grep -iw connected | grep -vi primary | sed "2q;d"', shell=True, universal_newlines=True).strip()
-        scr_3_name, *junk = scr_3.split()
-        scr_3_res, *junk = scr_3.split()[2].split('+')
-        ## scr_3 may have a name but no proper res (e.g. has 'normal' instead of '1920x1080') because
+        scr_3_name, *_ = scr_3.split()
+        scr_3_res_total = scr_3.split()[2]
+        scr_3_res, *_ = scr_3_res_total.split('+')
+
+        ## scr_3 may have a name but no proper scr_3_res (e.g. is 'normal' instead of '1920x1080') because
         ## screen 3 has been turned off at startup with 'xrandr --output "$scr_3_name" --off' command
         ## therefore it doesn't have proper x and y. So, we need try here
         ## TODO can this happen to scr_2 (in screen_2 function) too when second monitor is not attached?
         try:
             scr_3_x, scr_3_y = scr_3_res.split('x')
+            scr_3_x_offset, scr_3_y_offset = scr_3_res_total.split('+')[1:]
         except Exception:
             scr_3_x, scr_3_y = None, None
+            scr_3_x_offset, scr_3_y_offset = None, None
 
-        return scr_3_name, scr_3_res, scr_3_x, scr_3_y
+        return scr_3_name, scr_3_res, scr_3_x, scr_3_y, scr_3_x_offset, scr_3_y_offset
 
     @staticmethod
     def screen_all() -> str:
@@ -503,6 +511,14 @@ class Screen:  ## {{{
         scr_all_res = ''.join(scr_all_res).replace(',', '')
 
         return scr_all_res
+
+    @staticmethod
+    def screens_count() -> int:
+        from subprocess import check_output
+
+        screens_count = check_output('xrandr --listmonitors', shell=True, universal_newlines=True).strip().split()[1]  ## 2
+
+        return screens_count
 
 
 ## }}}
@@ -1305,7 +1321,7 @@ def compress_zip(inpt: str, password: str = '') -> None:  ## {{{
                 opened_new_zipfile.write(base)
     else:
         if path.isdir(inpt):
-            invalid('Files only. Currently, cannot create password-protected dirs.')
+            invalid('files only. currently, cannot create password-protected directories.')
         dest_zip = f'{inpt}.zip'
         compress(inpt, None, dest_zip, password, 5)
 

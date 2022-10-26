@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/mount-umount
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-12 08:27:09 +0330 Tuesday
+## @last-modified 1401-08-03 09:31:28 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -20,9 +20,9 @@ function prompt {
     for _ in "$@"; {
         case "$1" in
             -d )
-                device="${device:-"$(get_input 'Device (e.g. /dev/sdc)')"}" ;;
+                device="${device:-"$(get_input 'device (e.g. /dev/sdc)')"}" ;;
             -n )
-                name="${name:-"$(get_input "Name (e.g. nnnn)")"}" ;;
+                name="${name:-"$(get_input 'name (e.g. nnnn)')"}" ;;
         esac
         shift
     }

@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/typer
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 11:05:01 +0330 Wednesday
+## @last-modified 1401-08-03 09:37:37 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audio
@@ -86,9 +86,9 @@ function prompt {  ## {{{
     for _ in "$@"; {
         case "$1" in
             -f )
-                file="${file:-"$(get_input 'File')"}" ;;
+                file="${file:-"$(get_input 'file')"}" ;;
             -i )
-                interval="${interval:-"$(get_input 'Interval (e.g. 0.2, 1, random, etc)')"}" ;;
+                interval="${interval:-"$(get_input 'interval (e.g. 0.2, 1, random, etc)')"}" ;;
         esac
         shift
     }

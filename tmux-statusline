@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-26 09:58:56 +0330 Tuesday
+## @last-modified 1401-07-30 20:18:40 +0330 Saturday
 
 case "$1" in
     pwd )
@@ -37,14 +37,12 @@ case "$1" in
         \grep -qi "^$HOME/\." <<< "$2"        && is_in_hidden_dir='true'
         \grep -qi "^$HOME/downloads" <<< "$2" && is_in_downloads='true'
         \grep -qi "^$HOME/movie" <<< "$2"     && is_in_movie='true'
-        \grep -qi "^$HOME/trash" <<< "$2"     && is_in_trash='true'
         \grep -qi "^$HOME/kaddy" <<< "$2"     && is_in_kaddy='true'
 
         if [ ! "$is_home" ] && \
            [ ! "$is_in_hidden_dir" ] && \
            [ ! "$is_in_downloads" ] && \
            [ ! "$is_in_movie" ] && \
-           [ ! "$is_in_trash" ] && \
            [ ! "$is_in_kaddy" ]; then
 
             source "$HOME"/scripts/gb
@@ -63,7 +61,10 @@ case "$1" in
                 ## if hashes of HEAD in current directory and kaddy counterpart are different
                 if [ "$(if_git "$2")" == 'true' ]; then
                     [ "$(git_hash_head "$2")" == "$(git_hash_head "$kaddy_counterpart")" ] || {
-                        head_='HEAD '
+                        head_='H '
+                    }
+                    [ "$(git_commits_ahead "$2")" == "$(git_commits_ahead "$kaddy_counterpart")" ] || {
+                        ahead_='A '
                     }
                 fi
 
@@ -73,7 +74,7 @@ case "$1" in
                     ls_='LS '
                 fi
 
-                printf '%s%s\n' "$head_" "$ls_"
+                printf '%s%s%s\n' "$head_" "$ahead_" "$ls_"
             fi
         fi ;;
     git )

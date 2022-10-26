@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/record-unlimited.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:47:07 +0330 Tuesday
+## @last-modified 1401-08-03 13:17:20 +0330 Tuesday
 
 from os import getenv, path
 from signal import signal, SIGINT
@@ -41,7 +41,7 @@ print(Col.heading(title))
 main_items = ['audio', 'screen 1', 'screen 2', 'screen all', 'video']
 main_item = fzf(main_items)
 
-mic = get_single_input('Need mic?')
+mic = get_single_input('need mic?')
 if mic == 'y':
     Aud.mic('unmute')
     Aud.mic('25')
@@ -51,7 +51,7 @@ elif mic == 'n':
     Aud.mon('unmute')
     Aud.mon('100')
 else:
-    invalid('Invalid answer')
+    invalid('invalid answer')
 
 update_audio()
 
@@ -63,26 +63,24 @@ if main_item == 'audio':
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.audio_ul(output)
 elif main_item == 'screen 1':
-    scr_1_name, scr_1_res, scr_1_x, scr_1_y = Scr.screen_1()
-    scr_2_name, scr_2_res, scr_2_x, scr_2_y = Scr.screen_2()
+    scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset = Scr.screen_1()
+    scr_2_name, scr_2_res, scr_2_x, scr_2_y, scr_2_x_offset, scr_2_y_offset = Scr.screen_2()
     resolution = scr_1_res
-    x_offset = 0
+    x_offset = scr_1_x_offset
     suffix = 'SCR-1-UL'
     output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.screen_ul(resolution, x_offset, output)
 elif main_item == 'screen 2':
-    scr_1_name, scr_1_res, scr_1_x, scr_1_y = Scr.screen_1()
-    scr_2_name, scr_2_res, scr_2_x, scr_2_y = Scr.screen_2()
+    scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset = Scr.screen_1()
+    scr_2_name, scr_2_res, scr_2_x, scr_2_y, scr_2_x_offset, scr_2_y_offset = Scr.screen_2()
     resolution = scr_2_res
-    x_offset = scr_1_x
+    x_offset = scr_2_x_offset
     suffix = 'SCR-2-UL'
     output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.screen_ul(resolution, x_offset, output)
 elif main_item == 'screen all':
-    scr_1_name, scr_1_res, scr_1_x, scr_1_y = Scr.screen_1()
-    scr_2_name, scr_2_res, scr_2_x, scr_2_y = Scr.screen_2()
     scr_all_res = Scr.screen_all()
     resolution = scr_all_res
     x_offset = 0

@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/ffmpeg
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 10:34:11 +0330 Wednesday
+## @last-modified 1401-08-03 09:26:52 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -20,29 +20,29 @@ function prompt {
     for _ in "$@"; {
         case "$1" in
             -i )
-                input_file="${input_file:-"$(get_input 'Input file')"}" ;;
+                input_file="${input_file:-"$(get_input 'input file')"}" ;;
             -x )
-                offset="${offset:-"$(get_input 'Offset (e.g. 1.2 or -0.8)')"}" ;;
+                offset="${offset:-"$(get_input 'offset (e.g. 1.2 or -0.8)')"}" ;;
             -o )
-                output="${output:-"$(get_input 'Output file')"}" ;;
+                output="${output:-"$(get_input 'output file')"}" ;;
             -s )
-                start="${start:-"$(get_input 'Start time (e.g. 00:00:09)')"}" ;;
+                start="${start:-"$(get_input 'start time (e.g. 00:00:09)')"}" ;;
             -e )
-                end="${end:-"$(get_input 'End time (e.g. 00:18:34)')"}" ;;
+                end="${end:-"$(get_input 'end time (e.g. 00:18:34)')"}" ;;
             -a )
-                audio_input="${audio_input:-"$(get_input 'Audio input file')"}" ;;
+                audio_input="${audio_input:-"$(get_input 'audio input file')"}" ;;
             -v )
-                video_input="${video_input:-"$(get_input 'Video input file')"}" ;;
+                video_input="${video_input:-"$(get_input 'video input file')"}" ;;
             -t )
-                time="${time:-"$(get_input 'Time (e.g. 00:00:09)')"}" ;;
+                time="${time:-"$(get_input 'time (e.g. 00:00:09)')"}" ;;
             -u )
-                audio_stream="${audio_stream:-"$(get_input 'Audio stream to keep (e.g. 1)')"}" ;;
+                audio_stream="${audio_stream:-"$(get_input 'audio stream to keep (e.g. 1)')"}" ;;
             -c )
-                camera="${camera:-"$(get_input 'Camera (e.g. /dev/video0)')"}" ;;
+                camera="${camera:-"$(get_input 'camera (e.g. /dev/video0)')"}" ;;
             -f )
-                sub_file="${sub_file:-"$(get_input 'Subtitle file')"}" ;;
+                sub_file="${sub_file:-"$(get_input 'subtitle file')"}" ;;
             -d )
-                sub_index="${sub_index:-"$(get_input 'Subtitle index (e.g. 0, 1, etc)')"}" ;;
+                sub_index="${sub_index:-"$(get_input 'subtitle index (e.g. 0, 1, etc)')"}" ;;
         esac
         shift
     }
