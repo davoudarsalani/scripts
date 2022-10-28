@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/awesome-autorun
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-05-22 07:41:42 +0330 Saturday
+## @last-modified 1401-08-05 16:09:20 +0330 Thursday
 
 source "$HOME"/scripts/gb
 
@@ -58,7 +58,7 @@ widgets=(
     'klgr'  ## it is updated regularly with watch, but this had better be here too
     'tor'
     'turn_off_scr_3'
-    'move_screen_2_to_left'
+    # 'move_screen_2_to_left'
 )
 
 for widget in "${widgets[@]}"; {

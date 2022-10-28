@@ -5,8 +5,9 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/weather.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-09-02 23:12:01 +0330 Tuesday
+## @last-modified 1401-08-06 09:25:59 +0330 Friday
 
+from json import loads
 from os import getenv
 from sys import argv
 
@@ -28,7 +29,7 @@ arg = argv[1]
 
 def get_info() -> dict[str, str]:  ## {{{
     resp = Ses.get(url, headers=hdrs, timeout=20)
-    resp = resp.json()  ## dict
+    resp = loads(resp.text)  ## dict
 
     return resp
 

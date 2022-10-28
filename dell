@@ -5,11 +5,11 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/dell
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 10:23:25 +0330 Tuesday
+## @last-modified 1401-08-06 10:03:54 +0330 Friday
 
 source "$HOME"/scripts/gb
 
-trap 'exit 0' INT  ## avoid 255 exit code when using options that connect with x2x
+trap 'exit 0' INT  ## to avoid 255 exit code when using options that connect with x2x
 
 title="${0##*/}"
 
@@ -19,16 +19,12 @@ function display_help {
 }
 
 function upload {
-    scp -r "$@" nnnn@dell-"$bed":"$HOME"/downloads && \
+    scp -r "$name" nnnn@dell-"$bed":"$HOME"/downloads && \
     accomplished
 }
 
 function download {
-    # local all
-    # all="${@:0}"  ## turn array into str because shelcheck said:
-    #               ## SC2145 (error): Argument mixes string and array. Use * or separate argument.
-
-    scp -r nnnn@dell-"$bed":"$@" "$HOME"/downloads && \
+    scp -r nnnn@dell-"$bed":"$name" "$HOME"/downloads && \
     accomplished
 }
 

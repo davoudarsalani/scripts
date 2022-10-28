@@ -5,7 +5,7 @@
 ##    https://github.com/davoudarsalani/scripts/blob/master/screenshot.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-10 09:04:12 +0330 Sunday
+## @last-modified 1401-08-05 08:56:11 +0330 Thursday
 
 from os import path, remove, getenv
 
@@ -41,8 +41,8 @@ global output
 output = f'{getenv("HOME")}/downloads/{now}-SS.png'
 
 Scr = Screen()
-scr_1_name, scr_1_res, scr_1_x, scr_1_y = Scr.screen_1()
-scr_2_name, scr_2_res, scr_2_x, scr_2_y = Scr.screen_2()
+scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset = Scr.screen_1()
+scr_2_name, scr_2_res, scr_2_x, scr_2_y, scr_2_x_offset, scr_2_y_offset = Scr.screen_2()
 scr_all_res = Scr.screen_all()
 
 ## https://askubuntu.com/questions/1011507/screenshot-of-an-active-application-using-python
