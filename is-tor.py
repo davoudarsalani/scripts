@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/is-tor.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/is-tor.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-02 09:24:25 +0330 Monday

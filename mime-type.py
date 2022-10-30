@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/mime-type.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/mime-type.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-05 12:47:58 +0330 Thursday

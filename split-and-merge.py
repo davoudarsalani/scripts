@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/split-and-merge.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/split-and-merge.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-07-18 11:46:56 +0330 Monday

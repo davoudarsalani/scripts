@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/e-mail.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/e-mail.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1400-10-10 12:56:35 +0330 Friday

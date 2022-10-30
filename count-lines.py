@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/count-lines.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/count-lines.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-06-15 18:45:59 +0330 Tuesday

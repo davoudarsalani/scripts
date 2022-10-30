@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/record-video.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-video.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-03 09:48:52 +0330 Tuesday

@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/record-screen.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-screen.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-03 13:02:12 +0330 Tuesday

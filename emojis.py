@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/emojis.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/emojis.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-06-15 18:46:21 +0330 Tuesday

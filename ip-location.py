@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/ip-location.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/ip-location.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-06 09:19:24 +0330 Friday

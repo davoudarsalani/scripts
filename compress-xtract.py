@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/compress-xtract.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/compress-xtract.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-03 09:52:20 +0330 Tuesday

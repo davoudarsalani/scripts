@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/gp.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gp.py
 ##    https://davoudarsalani.ir
 
 ## {{{ requirements

@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/g
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/g
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-03 09:28:31 +0330 Tuesday

@@ -3,6 +3,7 @@
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/screenshot.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/screenshot.py
 ##    https://davoudarsalani.ir
 
 ## @last-modified 1401-08-05 08:56:11 +0330 Thursday
