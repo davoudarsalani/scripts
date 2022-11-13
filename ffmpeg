@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/ffmpeg
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:26:52 +0330 Tuesday
+## @last-modified 1401-08-17 07:52:19 +0330 Tuesday
 
 source "$HOME"/scripts/gb
 
@@ -39,7 +39,11 @@ function prompt {
             -u )
                 audio_stream="${audio_stream:-"$(get_input 'audio stream to keep (e.g. 1)')"}" ;;
             -c )
-                camera="${camera:-"$(get_input 'camera (e.g. /dev/video0)')"}" ;;
+                if [ ! "$camera" ]; then
+                    readarray -t cameras < <(find /dev/ -mindepth 1 -maxdepth 1 -iname '*video*' | sort)
+                    camera="$(pipe_to_fzf "${cameras[@]}")" && wrap_fzf_choice "$camera" || exit 37
+                fi
+                ;;
             -f )
                 sub_file="${sub_file:-"$(get_input 'subtitle file')"}" ;;
             -d )

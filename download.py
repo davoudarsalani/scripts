@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/download.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:45:28 +0330 Tuesday
+## @last-modified 1401-08-16 14:58:53 +0330 Monday
 
 ## {{{ imports
 from __future__ import unicode_literals
@@ -252,6 +252,7 @@ def restart_tor() -> None:  ## {{{
         tor_status = 'off'
 
     if not tor_status == 'off':
+        ## [CHECKING_HOST]
         if path.exists('/bin/pacman'):
             run('sudo systemctl restart tor', shell=True)
         elif path.exists('/bin/apt'):

@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-git
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-20 23:59:37 +0330 Wednesday
+## @last-modified 1401-08-21 10:14:45 +0330 Saturday
 
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
@@ -180,7 +180,7 @@ function git_hash_last_commit {  ## {{{
 ## }}}
 function git_if_behind {  ## {{{
     source "$HOME"/scripts/gb-color
-    local commits_ahead temp_path
+    local commits_ahead commits_behind commits_behind_ahead temp_path
 
     action_now 'updating remote'
     commits_ahead="$(git_commits_ahead "${1:-.}")"

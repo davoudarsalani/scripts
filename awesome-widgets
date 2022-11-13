@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-widgets
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-22 18:19:38 +0330 Friday
+## @last-modified 1401-08-13 23:21:11 +0330 Friday
 
 source "$HOME"/scripts/gb
 
@@ -905,24 +905,30 @@ msgn "$text" ;;
 
         update_variables
 
-        ## save currnt song output length seconds (csols) if speech
-        regex='^(playing|paused)$'
-        [[ "$play_status" =~ $regex ]] && [ "$album" == 'speech' ] && {
-            printf '%s\n' "$current_position_in_seconds" > "$csols_file"
-            # msgn 'saved csol' "<span color=\"${orange}\">${current_position}</span>"
-        }
+        if [ "$play_status" == 'stopped' ]; then
+            text=''
+            bar_position=0
+        else
+            ## save currnt song output length seconds (csols) if speech
+            regex='^(playing|paused)$'
+            [[ "$play_status" =~ $regex ]] && [ "$album" == 'speech' ] && {
+                printf '%s\n' "$current_position_in_seconds" > "$csols_file"
+                # msgn 'saved csol' "<span color=\"${orange}\">${current_position}</span>"
+            }
 
-        [ "$play_status" == 'playing' ] || pause_text='PAUSED '
-        preamp_iz_zero="$(compare_floats "$preamp" '=' 0)"
-        [ "$preamp_iz_zero" == 'false' ] && equalizer='EQ '
-        [ "$shuffle_status" == 'on' ] && shuffle_text='SH '
-        order="${position_in_playlist}/${playlist_length}"  ## 1/5
-        [ "$length" ] && time="${current_position}/${length}" || time='0:00/0:00'  ## 2:24/18:54
-        (( bar_position > 99 )) && bar_position=1 || bar_position=0.${bar_position}
-        left="$(convert_second "$left_in_seconds")"  ## 01:05:16
-        left="$(shorten_duration "$left")"  ## 1:05:16
+            [ "$play_status" == 'playing' ] || paused_text='PAUSED '
+            preamp_is_zero="$(compare_floats "$preamp" '=' 0)"
+            [ "$preamp_is_zero" == 'false' ] && equalizer='EQ '
+            [ "$shuffle_status" == 'on' ] && shuffle_text='SH '
+            order="${position_in_playlist}/${playlist_length}"  ## 1/5
+            [ "$length" ] && timestamp="${current_position}/${length}" || timestamp='0:00/0:00'  ## 2:24/18:54
+            (( bar_position > 99 )) && bar_position=1 || bar_position=0.${bar_position}
+            left="$(convert_second "$left_in_seconds")"  ## 01:05:16
+            left="$(shorten_duration "$left")"  ## 1:05:16
 
-        text="<span color=\"${grey}\">${pause_text}</span><span color=\"${fg_l}\">${equalizer}</span><span color=\"${fg_d}\">${shuffle_text}</span><span color=\"${fg_l}\">${order}</span> <span color=\"${fg_d}\">${time} -${left}</span> <span color=\"${fg_l}\">${title}</span> <span color=\"${fg_d}\">${album}</span> <span color=\"${fg_l}\">${artist}</span>"
+            text="<span color=\"${grey}\">${paused_text}</span><span color=\"${fg_l}\">${equalizer}</span><span color=\"${fg_d}\">${shuffle_text}</span><span color=\"${fg_l}\">${order}</span> <span color=\"${fg_d}\">${timestamp} -${left}</span> <span color=\"${fg_l}\">${title}</span> <span color=\"${fg_d}\">${album}</span> <span color=\"${fg_l}\">${artist}</span>"
+        fi
+
         set_widget 'audacious'     'markup'           "$text"
         set_widget 'audacious_bar' 'background_color' "$fg_l"
         set_widget 'audacious_bar' 'color'            "$fg_d"
