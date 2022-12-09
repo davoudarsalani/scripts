@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/screenshot.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-05 08:56:11 +0330 Thursday
+## @last-modified 1401-08-27 22:03:50 +0330 Friday
 
 from os import path, remove, getenv
 
@@ -15,7 +15,6 @@ from gi import require_version
 require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from PIL import Image
-from pynput.mouse import Listener
 from gp import Screen, get_datetime, rofi, msgn, msgc, countdown
 
 
@@ -97,6 +96,33 @@ elif main_item == 'current window':  ## {{{
 elif main_item == 'selected area':  ## {{{
     ## https://nitratine.net/blog/post/how-to-get-mouse-clicks-with-python/
     try:
+        from pynput.mouse import Listener
+
+        '''
+        NOTE
+        this import used to be at the top of screen, where it's supposed to,
+        but after some update, it started throwing an error (JUMP_1),
+        so I decided to move it here.
+
+        ERROR:START JUMP_1:
+        Traceback (most recent call last):
+          File "/home/nnnn/scripts/./screenshot.py", line 11, in <module>
+            from pynput.mouse import Listener
+          File "/home/nnnn/scripts/.venv/lib/python3.10/site-packages/pynput/__init__.py", line 40, in <module>
+            from . import keyboard
+          File "/home/nnnn/scripts/.venv/lib/python3.10/site-packages/pynput/keyboard/__init__.py", line 31, in <module>
+            backend = backend(__name__)
+          File "/home/nnnn/scripts/.venv/lib/python3.10/site-packages/pynput/_util/__init__.py", line 76, in backend
+            raise ImportError('this platform is not supported: {}'.format(
+        ImportError: this platform is not supported: ('failed to acquire X connection: libtk8.6.so: cannot open shared object file: No such file or directory', ImportError('libtk8.6.so: cannot open s
+        hared object file: No such file or directory'))
+
+        Try one of the following resolutions:
+
+        * Please make sure that you have an X server running, and that the DISPLAY environment variable is set correctly
+        ERROR:END
+        '''
+
         ## get x_1 and y_1
         def on_click_1(x: int, y: int, button, pressed: bool) -> tuple[int, int]:
             if pressed:

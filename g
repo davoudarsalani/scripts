@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/g
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:28:31 +0330 Tuesday
+## @last-modified 1401-08-23 10:07:40 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -198,7 +198,7 @@ function get_opt {  ## {{{
             -- )
                 break ;;
         esac
- shift
+        shift
     done
 }
 ## }}}

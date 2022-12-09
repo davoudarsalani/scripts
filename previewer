@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/previewer
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-05-16 22:24:17 +0330 Sunday
+## @last-modified 1401-09-04 21:25:48 +0330 Friday
 
 function hi_li {
     eval "$HIGHLIGHT" "$1" 2>/dev/null  ## NOTE do not replace 2 with &
@@ -45,15 +45,15 @@ case "$file_mime_type" in
     image/* )
         printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(me_in "$1")" ;;
     */*tar )
-        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort --numeric-sort | head -50)" ;;
     */gzip )
-        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort)" ;;
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(tar -tvf "$1" | awk '{print $NF}' | sort --numeric-sort | head -50)" ;;
     *bzip2 )
         printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
     */zip )
-        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unzip -l "$1" | sed '1,3d' | awk '{print $4}' | sed '/^$/d' | sort)" ;;
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unzip -l "$1" | sed '1,3d' | awk '{print $4}' | sed '/^$/d' | sort --numeric-sort | head -50)" ;;
     */*rar )
-        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unrar l "$1" | sed '1,8d' | head -n -3 | awk '{print $NF}' | sort)" ;;
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "$(unrar l "$1" | sed '1,8d' | head -n -3 | awk '{print $NF}' | sort --numeric-sort | head  -50)" ;;
     */*iso*image )
         printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
     * )

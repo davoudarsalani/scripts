@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/kaddyify
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-26 15:34:12 +0330 Tuesday
+## @last-modified 1401-08-23 09:58:49 +0330 Monday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-color
@@ -29,22 +29,45 @@ function display_help {
 function get_opt {
     local options
 
-    options="$(getopt --longoptions 'help,sync,diff' --options 'hsd' --alternative -- "$@")"
+    options="$(getopt --longoptions 'help,sync,diff,directory:' --options 'hsfd:' --alternative -- "$@")"
     eval set -- "$options"
     while true; do
         case "$1" in
             -h|--help )
                 display_help ;;
             -s|--sync )
-                shift
-                flags='--archive --progress --delete'
-                break ;;  ## JUMP_1 exceptionally using break
-            -d|--diff )
-                shift
+                flags='--archive --progress --delete' ;;
+            -f|--diff )
                 ## https://unix.stackexchange.com/questions/57305/rsync-compare-directories
                 ## -v not needed here
-                flags='--archive --itemize-changes --dry-run'  ## --archive OR --recursive
-                break ;;  ## JUMP_1
+                flags='--archive --itemize-changes --dry-run' ;;  ## --archive OR --recursive
+            -d|--directory )
+                shift
+                selected_directory="$1"
+
+                reg='^\.$'
+                [[ "$selected_directory" =~ $reg ]] && selected_directory="$PWD"
+
+                ## NOTE JUMP_1 remove trailing slash
+                ##             important because we want the directory itself
+                ##             to be synced/copeid to destination
+                ##             rather than its content
+                selected_directory="${selected_directory%/}"
+
+                dest_kaddy_dir="$home_kaddy_dir"/"${selected_directory##*/}"  ## ~/kaddy/scripts
+
+                [ -d "$selected_directory" ] || {
+                    red "${selected_directory/$HOME/\~} does not exist"
+                    exit
+                }
+                [ -d "$dest_kaddy_dir" ] || {
+                    red "${dest_kaddy_dir/$HOME/\~} does not exist"
+                    exit
+                }
+
+                sync_prompt="$(get_single_input "sync ${selected_directory/$HOME/\~} to ${home_kaddy_dir/$HOME/\~}?")" && printf '\n'
+                [ "$sync_prompt" == 'y' ] || exit
+                ;;
             -- )
                 break ;;
         esac
@@ -59,24 +82,29 @@ heading "$title"
 
 [ ! "$1" ] || [ ! "$flags" ] && display_help
 
-readarray -t kaddy_directories < <(find "$home_kaddy_dir" -mindepth 1 -maxdepth 1 -type d | sort)  ## ! -path '*lost+found*'
+if [ "$selected_directory" ]; then
+    ## NOTE JUMP_2 keep $flags unquoted
+    rsync $flags "$selected_directory" "$home_kaddy_dir" | \grep -v 'sending incremental file list'
+else
+    readarray -t kaddy_directories < <(find "$home_kaddy_dir" -mindepth 1 -maxdepth 1 -type d | sort)  ## ! -path '*lost+found*'
 
-for kaddy_dir in "${kaddy_directories[@]}"; {
-    base="${kaddy_dir##*/}"
+    for kaddy_dir in "${kaddy_directories[@]}"; {
+        base="${kaddy_dir##*/}"
 
-    ## NOTE remove trailing slash
-    ##      important because we want the directory itself
-    ##      to be synced/copeid to destination
-    ##      rather than its content
-    base="${base%/}"
+        ## NOTE JUMP_1 remove trailing slash
+        ##             important because we want the directory itself
+        ##             to be synced/copeid to destination
+        ##             rather than its content
+        base="${base%/}"
 
-    home_dir="$HOME"/"$base"
+        home_dir="$HOME"/"$base"
 
-    blue "${home_dir/$HOME/\~}"
+        blue "${home_dir/$HOME/\~}"
 
-    ## NOTE keep $flags unquoted
-    rsync $flags "$home_dir" "$home_kaddy_dir" | \grep -v 'sending incremental file list'
-}
+        ## NOTE JUMP_2 keep $flags unquoted
+        rsync $flags "$home_dir" "$home_kaddy_dir" | \grep -v 'sending incremental file list'
+    }
+fi
 
 ## Explanation of each bit position and value in rsync's output:
 ## (https://stackoverflow.com/questions/4493525/what-does-f-mean-in-rsync-logs)

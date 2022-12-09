@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/.help
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-05 12:52:58 +0330 Thursday
+## @last-modified 1401-08-23 09:48:32 +0330 Monday
 
 source "$HOME"/scripts/gb-color
 
@@ -71,8 +71,9 @@ function kaddyify_help {  ## {{{
 clear
 printf '%s\n' \
 "$(heading "$title") $(yellow "help")
-$(flag '-d|--diff')
-$(flag '-s|--sync')"
+$(flag '-s|--sync')
+$(flag '-f|--diff')
+$(flag '-d|--directory=')"
 exit
 }
 ## }}}

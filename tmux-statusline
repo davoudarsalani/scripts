@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/tmux-statusline
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-30 20:18:40 +0330 Saturday
+## @last-modified 1401-09-11 10:23:53 +0330 Friday
 
 case "$1" in
     pwd )
@@ -14,10 +14,10 @@ case "$1" in
     if_kaddy )
         \grep -qi "$HOME/kaddy" <<< "$2" && printf 'KADDY \n' ;;
     info )
-        [ "$2" == "$HOME" ] && {  ## OR JUMP_1
+        if [ "$2" == "$HOME" ] || [ "$2" == "$HOME"/kaddy ]; then  ## OR JUMP_1
             printf '%s\n' '--'
             exit
-        }
+        fi
 
         source "$HOME"/scripts/gb-calculation
 
@@ -36,14 +36,11 @@ case "$1" in
 
         \grep -qi "^$HOME$" <<< "$2"          && is_home='true'  ## OR [ "$2" == "$HOME" ] && is_home='true' as in JUMP_1
         \grep -qi "^$HOME/\." <<< "$2"        && is_in_hidden_dir='true'
-        \grep -qi "^$HOME/downloads" <<< "$2" && is_in_downloads='true'
-        \grep -qi "^$HOME/movie" <<< "$2"     && is_in_movie='true'
+        # \grep -qi "^$HOME/downloads" <<< "$2" && is_in_downloads='true'
         \grep -qi "^$HOME/kaddy" <<< "$2"     && is_in_kaddy='true'
 
         if [ ! "$is_home" ] && \
            [ ! "$is_in_hidden_dir" ] && \
-           [ ! "$is_in_downloads" ] && \
-           [ ! "$is_in_movie" ] && \
            [ ! "$is_in_kaddy" ]; then
 
             source "$HOME"/scripts/gb

@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/r
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-17 11:35:02 +0330 Sunday
+## @last-modified 1401-08-23 08:56:44 +0330 Monday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
@@ -29,7 +29,7 @@ function get_opt {
         case "$1" in
             -h|--help )
                 display_help ;;
-            -d|directory-- )
+            -d|--directory )
                 shift
                 directory="$1" ;;
             -- )

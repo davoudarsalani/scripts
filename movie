@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/movie
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-15 13:55:39 +0330 Friday
+## @last-modified 1401-09-11 22:54:35 +0330 Friday
 
 source "$HOME"/scripts/gb
 source "$HOME"/scripts/gb-audacious
@@ -122,6 +122,11 @@ esac
 no_suffix="${movie%.*}"
 
 movie_full_path="$HOME"/movie/"$directory"/"$movie"
+movie_kaddy_full_path="$(get_kaddy_counterpart "$movie_full_path")"
+
+srt_full_path="${movie_full_path%.*}.srt"
+srt_kaddy_full_path="${movie_kaddy_full_path%.*}.srt"
+
 [ -f "$movie_full_path" ] || no_such_file
 
 msgn 'playing' "<span color=\"${orange}\">${no_suffix}</span>" "$HOME"/linux/themes/filmroll-w.png
@@ -134,11 +139,33 @@ what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "header=${movie}" 'bg=red')"  # |
 case "$what_to_do" in
     'mv to WATCHED' )
         watched_dir="$HOME"/movie/"$directory"/WATCHED
+        watched_dir_kaddy="$(get_kaddy_counterpart "$watched_dir")"
 
         [ -d "$watched_dir" ] || mkdir "$watched_dir"
-        mv "$movie_full_path" "$watched_dir" && success_moving || error_moving ;;
+        [ -d "$watched_dir_kaddy" ] || mkdir "$watched_dir_kaddy"
+
+        {
+            mv "$movie_full_path" "$watched_dir"
+            mv "$movie_kaddy_full_path" "$watched_dir_kaddy"
+
+            ## mv srt
+            if [ -f "$srt_full_path" ]; then
+                mv "$srt_full_path" "$watched_dir"
+                mv "$srt_kaddy_full_path" "$watched_dir_kaddy"
+            fi
+
+        } && success_moving || error_moving ;;
     remove )
-        rm "$movie_full_path" && success_removing || error_removing ;;
+        {
+            rm "$movie_full_path"
+            rm "$movie_kaddy_full_path"
+
+            ## rm srt
+            if [ -f "$srt_full_path" ]; then
+                rm "$srt_full_path"
+                rm "$srt_kaddy_full_path"
+            fi
+        } && success_removing || error_removing ;;
     # * )  ## NOTE keep commented
     #     exit ;;
 esac

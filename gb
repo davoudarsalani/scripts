@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-02 06:54:57 +0330 Monday
+## @last-modified 1401-09-07 13:41:26 +0330 Monday
 
 function get_datetime {  ## {{{
     case "$1" in
@@ -512,7 +512,8 @@ function create_timeline_thumbnails {  ## {{{
     src_dir="$1"
     src_dir_base="${src_dir##*/}"
     dest_dir=~/website/static/files/page/video/00-timeline-thumbnail/"$src_dir_base"
-    [ -d "$dest_dir" ] || \mkdir "$dest_dir"
+    [ -d "$dest_dir" ] && \rm -r "$dest_dir"
+    \mkdir -p "$dest_dir"
 
     readarray -t vids < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "*.mp4" | sort)
     for v in "${vids[@]}"; {
@@ -523,6 +524,50 @@ function create_timeline_thumbnails {  ## {{{
         ## https://www.youtube.com/watch?v=ZeNyjnneq_w
         ffmpeg -i "$v" -vf fps=1/10,scale=120:-1 "$dest_dir"/timeline-thumbnail-"${vid_name}"-%03d.webp 2>/dev/null
     }
+}
+## }}}
+function create_exhibit_thumbnails {  ## {{{
+    source "$HOME"/scripts/gb
+    source "$HOME"/scripts/gb-color
+
+    local src_dir src_dir_base dest_dir vid_base vid_name
+    declare -a vids first_jpgs
+
+    [ "$1" ] || {
+        red "arg needed"
+        red "USAGE: $FUNCNAME ~/dl/video/bright-side"
+        exit
+    }
+
+    [ -d "$1" ] || {
+        red "$1 does not exist"
+        exit
+    }
+
+    src_dir="$1"
+    src_dir_base="${src_dir##*/}"
+    dest_dir=~/website/static/files/page/video/00-exhibit-thumbnail/"$src_dir_base"
+    [ -d "$dest_dir" ] && \rm -r "$dest_dir"
+    \mkdir -p "$dest_dir"
+
+    readarray -t vids < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "*.mp4" | sort)
+    for v in "${vids[@]}"; {
+        vid_base="${v##*/}"  ## 003.mp4
+        printf '%s\n' "$vid_base"
+        vid_name="${vid_base%%.*}"  ## 003
+
+        ## https://www.youtube.com/watch?v=ZeNyjnneq_w
+        ffmpeg -i "$v" -vf fps=1/10,scale=200:-1 "$dest_dir"/exhibit-thumbnail-"${vid_name}"-%03d.jpg 2>/dev/null  ## NOTE 200 is also used as 200px in video.css
+    }
+
+    action_now 'converting first jpgs to webp'
+    readarray -t first_jpgs < <(find "$dest_dir" -mindepth 1 -maxdepth 1 -type f -iname '*-001.jpg'| sort)
+    for f in "${first_jpgs[@]}"; {
+        ffmpeg -i "$f" "${f/.jpg/.webp}" 2>/dev/null
+    }
+
+    action_now 'removing jpgs'
+    \rm "$dest_dir"/*jpg
 }
 ## }}}
 function create_waveform_v2 {  ## {{{
@@ -538,8 +583,8 @@ function create_waveform_v2 {  ## {{{
     local type_ ext src_dir d_base f_base dest_media dest_png dest_js
     local -a dirs_ files
 
-    type_='audio'  ## audio/dictionary/video
-    ext='.mp3'  ## .mp3/.mp4
+    type_='audio'  ## audio/dictionary
+    ext='.mp3'  ## .mp3
 
     src_dir="$HOME"/dl/"$type_"
 
@@ -553,11 +598,24 @@ function create_waveform_v2 {  ## {{{
 
         for f in "${files[@]}"; {
             f_base="${f##*/}"  ## 001.mp3
-            dest_media="$HOME"/website/static/files/page/"$type_"/00-waveform/waveform--"$d_base"-v2-"$f_base"
+            dest_media="$HOME"/website/static/files/base/page/"$type_"/"$d_base"/00-waveform-v2/"$f_base"
             dest_png="${dest_media/$ext/.png}"
             dest_js="${dest_media/$ext/.js}"
 
             ## create waveform (https://github.com/andrewrk/waveform)
+            #
+            ## (for transparent wave with black background)
+            #  --png-color-bg 000000ff \
+            #  --png-color-center 00000000 \
+            #  --png-color-outer 00000000 \
+            #
+            ## (for creating json containing levels)
+            #  --wjs-width 840 \
+            #  --wjs-precision 4 \
+            #  --waveformjs {dest_js})
+            #
+
+
             ## (flags for creating json containing levels:
             ##   --wjs-width 840
             ##   --wjs-precision 4
