@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-widgets
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-13 23:21:11 +0330 Friday
+## @last-modified 1401-09-23 10:03:57 +0330 Wednesday
 
 source "$HOME"/scripts/gb
 
@@ -687,7 +687,7 @@ msgn "$text" ;;
             restart )
                 sudo systemctl restart tor && msgn "<span color=\"${orange}\">tor</span> restarted" ;;
             is-tor )
-                "$HOME"/scripts/is-tor 'msg' ;;
+                "$HOME"/scripts/is-tor.py 'msg' ;;
         esac
 
         tor_status="$(pgrep 'tor')"  ## why exceptionally used "$(sudo lsof -i -P -n | \grep 'LISTEN' | \grep '^tor')" instead of pgrep?
@@ -709,7 +709,7 @@ msgn "$text" ;;
 
                 ## set wf_conn_color based on wf_strength
                 wf_strength="$(tail -n 1 /proc/net/wireless | awk '{print $4}' | tr -d '.')"
-                if   (( wf_strength < -75 )); then wf_conn_color="${orange}"
+                if   (( wf_strength < -75 )); then wf_conn_color="$orange"
                 elif (( wf_strength < -50 )); then wf_conn_color="$yellow"
                 elif (( wf_strength < -25 )); then wf_conn_color="$fg_d"
                 elif (( wf_strength <   0 )); then wf_conn_color="$fg_d"
@@ -722,16 +722,25 @@ msgn "$text" ;;
                 ## down/up {{{ https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
                 for interface in 'ethernet' 'wifi'; {
 
-                    ## get last down/up
                     case "$interface" in
                         ethernet )
-                            cur_interface="$eth_devc"; pref='eth' ;;
+                            cur_interface="$eth_devc"
+                            if_connected="$eth_state"
+                            pref='eth'
+                            ;;
                         wifi )
-                            cur_interface="$wf_devc"; pref='wf' ;;
+                            cur_interface="$wf_devc"
+                            if_connected="$wf_state"
+                            pref='wf'
+                            ;;
                     esac
+
+                    [ "$if_connected" == 'connected' ] || continue
+
                     down_last_file="$HOME"/scripts/.last/network_"${pref}"_down
                     up_last_file="$HOME"/scripts/.last/network_"${pref}"_up
 
+                    ## get last down/up
                     down_last="$(< "$down_last_file")" || down_last=0  ## 19410508  ## NOTE do NOT add 2>/dev/null
                     up_last="$(< "$up_last_file")" || up_last=0        ## 19410508  ## NOTE do NOT add 2>/dev/null
 
@@ -753,37 +762,27 @@ msgn "$text" ;;
                     usage_high="$pink"
                     usage_ultrahigh="$red"
 
-                    down_total__int="${down_total%%[A-Z.]*}"  ## 387
-                    down_total__unit="${down_total//[0-9.]}"  ## K
-                    if [ "$down_total__unit" == 'B' ] || [ "$down_total__unit" == 'K' ]; then
-                        down_total_color="$usage_low"
-                    elif [ "$down_total__unit" == 'M' ]; then
-                        if   (( down_total__int < 400       )); then down_total_color="$usage_low"     ## JUMP_4 %%[A-Z.]* to remove both float (i.e. .56) and unit (i.e. M) at the same time
-                        elif (( down_total__int < 700       )); then down_total_color="$usage_medium"  ## JUMP_4
-                        elif (( down_total__int < byte_size )); then down_total_color="$usage_high"    ## JUMP_4
-                        fi
-                    elif [ "$down_total__unit" == 'G' ]; then
-                        down_total_color="$usage_ultrahigh"
+                    if   (( down < "$K"     )); then down_total_color="$usage_low"        ## is B
+                    elif (( down < "$M"     )); then down_total_color="$usage_low"        ## is K
+                    elif (( down < "$M_400" )); then down_total_color="$usage_low"        ## is below 400M
+                    elif (( down < "$M_700" )); then down_total_color="$usage_medium"     ## is below 700M
+                    elif (( down < "$G"     )); then down_total_color="$usage_high"       ## is below 1G
+                    else                             down_total_color="$usage_ultrahigh"  ## is 1G or higher
                     fi
 
-                    up_total__int="${up_total%%[A-Z.]*}"  ## 387
-                    up_total__unit="${up_total//[0-9.]}"  ## K
-                    if [ "$up_total__unit" == 'B' ] || [ "$up_total__unit" == 'K' ]; then
-                        up_total_color="$usage_low"
-                    elif [ "$up_total__unit" == 'M' ]; then
-                        if   (( up_total__int < 400       )); then up_total_color="$usage_low"     ## JUMP_4
-                        elif (( up_total__int < 700       )); then up_total_color="$usage_medium"  ## JUMP_4
-                        elif (( up_total__int < byte_size )); then up_total_color="$usage_high"    ## JUMP_4
-                        fi
-                    elif [ "$up_total__unit" == 'G' ]; then
-                        up_total_color="$usage_ultrahigh"
+                    if   (( up < "$K"     )); then up_total_color="$usage_low"        ## is B
+                    elif (( up < "$M"     )); then up_total_color="$usage_low"        ## is K
+                    elif (( up < "$M_400" )); then up_total_color="$usage_low"        ## is below 400M
+                    elif (( up < "$M_700" )); then up_total_color="$usage_medium"     ## is below 700M
+                    elif (( up < "$G"     )); then up_total_color="$usage_high"       ## is below 1G
+                    else                           up_total_color="$usage_ultrahigh"  ## is 1G or higher
                     fi
 
                     ## calculate diff and convert bytes
-                    (( down_diff="down - down_last" ))    ## 1341440
-                    (( up_diff="up - up_last" ))          ## 1341440
-                    down="$(convert_byte "$down_diff")"   ## 1.31M
-                    up="$(convert_byte "$up_diff")"       ## 1.31M
+                    (( down_diff="down - down_last" ))  ## 1341440
+                    (( up_diff="up - up_last" ))        ## 1341440
+                    down_diff_conv="$(convert_byte "$down_diff")"  ## 1.31M
+                    up_diff_conv="$(convert_byte "$up_diff")"      ## 1.31M
 
                     ## set down/up color
                     speed_low="$fg_l"
@@ -791,33 +790,21 @@ msgn "$text" ;;
                     speed_high="$green_dark"
                     speed_ultrahigh="$green"
 
-                    down__unit="${down//[0-9.]}"  ## K
-                    down__int="${down%%[A-Z.]*}"  ## 387
-                    if [ "$down__unit" == 'B' ]; then
-                        down_color="$speed_low"
-                    elif [ "$down__unit" == 'K' ]; then
-                        if   (( down__int < 400       )); then down_color="$speed_low"     ## JUMP_4
-                        elif (( down__int < 700       )); then down_color="$speed_medium"  ## JUMP_4
-                        elif (( down__int < byte_size )); then down_color="$speed_high"    ## JUMP_4
-                        fi
-                    elif [ "$down__unit" == 'M' ] || [ "$down__unit" == 'G' ]; then
-                        down_color="$speed_ultrahigh"
+                    if   (( down_diff < "$K"     )); then down_color="$speed_low"        ## is B
+                    elif (( down_diff < "$K_400" )); then down_color="$speed_low"        ## is below 400K
+                    elif (( down_diff < "$K_700" )); then down_color="$speed_medium"     ## is below 700K
+                    elif (( down_diff < "$M"     )); then down_color="$speed_high"       ## is below 1M
+                    else                                  down_color="$speed_ultrahigh"  ## is M or G
                     fi
 
-                    up__unit="${up//[0-9.]}"  ## K
-                    up__int="${up%%[A-Z.]*}"  ## 387
-                    if [ "$up__unit" == 'B' ]; then
-                        up_color="$speed_low"
-                    elif [ "$up__unit" == 'K' ]; then
-                        if   (( up__int < 400       )); then up_color="$speed_low"     ## JUMP_4
-                        elif (( up__int < 700       )); then up_color="$speed_medium"  ## JUMP_4
-                        elif (( up__int < byte_size )); then up_color="$speed_high"    ## JUMP_4
-                        fi
-                    elif [ "$up__unit" == 'M' ] || [ "$up__unit" == 'G' ]; then
-                        up_color="$speed_ultrahigh"
+                    if   (( up_diff < "$K"     )); then up_color="$speed_low"        ## is B
+                    elif (( up_diff < "$K_400" )); then up_color="$speed_low"        ## is below 400K
+                    elif (( up_diff < "$K_700" )); then up_color="$speed_medium"     ## is below 700K
+                    elif (( up_diff < "$M"     )); then up_color="$speed_high"       ## is below 1M
+                    else                                up_color="$speed_ultrahigh"  ## is M or G
                     fi
 
-                    down_up_text+=" <span color=\"${down_color}\">${down}</span> <span color=\"${up_color}\">${up}</span> \
+                    down_up_text+=" <span color=\"${down_color}\">${down_diff_conv}</span> <span color=\"${up_color}\">${up_diff_conv}</span> \
 <span color=\"${down_total_color}\">${down_total}</span> <span color=\"${up_total_color}\">${up_total}</span>"   ## 317K 2.31M 4.32G 4.32G
 
                 }
@@ -849,6 +836,7 @@ msgn "$text" ;;
 
         set_widget 'ping' 'markup' "$stts" ;;
     ## }}}
+
     audacious )  ## {{{
         source "$HOME"/scripts/gb-calculation
         source "$HOME"/scripts/gb-duration
