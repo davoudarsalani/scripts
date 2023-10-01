@@ -1,13 +1,11 @@
-## @last-modified 1401-08-03 13:15:51 +0330 Tuesday
-
+## {{{ requirements
+## for .venv_keylogger: keylogger
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/gp.py
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gp.py
 ##    https://davoudarsalani.ir
 
-## {{{ requirements
-## for .venv_keylogger: keylogger
 ## for .venv: (
 ##   beautifulsoup4
 ##   black
@@ -21,6 +19,7 @@
 ##   pillow
 ##   pycurl
 ##   pyfzf
+##   PyGObject (instead of vext.gi which threw error when installing)
 ##   pyminizip
 ##   pynput
 ##   python-magic
@@ -29,7 +28,6 @@
 ##   requests[socks]
 ##   tabulate
 ##   tinytag
-##   vext.gi
 ##   wget
 ##   wordcloud
 ##   youtube_dl
@@ -41,6 +39,8 @@ from os import getenv  ## for send_email* functions
 from typing import Any  ## for Audio, get_input, get_single_input, get_last, get_datetime
 
 ## }}}
+
+
 class Color:  ## {{{
     ## {{{
     @staticmethod
@@ -1051,7 +1051,7 @@ def update_audio() -> None:  ## {{{
     from os import getenv
     from subprocess import run
 
-    run(f'{getenv("HOME")}/scripts/awesome-widgets audio', shell=True)
+    run(f'{getenv("HOME")}/main/scripts/awesome-widgets audio', shell=True)
 
 
 ## }}}
@@ -1120,7 +1120,7 @@ def send_email(subject: str, body: str, sender: str = getenv('email1'), receiver
             opened_server.sendmail(sender, receiver, text)
         except Exception as exc:
             print(Color().red(f'ERROR sending mail:\n{exc!r}'))
-            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
 
 ## }}}
@@ -1178,7 +1178,7 @@ def send_email_with_attachment(subject: str, body: str, attachment: str, sender:
             opened_server.sendmail(sender, receiver, text)
         except Exception as exc:
             print(Color().red(f'ERROR sending mail:\n{exc!r}'))
-            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
 
 ## }}}

@@ -6,10 +6,8 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/previewer
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-09-04 21:25:48 +0330 Friday
-
 function hi_li {
-    eval "$HIGHLIGHT" "$1" 2>/dev/null  ## NOTE do not replace 2 with &
+    head -n 50 "$1" | eval "$HIGHLIGHT" 2>/dev/null  ## NOTE do not replace 2 with &
 }
 
 function me_in {
@@ -39,6 +37,8 @@ case "$file_mime_type" in
     */*spreadsheet* )
         printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
     */*officedocument* )
+        printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
+    */*opendocument* )
         printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;
     */pdf )
         printf '%s %s\n\n%s\n' "$attr" "$file_mime_type" "" ;;

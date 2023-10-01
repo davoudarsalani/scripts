@@ -6,20 +6,18 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/firewall
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:27:16 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-fir-blu-batt
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-fir-blu-batt
 
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     firewall_help
 }
 
 function update_firewall {
-    "$HOME"/scripts/awesome-widgets firewall
+    "$HOME"/main/scripts/awesome-widgets firewall
 }
 
 function prompt {

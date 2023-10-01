@@ -6,9 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/tmux
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 11:02:12 +0330 Wednesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 title="${0##*/}"
 heading "$title"

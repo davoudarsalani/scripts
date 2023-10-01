@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-audacious
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-11 11:27:28 +0330 Monday
-
 length_in_seconds="$(audtool --current-song-length-seconds)" || length_in_seconds=0  ## 3304
 length="$(audtool --current-song-length)"  ## 5:47
 
@@ -21,10 +19,10 @@ playlist_length="$(audtool --playlist-length)"  ## 5
 
 preamp="$(audtool equalizer-get-preamp | awk '{print $NF}')"  ## -2.10/0/etc
 
-current_song="$(audtool --current-song-filename)"                   ## /home/nnnn/speech/pargar/007.mp3
+current_song="$(audtool --current-song-filename)"                   ## /home/nnnn/main/speech/pargar/007.mp3
 current_song_base="$(audtool --current-song-tuple-data file-name)"  ## 007
-current_song_dir="${current_song%/*}"                               ## /home/nnnn/speech/pargar
-# ^^ OR current_song_dir="$(audtool --current-song-tuple-data file-path)"  ## ~/speech/pargar  ## throws error when used
+current_song_dir="${current_song%/*}"                               ## /home/nnnn/main/speech/pargar
+# ^^ OR current_song_dir="$(audtool --current-song-tuple-data file-path)"  ## ~/main/speech/pargar  ## throws error when used
 
 formatted_title="$(audtool --current-song-tuple-data formatted-title)"  ## pargar - speech - 007
 title="$(audtool --current-song-tuple-data title)"                      ## 007

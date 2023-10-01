@@ -6,10 +6,8 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/copy
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:22:44 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-color
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-color
 
 title="${0##*/}"
 
@@ -41,13 +39,13 @@ function copy {
 
 heading "$title"
 
-main_items=( 'vim' 'awesome' 'bash' 'tmux' 'fzf' 'lf' 'ranger' 'xfce4-terminal' 'cava' 'rofi' 'greenclip' 'grub' 'uget' 'kdenlive' 'mutt' 'lightdm' 'highlight' 'picom' 'kid3' 'audacious' 'vlc' 'irssi' 'git' 'tor' 'kdeconnect' 'torsocks' 'handbrake' 'vsftpd' 'ssh' 'aria2' 'mpv' 'vifm' 'gpicview' 'htop' 'qutebrowser' 'optimus-manager' 'wget' 'netrc' 'pacman.conf' 'gtk-2.0' 'gtk-3.0' 'fstab' 'mkinitcpio' '99-sysctl' 'dhcpcd' 'xorg.conf' 'xinitrc' 'mirrorlist'   'firefox' '/var/cache/pacman/pkg' )
+main_items=( 'sublime' 'awesome' 'bash' 'tmux' 'fzf' 'lf' 'ranger' 'xfce4-terminal' 'vim' 'cava' 'rofi' 'greenclip' 'grub' 'uget' 'kdenlive' 'mutt' 'lightdm' 'highlight' 'picom' 'kid3' 'audacious' 'vlc' 'irssi' 'git' 'tor' 'kdeconnect' 'torsocks' 'handbrake' 'vsftpd' 'ssh' 'aria2' 'mpv' 'vifm' 'gpicview' 'htop' 'qutebrowser' 'optimus-manager' 'wget' 'netrc' 'pacman.conf' 'gtk-2.0' 'gtk-3.0' 'fstab' 'mkinitcpio' '99-sysctl' 'dhcpcd' 'xorg.conf' 'xinitrc' 'mirrorlist'   'firefox' '/var/cache/pacman/pkg' )
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
-dest_dir="$HOME"/linux/cfg-"$main_item"
+dest_dir="$HOME"/main/linux/cfg-"$main_item"
 
 case "$main_item" in
-    vim )
-        copy "$HOME"/{.vim,.vimrc} ;;
+    sublime )
+        copy "$HOME"/.config/sublime-text/* ;;
     awesome )
         copy "$HOME"/.config/awesome/* ;;
     bash )
@@ -81,6 +79,8 @@ case "$main_item" in
              /usr/lib/python3.9/site-packages/ranger/container/fsobject.py ;;
     xfce4-terminal )
         copy "$HOME"/.config/xfce4/* ;;
+    vim )
+        copy "$HOME"/{.vim,.vimrc} ;;
     cava )
         copy "$HOME"/.config/cava/config ;;
     rofi )
@@ -185,7 +185,7 @@ case "$main_item" in
 
     ## has a different dest_dir
     /var/cache/pacman/pkg )
-        dest_dir="$HOME"/linux-pkg
+        dest_dir="$HOME"/main/linux-pkg
         dest_kaddy_dir="$(get_kaddy_counterpart "$dest_dir")"
         readarray -t pkgs < <(find /var/cache/pacman/pkg/ -mindepth 1 -maxdepth 1 -type f)
         if [ "$pkgs" ]; then

@@ -6,6 +6,4 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/fzf-dir-preview
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-18 11:38:45 +0330 Monday
-
 \ls $LS_FLAGS "${1/\~/$HOME}"  ## NOTE keep \ls escaped

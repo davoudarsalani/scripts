@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/emojis.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:46:21 +0330 Tuesday
-
 from os import path, listdir, getenv, chdir
 
 from clipboard import copy as clipboard_copy
@@ -16,7 +14,7 @@ from gp import Color, fzf, msgn
 title = path.basename(__file__).replace('.py', '')
 Col = Color()
 
-chdir(f'{getenv("HOME")}/linux/emojis')
+chdir(f'{getenv("HOME")}/main/linux/emojis')
 print(Col.heading(title))
 
 main_items = listdir()

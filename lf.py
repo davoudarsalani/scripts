@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/lf.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:53:14 +0330 Tuesday
-
 from os import path, getenv, symlink, rename, remove, getcwd
 from re import sub
 from shutil import rmtree
@@ -53,7 +51,7 @@ if main_arg == 'chattr':  ## {{{
                     attribution = check_output(f'lsattr {base}', shell=True, universal_newlines=True).split()[0]
                 msgn('mutable', f'<span color=\"{getenv("orange")}\">{base}</span>\n({attribution})')
             else:
-                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> mutable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> mutable\n{cmd_error}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
             sleep(0.1)
     elif main_item == 'immutable':
@@ -68,7 +66,7 @@ if main_arg == 'chattr':  ## {{{
                     attribution = check_output(f'lsattr {f}', shell=True, universal_newlines=True).split()[0]
                 msgn('immutable', f'<span color=\"{getenv("orange")}\">{base}</span>\n({attribution})')
             else:
-                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> immutable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> immutable\n{cmd_error}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
             sleep(0.1)
     elif main_item == 'deletable':
@@ -83,7 +81,7 @@ if main_arg == 'chattr':  ## {{{
                     attribution = check_output(f'lsattr {f}', shell=True, universal_newlines=True).split()[0]
                 msgn('deletable', f'<span color=\"{getenv("orange")}\">{base}</span>\n({attribution})')
             else:
-                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> deletable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> deletable\n{cmd_error}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
             sleep(0.1)
     elif main_item == 'undeletable':
@@ -98,7 +96,7 @@ if main_arg == 'chattr':  ## {{{
                     attribution = check_output(f'lsattr {f}', shell=True, universal_newlines=True).split()[0]
                 msgn('undeletable', f'<span color=\"{getenv("orange")}\">{base}</span>\n({attribution})')
             else:
-                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> undeletable\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> undeletable\n{cmd_error}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
             sleep(0.1)
     elif main_item == 'delete normal':
@@ -113,7 +111,7 @@ if main_arg == 'chattr':  ## {{{
                     attribution = check_output(f'lsattr {f}', shell=True, universal_newlines=True).split()[0]
                 msgn('delete normal', f'<span color=\"{getenv("orange")}\">{base}</span>\n({attribution})')
             else:
-                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> delete normal\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> delete normal\n{cmd_error}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
             sleep(0.1)
     elif main_item == 'delete secure':
@@ -128,7 +126,7 @@ if main_arg == 'chattr':  ## {{{
                     attribution = check_output(f'lsattr {f}', shell=True, universal_newlines=True).split()[0]
                 msgn('delete secure', f'<span color=\"{getenv("orange")}\">{base}</span>\n({attribution})')
             else:
-                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> delete secure\n{cmd_error}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'making <span color=\"{getenv("orange")}\">{base}</span> delete secure\n{cmd_error}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 
             sleep(0.1)
     elif main_item == 'lsattr':
@@ -141,15 +139,15 @@ if main_arg == 'chattr':  ## {{{
                     attribution = check_output(f'lsattr {base}', shell=True, universal_newlines=True).split()[0]
                 msgn(f'<span color=\"{getenv("orange")}\">{base}</span>\n{attribution}')
             except Exception as exc:
-                msgc('ERROR', f'printing lsattr for <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'printing lsattr for <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
             sleep(0.1)
 ## }}}
 elif main_arg == 'trash':  ## {{{
-    trash_dir = f'{getenv("HOME")}/trash'
+    trash_dir = f'{getenv("HOME")}/main/trash'
 
     ## exit if already in trash_dir
     if getcwd() == trash_dir:
-        msgc('ERROR', f'file(s)/dir(s) already in {sub(getenv("HOME"), "~", trash_dir)}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'file(s)/dir(s) already in {sub(getenv("HOME"), "~", trash_dir)}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         exit()
 
     for f in files:
@@ -162,14 +160,14 @@ elif main_arg == 'trash':  ## {{{
                 msgc(
                     'ERROR',
                     f'trashing <span color=\"{getenv("orange")}\">{base}</span>\n{sub(getenv("HOME"), "~", new_name)} already exists',
-                    f'{getenv("HOME")}/linux/themes/alert-w.png',
+                    f'{getenv("HOME")}/main/linux/themes/alert-w.png',
                 )
                 continue
 
             rename(base, new_name)
             msgn('trashed', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
-            msgc('ERROR', f'trashing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'trashing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'rm':  ## {{{
@@ -182,16 +180,16 @@ elif main_arg == 'rm':  ## {{{
             ## check if thre is literal * in dir/file name
             ## otherwise every file matching the pattern will be deleted
             if match(r'.*\*+.*', base):
-                msgc('ERROR', f'<span color=\"{getenv("orange")}\">{base}</span> has special characters', f'{getenv("HOME")}/linux/themes/alert-w.png')
+                msgc('ERROR', f'<span color=\"{getenv("orange")}\">{base}</span> has special characters', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
                 exit()
 
             if path.isdir(f):
                 rmtree(f)  ## removes even non-empty directories
             elif path.isfile(f):
                 remove(f)
-            msgn('removed', f'<span color=\r"{getenv("red")}\"><b>{base}</b></span>', icon=f'{getenv("HOME")}/linux/themes/delete-w.png')
+            msgn('removed', f'<span color=\r"{getenv("red")}\"><b>{base}</b></span>', icon=f'{getenv("HOME")}/main/linux/themes/delete-w.png')
         except Exception as exc:
-            msgc('ERROR', f'removing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'removing <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'mime_type':  ## {{{
@@ -201,15 +199,15 @@ elif main_arg == 'mime_type':  ## {{{
             mime = Magic(mime=True).from_file(base)
             msgn('mimetype', f'<span color=\"{getenv("orange")}\">{base}</span> is <span color=\"{getenv("orange")}\">{mime}</span>')
         except Exception as exc:
-            msgc('ERROR', f'showing mimetype of <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'showing mimetype of <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'softlink':  ## {{{
-    dest_dir = f'{getenv("HOME")}/downloads'
+    dest_dir = f'{getenv("HOME")}/main/downloads'
 
     ## exit if already in dest_dir
     if getcwd() == dest_dir:
-        msgc('ERROR', f'file(s)/dir(s) already in {sub(getenv("HOME"), "~", dest_dir)}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'file(s)/dir(s) already in {sub(getenv("HOME"), "~", dest_dir)}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         exit()
 
     for f in files:
@@ -218,7 +216,7 @@ elif main_arg == 'softlink':  ## {{{
             symlink(f, f'{dest_dir}/{base}')
             msgn('softlinekd', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
-            msgc('ERROR', f'softlinking <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'softlinking <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'tar':  ## {{{
@@ -228,7 +226,7 @@ elif main_arg == 'tar':  ## {{{
             compress_tar(f)
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to tar')
         except Exception as exc:
-            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to tar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to tar\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'gz':  ## {{{
@@ -238,7 +236,7 @@ elif main_arg == 'gz':  ## {{{
             compress_gz(f)
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to gz')
         except Exception as exc:
-            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to gz\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to gz\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'zip':  ## {{{
@@ -255,7 +253,7 @@ elif main_arg == 'zip':  ## {{{
                 invalid('wrong choice')
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to zip')
         except Exception as exc:
-            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to zip\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'rar':  ## {{{
@@ -271,7 +269,7 @@ elif main_arg == 'rar':  ## {{{
                 invalid('wrong choice')
             msgn('compressed', f'<span color=\"{getenv("orange")}\">{base}</span> to rar')
         except Exception as exc:
-            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to rar\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'compressing <span color=\"{getenv("orange")}\">{base}</span> to rar\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'untar':  ## {{{
@@ -281,7 +279,7 @@ elif main_arg == 'untar':  ## {{{
             xtract_tar(f)
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
-            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'ungz':  ## {{{
@@ -291,7 +289,7 @@ elif main_arg == 'ungz':  ## {{{
             xtract_gz(f)
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
-            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'unzip':  ## {{{
@@ -308,7 +306,7 @@ elif main_arg == 'unzip':  ## {{{
                 invalid('wrong choice')
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
-            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}
 elif main_arg == 'unrar':  ## {{{
@@ -326,6 +324,6 @@ elif main_arg == 'unrar':  ## {{{
                 invalid('wrong choice')
             msgn('xtracted', f'<span color=\"{getenv("orange")}\">{base}</span>')
         except Exception as exc:
-            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+            msgc('ERROR', f'xtracting <span color=\"{getenv("orange")}\">{base}</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
         sleep(0.1)
 ## }}}

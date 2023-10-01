@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-audio.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:48:09 +0330 Tuesday
-
 from os import getenv
 
 from gp import Audio, Record, get_datetime, rofi, update_audio, record_icon, set_widget, convert_second
@@ -39,7 +37,7 @@ else:
 
 dur = convert_second(secs)
 suffix = 'AUD'
-output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mp3'
+output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mp3'
 Aud = Audio()
 Rec = Record()
 

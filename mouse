@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/mouse
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 10:23:17 +0330 Wednesday
-
 x="$(xdotool getmouselocation --shell | \grep -i x | cut -d '=' -f 2)"  ## OR x="$(xdotool getmouselocation | \grep -ioP '(?<=x:).*?(?= y:)')"
 y="$(xdotool getmouselocation --shell | \grep -i y | cut -d '=' -f 2)"  ## OR y="$(xdotool getmouselocation | \grep -ioP '(?<=y:).*?(?= screen:)')"
 

@@ -6,19 +6,17 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/wallpaper
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 11:09:44 +0330 Wednesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 current_wallpaper_file=/tmp/current_wallpaper
 
 case "$1" in
     select )
-        readarray -t wallpapers < <(find "$HOME"/wallpapers/ -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
+        readarray -t wallpapers < <(find "$HOME"/main/wallpapers/ -mindepth 1 -maxdepth 1 -type f -iname '*.jpg' | sort)
         wallpaper="$(pipe_to_rofi "${wallpapers[@]##*/}" 'header=wallpaper')" || exit 37
 
         printf '%s\n' "$wallpaper" > "$current_wallpaper_file"
-        feh --bg-fill "$HOME"/wallpapers/"$wallpaper" ;;
+        feh --bg-fill "$HOME"/main/wallpapers/"$wallpaper" ;;
     random )
         random_wallpaper ;;
     current )

@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-video.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:48:52 +0330 Tuesday
-
 from os import getenv
 
 from gp import Audio, Record, get_datetime, rofi, update_audio, record_icon, set_widget, convert_second
@@ -39,7 +37,7 @@ else:
 
 dur = convert_second(secs)
 suffix = 'VID'
-output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
+output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
 Aud = Audio()
 Rec = Record()
 

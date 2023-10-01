@@ -6,13 +6,11 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/mint
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-28 14:51:58 +0330 Thursday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 case "$1" in
     audio_levels )
-        source "$HOME"/scripts/gb-audio
+        source "$HOME"/main/scripts/gb-audio
         [ "$vol_mute_status" == 'yes' ] && vol_on_off=':OF'
         [ "$mic_mute_status" == 'no' ] && mic_on_off=':ON'
         [ "$mon_mute_status" == 'no' ] && mon_on_off=':ON'
@@ -30,7 +28,7 @@ case "$1" in
 
         printf '%s°%s\n' "$average" "$if_one_cpu" ;;
     idle )
-        source "$HOME"/scripts/gb-calculation
+        source "$HOME"/main/scripts/gb-calculation
         weekday="$(get_datetime 'jweekday')"
         current_date="$(get_datetime 'jymd')"
         current_datetime="$(get_datetime 'jymdhms')"
@@ -42,7 +40,7 @@ case "$1" in
         printf '%s\t%s\t%s\n' "$current_datetime" "$weekday" "$perc" >> "$idle_file"
         printf '%s\n' "$perc" ;;
     network )
-        source "$HOME"/scripts/gb-network
+        source "$HOME"/main/scripts/gb-network
         printf '%s %s\n' "$eth_conn" "$wf_conn" ;;
     firefox_whatsapp )
         firefox --new-tab 'https://web.whatsapp.com' ;;

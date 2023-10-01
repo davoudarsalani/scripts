@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/e-mail.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-10 12:56:35 +0330 Friday
-
 ## https://stackoverflow.com/questions/953561/check-unread-count-of-gmail-messages-with-python
 
 from imaplib import IMAP4_SSL
@@ -34,7 +32,7 @@ else:
 
 port = 993
 dest_widget = arg
-error_file = f'{getenv("HOME")}/scripts/.error/{dest_widget}'
+error_file = f'{getenv("HOME")}/main/scripts/.error/{dest_widget}'
 
 set_widget(dest_widget, 'fg', 'reset')
 set_widget(dest_widget, 'markup', refresh_icon())

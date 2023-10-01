@@ -6,14 +6,12 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/ffmpeg
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-17 07:52:19 +0330 Tuesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     ffmpeg_help
 }
 

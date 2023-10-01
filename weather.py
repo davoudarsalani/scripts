@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/weather.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-06 09:25:59 +0330 Friday
-
 from json import loads
 from os import getenv
 from sys import argv
@@ -23,8 +21,8 @@ appid = getenv('api_weather')
 url = f'https://api.openweathermap.org/data/2.5/onecall?lang={lang}&lat={lat}&lon={lon}&units=metric&exclude=hourly,minutely&appid={appid}'
 Ses = Session()
 hdrs = get_headers()
-last_file = f'{getenv("HOME")}/scripts/.last/weather'
-error_file = f'{getenv("HOME")}/scripts/.error/weather'
+last_file = f'{getenv("HOME")}/main/scripts/.last/weather'
+error_file = f'{getenv("HOME")}/main/scripts/.error/weather'
 arg = argv[1]
 
 
@@ -132,4 +130,4 @@ elif arg == 'forecast':
         msgn(message, duration=20)
 
     except Exception as exc:
-        msgc('ERROR', f'gettin forecast\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'gettin forecast\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')

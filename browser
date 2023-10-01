@@ -6,13 +6,11 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/browser
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-03 17:28:18 +0330 Sunday
+source "$HOME"/main/scripts/gb
 
-source "$HOME"/scripts/gb
-
-readarray -t json_files < <(find "$HOME"/linux/cfg-firefox/ -mindepth 1 -maxdepth 1 -type f -iname 'bookmarks*.json' | sort)
+readarray -t json_files < <(find "$HOME"/main/linux/cfg-firefox/ -mindepth 1 -maxdepth 1 -type f -iname 'bookmarks*.json' | sort)
 readarray -t bookmarks < <(jq -rM .'children[1].children' "${json_files[-1]}" | \grep '"uri"' | sed 's/^\s*"\(uri\|iconUri\)": "//;s/"$//' | \grep '^http' | sort)  ## NOTE keep \grep '^http' the last one
-## previously: readarray -t bookmarks < <(\grep 'HREF=' "$HOME"/linux/cfg-firefox/bookmarks.html | \grep -vE 'place:parent|place:type' | sed 's/" .*//;s/^.*"//g;s/\/$//g' | sort)
+## previously: readarray -t bookmarks < <(\grep 'HREF=' "$HOME"/main/linux/cfg-firefox/bookmarks.html | \grep -vE 'place:parent|place:type' | sed 's/" .*//;s/^.*"//g;s/\/$//g' | sort)
 
 case "$1" in
     firefox )
@@ -31,7 +29,7 @@ case "$1" in
             preferences )
                 firefox --preferences &>/dev/null & ;;
             tor )
-                cd "$HOME"/tor-browser_en-US || exit  ## absolute path won't work
+                cd "$HOME"/main/tor-browser_en-US || exit  ## absolute path won't work
                 ./start-tor-browser.desktop &>/dev/null & ;;
             * )
                 firefox "$ff_item" &>/dev/null & ;;

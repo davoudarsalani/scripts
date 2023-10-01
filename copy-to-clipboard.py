@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/copy-to-clipboard.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:43:24 +0330 Tuesday
-
 from getopt import getopt
 from os import path, getenv
 from subprocess import run

@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-09-07 13:41:26 +0330 Monday
-
 function get_datetime {  ## {{{
     case "$1" in
             ymdhms )
@@ -34,31 +32,31 @@ function get_datetime {  ## {{{
 }
 ## }}}
 function heading {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     echo -e "$(green "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 ## }}}
 function flag {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     echo -e "$(purple "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 ## }}}
 function action_now {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     echo -e "$(green '→') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 ## }}}
 function accomplished {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     echo -e "$(green '✔') $(grey "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 ## }}}
 function wrap_fzf_choice {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
@@ -197,7 +195,7 @@ function mounted_drives {  ## {{{
 }
 ## }}}
 function get_mountable_umountable {  ## {{{
-    readarray -t mountable  < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE 'part $|rom $')
+    readarray -t mountable  < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -iE 'part $|rom $' | \grep -viE ' swap part $|^nvme|^sda|^sdb')
     readarray -t umountable < <(\lsblk -nro NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT | \grep -i '/tmp/')
 }
 ## }}}
@@ -210,9 +208,9 @@ function msgc {  ## {{{
 }
 ## }}}
 function copy_pacman_log {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
-    cp /var/log/pacman.log "$HOME"/linux/pacman.log
+    cp /var/log/pacman.log "$HOME"/main/linux/pacman.log
     msgn "<span color=\"${orange}\">/var/log/pacman.log</span> copied"
 }
 ## }}}
@@ -221,18 +219,18 @@ function clear_playlist {  ## {{{
 }
 ## }}}
 function turn_off_shuffle {  ## {{{
-    source "$HOME"/scripts/gb-audacious
+    source "$HOME"/main/scripts/gb-audacious
     [ "$shuffle_status" == 'on'  ] && audtool --playlist-shuffle-toggle
 }
 ## }}}
 function turn_on_shuffle {  ## {{{
-    source "$HOME"/scripts/gb-audacious
+    source "$HOME"/main/scripts/gb-audacious
     [ "$shuffle_status" == 'off' ] && audtool --playlist-shuffle-toggle
 }
 ## }}}
 function play_shutdown_track {  ## {{{
-    source "$HOME"/scripts/gb-audio
-    pacmd play-file "$HOME"/linux/sounds/shutdown.ogg "$def_sink_index"
+    source "$HOME"/main/scripts/gb-audio
+    pacmd play-file "$HOME"/main/linux/sounds/shutdown.ogg "$def_sink_index"
 }
 ## }}}
 function relative_date {  ## {{{
@@ -276,7 +274,7 @@ function convert_second {  ## {{{
         mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
         year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
 
-        ## NOTE used [ var -eq 0 ] instead of (( var == 0 )) because
+        ## NOTE used [ "$var" -eq 0 ] instead of (( var == 0 )) because
         ##      1. (( var == 0 )) is stupid (i.e. it returns true even if var does not exist)
         ##      2. ints here are two-digit and (( var == 0 )) can't handle that
         if [ "$year" -eq 0 ] && [ "$mont" -eq 0 ] && [ "$day" -eq 0 ]; then
@@ -339,7 +337,7 @@ function insert_comma {  ## {{{
 ## }}}
 function clear_clipboard {  ## {{{
     greenclip clear
-    msgn 'cleared' '' "$HOME"/linux/themes/greenclip.png
+    msgn 'cleared' '' "$HOME"/main/linux/themes/greenclip.png
 }
 ## }}}
 function random_wallpaper {  ## {{{
@@ -347,17 +345,21 @@ function random_wallpaper {  ## {{{
 
     current_wallpaper_file=/tmp/current_wallpaper
     ## same wallpaper for both screens
-    rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
+    rand_wall="$(shuf -n 1 < <(find "$HOME"/main/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
     printf '%s\n' "${rand_wall##*/}" > "$current_wallpaper_file"
     feh --bg-scale "$rand_wall"
 }
 ## }}}
 function copy_random_wallpaper_for_startup {  ## {{{
-    source "$HOME"/scripts/gb-color
-    local rand_wall
+    source "$HOME"/main/scripts/gb-color
+    local rand_wall dest_dir
 
-    rand_wall="$(shuf -n 1 < <(find "$HOME"/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
-    sudo cp "$rand_wall" /usr/share/wallpapers/startup_background.jpg
+    rand_wall="$(shuf -n 1 < <(find "$HOME"/main/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
+
+    dest_dir=/usr/share/wallpapers
+    [ -d "$dest_dir" ] || sudo mkdir "$dest_dir"
+
+    sudo cp "$rand_wall" "$dest_dir"/startup_background.jpg && \
     msgn "<span color=\"${orange}\">${rand_wall##*/}</span> copied"
 }
 ## }}}
@@ -375,7 +377,7 @@ function set_widget {  ## {{{
 }
 ## }}}
 function get_input {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
     local input
 
     unset input
@@ -384,7 +386,7 @@ function get_input {  ## {{{
 }
 ## }}}
 function get_single_input {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
     local single_input
 
     unset single_input
@@ -393,7 +395,7 @@ function get_single_input {  ## {{{
 }
 ## }}}
 function line {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     grey "$(printf "%$(tput cols)s\n" | sed "s/ /▬/g")"
 }
@@ -405,23 +407,23 @@ function rand_str {  ## {{{
 }
 ## }}}
 function get_kaddy_counterpart {  ## {{{
-    printf '%s\n' "$(sed -e "s|\($HOME\)/\(\)|\1/kaddy/\2|" <<< "$1")"
+    printf '%s\n' "$(sed -e "s|\($HOME\)/main\(\)|\1/kaddy\2|" <<< "$1")"
 }
 ## }}}
 function remove_older_pkgs {  ## {{{
-    source "$HOME"/scripts/gb
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb
+    source "$HOME"/main/scripts/gb-color
 
     local src_dir src_kaddy_dir uniq count file exceed idx remove_propmt
     declare -a files uniques repeats to_be_removed
     declare -i keep=3
 
-    src_dir="$HOME"/linux-pkg
+    src_dir="$HOME"/main/linux-pkg
     src_kaddy_dir="$(get_kaddy_counterpart "$src_dir")"
     readarray -t files < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f ! -iname '*.sig' ! -iname '*:*' | sort)
     readarray -t uniques < <(printf '%s\n' "${files[@]}" | sed 's|-[0-9]\+[^:]*||g' | sort | uniq --count)
     for uniq in "${uniques[@]}"; {
-        read count file <<< "$uniq"  ## 8 /home/nnnn/linux-pkg/alsa-card-profiles
+        read count file <<< "$uniq"  ## 8 /home/nnnn/main/linux-pkg/alsa-card-profiles
         (( count <= keep )) && continue
         (( exceed="count - keep" ))  ## 5
         readarray -t repeats < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "${file##*/}*" ! -iname '*.sig' ! -iname '*:*' | sort)
@@ -448,17 +450,17 @@ function remove_older_pkgs {  ## {{{
 }
 ## }}}
 function expand_ips_from_ranges {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
     local ip1 ip2 dest_file ip1_4_new
     local ip1_1 ip1_2 ip1_3 ip1_4 ip2_1 ip2_2 ip2_3 ip2_4
 
     [ "$3" ] || {
         red "args needed"
-        red "USAGE: $FUNCNAME <IP1> <IP2> ~/downloads/ip_ranges.py "
+        red "USAGE: $FUNCNAME <IP1> <IP2> ~/main/downloads/ip_ranges.py "
         exit
     }
 
-    [ -f "$3" ] || {
+    [ -f "$3" ] && {
         red "$3 already exists"
         exit
     }
@@ -493,14 +495,14 @@ function expand_ips_from_ranges {  ## {{{
 
 ## for website:
 function create_timeline_thumbnails {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     local src_dir src_dir_base dest_dir vid_base vid_name
     declare -a vids
 
     [ "$1" ] || {
         red "arg needed"
-        red "USAGE: $FUNCNAME ~/dl/video/bright-side"
+        red "USAGE: $FUNCNAME ~/main/dl/video/bright-side"
         exit
     }
 
@@ -511,7 +513,7 @@ function create_timeline_thumbnails {  ## {{{
 
     src_dir="$1"
     src_dir_base="${src_dir##*/}"
-    dest_dir=~/website/static/files/page/video/00-timeline-thumbnail/"$src_dir_base"
+    dest_dir=~/main/website/static/files/page/video/00-timeline-thumbnail/"$src_dir_base"
     [ -d "$dest_dir" ] && \rm -r "$dest_dir"
     \mkdir -p "$dest_dir"
 
@@ -527,15 +529,15 @@ function create_timeline_thumbnails {  ## {{{
 }
 ## }}}
 function create_exhibit_thumbnails {  ## {{{
-    source "$HOME"/scripts/gb
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb
+    source "$HOME"/main/scripts/gb-color
 
     local src_dir src_dir_base dest_dir vid_base vid_name
     declare -a vids first_jpgs
 
     [ "$1" ] || {
         red "arg needed"
-        red "USAGE: $FUNCNAME ~/dl/video/bright-side"
+        red "USAGE: $FUNCNAME ~/main/dl/video/bright-side"
         exit
     }
 
@@ -546,7 +548,7 @@ function create_exhibit_thumbnails {  ## {{{
 
     src_dir="$1"
     src_dir_base="${src_dir##*/}"
-    dest_dir=~/website/static/files/page/video/00-exhibit-thumbnail/"$src_dir_base"
+    dest_dir=~/main/website/static/files/page/video/00-exhibit-thumbnail/"$src_dir_base"
     [ -d "$dest_dir" ] && \rm -r "$dest_dir"
     \mkdir -p "$dest_dir"
 
@@ -571,7 +573,7 @@ function create_exhibit_thumbnails {  ## {{{
 }
 ## }}}
 function create_waveform_v2 {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     ## [CHECKING_OS]
     [ "$(command -v apt)" ] || {
@@ -586,7 +588,7 @@ function create_waveform_v2 {  ## {{{
     type_='audio'  ## audio/dictionary
     ext='.mp3'  ## .mp3
 
-    src_dir="$HOME"/dl/"$type_"
+    src_dir="$HOME"/main/dl/"$type_"
 
     readarray -t dirs_ < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type d | sort)
 
@@ -598,7 +600,7 @@ function create_waveform_v2 {  ## {{{
 
         for f in "${files[@]}"; {
             f_base="${f##*/}"  ## 001.mp3
-            dest_media="$HOME"/website/static/files/base/page/"$type_"/"$d_base"/00-waveform-v2/"$f_base"
+            dest_media="$HOME"/main/website/static/files/base/page/"$type_"/"$d_base"/00-waveform-v2/"$f_base"
             dest_png="${dest_media/$ext/.png}"
             dest_js="${dest_media/$ext/.js}"
 
@@ -620,7 +622,7 @@ function create_waveform_v2 {  ## {{{
             ##   --wjs-width 840
             ##   --wjs-precision 4
             ##   --waveformjs "$dest_js")
-            "$HOME"/linux/sources/waveform/waveform \
+            "$HOME"/main/linux/sources/waveform/waveform \
                 --png-width 840 \
                 --png-height 128 \
                 --png-color-center ffffffff \
@@ -696,8 +698,8 @@ function create_waveform_v2 {  ## {{{
 # function compare_network_speed {  ## {{{
 #    ## this function takes only one arg which can only be either old or new
 
-#    source "$HOME"/scripts/gb-calculation
-#    source "$HOME"/scripts/gb-color
+#    source "$HOME"/main/scripts/gb-calculation
+#    source "$HOME"/main/scripts/gb-color
 
 #    declare -a loop_durs loops_durs
 
@@ -719,7 +721,7 @@ function create_waveform_v2 {  ## {{{
 #        printf 'loop %s\n' "$i"
 #        > "$durs_file"
 #        for ((j=1; j<="$loops_count"; j++)); {
-#            { time -p "$HOME"/scripts/awesome-widgets network ;} &>>"$durs_file"
+#            { time -p "$HOME"/main/scripts/awesome-widgets network ;} &>>"$durs_file"
 #            printf '\n' >> "$durs_file"
 #            sleep 1
 #        }
@@ -761,9 +763,9 @@ function create_waveform_v2 {  ## {{{
 ## }}}
 # timer and record_* {{{
 # function timer {  ## {{{
-#     source "$HOME"/scripts/gb-color
-#     source "$HOME"/scripts/gb-screen
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-color
+#     source "$HOME"/main/scripts/gb-screen
+#     source "$HOME"/main/scripts/gb-audio
 #     start="$(get_datetime 'jhms')"
 #     for ((i=1; i<="$1"; i++)); {
 #         current="$(get_datetime 'jhms')"
@@ -779,8 +781,8 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_audio {  ## {{{
-#     source "$HOME"/scripts/gb-screen
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-screen
+#     source "$HOME"/main/scripts/gb-audio
 #     timer "$3" "$4" &
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default                \
@@ -789,8 +791,8 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_audio_ul {  ## {{{
-#     source "$HOME"/scripts/gb-screen
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-screen
+#     source "$HOME"/main/scripts/gb-audio
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
 #            -filter_complex amix=inputs=2 \
@@ -798,7 +800,7 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_screen {  ## {{{
-#     source "$HOME"/scripts/gb-screen
+#     source "$HOME"/main/scripts/gb-screen
 #     timer "$3" "$6" &
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
@@ -809,8 +811,8 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_screen_ul {  ## {{{
-#     source "$HOME"/scripts/gb-screen
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-screen
+#     source "$HOME"/main/scripts/gb-audio
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
 #            -filter_complex amix=inputs=2 \
@@ -820,8 +822,8 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_video {  ## {{{
-#     source "$HOME"/scripts/gb-screen
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-screen
+#     source "$HOME"/main/scripts/gb-audio
 #     timer "$3" "$4" &
 #     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
 #            -f pulse -i "$def_source_mon_index" \
@@ -831,8 +833,8 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_video_ul {  ## {{{
-#     source "$HOME"/scripts/gb-screen
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-screen
+#     source "$HOME"/main/scripts/gb-audio
 #     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
 #            -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
@@ -841,7 +843,7 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_mic_mon_on {  ## {{{
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-audio
 #     unmute_mic
 #     mic_25
 #     unmute_mon
@@ -849,13 +851,13 @@ function create_waveform_v2 {  ## {{{
 # }
 ## }}}
 # function record_mon_on {  ## {{{
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-audio
 #     unmute_mon
 #     mon_100
 # }
 ## }}}
 # function record_mic_mon_off {  ## {{{
-#     source "$HOME"/scripts/gb-audio
+#     source "$HOME"/main/scripts/gb-audio
 #     mute_mic
 #     mic_0
 #     mute_mon

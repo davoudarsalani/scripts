@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-unlimited.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 13:17:20 +0330 Tuesday
-
 from os import getenv, path
 from signal import signal, SIGINT
 
@@ -60,7 +58,7 @@ set_widget('record', 'fg', getenv('red'))
 
 if main_item == 'audio':
     suffix = 'AUD-UL'
-    output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mp3'
+    output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mp3'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.audio_ul(output)
 elif main_item == 'screen 1':
@@ -69,7 +67,7 @@ elif main_item == 'screen 1':
     resolution = scr_1_res
     x_offset = scr_1_x_offset
     suffix = 'SCR-1-UL'
-    output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
+    output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.screen_ul(resolution, x_offset, output)
 elif main_item == 'screen 2':
@@ -78,7 +76,7 @@ elif main_item == 'screen 2':
     resolution = scr_2_res
     x_offset = scr_2_x_offset
     suffix = 'SCR-2-UL'
-    output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
+    output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.screen_ul(resolution, x_offset, output)
 elif main_item == 'screen all':
@@ -86,11 +84,11 @@ elif main_item == 'screen all':
     resolution = scr_all_res
     x_offset = 0
     suffix = 'SCR-ALL-UL'
-    output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
+    output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.screen_ul(resolution, x_offset, output)
 elif main_item == 'video':
     suffix = 'VID-UL'
-    output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
+    output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
     set_widget('record', 'markup', f'{record_icon()}:{suffix}')
     Rec.video_ul(output)

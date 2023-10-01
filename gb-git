@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-git
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-21 10:14:45 +0330 Saturday
-
 # NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
 
 ## %x09 = tab (https://stackoverflow.com/questions/1441010/the-shortest-possible-output-from-git-log-containing-author-and-date)
@@ -179,7 +177,7 @@ function git_hash_last_commit {  ## {{{
 }
 ## }}}
 function git_if_behind {  ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
     local commits_ahead commits_behind commits_behind_ahead temp_path
 
     action_now 'updating remote'
@@ -218,7 +216,7 @@ function git_pull_proxy {  ## {{{
 }
 ## }}}
 function git_push_failed { ## {{{
-    source "$HOME"/scripts/gb-color
+    source "$HOME"/main/scripts/gb-color
 
     red 'push failed.'
     red "try: git -C ${1:-.} push --set-upstream origin master"  ## --set-upstream or -u

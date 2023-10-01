@@ -6,16 +6,14 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/typer
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:37:37 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-audio
-source "$HOME"/scripts/gb-calculation
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-audio
+source "$HOME"/main/scripts/gb-calculation
 
 title="${0##*/}"
 
 function display_help {  ## {{{
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     typer_help
 }
 ## }}}
@@ -139,10 +137,10 @@ intervals_length="${#intervals[@]}"
 intervals_middle_member="${intervals["$(( "$intervals_length" / 2 ))"]}"
 
 key_sounds=(
-    "$HOME"/linux/sounds/key_press_1.wav
-    "$HOME"/linux/sounds/key_press_1_dance.wav
-    "$HOME"/linux/sounds/key_press_2.wav
-    "$HOME"/linux/sounds/key_press_2_fullbase.wav
+    "$HOME"/main/linux/sounds/key_press_1.wav
+    "$HOME"/main/linux/sounds/key_press_1_dance.wav
+    "$HOME"/main/linux/sounds/key_press_2.wav
+    "$HOME"/main/linux/sounds/key_press_2_fullbase.wav
 )
 key_sounds_length="${#key_sounds[@]}"
 [ "$is_quiet" == 'true' ] && play=':' || play='play_random_key_sound'

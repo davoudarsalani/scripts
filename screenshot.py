@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/screenshot.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-27 22:03:50 +0330 Friday
-
 from os import path, remove, getenv
 
 from gi import require_version
@@ -38,7 +36,7 @@ main_item = rofi(main_items, 'screenshot')
 
 now = get_datetime('jymdhms')
 global output
-output = f'{getenv("HOME")}/downloads/{now}-SS.png'
+output = f'{getenv("HOME")}/main/downloads/{now}-SS.png'
 
 Scr = Screen()
 scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset = Scr.screen_1()
@@ -55,7 +53,7 @@ if main_item == 'screen 1':  ## {{{
         # convert_to_jpg(output)
         msgn('screen 1', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 1</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 1</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 ## }}}
 elif main_item == 'screen 2':  ## {{{
     try:
@@ -66,7 +64,7 @@ elif main_item == 'screen 2':  ## {{{
         # convert_to_jpg(output)
         msgn('screen 2', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 2</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 2</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 ## }}}
 elif main_item == 'screen all':  ## {{{
     try:
@@ -77,7 +75,7 @@ elif main_item == 'screen all':  ## {{{
         # convert_to_jpg(output)
         msgn('screen all', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen all</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen all</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 ## }}}
 elif main_item == 'current window':  ## {{{
     try:
@@ -91,7 +89,7 @@ elif main_item == 'current window':  ## {{{
         # convert_to_jpg(output)
         msgn('current window', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">current window</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">current window</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 ## }}}
 elif main_item == 'selected area':  ## {{{
     ## https://nitratine.net/blog/post/how-to-get-mouse-clicks-with-python/
@@ -106,13 +104,13 @@ elif main_item == 'selected area':  ## {{{
 
         ERROR:START JUMP_1:
         Traceback (most recent call last):
-          File "/home/nnnn/scripts/./screenshot.py", line 11, in <module>
+          File "/home/nnnn/main/scripts/./screenshot.py", line 11, in <module>
             from pynput.mouse import Listener
-          File "/home/nnnn/scripts/.venv/lib/python3.10/site-packages/pynput/__init__.py", line 40, in <module>
+          File "/home/nnnn/main/scripts/.venv/lib/python3.10/site-packages/pynput/__init__.py", line 40, in <module>
             from . import keyboard
-          File "/home/nnnn/scripts/.venv/lib/python3.10/site-packages/pynput/keyboard/__init__.py", line 31, in <module>
+          File "/home/nnnn/main/scripts/.venv/lib/python3.10/site-packages/pynput/keyboard/__init__.py", line 31, in <module>
             backend = backend(__name__)
-          File "/home/nnnn/scripts/.venv/lib/python3.10/site-packages/pynput/_util/__init__.py", line 76, in backend
+          File "/home/nnnn/main/scripts/.venv/lib/python3.10/site-packages/pynput/_util/__init__.py", line 76, in backend
             raise ImportError('this platform is not supported: {}'.format(
         ImportError: this platform is not supported: ('failed to acquire X connection: libtk8.6.so: cannot open shared object file: No such file or directory', ImportError('libtk8.6.so: cannot open s
         hared object file: No such file or directory'))
@@ -156,7 +154,7 @@ elif main_item == 'selected area':  ## {{{
         # convert_to_jpg(output)
         msgn('selected area', f'<span color=\"{getenv("orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">selected area</span>\n{exc!r}', f'{getenv("HOME")}/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">selected area</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
 ## }}}
 else:  ## {{{
     exit()

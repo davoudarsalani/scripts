@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-screen.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 13:02:12 +0330 Tuesday
-
 from os import getenv
 
 from gp import Screen, Record, Audio, get_datetime, rofi, update_audio, record_icon, set_widget, convert_second
@@ -54,7 +52,7 @@ elif screen == 'all':
 else:
     exit()
 
-output = f'{getenv("HOME")}/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
+output = f'{getenv("HOME")}/main/downloads/{get_datetime("jymdhms")}-{suffix}.mkv'
 Aud = Audio()
 Rec = Record()
 

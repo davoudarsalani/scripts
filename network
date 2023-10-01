@@ -6,20 +6,18 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/network
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:33:21 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-network
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-network
 
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     network_help
 }
 
 function add_desired_ip_to_ethernet {
-    source "$HOME"/scripts/gb-network
+    source "$HOME"/main/scripts/gb-network
     sudo ip address add "$desired_eth_ip" broadcast + dev "$eth_devc"
 }
 

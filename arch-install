@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/arch-install
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-26 16:04:15 +0330 Tuesday
-
 function display_help {
     local cmd
 
@@ -204,7 +202,7 @@ case "$1" in
                 EDITOR=vim visudo
                 ## add this line:
                 %wheel ALL=(ALL) NOPASSWD: ALL
-                ## alternatively, you can have these two lines where you specify ehich commands to be run without asking for a password:
+                ## alternatively, you can have these two lines where you specify which commands to be run without asking for a password:
                 %wheel ALL=(ALL) ALL
                 %wheel ALL=(ALL) NOPASSWD: COMMAND_1, COMMAND_2, COMMAND_3"
                 display_cmd "$cmd"
@@ -320,17 +318,19 @@ case "$1" in
                 sd_3 for /
                 sd_4 for home
 
-                mkfs.vfat /dev/sd_1
+                mkfs.vfat /dev/sd_1  ## OR mkfs.fat -F 32 /dev/sd_1 (by Arch Wiki)
                 mkswap    /dev/sd_2
                 swapon    /dev/sd_2
                 mkfs.ext4 /dev/sd_3
                 mkfs.ext4 /dev/sd_4
 
-                mkdir -p /mnt/boot/efi         <--,-- mount efi
-                mount /dev/sd_1 /mnt/boot/efi  <--'
                 mount /dev/sd_3 /mnt           <-- mount root
+
                 mkdir /mnt/home                <--,-- mount home
-                mount /dev/sd_4 /mnt/home      <--'"
+                mount /dev/sd_4 /mnt/home      <--'
+
+                mkdir -p /mnt/boot/efi         <--,-- mount efi
+                mount /dev/sd_1 /mnt/boot/efi  <--' <-- NOTE mount this last"
                 display_cmd "$cmd"
                 ;;
             2 )
@@ -625,6 +625,7 @@ fi
 ##
 ## >> method 1:
 ## useradd -mG wheel -s /bin/bash nnnn
+## EDITOR=vim visudo
 ## #uncomment this line:
 ## # %wheel ALL=(ALL) NOPASSWD: ALL
 ##
@@ -634,10 +635,9 @@ fi
 ## # add "nnnn ALL=(ALL) NOPASSWD: ALL" under the line "root = ALL=(ALL) ALL") (without the quotes)
 ## (save & exit)
 ## }}}
+##
 ## >> {{{ method 3 (Luke version) (www.youtube.com/watch?v=nSHOb8YU9Gw):
 ## useradd -m -g wheel nnnn
-##
-##
 ## EDITOR=vim visudo
 ## # Add this line:
 ## %wheel ALL=(ALL) NOPASSWD: ALL

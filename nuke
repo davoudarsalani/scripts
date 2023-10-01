@@ -6,12 +6,10 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/nuke
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:36:19 +0330 Tuesday
-
 ## https://revelry.co/terminal-workflow-fzf/
 ## https://github.com/junegunn/fzf/wiki/examples
 
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 IFS=$'\n'
 if (( UID > 0 )); then

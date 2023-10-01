@@ -6,15 +6,13 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/todo
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-19 09:59:11 +0330 Tuesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 function cp_file_to_kaddy {
     cp "$todo_file" "$todo_kaddy_file"
 }
 
-todo_file="$HOME"/todo/todo
+todo_file="$HOME"/main/todo/todo
 todo_kaddy_file="$(get_kaddy_counterpart "$todo_file")"
 readarray -t content < "$todo_file"
 
@@ -27,7 +25,7 @@ case "$main_item" in
         add_item="$(pipe_to_rofi "${add_items[@]}" 'header=add')" || exit 37
 
         ## exit if it already exists
-        \grep -qw "$add_item" "$todo_file" && msgc 'ERROR' "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/linux/themes/alert-w.png && exit
+        \grep -qw "$add_item" "$todo_file" && msgc 'ERROR' "<span color=\"${orange}\">${add_item}</span> already exists" "$HOME"/main/linux/themes/alert-w.png && exit
 
         {
             printf '%s\n' "$add_item" >> "$todo_file"
@@ -35,7 +33,7 @@ case "$main_item" in
         } && msgn "added <span color=\"${orange}\">${add_item}</span>" ;;
     REMOVE )
         [ "${content[0]}" ] || {
-            msgc 'ERROR' 'todo is empty' "$HOME"/linux/themes/alert-w.png
+            msgc 'ERROR' 'todo is empty' "$HOME"/main/linux/themes/alert-w.png
             exit
         }
 

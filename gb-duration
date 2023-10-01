@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-duration
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-10 16:26:23 +0330 Sunday
-
 function get_duration {
     local file_ duration
 

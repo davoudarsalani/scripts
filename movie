@@ -6,14 +6,12 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/movie
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-09-11 22:54:35 +0330 Friday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-audacious
-source "$HOME"/scripts/gb-duration
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-audacious
+source "$HOME"/main/scripts/gb-duration
 
 function no_such_file {
-    msgc 'ERROR' "no such file as <span color=\"${orange}\">${movie_full_path/$HOME/\~}</span>" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "no such file as <span color=\"${orange}\">${movie_full_path/$HOME/\~}</span>" "$HOME"/main/linux/themes/alert-w.png
     exit
 }
 
@@ -21,30 +19,30 @@ function success_moving {
     local text
 
     text="$(printf "moved to <span color=\"%s\">WATCHED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$no_suffix")"
-    msgn "$text" '' "$HOME"/linux/themes/delete-w.png
+    msgn "$text" '' "$HOME"/main/linux/themes/delete-w.png
 }
 
 function error_moving {
-    msgc 'ERROR' "moving <span color=\"${orange}\">${no_suffix}</span> to <span color=\"${blue}\">WATCHED</span>" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "moving <span color=\"${orange}\">${no_suffix}</span> to <span color=\"${blue}\">WATCHED</span>" "$HOME"/main/linux/themes/alert-w.png
     # exit  ## exceptionally commented
 }
 
 function success_removing {
-    msgn 'removed' "<span color=\"${red}\"><b>${no_suffix}</b></span>" "$HOME"/linux/themes/delete-w.png
+    msgn 'removed' "<span color=\"${red}\"><b>${no_suffix}</b></span>" "$HOME"/main/linux/themes/delete-w.png
 }
 
 function error_removing {
-    msgc 'ERROR' "removing <span color=\"${orange}\">${no_suffix}</span>" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "removing <span color=\"${orange}\">${no_suffix}</span>" "$HOME"/main/linux/themes/alert-w.png
 }
 
-function if_empty {  ## JUMP_1 the same used in "$HOME"/scripts/speech
+function if_empty {  ## JUMP_1 the same used in "$HOME"/main/scripts/speech
     local count
 
     read count directory <<< "$directory"  ## 8 pargar
 
     ## check if count is an int
     [ "$count" -eq "$count" ] || {
-        msgc 'ERROR' "<span color=\"${orange}\">${count}</span> is invalid count" "$HOME"/linux/themes/alert-w.png
+        msgc 'ERROR' "<span color=\"${orange}\">${count}</span> is invalid count" "$HOME"/main/linux/themes/alert-w.png
         exit
     }
 
@@ -55,8 +53,8 @@ function if_empty {  ## JUMP_1 the same used in "$HOME"/scripts/speech
 }
 
 function if_no_dir {  ## JUMP_1
-    [ -d "$HOME"/movie/"$directory" ] || {
-        msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/movie/${directory}</span>" "$HOME"/linux/themes/alert-w.png
+    [ -d "$HOME"/main/movie/"$directory" ] || {
+        msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/main/movie/${directory}</span>" "$HOME"/main/linux/themes/alert-w.png
         exit
     }
 }
@@ -69,7 +67,7 @@ declare -a directories_plus_count movies_array
 [ "$1" ] || exit
 [ "$1" == 'random' ] && title='random movie' || title='select movie'
 
-readarray -t directories < <(find "$HOME"/movie -mindepth 1 -maxdepth 1 -type d | sort)
+readarray -t directories < <(find "$HOME"/main/movie -mindepth 1 -maxdepth 1 -type d | sort)
 
 ## get movie count in each directory and prepend it to the directory name
 for tmp_directory in "${directories[@]}"; {
@@ -92,7 +90,7 @@ directory="$(pipe_to_rofi "${directories_plus_count[@]}" "header=${title}")" || 
 if_empty  ## NOTE if_empty must precede if_no_dir (i.e. JUMP_2)
 if_no_dir  ## JUMP_2
 
-find_movies_cmd='find "$HOME"/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname "*.srt"'
+find_movies_cmd='find "$HOME"/main/movie/"$directory" -mindepth 1 -maxdepth 1 -type f ! -iname "*.srt"'
 case "$1" in
     random )
         movie="$(shuf -n 1 < <(eval "$find_movies_cmd"))"
@@ -121,7 +119,7 @@ esac
 ## play
 no_suffix="${movie%.*}"
 
-movie_full_path="$HOME"/movie/"$directory"/"$movie"
+movie_full_path="$HOME"/main/movie/"$directory"/"$movie"
 movie_kaddy_full_path="$(get_kaddy_counterpart "$movie_full_path")"
 
 srt_full_path="${movie_full_path%.*}.srt"
@@ -129,7 +127,7 @@ srt_kaddy_full_path="${movie_kaddy_full_path%.*}.srt"
 
 [ -f "$movie_full_path" ] || no_such_file
 
-msgn 'playing' "<span color=\"${orange}\">${no_suffix}</span>" "$HOME"/linux/themes/filmroll-w.png
+msgn 'playing' "<span color=\"${orange}\">${no_suffix}</span>" "$HOME"/main/linux/themes/filmroll-w.png
 vlc -f --play-and-exit -- "$movie_full_path" 2>/dev/null
 
 ## move to WATCHED or remove
@@ -138,7 +136,7 @@ what_to_do="$(pipe_to_rofi "${what_to_dos[@]}" "header=${movie}" 'bg=red')"  # |
 
 case "$what_to_do" in
     'mv to WATCHED' )
-        watched_dir="$HOME"/movie/"$directory"/WATCHED
+        watched_dir="$HOME"/main/movie/"$directory"/WATCHED
         watched_dir_kaddy="$(get_kaddy_counterpart "$watched_dir")"
 
         [ -d "$watched_dir" ] || mkdir "$watched_dir"
@@ -171,4 +169,4 @@ case "$what_to_do" in
 esac
 
 ## play audacious if it was playing before the video was played
-[ "$continue_playing" == 'true' ] && "$HOME"/scripts/awesome-widgets audacious play_pause
+[ "$continue_playing" == 'true' ] && "$HOME"/main/scripts/awesome-widgets audacious play_pause

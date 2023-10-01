@@ -6,9 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-app-off
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-10 09:02:18 +0330 Sunday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 function now {
     copy_pacman_log
@@ -65,7 +63,7 @@ case "$1" in
     kid3 )
         kid3 &>/dev/null & ;;
     lf )
-        "$terminal" -e "lf ${HOME}/downloads/" &>/dev/null & ;;
+        "$terminal" -e "lf ${HOME}/main/downloads/" &>/dev/null & ;;
     libreoffice )
         libreoffice &>/dev/null & ;;
     lxappearance )
@@ -73,9 +71,11 @@ case "$1" in
     qutebrowser )
         qutebrowser --target tab &>/dev/null & ;;
     ranger )
-        "$terminal" -e "ranger ${HOME}/downloads/" &>/dev/null & ;;
+        "$terminal" -e "ranger ${HOME}/main/downloads/" &>/dev/null & ;;
     simplescreenrecorder )
         simplescreenrecorder &>/dev/null & ;;
+    sublime )
+        subl &>/dev/null & ;;
     terminal )
         "$terminal" &>/dev/null ;;
     terminal_tmux )

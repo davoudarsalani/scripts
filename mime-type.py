@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/mime-type.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-05 12:47:58 +0330 Thursday
-
 from getopt import getopt
 from os import path
 from subprocess import run

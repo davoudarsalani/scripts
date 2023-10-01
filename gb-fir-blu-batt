@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-fir-blu-batt
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-09-14 12:00:16 +0330 Sunday
-
 ## firewall
 firewall_status="$(sudo ufw status | \grep -i status | awk '{print $NF}')"
 

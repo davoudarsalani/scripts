@@ -6,16 +6,14 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/dictionary
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-29 09:24:18 +0330 Wednesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 gold_items=( 'open' )
 
 case "$1" in
      goldendict )
         [ "$2" == 'words' ] && {
-            readarray -t words < "$HOME"/bgls/words
+            readarray -t words < "$HOME"/main/bgls/words
             gold_items+=( '' "${words[@]}" )
         }
 

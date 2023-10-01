@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-calculation
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-04 12:19:42 +0330 Friday
-
 function float_pad {  ## {{{
     local input new_l_length new_r_length floated l r r_length lacking_pad
 

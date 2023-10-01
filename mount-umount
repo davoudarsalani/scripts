@@ -6,14 +6,12 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/mount-umount
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:31:28 +0330 Tuesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     mount_umount_help
 }
 
@@ -92,7 +90,7 @@ case "$1" in
             fi
 
             msg_text="$(printf "mounting <span color=\"%s\">/dev/%s</span> at <span color=\"%s\">%s</span>\n(%s)\n" "$orange" "$name" "$orange" "$dest_mount_dir" "$fail_reason")"
-            msgc 'ERROR' "$msg_text" "$HOME"/linux/themes/alert-w.png
+            msgc 'ERROR' "$msg_text" "$HOME"/main/linux/themes/alert-w.png
         }
 
         dest_mount_dir=/tmp/"$current_datetime"-"$name"
@@ -135,7 +133,7 @@ case "$1" in
         }
 
         function msg_umount_failed {
-            msgc 'ERROR' "umounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/linux/themes/alert-w.png
+            msgc 'ERROR' "umounting <span color=\"${orange}\">/dev/${name}</span>" "$HOME"/main/linux/themes/alert-w.png
         }
 
         sudo umount /dev/"$name" && msg_umount_successful || msg_umount_failed

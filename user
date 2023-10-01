@@ -6,15 +6,13 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/user
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:37:47 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-color
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-color
 
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     user_help
 }
 

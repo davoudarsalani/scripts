@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/reminder.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:47:27 +0330 Tuesday
-
 from time import sleep
 
 from gp import rofi, msgn, msgc, remove_leading_zeros, get_datetime

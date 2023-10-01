@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/download.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-16 14:58:53 +0330 Monday
-
 ## {{{ imports
 from __future__ import unicode_literals
 from dataclasses import dataclass, field
@@ -33,12 +31,13 @@ from wget import download as wget_download
 from youtube_dl import YoutubeDL
 from gp import Color, convert_byte, convert_second, duration_wrapper, fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
 
+
 ## }}}
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
     print(
         f'''{Col.heading(f'{title}')} {Col.yellow('help')}
-{Col.flag('-s|--source=')}a text file (e.g. $HOME/downloads/lucy),
+{Col.flag('-s|--source=')}a text file (e.g. $HOME/main/downloads/lucy),
             a url (e.g. https://www.youtube.com/watch?v=WpqCLcAXkJs or https://www.davoudarsalani.ir/files/temp/002.webp),
             a youtube playlist id (e.g. PLzMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu or PL-zMcBGfZo4-nK0Pyubp7yIG0RdXp6zklu)
             or free
@@ -193,7 +192,7 @@ def make_errors() -> dict[str, str]:  ## {{{
         ## error(28, 'Connection timed out after 20001 milliseconds')
         ## error(23, 'Failure writing output to destination')
         ## ]]
-        ## [[ happening in error files (i.e. error files of bwu, weather, etc. in $HOME/scripts/.last directory) just to add more examples
+        ## [[ happening in error files (i.e. error files of bwu, weather, etc. in $HOME/main/scripts/.last directory) just to add more examples
         'AttributeError': 'break',
         ## Full: AttributeError("'NoneType' object has no attribute 'text'")
         'OSError': 'break',
@@ -357,7 +356,6 @@ def main() -> None:  ## {{{
     item = fzf(items)
 
     if item == 'download':
-
         Ini.verify_args()
         Ini.remove_duplicates()
         savelog_print(f'{Ini}\n', 'blue')
@@ -370,7 +368,6 @@ def main() -> None:  ## {{{
             sleep(60)
 
         for url in Ini.urls:
-
             Ini.create_current(url)
 
             for Cur.attempt in Cur.attempts:
@@ -435,6 +432,7 @@ class Initial:  ## {{{
     no_information: bool = False
     verbose: bool = False
     purge: bool = False
+
     ## }}}
     def getopts(self) -> None:  ## {{{
         try:
@@ -484,7 +482,6 @@ class Initial:  ## {{{
 
         ## check if self.source is a file
         if path.isfile(self.source):
-
             ## create self.urls list from self.source
             with open(self.source, 'r') as opened_source:
                 lines = opened_source.read().splitlines()  ## OR: opened_source.readlines()
@@ -492,13 +489,13 @@ class Initial:  ## {{{
             if not self.urls:
                 invalid('source contains no downloadable urls')
 
-            root_base, _ = path.splitext(self.source)  ## $HOME/downloads/lucy, .txt
+            root_base, _ = path.splitext(self.source)  ## $HOME/main/downloads/lucy, .txt
             self.dest_dir = root_base
 
         ## check if we should download videos from my website
         ## better be placed before the statement that makes sure self.source is not a directory (i.e. JUMP_3)
         elif self.source == 'free':
-            v_dirs = glob(f'{getenv("HOME")}/dl/video/*')
+            v_dirs = glob(f'{getenv("HOME")}/main/dl/video/*')
             for v_dir in v_dirs:
                 v_count = len(list(glob(f'{v_dir}/*mp4')))
                 if v_count:
@@ -511,7 +508,7 @@ class Initial:  ## {{{
 
             shuffle(self.urls)
 
-            self.dest_dir = f'{getenv("HOME")}/downloads/free'
+            self.dest_dir = f'{getenv("HOME")}/main/downloads/free'
 
         ## make sure self.source is not a directory (JUMP_3)
         elif path.isdir(self.source):
@@ -530,11 +527,11 @@ class Initial:  ## {{{
                 if not url_id:
                     invalid('url seems incorrect.')
 
-                self.dest_dir = f'{getenv("HOME")}/downloads/{url_id}'
+                self.dest_dir = f'{getenv("HOME")}/main/downloads/{url_id}'
             else:
                 source_base = path.basename(self.source)  ## 001.webp
                 root_source_base, _ = path.splitext(source_base)  ## 001, .webp
-                self.dest_dir = f'{getenv("HOME")}/downloads/{root_source_base}'
+                self.dest_dir = f'{getenv("HOME")}/main/downloads/{root_source_base}'
 
         ## check if self.source is a playlist id
         elif match(playlist_id_regex, self.source):
@@ -548,7 +545,7 @@ class Initial:  ## {{{
             self.urls = list(filter(lambda line: not line.startswith('#') and line, Pla.pl_urls))
             if not self.urls:
                 invalid('no urls extracted from playlist id')
-            self.dest_dir = f'{getenv("HOME")}/downloads/{normalize(self.source)}'
+            self.dest_dir = f'{getenv("HOME")}/main/downloads/{normalize(self.source)}'
 
         else:
             invalid('source neither exists nor is a valid url')
@@ -721,6 +718,7 @@ class Profile:  ## {{{
     time: int = None
     url: int = None
     outputname: str = None
+
     ## }}}
     def report(self) -> None:  ## {{{
         savelog_print({**self.download_duration_dict, **Ini.total_downloaded_dict, **Ini.failures_count_dict}, 'brown')
@@ -771,6 +769,7 @@ class File(Profile):  ## {{{
     file_size: str = None
     file_content_type: str = None
     file_last_modified: str = None
+
     ## }}}
     def __post_init__(self):  ## {{{
         super().__init__()
@@ -873,7 +872,6 @@ class File(Profile):  ## {{{
     def download(self) -> None:  ## {{{
         try:
             if not Ini.downloader:  ## {{{ uses urlopen
-
                 if Ini.tor:
                     ## TODO not tested if proxy really works for urlopen. Needs more tests.
                     ## https://stackoverflow.com/questions/3168171/how-can-i-open-a-website-with-urllib-via-proxy-in-python
@@ -906,7 +904,6 @@ class File(Profile):  ## {{{
                     opened_session.raise_for_status()
 
                     with open(self.outputname, 'wb') as opened_outputname:
-
                         if self.file_raw_size_validity:
                             for chunk in opened_session.iter_content(chunk_size=self.chunksize):
                                 ## JUMP_2
@@ -919,7 +916,6 @@ class File(Profile):  ## {{{
                                 opened_outputname.write(chunk)
             ## }}}
             elif Ini.downloader == 'wget':  ## {{{
-
                 ## https://stackoverflow.com/questions/58125279/python-wget-module-doesnt-show-progress-bar
                 ## https://www.itersdesktop.com/2020/09/06/downloading-files-in-python-using-wget-module/
                 def wget_bar(progress_file_downloaded_raw, total=self.file_raw_size, width=80) -> None:  ## JUMP_5 FIXME can't use self.progress_file_downloaded_raw
@@ -1011,6 +1007,7 @@ class Youtube(Profile):  ## {{{
     video_view_count: int = None
     video_like_count: int = None
     video_ext: str = None
+
     ## }}}
     def __post_init__(self):  ## {{{
         super().__init__()
@@ -1206,6 +1203,7 @@ class Playlist(Profile):  ## {{{
     pl_uploader: str = None
     pl_entries: list[str] = field(repr=False, default_factory=list)
     pl_entries_count: int = None
+
     ## }}}
     def __post_init__(self):  ## {{{
         super().__init__()

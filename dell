@@ -6,26 +6,24 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/dell
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-06 10:03:54 +0330 Friday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 trap 'exit 0' INT  ## to avoid 255 exit code when using options that connect with x2x
 
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     dell_help
 }
 
 function upload {
-    scp -r "$name" nnnn@dell-"$bed":"$HOME"/downloads && \
+    scp -r "$name" nnnn@dell-"$bed":"$HOME"/main/downloads && \
     accomplished
 }
 
 function download {
-    scp -r nnnn@dell-"$bed":"$name" "$HOME"/downloads && \
+    scp -r nnnn@dell-"$bed":"$name" "$HOME"/main/downloads && \
     accomplished
 }
 
@@ -42,7 +40,9 @@ function rsync_ {
     ## NOTE remove trailing slash
     source_dir="${source_dir%/}"
 
-    rsync --archive --progress --delete "$source_dir" nnnn@dell-"$bed":
+    dest_dir="${source_dir%/*}"   ## a/b/c/d -> a/b/c
+
+    rsync --archive --progress --delete "$source_dir" nnnn@dell-"$bed":"$dest_dir"
 }
 
 function prompt {
@@ -81,16 +81,26 @@ main_items=(
     'ethernet connect'
     'ethernet download'
     'ethernet upload'
-    'ethernet rsync ~/linux'
-    'ethernet rsync ~/scripts'
-    'ethernet rsync ~/website'
+    'ethernet rsync ~/main/eterna'
+    'ethernet rsync ~/main/ariel'
+    'ethernet rsync ~/main/rcc'
+    'ethernet rsync ~/main/journal'
+    'ethernet rsync ~/main/linux'
+    'ethernet rsync ~/main/scripts'
+    'ethernet rsync ~/main/website'
+    'ethernet rsync ~/main/globaldaily'
     'wifi connect + x2x'
     'wifi connect'
     'wifi download'
     'wifi upload'
-    'wifi rsync ~/linux'
-    'wifi rsync ~/scripts'
-    'wifi rsync ~/website'
+    'wifi rsync ~/main/eterna'
+    'wifi rsync ~/main/ariel'
+    'wifi rsync ~/main/rcc'
+    'wifi rsync ~/main/journal'
+    'wifi rsync ~/main/linux'
+    'wifi rsync ~/main/scripts'
+    'wifi rsync ~/main/website'
+    'wifi rsync ~/main/globaldaily'
     'help'
 )
 
@@ -111,17 +121,37 @@ case "$main_item" in
         prompt -n
         bed='ethernet'
         upload "$name" ;;
-    'ethernet rsync ~/linux' )
+    'ethernet rsync ~/main/eterna' )
         bed='ethernet'
-        source_dir="$HOME"/linux  ## NOTE JUMP_1 no trailing slash
+        source_dir="$HOME"/main/eterna  ## NOTE JUMP_1 no trailing slash
         rsync_ ;;
-    'ethernet rsync ~/scripts' )
+    'ethernet rsync ~/main/ariel' )
         bed='ethernet'
-        source_dir="$HOME"/scripts  ## JUMP_1
+        source_dir="$HOME"/main/ariel  ## JUMP_1
         rsync_ ;;
-    'ethernet rsync ~/website' )
+    'ethernet rsync ~/main/rcc' )
         bed='ethernet'
-        source_dir="$HOME"/website  ## JUMP_1
+        source_dir="$HOME"/main/rcc  ## JUMP_1
+        rsync_ ;;
+    'ethernet rsync ~/main/journal' )
+        bed='ethernet'
+        source_dir="$HOME"/main/journal  ## JUMP_1
+        rsync_ ;;
+    'ethernet rsync ~/main/linux' )
+        bed='ethernet'
+        source_dir="$HOME"/main/linux  ## JUMP_1
+        rsync_ ;;
+    'ethernet rsync ~/main/scripts' )
+        bed='ethernet'
+        source_dir="$HOME"/main/scripts  ## JUMP_1
+        rsync_ ;;
+    'ethernet rsync ~/main/website' )
+        bed='ethernet'
+        source_dir="$HOME"/main/website  ## JUMP_1
+        rsync_ ;;
+    'ethernet rsync ~/main/globaldaily' )
+        bed='ethernet'
+        source_dir="$HOME"/main/globaldaily  ## JUMP_1
         rsync_ ;;
 
     'wifi connect + x2x' )
@@ -138,17 +168,37 @@ case "$main_item" in
         prompt -n
         bed='wifi'
         upload "$name" ;;
-    'wifi rsync ~/linux' )
+    'wifi rsync ~/main/eterna' )
         bed='wifi'
-        source_dir="$HOME"/linux  ## JUMP_1
+        source_dir="$HOME"/main/eterna  ## JUMP_1
         rsync_ ;;
-    'wifi rsync ~/scripts' )
+    'wifi rsync ~/main/ariel' )
         bed='wifi'
-        source_dir="$HOME"/scripts  ## JUMP_1
+        source_dir="$HOME"/main/ariel  ## JUMP_1
         rsync_ ;;
-    'wifi rsync ~/website' )
+    'wifi rsync ~/main/rcc' )
         bed='wifi'
-        source_dir="$HOME"/website  ## JUMP_1
+        source_dir="$HOME"/main/rcc  ## JUMP_1
+        rsync_ ;;
+    'wifi rsync ~/main/journal' )
+        bed='wifi'
+        source_dir="$HOME"/main/journal  ## JUMP_1
+        rsync_ ;;
+    'wifi rsync ~/main/linux' )
+        bed='wifi'
+        source_dir="$HOME"/main/linux  ## JUMP_1
+        rsync_ ;;
+    'wifi rsync ~/main/scripts' )
+        bed='wifi'
+        source_dir="$HOME"/main/scripts  ## JUMP_1
+        rsync_ ;;
+    'wifi rsync ~/main/website' )
+        bed='wifi'
+        source_dir="$HOME"/main/website  ## JUMP_1
+        rsync_ ;;
+    'wifi rsync ~/main/globaldaily' )
+        bed='wifi'
+        source_dir="$HOME"/main/globaldaily  ## JUMP_1
         rsync_ ;;
     help )
         display_help ;;

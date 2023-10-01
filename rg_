@@ -2,21 +2,19 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/r
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/r
+##    https://github.com/davoudarsalani/scripts/blob/master/rg_
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/rg_
 ##    https://davoudarsalani.ir
-
-## @last-modified 1401-08-23 08:56:44 +0330 Monday
 
 ## https://github.com/junegunn/fzf/wiki/Examples
 
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-color
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-color
 
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     r_help
 }
 

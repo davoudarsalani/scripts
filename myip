@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/myip
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-10 10:44:53 +0330 Sunday
-
 cmd='wget -qO - https://api.ipify.org'  ## https://github.com/rkienjet/torscripts/blob/master/newcircuit
 ## OR:
     # curl -s http://myip.enix.org/REMOTE_ADDR

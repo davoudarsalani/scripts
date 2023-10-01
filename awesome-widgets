@@ -6,9 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-widgets
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-09-23 10:03:57 +0330 Wednesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 threshhold=70
 
@@ -23,13 +21,13 @@ case "$1" in
         random_wallpaper || touch "$rand_wall_allowed_file" ;;  ## ^^ exceptionally used ps because pgrep cannot find simplescreenrecorder
     ## }}}
     jadi )  ## {{{
-        "$HOME"/scripts/jadi.py ;;
+        "$HOME"/main/scripts/jadi.py ;;
     ## }}}
     restart_picom )  ## {{{
         pkill picom && sleep 2 && picom -b ;;
     ## }}}
     turn_off_scr_3 )  ## {{{
-        source "$HOME"/scripts/gb-screen
+        source "$HOME"/main/scripts/gb-screen
 
         [ "$scr_3_name" ] && {
             xrandr --output "$scr_3_name" --off  ## https://superuser.com/questions/618127/disable-unplugged-displays-xrandr
@@ -37,7 +35,7 @@ case "$1" in
         } ;;
     ## }}}
     move_screen_2_to_left )  ## {{{
-        source "$HOME"/scripts/gb-screen
+        source "$HOME"/main/scripts/gb-screen
 
         [ "$scr_2_name" ] && {
             xrandr --output "$scr_2_name" --left-of "$scr_1_name"
@@ -57,14 +55,14 @@ case "$1" in
     weather )  ## {{{
         case "$2" in
           update )
-            "$HOME"/scripts/weather.py 'update' ;;
+            "$HOME"/main/scripts/weather.py 'update' ;;
           forecast )
-            "$HOME"/scripts/weather.py 'forecast' ;;
+            "$HOME"/main/scripts/weather.py 'forecast' ;;
         esac ;;
     ## }}}
     audio )  ## {{{
         function update_variables {
-            source "$HOME"/scripts/gb-audio
+            source "$HOME"/main/scripts/gb-audio
         }
 
         update_variables
@@ -111,7 +109,7 @@ case "$1" in
         # }
 
         function connecttoheadset {
-            source "$HOME"/scripts/gb-fir-blu-batt
+            source "$HOME"/main/scripts/gb-fir-blu-batt
             local output text
 
             msgn "connecting to headset <span color=\"${orange}\">${headset_mac}</span>"
@@ -121,7 +119,7 @@ case "$1" in
                 msgn "connected to <span color=\"${orange}\">${headset_mac}</span>"
             else
                 text="$(printf "connecting to <span color=\"%s\">%s</span>\n%s\n" "$orange" "$headset_mac" "$output")"
-                 msgc 'ERROR' "$text" "$HOME"/linux/themes/alert-w.png
+                 msgc 'ERROR' "$text" "$HOME"/main/linux/themes/alert-w.png
             fi
         }
 
@@ -227,7 +225,7 @@ msgn "$text" ;;
         set_widget 'audio' 'markup' "${vol_level}${vol_on_off} ${mic_level}${mic_on_off} ${mon_level}${mon_on_off} ${states_initials} ${indeces}${headset_connectivity}" ;;
     ## }}}
     battery )  ## {{{
-        source "$HOME"/scripts/gb-fir-blu-batt
+        source "$HOME"/main/scripts/gb-fir-blu-batt
 
         if [ "$battery_level" ] && (( battery_level < 15 )); then  ## <--,-- sometimes battery_level is not present and, in spite of that,
             set_widget 'battery_ct' 'fg' "$red"                    ##    |-- the (()) statement falsely returns true.
@@ -249,7 +247,7 @@ msgn "$text" ;;
         esac
 
         ## get battery_temp_last
-        battery_temp_last_file="$HOME"/scripts/.last/battery_temp
+        battery_temp_last_file="$HOME"/main/scripts/.last/battery_temp
         battery_temp_last="$(< "$battery_temp_last_file")" || battery_temp_last=0  ## NOTE do NOT add 2>/dev/null
         ## save battery_temp as last for our next read
         printf '%s\n' "$battery_temp" > "$battery_temp_last_file"
@@ -267,7 +265,7 @@ msgn "$text" ;;
         set_widget 'battery' 'markup' "${ac_or_dc}${battery_level}${battery_rem}${pref}${battery_temp}°" ;;
     ## }}}
     memory_cpu )  ## {{{
-        source "$HOME"/scripts/gb-calculation
+        source "$HOME"/main/scripts/gb-calculation
 
         case "$2" in
             intensives )
@@ -280,9 +278,9 @@ msgn "$text" ;;
 
                 ## cpu (https://www.idnt.net/en-US/kb/941772)
                 ## get last usage
-                cpu_last_file="$HOME"/scripts/.last/cpu
-                cpu_sum_last_file="$HOME"/scripts/.last/cpu_sum
-                cpu_temp_last_file="$HOME"/scripts/.last/cpu_temp
+                cpu_last_file="$HOME"/main/scripts/.last/cpu
+                cpu_sum_last_file="$HOME"/main/scripts/.last/cpu_sum
+                cpu_temp_last_file="$HOME"/main/scripts/.last/cpu_temp
                 read -a cpu_last < "$cpu_last_file" || cpu_last=( cpu 0 0 0 0 0 0 0 0 0 0 )  ## JUMP_2
                 cpu_sum_last="$(< "$cpu_sum_last_file")" || cpu_sum_last=0  ## NOTE do NOT add 2>/dev/null
                 cpu_temp_last="$(< "$cpu_temp_last_file")" || cpu_temp_last=0  ## NOTE do NOT add 2>/dev/null
@@ -352,7 +350,7 @@ msgn "$text" ;;
         esac ;;
     ## }}}
     harddisk )  ## {{{
-        source "$HOME"/scripts/gb-calculation
+        source "$HOME"/main/scripts/gb-calculation
 
         case "$2" in
             partitions )
@@ -370,8 +368,7 @@ msgn "$text" ;;
                 (( home_used > 0 )) && home_used="$(float_pad "${home_used}*100/${home_size}" 1 2)"
                 home_greater="$(compare_floats "$home_used" '>' "$threshhold")"
 
-                ## vvv TEMPORARY temporarily commented
-                # [ "$home_greater" == 'true' ] && home_used="<span color=\"${red}\">${home_used}</span>"
+                [ "$home_greater" == 'true' ] && home_used="<span color=\"${red}\">${home_used}</span>"
 
                 swap_size="$(swapon --summary | \grep -i 'partition' | awk '{print $3}')"
                 swap_used="$(swapon --summary | \grep -i 'partition' | awk '{print $4}')"
@@ -379,7 +376,7 @@ msgn "$text" ;;
                 swap_geater="$(compare_floats "$swap_used" '>' "$threshhold")"
                 [ "$swap_geater" == 'true' ] && swap_used="<span color=\"${red}\">${swap_used}</span>"
 
-                hdd_temp_last_file="$HOME"/scripts/.last/hdd_temp
+                hdd_temp_last_file="$HOME"/main/scripts/.last/hdd_temp
                 hdd_temp_last="$(< "$hdd_temp_last_file")" || hdd_temp_last=0  ## NOTE do NOT add 2>/dev/null
                 hdd_temp="$(sudo hddtemp /dev/sda --numeric)"
                 ## save hdd_temp as last for our next read
@@ -403,13 +400,13 @@ msgn "$text" ;;
     #     [ "$active_gpu" == 'n' ] && active_gpu="<span color=\"${red}\">${active_gpu}</span>"
     #     set_widget 'gpu' 'markup' "$active_gpu" ;;
     ## }}}
-    pkg_count )  ## {{{
-        pkg_count="$(wc -l < <(pacman -Q))"
-        set_widget 'pkg_count' 'markup' "$pkg_count" ;;
+    # pkg_count )  ## {{{
+    #     pkg_count="$(wc -l < <(pacman -Q))"
+    #     set_widget 'pkg_count' 'markup' "$pkg_count" ;;
     ## }}}
     processes )  ## {{{
         ## get last processes_count
-        processes_last_file="$HOME"/scripts/.last/processes
+        processes_last_file="$HOME"/main/scripts/.last/processes
         processes_count_last="$(< "$processes_last_file")" || processes_count_last=0  ## NOTE do NOT add 2>/dev/null
 
         processes_count="$(wc -l < <(pgrep .))"  ## previously: "$(wc -l < <(ps -aux))"
@@ -426,30 +423,30 @@ msgn "$text" ;;
 
         set_widget 'processes' 'markup' "${pref}${processes_count}" ;;
     ## }}}
-    idle )  ## {{{
-        source "$HOME"/scripts/gb-calculation
-
-        weekday="$(get_datetime 'jweekday')"
-        current_date="$(get_datetime 'jymd')"
-        current_datetime="$(get_datetime 'jymdhms')"
-
-        idle_file="$HOME"/linux/idle/idle-"$current_date"  ##    ,-- NOTE do NOT use printf '%02d\n' since it causes errors for 07 and 08 in convert_second function
-        (( idle_secs="$(xprintidle) / 1000" ))             ## <--'-- 103
-        perc="$(float_pad "${idle_secs}*100/600" 1 2)"
-
-        printf '%s\t%s\t%s\n' "$current_datetime" "$weekday" "$perc" >> "$idle_file"
-        is_bigger="$(compare_floats "$perc" '>' 90)"
-        [ "$is_bigger" == 'true' ] && perc="<span color=\"${red}\">${perc}</span>"
-        set_widget 'idle' 'markup' "$perc" ;;
+    # idle )  ## {{{
+    #     source "$HOME"/main/scripts/gb-calculation
+    #     weekday="$(get_datetime 'jweekday')"
+    #     current_date="$(get_datetime 'jymd')"
+    #     current_datetime="$(get_datetime 'jymdhms')"
+    #     idle_file="$HOME"/main/linux/idle/idle-"$current_date"  ##    ,-- NOTE do NOT use printf '%02d\n' since it causes errors for 07 and 08 in convert_second function
+    #     (( idle_secs="$(xprintidle) / 1000" ))             ## <--'-- 103
+    #     perc="$(float_pad "${idle_secs}*100/600" 1 2)"
+    #     printf '%s\t%s\t%s\n' "$current_datetime" "$weekday" "$perc" >> "$idle_file"
+    #     is_bigger="$(compare_floats "$perc" '>' 90)"
+    #     [ "$is_bigger" == 'true' ] && perc="<span color=\"${red}\">${perc}</span>"
+    #     set_widget 'idle' 'markup' "$perc" ;;
     ## }}}
-    reputation )  ## {{{
-        "$HOME"/scripts/reputation.py ;;
+    # reputation )  ## {{{
+    #     "$HOME"/main/scripts/reputation.py ;;
     ## }}}
     visits )  ## {{{
-        "$HOME"/scripts/visits.py ;;
+        "$HOME"/main/scripts/visits.py ;;
+    ## }}}
+    status )  ## {{{
+        "$HOME"/main/scripts/status.py ;;
     ## }}}
     youtube )  ## {{{
-        source "$HOME"/scripts/gb-screen
+        source "$HOME"/main/scripts/gb-screen
 
         ## determine if screen 2 is on right or left of screen 1
         is_right_of='false'
@@ -478,7 +475,7 @@ msgn "$text" ;;
         fi
         y=300
 
-        "$HOME"/scripts/awesome-widgets audacious pause
+        "$HOME"/main/scripts/awesome-widgets audacious pause
         xdotool mousemove "$x" "$y"
         sleep 0.1
         xdotool click --repeat 2 --delay 200 1
@@ -495,7 +492,7 @@ msgn "$text" ;;
     ## }}}
     firewall )  ## {{{
         function update_variables {
-            source "$HOME"/scripts/gb-fir-blu-batt
+            source "$HOME"/main/scripts/gb-fir-blu-batt
         }
 
         update_variables
@@ -518,7 +515,7 @@ msgn "$text" ;;
     ## }}}
     bluetooth )  ## {{{
         function update_variables {
-            source "$HOME"/scripts/gb-fir-blu-batt
+            source "$HOME"/main/scripts/gb-fir-blu-batt
         }
 
         update_variables
@@ -540,14 +537,11 @@ msgn "$text" ;;
         esac ;;
     ## }}}
     ymail )  ## {{{
-        "$HOME"/scripts/e-mail.py 'ymail' ;;
+        "$HOME"/main/scripts/e-mail.py 'ymail' ;;
     ## }}}
     gmail )  ## {{{
         sleep 10  ## only to prevent probable collision with ymail
-        "$HOME"/scripts/e-mail.py 'gmail' ;;
-    ## }}}
-    status )  ## {{{
-        "$HOME"/scripts/status.py ;;
+        "$HOME"/main/scripts/e-mail.py 'gmail' ;;
     ## }}}
     webcam )  ## {{{
         webcam_status="$(lsmod | \grep -i '^uvcvideo' | awk '{print $NF}')"
@@ -555,7 +549,7 @@ msgn "$text" ;;
         set_widget 'webcam' 'markup' "$webcam_text" ;;
     ## }}}
     git )  ## {{{
-        source "$HOME"/scripts/gb-git
+        source "$HOME"/main/scripts/gb-git
 
         modified_repos=''
 
@@ -570,7 +564,7 @@ msgn "$text" ;;
         ## synced with path flags for FZF_ALT_C_COMMAND_GIT in /etc/bash.bashrc
         path_flags_2="! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*'"
 
-        find_cmd="find "$HOME" -type d $path_flags_1 $path_flags_2 -iname '.git' | sed 's#/\.git##' | sort"
+        find_cmd="find "$HOME"/main/ -type d $path_flags_1 $path_flags_2 -iname '.git' | sed 's#/\.git##' | sort"
 
         readarray -t all_repos < <(eval "$find_cmd")
 
@@ -636,18 +630,18 @@ msgn "$text" ;;
         [ "$if_on" ] && clipboard_text='CL' || clipboard_text="<span color=\"${red}\">CL:OF</span>"
         set_widget 'clipboard' 'markup' "$clipboard_text" ;;
     ## }}}
-    klgr )  ## {{{
-       ## append current_datetime to the most recent log
-       current_datetime="$(get_datetime 'jymdhms')"
-       weekday="$(get_datetime 'jweekday')"
-       most_recent_log="$(find "$HOME"/linux/keylogs/ -mindepth 1 -maxdepth 1 | sort | tail -n 1)"
-       dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"  ## NOTE do NOT replace " with '  ## https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html
-       printf '%s\n%s\t%s\n' "$dashed" "$current_datetime" "$weekday" >> "$most_recent_log"
+    # klgr )  ## {{{
+    #    ## append current_datetime to the most recent log
+    #    current_datetime="$(get_datetime 'jymdhms')"
+    #    weekday="$(get_datetime 'jweekday')"
+    #    most_recent_log="$(find "$HOME"/main/linux/keylogs/ -mindepth 1 -maxdepth 1 | sort | tail -n 1)"
+    #    dashed="$(awk -v i=30 'BEGIN {OFS="-"; $i="-"; print}')"  ## NOTE do NOT replace " with '  ## https://www.unix.com/shell-programming-and-scripting/235829-how-print-particular-character-n-number-times-line.html
+    #    printf '%s\n%s\t%s\n' "$dashed" "$current_datetime" "$weekday" >> "$most_recent_log"
 
-       ## check status (exceptionally used ps because pgrep cannot find this)
-       keylogger_status="$(ps -f -u "$UID" | sed 1d | \grep -v '\-remote' | \grep '[k]eylogger')"
-       [ "$keylogger_status" ] && keylogger_text='KE' || keylogger_text="<span color=\"${red}\">KE:OF</span>"
-       set_widget 'keylogger' 'markup' "$keylogger_text" ;;
+    #    ## check status (exceptionally used ps because pgrep cannot find this)
+    #    keylogger_status="$(ps -f -u "$UID" | sed 1d | \grep -v '\-remote' | \grep '[k]eylogger')"
+    #    [ "$keylogger_status" ] && keylogger_text='KE' || keylogger_text="<span color=\"${red}\">KE:OF</span>"
+    #    set_widget 'keylogger' 'markup' "$keylogger_text" ;;
     ## }}}
     established )  ## {{{
         ## we can add sudo in this case to get instances other than the user-related ones:
@@ -687,135 +681,12 @@ msgn "$text" ;;
             restart )
                 sudo systemctl restart tor && msgn "<span color=\"${orange}\">tor</span> restarted" ;;
             is-tor )
-                "$HOME"/scripts/is-tor.py 'msg' ;;
+                "$HOME"/main/scripts/is-tor.py 'msg' ;;
         esac
 
         tor_status="$(pgrep 'tor')"  ## why exceptionally used "$(sudo lsof -i -P -n | \grep 'LISTEN' | \grep '^tor')" instead of pgrep?
         [ "$tor_status" ] && tor_status_text="<span color=\"${red}\">TO:ON</span>" || tor_status_text='TO'
         set_widget 'tor' 'markup' "$tor_status_text" ;;
-    ## }}}
-    network )  ## {{{
-        source "$HOME"/scripts/gb-calculation
-        source "$HOME"/scripts/gb-network
-
-        down_up_text=''
-
-        case "$2" in
-            usage )
-                ## {{{ connections
-                [ "$vpn_info" ] && vpn_conn="[${vpn_conn}] "
-                [ "$wf_conn" == 'MCI' ] && if_simcard=' SIM'
-                [ "$wf_state" == 'connected' ] || if_wf_down=' DOWN'
-
-                ## set wf_conn_color based on wf_strength
-                wf_strength="$(tail -n 1 /proc/net/wireless | awk '{print $4}' | tr -d '.')"
-                if   (( wf_strength < -75 )); then wf_conn_color="$orange"
-                elif (( wf_strength < -50 )); then wf_conn_color="$yellow"
-                elif (( wf_strength < -25 )); then wf_conn_color="$fg_d"
-                elif (( wf_strength <   0 )); then wf_conn_color="$fg_d"
-                else                               wf_conn_color="$purple"
-                fi
-
-                connections_text="<span color=\"${fg_d}\">${vpn_conn}${eth_conn}</span> <span color=\"${wf_conn_color}\">${wf_conn}</span><span color=\"${orange}\">${if_simcard}${if_wf_down}</span>"
-                # connections_text="<span color=\"${fg_d}\">${vpn_conn}${eth_conn} ${wf_conn}</span>"
-                ## }}}
-                ## down/up {{{ https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
-                for interface in 'ethernet' 'wifi'; {
-
-                    case "$interface" in
-                        ethernet )
-                            cur_interface="$eth_devc"
-                            if_connected="$eth_state"
-                            pref='eth'
-                            ;;
-                        wifi )
-                            cur_interface="$wf_devc"
-                            if_connected="$wf_state"
-                            pref='wf'
-                            ;;
-                    esac
-
-                    [ "$if_connected" == 'connected' ] || continue
-
-                    down_last_file="$HOME"/scripts/.last/network_"${pref}"_down
-                    up_last_file="$HOME"/scripts/.last/network_"${pref}"_up
-
-                    ## get last down/up
-                    down_last="$(< "$down_last_file")" || down_last=0  ## 19410508  ## NOTE do NOT add 2>/dev/null
-                    up_last="$(< "$up_last_file")" || up_last=0        ## 19410508  ## NOTE do NOT add 2>/dev/null
-
-                    ## get new down/up
-                    down_up="$(\grep "$cur_interface" /proc/net/dev | awk '{print "down="$2, "up="$10}')"  ## <-- NOTE do NOT replace " with ' in awk
-                    eval "$down_up"  ## 19410509 789384
-
-                    ## save new down/up as last (in bytes, before converting them) for our next read
-                    printf '%s\n' "$down" > "$down_last_file"
-                    printf '%s\n' "$up"   > "$up_last_file"
-
-                    ## get+convert total down/up before converting down/up
-                    down_total="$(convert_byte "$down")"  ## 4.32G
-                    up_total="$(convert_byte "$up")"      ## 4.32G
-
-                    ## set total down/up color
-                    usage_low="$grey_dark"
-                    usage_medium="$grey"
-                    usage_high="$pink"
-                    usage_ultrahigh="$red"
-
-                    if   (( down < "$K"     )); then down_total_color="$usage_low"        ## is B
-                    elif (( down < "$M"     )); then down_total_color="$usage_low"        ## is K
-                    elif (( down < "$M_400" )); then down_total_color="$usage_low"        ## is below 400M
-                    elif (( down < "$M_700" )); then down_total_color="$usage_medium"     ## is below 700M
-                    elif (( down < "$G"     )); then down_total_color="$usage_high"       ## is below 1G
-                    else                             down_total_color="$usage_ultrahigh"  ## is 1G or higher
-                    fi
-
-                    if   (( up < "$K"     )); then up_total_color="$usage_low"        ## is B
-                    elif (( up < "$M"     )); then up_total_color="$usage_low"        ## is K
-                    elif (( up < "$M_400" )); then up_total_color="$usage_low"        ## is below 400M
-                    elif (( up < "$M_700" )); then up_total_color="$usage_medium"     ## is below 700M
-                    elif (( up < "$G"     )); then up_total_color="$usage_high"       ## is below 1G
-                    else                           up_total_color="$usage_ultrahigh"  ## is 1G or higher
-                    fi
-
-                    ## calculate diff and convert bytes
-                    (( down_diff="down - down_last" ))  ## 1341440
-                    (( up_diff="up - up_last" ))        ## 1341440
-                    down_diff_conv="$(convert_byte "$down_diff")"  ## 1.31M
-                    up_diff_conv="$(convert_byte "$up_diff")"      ## 1.31M
-
-                    ## set down/up color
-                    speed_low="$fg_l"
-                    speed_medium="$green_darker"
-                    speed_high="$green_dark"
-                    speed_ultrahigh="$green"
-
-                    if   (( down_diff < "$K"     )); then down_color="$speed_low"        ## is B
-                    elif (( down_diff < "$K_400" )); then down_color="$speed_low"        ## is below 400K
-                    elif (( down_diff < "$K_700" )); then down_color="$speed_medium"     ## is below 700K
-                    elif (( down_diff < "$M"     )); then down_color="$speed_high"       ## is below 1M
-                    else                                  down_color="$speed_ultrahigh"  ## is M or G
-                    fi
-
-                    if   (( up_diff < "$K"     )); then up_color="$speed_low"        ## is B
-                    elif (( up_diff < "$K_400" )); then up_color="$speed_low"        ## is below 400K
-                    elif (( up_diff < "$K_700" )); then up_color="$speed_medium"     ## is below 700K
-                    elif (( up_diff < "$M"     )); then up_color="$speed_high"       ## is below 1M
-                    else                                up_color="$speed_ultrahigh"  ## is M or G
-                    fi
-
-                    down_up_text+=" <span color=\"${down_color}\">${down_diff_conv}</span> <span color=\"${up_color}\">${up_diff_conv}</span> \
-<span color=\"${down_total_color}\">${down_total}</span> <span color=\"${up_total_color}\">${up_total}</span>"   ## 317K 2.31M 4.32G 4.32G
-
-                }
-                ## }}}
-                set_widget 'network' 'markup' "${connections_text} ${down_up_text# }"  ## remove leading space
-                ;;
-            turn_on_wifi )
-                nmcli radio wifi on ;;
-            turn_off_wifi )
-                nmcli radio wifi off ;;
-        esac ;;
     ## }}}
     ping )  ## {{{
         ping_failed_file=/tmp/ping_failed
@@ -826,7 +697,7 @@ msgn "$text" ;;
             stts=''
             if [ -f "$ping_failed_file" ]; then
                 text="$(printf 'Connected back at\n%s\n' "$(jdate '+%Y-%m-%d %H:%M:%S')")"
-                msgc "$text"
+                # msgc "$text"
                 rm "$ping_failed_file"
             fi
         } || {
@@ -838,14 +709,14 @@ msgn "$text" ;;
     ## }}}
 
     audacious )  ## {{{
-        source "$HOME"/scripts/gb-calculation
-        source "$HOME"/scripts/gb-duration
+        source "$HOME"/main/scripts/gb-calculation
+        source "$HOME"/main/scripts/gb-duration
 
         function update_variables {
-            source "$HOME"/scripts/gb-audacious
+            source "$HOME"/main/scripts/gb-audacious
         }
 
-        csols_file="$HOME"/scripts/.last/csols
+        csols_file="$HOME"/main/scripts/.last/csols
 
         update_variables
 
@@ -870,18 +741,18 @@ msgn "$text" ;;
                 audtool --playlist-reverse ;;  ## OR audacious -r
             next )
                 audtool --playlist-advance ;;  ## OR audacious -f
-            forward )
-                forward_length=120
-                (( remaining_seconds="length_in_seconds - current_position_in_seconds" ))
-                if (( remaining_seconds < forward_length )); then
-                    audtool --playlist-advance
-                else
-                    audtool --playback-seek-relative "+${forward_length}"
-                fi ;;
-            +60 )
-                audtool --playback-seek-relative +60 ;;
+            # forward )
+            #     forward_length=120
+            #     (( remaining_seconds="length_in_seconds - current_position_in_seconds" ))
+            #     if (( remaining_seconds < forward_length )); then
+            #         audtool --playlist-advance
+            #     else
+            #         audtool --playback-seek-relative "+${forward_length}"
+            #     fi ;;
             -60 )
                 audtool --playback-seek-relative -60 ;;
+            +60 )
+                audtool --playback-seek-relative +60 ;;
             songs )
                 IFS=$'\n'
                 readarray -t current_songs < <(audtool --playlist-display)

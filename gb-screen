@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-screen
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 13:19:48 +0330 Tuesday
-
 xrandr_output="$(xrandr)"
 
 scr_1_name="$(printf '%s\n' "$xrandr_output" | \grep -iw 'connected' | \grep -i  'primary'              | awk '{print $1}')"

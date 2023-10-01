@@ -6,23 +6,21 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/speech
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-19 09:55:56 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-audacious
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-audacious
 
 function update_audacious {
-    "$HOME"/scripts/awesome-widgets audacious
+    "$HOME"/main/scripts/awesome-widgets audacious
 }
 
-function if_empty {  ## JUMP_1 the same used in "$HOME"/scripts/movie
+function if_empty {  ## JUMP_1 the same used in "$HOME"/main/scripts/movie
     local count
 
     read count directory <<< "$directory"  ## 8 pargar
 
     ## check if count is an int
     [ "$count" -eq "$count" ] || {
-        msgc 'ERROR' "<span color=\"${orange}\">${count}</span> is invalid count" "$HOME"/linux/themes/alert-w.png
+        msgc 'ERROR' "<span color=\"${orange}\">${count}</span> is invalid count" "$HOME"/main/linux/themes/alert-w.png
         exit
     }
 
@@ -33,8 +31,8 @@ function if_empty {  ## JUMP_1 the same used in "$HOME"/scripts/movie
 }
 
 function if_no_dir {  ## JUMP_1
-    [ -d "$HOME"/speech/"$directory" ] || {
-        msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/speech/${directory}</span>" "$HOME"/linux/themes/alert-w.png
+    [ -d "$HOME"/main/speech/"$directory" ] || {
+        msgc 'ERROR' "no such directory as <span color=\"${orange}\">\$HOME/main/speech/${directory}</span>" "$HOME"/main/linux/themes/alert-w.png
         exit
     }
 }
@@ -43,17 +41,17 @@ function success_moving {
     local text
 
     text="$(printf "moved to <span color=\"%s\">LISTENED</span>\n<span color=\"%s\">%s</span>\n" "$blue" "$orange" "$no_suffix")"
-    msgn "$text" '' "$HOME"/linux/themes/delete-w.png
+    msgn "$text" '' "$HOME"/main/linux/themes/delete-w.png
 }
 
 function error_moving {
-    msgc 'ERROR' "moving <span color=\"${orange}\">${no_suffix}</span>" "$HOME"/linux/themes/alert-w.png
+    msgc 'ERROR' "moving <span color=\"${orange}\">${no_suffix}</span>" "$HOME"/main/linux/themes/alert-w.png
     exit
 }
 
 declare -a directories_plus_count
 
-readarray -t directories < <(find "$HOME"/speech -mindepth 1 -maxdepth 1 -type d | sort)
+readarray -t directories < <(find "$HOME"/main/speech -mindepth 1 -maxdepth 1 -type d | sort)
 
 ## get audio count in each directory and prepend it to the directory name
 for tmp_directory in "${directories[@]}"; {
@@ -82,12 +80,12 @@ case "$1" in
         turn_off_shuffle; sleep 0.1
         clear_playlist  ; sleep 0.1
 
-        msgn 'playing' "<span color=\"${orange}\">${directory}</span>" "$HOME"/linux/themes/user-w.png
+        msgn 'playing' "<span color=\"${orange}\">${directory}</span>" "$HOME"/main/linux/themes/user-w.png
 
-        readarray -t first_five_files < <(find "$HOME"/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 5)
+        readarray -t first_five_files < <(find "$HOME"/main/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 5)
         audacious -E "${first_five_files[@]}"  # &
         sleep 0.1
-        "$HOME"/scripts/awesome-widgets audacious resume ;;
+        "$HOME"/main/scripts/awesome-widgets audacious resume ;;
     move )
         if [ "$2" == 'auto' ]; then
             ## NOTE the auto option is called directly by audacious when starting a new song
@@ -102,7 +100,7 @@ case "$1" in
 
         if_no_dir  ## JUMP_4
 
-        first_file="$(find "$HOME"/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 1)"  ## /home/nnnn/speech/pargar/709.mp3
+        first_file="$(find "$HOME"/main/speech/"$directory" -mindepth 1 -maxdepth 1 -iname '*.mp3' | sort | head -n 1)"  ## /home/nnnn/main/speech/pargar/709.mp3
         first_kaddy_file="$(get_kaddy_counterpart "$first_file")"  ## /home/nnnn/kaddy/speech/pargar/709.mp3
 
         base="${first_file##*/}"
@@ -111,7 +109,7 @@ case "$1" in
         ## exit if first file is the same as the current song
         [ "$current_song" == "$first_file" ] && exit
 
-        listened_dir="$HOME"/speech/"$directory"/LISTENED
+        listened_dir="$HOME"/main/speech/"$directory"/LISTENED
         listened_kaddy_dir="$(get_kaddy_counterpart "$listened_dir")"
 
         [ -d "$listened_dir" ] || mkdir "$listened_dir"
@@ -122,7 +120,7 @@ case "$1" in
 
         ## trigger add_4 only if current playing file is the last file in playlist
         if (( playlist_length == position_in_playlist )); then
-            "$HOME"/scripts/speech add_4
+            "$HOME"/main/scripts/speech add_4
         else
             update_audacious
         fi ;;
@@ -139,7 +137,7 @@ case "$1" in
                 }
             elif [ ! "$position_in_playlist" ]; then
                 clear_playlist
-                "$HOME"/scripts/speech play &
+                "$HOME"/main/scripts/speech play &
                 exit
             fi
 

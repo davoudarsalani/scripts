@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/split-and-merge.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-18 11:46:56 +0330 Monday
-
 ## Original script by roshanok (https://github.com/roshanok/SplitAndCompile)
 
 import os, sys, re

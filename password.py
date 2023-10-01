@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/password.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:46:45 +0330 Tuesday
-
 import string
 from getopt import getopt
 from os import path

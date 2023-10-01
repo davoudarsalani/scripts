@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/is-tor.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-02 09:24:25 +0330 Monday
-
 from json import loads
 from os import path, getenv
 from sys import argv
@@ -18,7 +16,6 @@ from gp import Color, msgn, get_headers
 title = path.basename(__file__).replace('.py', '')
 istor = False
 ip = None
-attempts = 10
 url = 'https://check.torproject.org/api/ip'
 tor_proxy = 'socks5h://127.0.0.1:9050'
 country_url = 'http://ip-api.com/json'
@@ -35,14 +32,15 @@ else:
 
 if first_arg == 'msg':
     msgn(f'<span color=\"{getenv("orange")}\">{title}</span> checking')
+    attempts = 10
 else:
+    attempts = 1000
     print(Col.heading(title))
 
 for attempt in range(1, attempts + 1):
     if istor and ip:  ## JUMP_1
         break
     else:
-
         if attempt > 1:
             if first_arg == 'msg':
                 msgn(f'<span color=\"{getenv("orange")}\">{title}</span> attempt {attempt}/{attempts}')

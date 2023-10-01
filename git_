@@ -2,20 +2,18 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/g
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/g
+##    https://github.com/davoudarsalani/scripts/blob/master/git_
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/git_
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-23 10:07:40 +0330 Monday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-color
-source "$HOME"/scripts/gb-git
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-color
+source "$HOME"/main/scripts/gb-git
 
 title="${0##*/}"
 
 function display_help {  ## {{{
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     g_help
 }
 ## }}}
@@ -38,7 +36,7 @@ function branch_info {  ## {{{ https://revelry.co/terminal-workflow-fzf/
                                          ##        we have to do the sourcing for the very same reason
     ## no need to --preview-window "$preview_status" because it uses the value set in bahrc in FZF_DEFAULT_OPTS
     fzf_choice="$(printf '%s\n' "$@" | fzf \
-                  --preview 'source "$HOME"/scripts/gb-git; git_log "${directory2:-.}" \
+                  --preview 'source "$HOME"/main/scripts/gb-git; git_log "${directory2:-.}" \
                   $(sed s/^..// <<< {} | cut -d " " -f 1)' #| sed 's/^..//' | cut -d " " -f 1
                   ## ^^ ORIG: --preview 'git -C "${directory2:-.}" log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
                 )"
@@ -60,7 +58,7 @@ function check_pattern {  ## {{{  JUMP_4
 }
 ## }}}
 function if_amend_allowed {  ## {{{
-    ## NOTE used [ var -eq 0 ] instead of (( var == 0 )) because
+    ## NOTE used [ "$var" -eq 0 ] instead of (( var == 0 )) because
     ##      (( var == 0 )) is stupid (i.e. it returns true even if var does not exist)
     if [ "$(git_commits_ahead "$directory")" -eq 0 ] && [ "$(git_remotes "$directory")" ]; then
         red 'amend not allowed'
@@ -108,14 +106,14 @@ function pipe_to_fzf_locally {  ## {{{ https://revelry.co/terminal-workflow-fzf/
         fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
                                                --preview-window "$preview_status" \
                                                ${multi_arg} \
-                                               --preview '(source "$HOME"/scripts/gb-git; git_show "${directory2:-.}" {2})')"
-                                               ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+                                               --preview '(source "$HOME"/main/scripts/gb-git; git_show "${directory2:-.}" {2})')"
+                                               ## ^^ ORIG: --preview '(source "$HOME"/main/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     else
         fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
                                                --preview-window "$preview_status" \
                                                ${multi_arg} \
-                                               --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
-                                               ## ^^ ORIG: --preview '(source "$HOME"/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+                                               --preview '(source "$HOME"/main/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1})')"
+                                               ## ^^ ORIG: --preview '(source "$HOME"/main/scripts/gb-git; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     fi
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }

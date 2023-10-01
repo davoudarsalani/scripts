@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/jadi.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-10 12:57:22 +0330 Friday
-
 from os import getenv
 
 from googleapiclient.discovery import build
@@ -15,8 +13,8 @@ from gp import msgc, get_datetime, last_file_exists, save_as_last, save_error, g
 
 api_key = getenv('api_jadi')
 channel_id = 'UCgKePkWtPuF36bJy0n2cEMQ'
-last_file = f'{getenv("HOME")}/scripts/.last/jadi'
-error_file = f'{getenv("HOME")}/scripts/.error/jadi'
+last_file = f'{getenv("HOME")}/main/scripts/.last/jadi'
+error_file = f'{getenv("HOME")}/main/scripts/.error/jadi'
 message_text = ''
 
 try:

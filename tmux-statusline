@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/tmux-statusline
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-09-11 10:23:53 +0330 Friday
-
 case "$1" in
     pwd )
         printf '%s\n' "${2/$HOME/\~}" ;;  ## '%-15s\n'
@@ -19,7 +17,7 @@ case "$1" in
             exit
         fi
 
-        source "$HOME"/scripts/gb-calculation
+        source "$HOME"/main/scripts/gb-calculation
 
         size="$(du -bs "$2" | awk '{print $1}')"
         size="$(convert_byte "$size")"
@@ -43,10 +41,10 @@ case "$1" in
            [ ! "$is_in_hidden_dir" ] && \
            [ ! "$is_in_kaddy" ]; then
 
-            source "$HOME"/scripts/gb
-            source "$HOME"/scripts/gb-git
+            source "$HOME"/main/scripts/gb
+            source "$HOME"/main/scripts/gb-git
 
-            ## ~/scripts -> ~/kaddy/scripts
+            ## ~/main/scripts -> ~/kaddy/scripts
             kaddy_counterpart="$(get_kaddy_counterpart "$2")"
 
             if [ ! -d "$kaddy_counterpart" ]; then
@@ -76,7 +74,7 @@ case "$1" in
             fi
         fi ;;
     git )
-        source "$HOME"/scripts/gb-git
+        source "$HOME"/main/scripts/gb-git
 
         [ "$(if_git "$2")" == 'false' ] && exit
 

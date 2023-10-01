@@ -6,10 +6,8 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/kaddyify
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-23 09:58:49 +0330 Monday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-color
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-color
 
 ## --archive, -a            archive mode is -rlptgoD (no -A,-X,-U,-N,-H)
 ## --recursive, -r          recurse into directories
@@ -22,7 +20,7 @@ source "$HOME"/scripts/gb-color
 title="${0##*/}"
 
 function display_help {
-    source "$HOME"/scripts/.help
+    source "$HOME"/main/scripts/.help
     kaddyify_help
 }
 
@@ -97,7 +95,7 @@ else
         ##             rather than its content
         base="${base%/}"
 
-        home_dir="$HOME"/"$base"
+        home_dir="$HOME"/main/"$base"
 
         blue "${home_dir/$HOME/\~}"
 
@@ -105,6 +103,8 @@ else
         rsync $flags "$home_dir" "$home_kaddy_dir" | \grep -v 'sending incremental file list'
     }
 fi
+
+exit 0
 
 ## Explanation of each bit position and value in rsync's output:
 ## (https://stackoverflow.com/questions/4493525/what-does-f-mean-in-rsync-logs)

@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/count-lines.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-06-15 18:45:59 +0330 Tuesday
-
 from magic import Magic
 from natsort import natsorted
 from os import listdir, path
@@ -27,7 +25,6 @@ for f in text_files:
     mime = Magic(mime=True).from_file(f)
 
     if match(text_reg, mime) or mime in ['application/json', 'application/csv', 'message/news']:
-
         try:
             with open(f) as opened:
                 content = opened.readlines()

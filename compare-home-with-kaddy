@@ -6,11 +6,9 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/compare-home-with-kaddy
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-07-26 09:05:43 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-color
-source "$HOME"/scripts/gb-git
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-color
+source "$HOME"/main/scripts/gb-git
 
 title="${0##*/}"
 heading "$title"
@@ -27,7 +25,7 @@ readarray -t kaddy_directories < <(find "$HOME"/kaddy -mindepth 1 -maxdepth 1 -t
 
 for kaddy_dir in "${kaddy_directories[@]}"; {
     base="${kaddy_dir##*/}"
-    home_dir="$HOME"/"$base"
+    home_dir="$HOME"/main/"$base"
 
     head_difference='    '
     ls_difference='  '

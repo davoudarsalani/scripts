@@ -6,9 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/bash
 ##    https://davoudarsalani.ir
 
-## @last-modified 1400-10-28 23:18:16 +0330 Tuesday
-
-source "$HOME"/scripts/gb
+source "$HOME"/main/scripts/gb
 
 title="${0##*/}"
 heading "$title"

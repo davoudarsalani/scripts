@@ -6,8 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/checksum.py
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:44:05 +0330 Tuesday
-
 from getopt import getopt
 from os import path
 from subprocess import run

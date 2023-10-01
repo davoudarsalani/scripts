@@ -6,15 +6,13 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/bluetooth
 ##    https://davoudarsalani.ir
 
-## @last-modified 1401-08-03 09:21:00 +0330 Tuesday
-
-source "$HOME"/scripts/gb
-source "$HOME"/scripts/gb-fir-blu-batt
+source "$HOME"/main/scripts/gb
+source "$HOME"/main/scripts/gb-fir-blu-batt
 
 title="${0##*/}"
 
 function update_bluetooth {
-    "$HOME"/scripts/awesome-widgets bluetooth
+    "$HOME"/main/scripts/awesome-widgets bluetooth
 }
 
 function get_mac {
