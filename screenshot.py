@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/nnnn/main/scripts/venv/bin/python3
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
@@ -9,12 +9,10 @@
 from os import path, remove, getenv
 
 from gi import require_version
-
 require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from PIL import Image
-from gp import Screen, get_datetime, rofi, msgn, msgc, countdown
-
+from gp import Screen, get_datetime, pip_to_dmenu, msgn, msgc, countdown
 
 def convert_to_jpg(png_image: str) -> None:  ## {{{
     global output
@@ -27,12 +25,10 @@ def convert_to_jpg(png_image: str) -> None:  ## {{{
         remove(png_image)
     except Exception:
         pass
-
-
 ## }}}
 
 main_items = ['screen 1', 'screen 2', 'screen all', 'current window', 'selected area']
-main_item = rofi(main_items, 'screenshot')
+main_item = pip_to_dmenu(main_items, 'screenshot')
 
 now = get_datetime('jymdhms')
 global output
@@ -44,16 +40,16 @@ scr_2_name, scr_2_res, scr_2_x, scr_2_y, scr_2_x_offset, scr_2_y_offset = Scr.sc
 scr_all_res = Scr.screen_all()
 
 ## https://askubuntu.com/questions/1011507/screenshot-of-an-active-application-using-python
-if main_item == 'screen 1':  ## {{{
+if   main_item == 'screen 1':  ## {{{
     try:
         countdown()
         window = Gdk.get_default_root_window()
         pb = Gdk.pixbuf_get_from_window(window, 0, 0, int(scr_1_x), int(scr_1_y))
         pb.savev(output, 'png', (), ())
         # convert_to_jpg(output)
-        msgn('screen 1', f'<span color=\"{getenv("orange")}\">{output}</span>')
+        msgn('screen 1', f'<span color=\"{getenv("gruvbox_orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 1</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("gruvbox_orange")}\">screen 1</span>\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 ## }}}
 elif main_item == 'screen 2':  ## {{{
     try:
@@ -62,9 +58,9 @@ elif main_item == 'screen 2':  ## {{{
         pb = Gdk.pixbuf_get_from_window(window, int(scr_1_x), 0, int(scr_2_x), int(scr_2_y))
         pb.savev(output, 'png', (), ())
         # convert_to_jpg(output)
-        msgn('screen 2', f'<span color=\"{getenv("orange")}\">{output}</span>')
+        msgn('screen 2', f'<span color=\"{getenv("gruvbox_orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen 2</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("gruvbox_orange")}\">screen 2</span>\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 ## }}}
 elif main_item == 'screen all':  ## {{{
     try:
@@ -73,9 +69,9 @@ elif main_item == 'screen all':  ## {{{
         pb = Gdk.pixbuf_get_from_window(window, *window.get_geometry())
         pb.savev(output, 'png', (), ())
         # convert_to_jpg(output)
-        msgn('screen all', f'<span color=\"{getenv("orange")}\">{output}</span>')
+        msgn('screen all', f'<span color=\"{getenv("gruvbox_orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">screen all</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("gruvbox_orange")}\">screen all</span>\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 ## }}}
 elif main_item == 'current window':  ## {{{
     try:
@@ -87,15 +83,14 @@ elif main_item == 'current window':  ## {{{
             pb = Gdk.pixbuf_get_from_window(w, *w.get_geometry())
             pb.savev(output, 'png', (), ())
         # convert_to_jpg(output)
-        msgn('current window', f'<span color=\"{getenv("orange")}\">{output}</span>')
+        msgn('current window', f'<span color=\"{getenv("gruvbox_orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">current window</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("gruvbox_orange")}\">current window</span>\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 ## }}}
 elif main_item == 'selected area':  ## {{{
     ## https://nitratine.net/blog/post/how-to-get-mouse-clicks-with-python/
     try:
         from pynput.mouse import Listener
-
         '''
         NOTE
         this import used to be at the top of screen, where it's supposed to,
@@ -152,9 +147,9 @@ elif main_item == 'selected area':  ## {{{
         pb = Gdk.pixbuf_get_from_window(window, int(x_1), int(y_1), int(x_2), int(y_2))
         pb.savev(output, 'png', (), ())
         # convert_to_jpg(output)
-        msgn('selected area', f'<span color=\"{getenv("orange")}\">{output}</span>')
+        msgn('selected area', f'<span color=\"{getenv("gruvbox_orange")}\">{output}</span>')
     except Exception as exc:
-        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("orange")}\">selected area</span>\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
+        msgc('ERROR', f'taking screenshot of <span color=\"{getenv("gruvbox_orange")}\">selected area</span>\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 ## }}}
 else:  ## {{{
     exit()

@@ -2,119 +2,92 @@
 # Bash/python scripts for everyday use on [Arch Linux](https://www.archlinux.org/)
 <div align='center'>
 <img alt='platform' src='https://img.shields.io/static/v1?label=Platform&message=GNU/Linux&labelColor=black&color=grey&style=flat&logo=gnu&logoColor=white'>
-<img alt='total' src='https://img.shields.io/static/v1?label=Total&message=78&labelColor=black&color=grey&style=flat'>
-<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=4.23M&labelColor=black&color=grey&style=flat'>
-<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=148&labelColor=black&color=grey&style=flat'>
+<img alt='total' src='https://img.shields.io/static/v1?label=Total&message=51&labelColor=black&color=grey&style=flat'>
+<img alt='size' src='https://img.shields.io/static/v1?label=Size&message=4.24M&labelColor=black&color=grey&style=flat'>
+<img alt='commit' src='https://img.shields.io/static/v1?label=Commits&message=149&labelColor=black&color=grey&style=flat'>
 <img alt='last-commit' src='https://img.shields.io/github/last-commit/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 <img alt='commit-activity' src='https://img.shields.io/github/commit-activity/m/davoudarsalani/scripts?&labelColor=black&color=grey&style=flat'>
 </div>
 <br>
 
-![table-badge](https://img.shields.io/static/v1?label=Bash&message=56&labelColor=black&color=blue&style=flat&logo=gnubash&logoColor=white)
+![table-badge](https://img.shields.io/static/v1?label=Bash&message=40&labelColor=black&color=blue&style=flat&logo=gnubash&logoColor=white)
 [![Shellcheck](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml/badge.svg?branch=master)](https://github.com/davoudarsalani/scripts/actions/workflows/shellcheck.yml)
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[application](https://github.com/davoudarsalani/scripts/blob/master/application)|282|1,338|12,576|12.28K|23|2022-12-09 16:50:21 +0330|
-|[arch-install](https://github.com/davoudarsalani/scripts/blob/master/arch-install)|673|2,027|20,655|20.17K|20|2022-10-30 13:08:48 +0330|
-|[awesome-app-off](https://github.com/davoudarsalani/scripts/blob/master/awesome-app-off)|117|372|3,170|3.10K|12|2022-10-30 13:08:48 +0330|
-|[awesome-autorun](https://github.com/davoudarsalani/scripts/blob/master/awesome-autorun)|77|266|2,459|2.40K|13|2022-10-30 13:08:48 +0330|
-|[awesome-widgets](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets)|797|3,405|36,224|35.38K|36|2022-12-18 12:58:58 +0330|
-|[awesome-widgets-network](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets-network)|130|577|6,328|6.18K|🔻0||
-|[bash](https://github.com/davoudarsalani/scripts/blob/master/bash)|30|96|970|970B|10|2022-10-30 13:08:48 +0330|
-|[bluetooth](https://github.com/davoudarsalani/scripts/blob/master/bluetooth)|129|499|5,054|4.94K|14|2022-10-30 13:08:48 +0330|
-|[browser](https://github.com/davoudarsalani/scripts/blob/master/browser)|60|252|2,565|2.50K|14|2022-10-30 13:08:48 +0330|
-|[colors](https://github.com/davoudarsalani/scripts/blob/master/colors)|60|217|2,069|2.02K|13|2022-10-30 13:08:48 +0330|
-|[commands](https://github.com/davoudarsalani/scripts/blob/master/commands)|279|2,476|17,839|17.42K|26|2022-10-30 13:08:48 +0330|
-|[compare-home-with-kaddy](https://github.com/davoudarsalani/scripts/blob/master/compare-home-with-kaddy)|52|191|1,785|1.74K|3|2022-10-30 13:08:48 +0330|
-|[copy](https://github.com/davoudarsalani/scripts/blob/master/copy)|204|619|6,764|6.61K|19|2022-10-30 13:08:48 +0330|
-|[dell](https://github.com/davoudarsalani/scripts/blob/master/dell)|205|485|5,219|5.10K|4|2022-10-30 13:08:48 +0330|
-|[dictionary](https://github.com/davoudarsalani/scripts/blob/master/dictionary)|28|66|781|781B|12|2022-10-30 13:08:48 +0330|
-|[ffmpeg](https://github.com/davoudarsalani/scripts/blob/master/ffmpeg)|220|999|11,496|11.23K|18|2022-11-13 09:59:46 +0330|
-|[fingil](https://github.com/davoudarsalani/scripts/blob/master/fingil)|355|1,423|11,933|11.65K|10|2022-10-30 13:08:48 +0330|
-|[firewall](https://github.com/davoudarsalani/scripts/blob/master/firewall)|94|297|2,795|2.73K|14|2022-10-30 13:08:48 +0330|
-|[fzf-dir-preview](https://github.com/davoudarsalani/scripts/blob/master/fzf-dir-preview)|🔻9|🔻22|🔻342|🔻342B|3|2022-10-30 13:08:48 +0330|
-|[gb](https://github.com/davoudarsalani/scripts/blob/master/gb)|867|3,567|29,454|28.76K|🔺37|2022-12-09 16:50:21 +0330|
-|[gb-audacious](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious)|43|170|2,399|2.34K|12|2022-10-30 13:08:48 +0330|
-|[gb-audio](https://github.com/davoudarsalani/scripts/blob/master/gb-audio)|44|344|2,663|2.60K|8|2022-10-30 13:08:48 +0330|
-|[gb-calculation](https://github.com/davoudarsalani/scripts/blob/master/gb-calculation)|101|452|3,711|3.62K|21|2022-10-30 13:08:48 +0330|
-|[gb-color](https://github.com/davoudarsalani/scripts/blob/master/gb-color)|308|836|5,990|5.85K|8|2022-10-30 13:08:48 +0330|
-|[gb-duration](https://github.com/davoudarsalani/scripts/blob/master/gb-duration)|62|193|1,807|1.76K|3|2022-10-30 13:08:48 +0330|
-|[gb-fir-blu-batt](https://github.com/davoudarsalani/scripts/blob/master/gb-fir-blu-batt)|24|119|1,101|1.08K|9|2022-10-30 13:08:48 +0330|
-|[gb-git](https://github.com/davoudarsalani/scripts/blob/master/gb-git)|343|1,676|11,446|11.18K|28|2022-11-13 09:59:46 +0330|
-|[gb-network](https://github.com/davoudarsalani/scripts/blob/master/gb-network)|46|270|2,481|2.42K|11|2022-10-30 13:08:48 +0330|
-|[gb-screen](https://github.com/davoudarsalani/scripts/blob/master/gb-screen)|46|402|3,086|3.01K|13|2022-10-30 13:08:48 +0330|
-|[git_](https://github.com/davoudarsalani/scripts/blob/master/git_)|709|2,798|29,163|28.48K|🔻0||
-|[.help](https://github.com/davoudarsalani/scripts/blob/master/.help)|165|567|5,048|4.93K|29|2022-12-09 16:50:21 +0330|
-|[install-jdate](https://github.com/davoudarsalani/scripts/blob/master/install-jdate)|78|292|2,856|2.79K|8|2022-10-30 13:08:48 +0330|
-|[kaddyify](https://github.com/davoudarsalani/scripts/blob/master/kaddyify)|140|581|5,330|5.21K|4|2022-12-09 16:50:21 +0330|
-|[launcher](https://github.com/davoudarsalani/scripts/blob/master/launcher)|14|45|472|472B|10|2022-10-30 13:08:48 +0330|
-|[mint](https://github.com/davoudarsalani/scripts/blob/master/mint)|57|184|2,053|2K|13|2022-10-30 13:08:48 +0330|
-|[mount-umount](https://github.com/davoudarsalani/scripts/blob/master/mount-umount)|206|660|6,749|6.59K|19|2022-10-30 13:08:48 +0330|
-|[mouse](https://github.com/davoudarsalani/scripts/blob/master/mouse)|54|203|1,445|1.41K|10|2022-10-30 13:08:48 +0330|
-|[movie](https://github.com/davoudarsalani/scripts/blob/master/movie)|172|561|5,973|5.83K|15|2022-12-09 16:50:21 +0330|
-|[music](https://github.com/davoudarsalani/scripts/blob/master/music)|33|128|1,472|1.44K|11|2022-10-30 13:08:48 +0330|
-|[myip](https://github.com/davoudarsalani/scripts/blob/master/myip)|26|74|775|775B|12|2022-10-30 13:08:48 +0330|
-|[network](https://github.com/davoudarsalani/scripts/blob/master/network)|140|541|4,956|4.84K|15|2022-10-30 13:08:48 +0330|
-|[nuke](https://github.com/davoudarsalani/scripts/blob/master/nuke)|27|83|828|828B|13|2022-10-30 13:08:48 +0330|
-|[off](https://github.com/davoudarsalani/scripts/blob/master/off)|110|303|3,420|3.34K|11|2022-10-30 13:08:48 +0330|
-|[postinstall](https://github.com/davoudarsalani/scripts/blob/master/postinstall)|342|1,813|15,500|15.14K|6|2022-10-30 13:08:48 +0330|
-|[previewer](https://github.com/davoudarsalani/scripts/blob/master/previewer)|61|302|2,554|2.49K|12|2022-12-09 16:50:21 +0330|
-|[pulseaudio](https://github.com/davoudarsalani/scripts/blob/master/pulseaudio)|128|455|4,494|4.39K|15|2022-10-30 13:08:48 +0330|
-|[rg_](https://github.com/davoudarsalani/scripts/blob/master/rg_)|65|175|1,712|1.67K|🔻0||
-|[speech](https://github.com/davoudarsalani/scripts/blob/master/speech)|158|568|5,768|5.63K|15|2022-10-30 13:08:48 +0330|
-|[telegram](https://github.com/davoudarsalani/scripts/blob/master/telegram)|462|1,705|14,658|14.31K|6|2022-10-30 13:08:48 +0330|
-|[tmux](https://github.com/davoudarsalani/scripts/blob/master/tmux)|37|135|1,227|1.20K|10|2022-10-30 13:08:48 +0330|
-|[tmux-statusline](https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline)|152|657|6,260|6.11K|30|2022-12-09 16:50:21 +0330|
-|[todo](https://github.com/davoudarsalani/scripts/blob/master/todo)|58|200|2,098|2.05K|14|2022-10-30 13:08:48 +0330|
-|[typer](https://github.com/davoudarsalani/scripts/blob/master/typer)|161|413|4,250|4.15K|18|2022-10-30 13:08:48 +0330|
-|[user](https://github.com/davoudarsalani/scripts/blob/master/user)|76|264|2,363|2.31K|16|2022-10-30 13:08:48 +0330|
-|[video-subtitle](https://github.com/davoudarsalani/scripts/blob/master/video-subtitle)|204|721|6,875|6.71K|20|2022-10-30 13:08:48 +0330|
-|[wallpaper](https://github.com/davoudarsalani/scripts/blob/master/wallpaper)|26|71|947|947B|12|2022-10-30 13:08:48 +0330|
+|[application.sh](https://github.com/davoudarsalani/scripts/blob/master/application.sh)|291|1,347|12,757|12.46K|🔻0||
+|[awesome-menu.sh](https://github.com/davoudarsalani/scripts/blob/master/awesome-menu.sh)|98|265|2,508|2.45K|🔻0||
+|[awesome-startup.sh](https://github.com/davoudarsalani/scripts/blob/master/awesome-startup.sh)|81|250|2,358|2.30K|🔻0||
+|[awesome-widgets-network.sh](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets-network.sh)|140|572|6,289|6.14K|🔻0||
+|[awesome-widgets.sh](https://github.com/davoudarsalani/scripts/blob/master/awesome-widgets.sh)|742|2,771|31,433|30.70K|🔻0||
+|[bluetooth.sh](https://github.com/davoudarsalani/scripts/blob/master/bluetooth.sh)|135|505|5,155|5.03K|🔻0||
+|[browser.sh](https://github.com/davoudarsalani/scripts/blob/master/browser.sh)|55|169|1,780|1.74K|🔻0||
+|[colors.sh](https://github.com/davoudarsalani/scripts/blob/master/colors.sh)|61|218|2,086|2.04K|🔻0||
+|[commands.sh](https://github.com/davoudarsalani/scripts/blob/master/commands.sh)|281|2,485|17,953|17.53K|🔻0||
+|[copy.sh](https://github.com/davoudarsalani/scripts/blob/master/copy.sh)|171|516|5,349|5.22K|🔻0||
+|[ffmpeg.sh](https://github.com/davoudarsalani/scripts/blob/master/ffmpeg.sh)|222|1,001|11,544|11.27K|🔻0||
+|[firewall.sh](https://github.com/davoudarsalani/scripts/blob/master/firewall.sh)|95|298|2,803|2.74K|🔻0||
+|[fzf-dir-preview.sh](https://github.com/davoudarsalani/scripts/blob/master/fzf-dir-preview.sh)|🔻9|🔻22|🔻348|🔻348B|🔻0||
+|[gb-audacious.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-audacious.sh)|43|170|2,405|2.35K|🔻0||
+|[gb-audio.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-audio.sh)|44|344|2,669|2.61K|🔻0||
+|[gb-calculation.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-calculation.sh)|103|454|3,799|3.71K|🔻0||
+|[gb-color.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-color.sh)|308|836|5,996|5.86K|🔻0||
+|[gb-duration.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-duration.sh)|62|193|1,813|1.77K|🔻0||
+|[gb-fir-blu-batt.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-fir-blu-batt.sh)|24|119|1,107|1.08K|🔻0||
+|[gb-git.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-git.sh)|343|1,676|11,446|11.18K|🔻0||
+|[gb-network.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-network.sh)|45|261|2,441|2.38K|🔻0||
+|[gb-screen.sh](https://github.com/davoudarsalani/scripts/blob/master/gb-screen.sh)|46|402|3,092|3.02K|🔻0||
+|[gb.sh](https://github.com/davoudarsalani/scripts/blob/master/gb.sh)|722|2,889|23,525|22.97K|🔻0||
+|[git.sh](https://github.com/davoudarsalani/scripts/blob/master/git.sh)|710|2,806|29,177|28.49K|🔻0||
+|[.help.sh](https://github.com/davoudarsalani/scripts/blob/master/.help.sh)|163|507|4,832|4.72K|🔻0||
+|[install-jdate.sh](https://github.com/davoudarsalani/scripts/blob/master/install-jdate.sh)|78|292|2,862|2.79K|🔻0||
+|[kaddyify.sh](https://github.com/davoudarsalani/scripts/blob/master/kaddyify.sh)|140|584|5,314|5.19K|🔻0||
+|[launcher.sh](https://github.com/davoudarsalani/scripts/blob/master/launcher.sh)|28|83|991|991B|🔻0||
+|[mount-umount.sh](https://github.com/davoudarsalani/scripts/blob/master/mount-umount.sh)|214|664|6,902|6.74K|🔻0||
+|[movie.sh](https://github.com/davoudarsalani/scripts/blob/master/movie.sh)|173|540|5,470|5.34K|🔻0||
+|[music.sh](https://github.com/davoudarsalani/scripts/blob/master/music.sh)|38|131|1,499|1.46K|🔻0||
+|[network.sh](https://github.com/davoudarsalani/scripts/blob/master/network.sh)|141|542|4,964|4.85K|🔻0||
+|[nuke.sh](https://github.com/davoudarsalani/scripts/blob/master/nuke.sh)|29|85|850|850B|🔻0||
+|[power.sh](https://github.com/davoudarsalani/scripts/blob/master/power.sh)|58|111|1,220|1.19K|🔻0||
+|[pulseaudio.sh](https://github.com/davoudarsalani/scripts/blob/master/pulseaudio.sh)|130|457|4,531|4.42K|🔻0||
+|[rg.sh](https://github.com/davoudarsalani/scripts/blob/master/rg.sh)|72|184|1,864|1.82K|🔻0||
+|[tmux.sh](https://github.com/davoudarsalani/scripts/blob/master/tmux.sh)|39|137|1,262|1.23K|🔻0||
+|[tmux-statusline.sh](https://github.com/davoudarsalani/scripts/blob/master/tmux-statusline.sh)|106|443|4,194|4.10K|🔻0||
+|[user.sh](https://github.com/davoudarsalani/scripts/blob/master/user.sh)|77|265|2,374|2.32K|🔻0||
+|[video-subtitle.sh](https://github.com/davoudarsalani/scripts/blob/master/video-subtitle.sh)|205|722|6,886|6.72K|🔻0||
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|__total__|9,546|38,155|354,408|346.10K|758||
-|__average__|170|681|6,328|6.18K|13||
+|__total__|6,522|26,316|245,848|240.09K|0||
+|__average__|163|657|6,146|6K|0||
 <br>
 
-![table-badge](https://img.shields.io/static/v1?label=Python&message=22&labelColor=black&color=blue&style=flat&logo=python&logoColor=white)
+![table-badge](https://img.shields.io/static/v1?label=Python&message=11&labelColor=black&color=blue&style=flat&logo=python&logoColor=white)
 [![Black](https://github.com/davoudarsalani/scripts/actions/workflows/black.yml/badge.svg?branch=master)](https://github.com/davoudarsalani/scripts/actions/workflows/black.yml)
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[checksum.py](https://github.com/davoudarsalani/scripts/blob/master/checksum.py)|88|200|2,051|2K|14|2022-10-30 13:08:48 +0330|
-|[compress-xtract.py](https://github.com/davoudarsalani/scripts/blob/master/compress-xtract.py)|114|275|2,932|2.86K|14|2022-10-30 13:08:48 +0330|
-|[copy-to-clipboard.py](https://github.com/davoudarsalani/scripts/blob/master/copy-to-clipboard.py)|112|276|3,252|3.18K|14|2022-10-30 13:08:48 +0330|
-|[count-lines.py](https://github.com/davoudarsalani/scripts/blob/master/count-lines.py)|40|114|1,190|1.16K|3|2022-10-30 13:08:48 +0330|
-|[download.py](https://github.com/davoudarsalani/scripts/blob/master/download.py)|1,317|🔺5,129|🔺58,048|🔺56.69K|24|2022-11-13 09:59:46 +0330|
-|[e-mail.py](https://github.com/davoudarsalani/scripts/blob/master/e-mail.py)|60|136|1,555|1.52K|9|2022-10-30 13:08:48 +0330|
-|[emojis.py](https://github.com/davoudarsalani/scripts/blob/master/emojis.py)|32|77|940|940B|11|2022-10-30 13:08:48 +0330|
-|[gp.py](https://github.com/davoudarsalani/scripts/blob/master/gp.py)|🔺1,419|4,427|44,637|43.59K|25|2022-10-30 13:08:48 +0330|
-|[ip-location.py](https://github.com/davoudarsalani/scripts/blob/master/ip-location.py)|82|184|1,790|1.75K|5|2022-10-30 13:08:48 +0330|
-|[is-tor.py](https://github.com/davoudarsalani/scripts/blob/master/is-tor.py)|75|247|2,628|2.57K|2|2022-10-30 13:08:48 +0330|
-|[jadi.py](https://github.com/davoudarsalani/scripts/blob/master/jadi.py)|90|236|3,112|3.04K|8|2022-10-30 13:08:48 +0330|
-|[lf.py](https://github.com/davoudarsalani/scripts/blob/master/lf.py)|329|1,045|14,845|14.50K|15|2022-10-30 13:08:48 +0330|
-|[mime-type.py](https://github.com/davoudarsalani/scripts/blob/master/mime-type.py)|75|158|1,571|1.53K|2|2022-10-30 13:08:48 +0330|
-|[password.py](https://github.com/davoudarsalani/scripts/blob/master/password.py)|109|282|2,678|2.62K|15|2022-10-30 13:08:48 +0330|
-|[record-audio.py](https://github.com/davoudarsalani/scripts/blob/master/record-audio.py)|71|178|1,591|1.55K|13|2022-10-30 13:08:48 +0330|
-|[record-screen.py](https://github.com/davoudarsalani/scripts/blob/master/record-screen.py)|86|244|2,175|2.12K|13|2022-10-30 13:08:48 +0330|
-|[record-unlimited.py](https://github.com/davoudarsalani/scripts/blob/master/record-unlimited.py)|94|253|3,167|3.09K|14|2022-10-30 13:08:48 +0330|
-|[record-video.py](https://github.com/davoudarsalani/scripts/blob/master/record-video.py)|71|178|1,591|1.55K|13|2022-10-30 13:08:48 +0330|
-|[reminder.py](https://github.com/davoudarsalani/scripts/blob/master/reminder.py)|45|120|1,413|1.38K|11|2022-10-30 13:08:48 +0330|
-|[screenshot.py](https://github.com/davoudarsalani/scripts/blob/master/screenshot.py)|161|579|6,589|6.43K|14|2022-12-09 16:50:21 +0330|
-|[split-and-merge.py](https://github.com/davoudarsalani/scripts/blob/master/split-and-merge.py)|289|1,025|10,315|10.07K|8|2022-10-30 13:08:48 +0330|
-|[weather.py](https://github.com/davoudarsalani/scripts/blob/master/weather.py)|133|380|3,937|3.84K|14|2022-10-30 13:08:48 +0330|
+|[checksum.py](https://github.com/davoudarsalani/scripts/blob/master/checksum.py)|70|197|1,949|1.90K|15|2023-10-01 16:32:14 +0330|
+|[compress-xtract.py](https://github.com/davoudarsalani/scripts/blob/master/compress-xtract.py)|97|272|2,855|2.79K|15|2023-10-01 16:32:14 +0330|
+|[download.py](https://github.com/davoudarsalani/scripts/blob/master/download.py)|🔺1,205|🔺5,107|🔺58,682|🔺57.31K|25|2023-10-01 16:32:14 +0330|
+|[gp.py](https://github.com/davoudarsalani/scripts/blob/master/gp.py)|1,052|4,048|41,900|40.92K|🔺26|2023-10-01 16:32:14 +0330|
+|[is-tor.py](https://github.com/davoudarsalani/scripts/blob/master/is-tor.py)|77|244|2,655|2.59K|3|2023-10-01 16:32:14 +0330|
+|[password.py](https://github.com/davoudarsalani/scripts/blob/master/password.py)|103|271|2,687|2.62K|16|2023-10-01 16:32:14 +0330|
+|[record-audio.py](https://github.com/davoudarsalani/scripts/blob/master/record-audio.py)|55|167|1,459|1.42K|14|2023-10-01 16:32:14 +0330|
+|[record-screen.py](https://github.com/davoudarsalani/scripts/blob/master/record-screen.py)|66|233|2,060|2.01K|14|2023-10-01 16:32:14 +0330|
+|[record-unlimited.py](https://github.com/davoudarsalani/scripts/blob/master/record-unlimited.py)|82|226|2,725|2.66K|15|2023-10-01 16:32:14 +0330|
+|[record-video.py](https://github.com/davoudarsalani/scripts/blob/master/record-video.py)|55|167|1,461|1.43K|14|2023-10-01 16:32:14 +0330|
+|[screenshot.py](https://github.com/davoudarsalani/scripts/blob/master/screenshot.py)|156|578|6,713|6.56K|15|2023-10-01 16:32:14 +0330|
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
-|__total__|4,892|15,743|172,007|167.98K|261||
-|__average__|222|715|7,818|7.63K|11||
+|__total__|3,018|11,510|125,146|122.21K|172||
+|__average__|274|1,046|11,376|11.11K|15||
 <br>
 
-![table-badge](https://img.shields.io/static/v1?label=Total&message=78&labelColor=black&color=blue&style=flat&logo=&logoColor=white)
+![table-badge](https://img.shields.io/static/v1?label=Total&message=51&labelColor=black&color=blue&style=flat&logo=&logoColor=white)
 
 
 ||__lines__|__words__|__characters__|__size__|__commits__|__last committed__|
 |-|:-:|:-:|:-:|:-:|:-:|:-:|
-|__total__|14,438|53,898|526,415|514.08K|1,019||
-|__average__|185|691|6,748|6.59K|13||
+|__total__|9,540|37,826|370,994|362.30K|172||
+|__average__|187|741|7,274|7.10K|3||
 <br>
 
 __In the tables that come next, there is presented the most frequent words and characters in the scripts above with the exact number of times each of them has been used:__
@@ -124,131 +97,131 @@ __In the tables that come next, there is presented the most frequent words and c
 
 |word|count|word|count|word|count|
 |-:|:-|-:|:-|-:|:-|
-|__file__|720|__in__|576|__main__|571|
-|__printf__|528|__to__|511|__https__|484|
-|__scripts__|432|__self__|403|__str__|371|
-|__get__|355|__function__|346|__text__|343|
-|__span__|336|__the__|323|__def__|320|
-|__true__|308|__for__|305|__color__|304|
-|__dir__|285|__name__|282|__from__|279|
-|__exit__|255|__scr__|234|__count__|233|
-|__grep__|229|__print__|223|__elif__|218|
-|__import__|213|__error__|212|__help__|210|
-|__input__|206|__fzf__|197|__github__|196|
-|__all__|190|__out__|188|__then__|187|
-|__return__|185|__and__|185|__not__|182|
-|__dev__|179|__path__|178|__base__|176|
-|__as__|167|__cmd__|164|__no__|159|
-|__gb__|157|__int__|155|__of__|154|
-|__0m__|150|__status__|148|__none__|147|
-|__prompt__|146|__items__|146|__case__|143|
-|__dest__|141|__add__|141|__title__|139|
-|__with__|137|__or__|137|__default__|137|
-|__video__|132|__sudo__|131|__fi__|130|
-|__index__|128|__remove__|127|__red__|126|
-|__length__|125|__jump__|125|__files__|123|
-|__clr__|122|__pacman__|120|__null__|118|
-|__type__|116|__temp__|115|__display__|115|
-|__flag__|112|__arg__|112|__commit__|111|
-|__check__|109|__options__|108|__mon__|108|
-|__password__|106|__note__|106|__echo__|106|
-|__bash__|104|__linux__|103|__pattern__|102|
-|__false__|101|__progress__|100|__py__|99|
-|__bin__|97|__audio__|97|__on__|96|
-|__total__|95|__msgn__|95|__cpu__|95|
-|__exc__|94|__run__|93|__pipe__|93|
-|__line__|91|__do__|90|__datetime__|90|
-|__update__|89|__shell__|89|__kaddy__|89|
-|__split__|88|__log__|88|__local__|86|
-|__blob__|85|__staticmethod__|84|__ip__|84|
-|__widget__|83|__seconds__|83|__png__|83|
-|__tor__|82|__header__|82|__githubusercontent__|80|
-|__open__|79|__full__|79|__env__|79|
-|__opened__|78|__choice__|77|__time__|75|
-|__convert__|75|__sort__|74|__result__|74|
-|__root__|73|__id__|73|__duration__|73|
-|__diff__|72|__sink__|71|__mute__|71|
-|__python__|70|__sleep__|69|__except__|69|
-|__up__|68|__readarray__|68|__hash__|68|
-|__ini__|67|__this__|66|__off__|66|
-|__record__|65|__find__|65|__down__|65|
-|__offset__|64|__inpt__|64|__first__|64|
-|__invalid__|63|__var__|62|__read__|62|
-|__awesome__|62|__rofi__|61|__download__|61|
-|__response__|60|__msgc__|60|__delete__|60|
-|__chunk__|60|__when__|59|__tag__|59|
-|__create__|59|__vid__|58|__format__|58|
-|__array__|57|__show__|56|__rsync__|56|
-|__exception__|56|__config__|56|__themes__|55|
-|__yellow__|54|__wrap__|54|__suffix__|54|
-|__heading__|54|__used__|53|__aud__|53|
-|__command__|52|__zip__|51|__shutdown__|51|
-|__ethernet__|51|__bg__|51|__wf__|50|
-|__dict__|50|__cur__|50|__connection__|50|
-|__strip__|49|__single__|49|__repr__|49|
-|__proxy__|49|__level__|49|__key__|49|
-|__use__|48|__universal__|48|__newlines__|48|
-|__date__|48|__pacmd__|47|__make__|47|
-|__alert__|47|__you__|46|__regex__|46|
-|__commits__|46|__can__|46|__systemctl__|45|
-|__playlist__|45|__dl__|45|__clipboard__|45|
-|__mindepth__|44|__end__|44|__devc__|44|
-|__connect__|44|__at__|44|__action__|44|
-|__save__|43|__maxdepth__|43|__eth__|43|
-|__mode__|42|__lines__|42|__empty__|42|
-|__www__|41|__only__|41|__number__|41|
-|__telegram__|40|__state__|40|__mount__|40|
-|__mac__|40|__icon__|40|__dur__|40|
-|__window__|39|__vol__|39|__should__|39|
-|__install__|39|__conf__|39|__port__|38|
-|__org__|38|__have__|38|__stackoverflow__|37|
-|__data__|37|__audtool__|37|__usage__|36|
-|__token__|36|__stts__|36|__rm__|36|
-|__here__|36|__has__|36|__en__|36|
-|__while__|35|__user__|35|__src__|35|
-|__movie__|35|__iname__|35|__turn__|34|
-|__tar__|34|__sources__|34|__restart__|34|
-|__green__|34|__getopt__|34|__bluetooth__|34|
-|__basename__|34|__attempt__|34|__are__|34|
-|__random__|33|__network__|33|__method__|33|
-|__we__|32|__vim__|32|__srt__|32|
-|__perc__|32|__outputname__|32|__nf__|32|
-|__after__|32|__by__|31|__api__|31|
-|__xrandr__|30|__wget__|30|__wc__|30|
-|__using__|30|__sure__|30|__pl__|30|
-|__enable__|30|__compare__|30|__cc__|30|
-|__yay__|29|__verbose__|29|__value__|29|
-|__server__|29|__remote__|29|__eq__|29|
-|__changes__|29|__bed__|29|__xtract__|28|
-|__todo__|28|__sys__|28|__song__|28|
-|__need__|28|__mem__|28|__ip1__|28|
-|__exists__|28|__done__|28|__apps__|28|
-|__xorg__|27|__without__|27|__unit__|27|
-|__sd__|27|__received__|27|__purple__|27|
-|__docker__|27|__weather__|26|__wallpaper__|26|
-|__selected__|26|__returns__|26|__ls__|26|
-|__jq__|26|__editor__|26|__directories__|26|
-|__version__|25|__speed__|25|__same__|25|
-|__image__|25|__grey__|25|__downloader__|25|
-|__write__|24|__vpn__|24|__unmute__|24|
-|__relative__|24|__re__|24|__pulse__|24|
-|__page__|24|__modified__|24|__loops__|24|
-|__global__|24|__firefox__|24|__downloads__|24|
-|__conn__|24|__but__|24|__branches__|24|
-|__amend__|24|__will__|23|__white__|23|
-|__tmp__|23|__that__|23|__runnable__|23|
-|__ports__|23|__part__|23|__order__|23|
-|__mnt__|23|__mkdir__|23|__manager__|23|
-|__idx__|23|__http__|23|__force__|23|
-|__dim__|23|__compress__|23|__bar__|23|
-|__yes__|22|__wheel__|22|__rar__|22|
-|__later__|22|__jymdhms__|22|__gp__|22|
-|__brown__|22|__bluetoothctl__|22|__aur__|22|
-|__application__|22|__always__|22|__test__|21|
-|__public__|21|__needed__|21|__mp4__|21|
-|__match__|21|__jpg__|21|__ii__|21|
-|__idle__|21|__duos__|21|__chats__|21|
-|__attribution__|21|__also__|21|__underline__|20|
+|__printf__|429|__to__|406|__in__|395|
+|__if__|369|__self__|356|__str__|350|
+|__https__|323|__git__|316|__function__|306|
+|__def__|295|__text__|270|__source__|258|
+|__com__|245|__is__|233|__color__|232|
+|__scr__|213|__fzf__|208|__sh__|205|
+|__from__|196|__item__|193|__span__|192|
+|__print__|190|__name__|186|__true__|179|
+|__the__|175|__return__|172|__directory__|169|
+|__exit__|165|__elif__|161|__dir__|160|
+|__help__|157|__import__|155|__title__|154|
+|__and__|145|__total__|134|__none__|134|
+|__github__|132|__default__|132|__all__|132|
+|__not__|129|__prompt__|127|__gb__|124|
+|__video__|121|__index__|121|__error__|121|
+|__raw__|119|__case__|118|__sed__|117|
+|__now__|115|__master__|115|__with__|112|
+|__commit__|111|__then__|109|__mon__|109|
+|__gruvbox__|107|__flag__|107|__remove__|106|
+|__info__|106|__no__|105|__awk__|105|
+|__path__|103|__last__|103|__as__|103|
+|__progress__|98|__pattern__|97|__or__|97|
+|__sudo__|94|__dest__|93|__items__|92|
+|__string__|89|__audio__|89|__null__|88|
+|__break__|88|__seconds__|86|__staticmethod__|84|
+|__branch__|83|__screen__|82|__red__|82|
+|__cpu__|81|__new__|79|__diff__|79|
+|__note__|77|__mic__|76|__jump__|75|
+|__options__|74|__col__|73|__update__|72|
+|__on__|72|__getenv__|71|__sink__|70|
+|__check__|70|__orange__|69|__arg__|69|
+|__start__|68|__mute__|68|__local__|68|
+|__up__|67|__pipe__|67|__pacman__|66|
+|__duration__|66|__bash__|66|__ini__|65|
+|__offset__|64|__it__|64|__inpt__|64|
+|__convert__|64|__password__|63|__hash__|63|
+|__ip__|62|__var__|61|__suffix__|61|
+|__shell__|60|__time__|59|__ir__|59|
+|__array__|58|__shift__|57|__blob__|57|
+|__show__|56|__root__|56|__display__|56|
+|__result__|55|__readarray__|55|__datetime__|55|
+|__msgn__|54|__line__|54|__run__|53|
+|__aud__|53|__py__|52|__log__|52|
+|__youtube__|51|__secs__|51|__field__|51|
+|__wrap__|50|__when__|50|__rofi__|50|
+|__be__|50|__yellow__|49|__repr__|49|
+|__base__|49|__locked__|48|__invalid__|48|
+|__downloaded__|48|__opt__|47|__download__|47|
+|__create__|47|__awesome__|47|__replace__|46|
+|__off__|46|__usr__|45|__used__|45|
+|__make__|45|__find__|45|__dict__|45|
+|__vid__|44|__temp__|44|__failed__|44|
+|__devc__|44|__commits__|44|__try__|43|
+|__single__|43|__end__|43|__clear__|43|
+|__cut__|42|__cur__|42|__sort__|41|
+|__blue__|41|__split__|40|__preview__|40|
+|__exc__|40|__dur__|40|__class__|40|
+|__sub__|38|__questions__|38|__pactl__|38|
+|__except__|38|__dl__|38|__date__|38|
+|__this__|36|__subtitle__|36|__stts__|36|
+|__os__|36|__level__|36|__wifi__|35|
+|__read__|35|__number__|35|__head__|35|
+|__audtool__|35|__wf__|34|__volume__|34|
+|__urls__|34|__systemctl__|34|__sources__|34|
+|__etc__|34|__attempt__|34|__turn__|33|
+|__png__|33|__here__|33|__green__|33|
+|__restart__|32|__response__|32|__reset__|32|
+|__id__|32|__configs__|32|__bluetooth__|32|
+|__www__|31|__mindepth__|31|__because__|31|
+|__playlist__|30|__pl__|30|__maxdepth__|30|
+|__position__|29|__mount__|29|__how__|29|
+|__audacious__|29|__args__|29|__sure__|28|
+|__srt__|28|__purple__|28|__network__|28|
+|__mem__|28|__ip1__|28|__empty__|28|
+|__can__|28|__at__|28|__unit__|27|
+|__only__|27|__nnnn__|27|__nf__|27|
+|__dmenu__|27|__bg__|27|__active__|27|
+|__yay__|26|__while__|26|__we__|26|
+|__verbose__|26|__using__|26|__returns__|26|
+|__regex__|26|__lines__|26|__iname__|26|
+|__group__|26|__cc__|26|__wget__|25|
+|__terminal__|25|__selected__|25|__newlines__|25|
+|__markup__|25|__downloader__|25|__xrandr__|24|
+|__subprocess__|24|__session__|24|__repos__|24|
+|__pip__|24|__loops__|24|__ia__|24|
+|__connect__|24|__command__|24|__branches__|24|
+|__zip__|23|__white__|23|__vpn__|23|
+|__song__|23|__ports__|23|__org__|23|
+|__increment__|23|__icon__|23|__header__|23|
+|__dim__|23|__declare__|23|__bold__|23|
+|__user__|22|__msgc__|22|__kaddy__|22|
+|__greenclip__|22|__clipboard__|22|__bluetoothctl__|22|
+|__available__|22|__tar__|21|__retries__|21|
+|__eval__|21|__en__|21|__brown__|21|
+|__are__|21|__any__|21|__you__|20|
+|__test__|20|__perc__|20|__nmcli__|20|
+|__ins__|20|__ifs__|20|__done__|20|
+|__connected__|20|__after__|20|__yes__|19|
+|__sinks__|19|__rm__|19|__reboot__|19|
+|__prefix__|19|__order__|19|__italic__|19|
+|__force__|19|__compare__|19|__blink__|19|
+|__xtract__|18|__venv__|18|__tmux__|18|
+|__systemd__|18|__sys__|18|__strikethrough__|18|
+|__shutdown__|18|__server__|18|__relative__|18|
+|__rand__|18|__public__|18|__http__|18|
+|__eq__|18|__dups__|18|__content__|18|
+|__by__|18|__but__|18|__burn__|18|
+|__zipfile__|17|__value__|17|__ufw__|17|
+|__torsocks__|17|__timer__|17|__shuffle__|17|
+|__same__|17|__resolution__|17|__previously__|17|
+|__out__|17|__openvpn__|17|__needed__|17|
+|__match__|17|__locally__|17|__ip2__|17|
+|__downloads__|17|__disable__|17|__byte__|17|
+|__api__|17|__allow__|17|__youtubedl__|16|
+|__without__|16|__will__|16|__variable__|16|
+|__ul__|16|__stream__|16|__restore__|16|
+|__python3__|16|__pwd__|16|__pass__|16|
+|__one__|16|__jymdhms__|16|__init__|16|
+|__has__|16|__flags__|16|__filter__|16|
+|__email__|16|__editor__|16|__cyan__|16|
+|__cache__|16|__widgets__|15|__usage__|15|
+|__sync__|15|__such__|15|__stop__|15|
+|__select__|15|__rg__|15|__rec__|15|
+|__quit__|15|__part__|15|__old__|15|
+|__noinfo__|15|__method__|15|__latest__|15|
 </details>
 
 <details>
@@ -256,30 +229,30 @@ __In the tables that come next, there is presented the most frequent words and c
 
 |char|count|char|count|char|count|
 |-:|:-|-:|:-|-:|:-|
-|__e__|27,880|__t__|21,633|__i__|17,811|
-|__r__|16,820|__n__|16,221|__o__|16,008|
-|__l__|11,644|__c__|10,452|__d__|10,273|
-|__p__|9,692|__"__|9,357|__m__|8,384|
-|_____|8,335|__f__|8,208|__-__|6,706|
-|__h__|5,527|__g__|5,450|__)__|5,113|
-|__=__|4,246|__/__|4,201|__(__|4,140|
-|__}__|3,874|__b__|3,091|__w__|3,006|
-|__y__|2,749|____|2,705|__;__|2,664|
-|__0__|2,419|____|2,170|__,__|2,096|
-|__k__|1,724|__1__|1,677|__E__|1,439|
-|__|__|1,323|__&__|1,203|__O__|1,184|
-|__>__|1,136|__2__|1,126|__]__|1,100|
-|__M__|982|__N__|890|__<__|889|
-|__%__|823|__A__|763|__S__|682|
-|__I__|659|__4__|644|__H__|638|
-|__P__|507|__F__|500|__9__|464|
-|__@__|456|__U__|445|__5__|422|
-|__D__|402|__q__|375|__8__|370|
-|__6__|349|__7__|336|__j__|300|
-|__!__|194|__B__|176|__Y__|168|
-|__^__|153|__J__|147|__V__|123|
-|__~__|120|__W__|114|__K__|89|
-|__Z__|51|__Q__|42|__�__|2|
+|__e__|19,892|__t__|16,167|__i__|12,941|
+|__r__|12,251|__o__|12,162|__n__|11,802|
+|__l__|8,506|__c__|7,509|__d__|7,374|
+|__'__|6,724|_____|6,524|__u__|6,381|
+|__"__|5,992|__m__|5,946|__-__|5,310|
+|__g__|3,878|__#__|3,784|__)__|3,464|
+|__=__|2,907|__(__|2,896|__/__|2,763|
+|__{__|2,608|__w__|2,233|__b__|2,139|
+|____|2,116|__v__|2,012|__y__|1,886|
+|__;__|1,769|____|1,688|__,__|1,546|
+|__1__|1,309|__k__|1,204|__|__|1,136|
+|__3__|952|__&__|950|__2__|873|
+|__]__|766|__%__|653|__T__|643|
+|__R__|594|__N__|586|__<__|575|
+|__C__|470|__z__|467|__A__|467|
+|__I__|413|__S__|410|__M__|393|
+|__@__|377|__9__|330|__P__|310|
+|__*__|297|__+__|282|__q__|270|
+|__U__|252|__D__|246|__7__|228|
+|__L__|209|__H__|183|__8__|176|
+|__G__|136|__Y__|131|__^__|125|
+|__!__|117|__B__|111|__V__|93|
+|__X__|71|__W__|59|__Z__|45|
+|__Q__|24|____|15|__`__|4|
 </details>
 <br>
 

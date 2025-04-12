@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/nnnn/main/scripts/venv/bin/python3
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
@@ -11,23 +11,18 @@ from os import path
 from subprocess import run
 from sys import argv
 
-from gp import Color, fzf, invalid, get_input, get_single_input, get_password, compress_tar, xtract_tar, compress_zip, xtract_zip, xtract_rar
+from gp import Color, pip_to_fzf, invalid, get_input, get_single_input, get_password, compress_tar, xtract_tar, compress_zip, xtract_zip, xtract_rar
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
 Col = Color()
 
-
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(
-        f'''{Col.heading(f'{title}')} {Col.yellow('help')}
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-i|--input=')}
-{Col.flag('-p|--password=')}'''
-    )
+{Col.flag('-p|--password=')}''')
     exit()
-
-
 ## }}}
 def getopts() -> None:  ## {{{
     global inpt, password
@@ -38,33 +33,21 @@ def getopts() -> None:  ## {{{
         invalid(f'{exc!r}')
 
     for opt, arg in duos:
-        if opt in ('-h', '--help'):
-            display_help()
-        elif opt in ('-i', '--input'):
-            inpt = arg
-        elif opt in ('-p', '--password'):
-            password = arg
-
-
+        if   opt in ('-h', '--help'):     display_help()
+        elif opt in ('-i', '--input'):    inpt = arg
+        elif opt in ('-p', '--password'): password = arg
 ## }}}
 def prompt(*args: list[str]) -> None:  ## {{{
     global inpt, password
 
     for arg in args:
-        if arg == '-i':
-            try:
-                inpt
-            except:
-                inpt = get_input('input')
-            if not path.exists(f'{inpt}'):
-                invalid(f'{inpt} does not exist')
+        if   arg == '-i':
+            try:    inpt
+            except: inpt = get_input('input')
+            if not path.exists(f'{inpt}'): invalid(f'{inpt} does not exist')
         elif arg == '-p':
-            try:
-                password
-            except:
-                password = get_password('password ')
-
-
+            try:    password
+            except: password = get_password('password ')
 ## }}}
 
 getopts()
@@ -72,9 +55,9 @@ getopts()
 print(Col.heading(title))
 
 main_items = ['tar', 'untar', 'zip', 'unzip', 'unrar', 'help']
-main_item = fzf(main_items)
+main_item = pip_to_fzf(main_items)
 
-if main_item == 'tar':
+if   main_item == 'tar':
     prompt('-i')
     compress_tar(inpt)
 elif main_item == 'untar':
@@ -82,7 +65,7 @@ elif main_item == 'untar':
     xtract_tar(inpt)
 elif main_item == 'zip':
     use_password = get_single_input('use password (y/n)?')
-    if use_password == 'y':
+    if   use_password == 'y':
         prompt('-i', '-p')
         compress_zip(inpt, password)
     elif use_password == 'n':
@@ -92,7 +75,7 @@ elif main_item == 'zip':
         invalid('wrong choice')
 elif main_item == 'unzip':
     has_password = get_single_input('has password (y/n)?')
-    if has_password == 'y':
+    if   has_password == 'y':
         prompt('-i', '-p')
         xtract_zip(inpt, password)
     elif has_password == 'n':
@@ -102,7 +85,7 @@ elif main_item == 'unzip':
         invalid('wrong choice')
 elif main_item == 'unrar':
     has_password = get_single_input('has password (y/n)?')
-    if has_password == 'y':
+    if   has_password == 'y':
         prompt('-i', '-p')
         xtract_rar(inpt, password)
     elif has_password == 'n':

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/nnnn/main/scripts/venv/bin/python3
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
@@ -22,7 +22,10 @@ country_url = 'http://ip-api.com/json'
 Col = Color()
 Ses = Session()
 hdrs = get_headers()
-Ses.proxies = {'http': tor_proxy, 'https': tor_proxy}
+Ses.proxies = {
+    'http': tor_proxy,
+    'https': tor_proxy
+}
 
 script_args = argv[1:]
 if script_args:
@@ -31,19 +34,20 @@ else:
     first_arg = None
 
 if first_arg == 'msg':
-    msgn(f'<span color=\"{getenv("orange")}\">{title}</span> checking')
+    msgn(f'<span color=\"{getenv("gruvbox_orange")}\">{title}</span> checking')
     attempts = 10
 else:
     attempts = 1000
     print(Col.heading(title))
 
-for attempt in range(1, attempts + 1):
+for attempt in range(1, attempts+1):
     if istor and ip:  ## JUMP_1
         break
     else:
+
         if attempt > 1:
             if first_arg == 'msg':
-                msgn(f'<span color=\"{getenv("orange")}\">{title}</span> attempt {attempt}/{attempts}')
+                msgn(f'<span color=\"{getenv("gruvbox_orange")}\">{title}</span> attempt {attempt}/{attempts}')
             else:
                 print(f'attempt {attempt}/{attempts}')
 
@@ -53,7 +57,7 @@ for attempt in range(1, attempts + 1):
             response = loads(response.text)  ## {'IsTor': True, 'IP': 'YOUR-IP'}
 
             istor = response.get('IsTor', False)  ## True/False
-            ip = response.get('IP')
+            ip    = response.get('IP')
         except Exception as exc:
             pass
 
@@ -61,15 +65,13 @@ for attempt in range(1, attempts + 1):
             ## get country of ip
             try:
                 response = Ses.get(f'{country_url}/{ip}', headers=hdrs, timeout=20)
-                response = loads(
-                    response.text
-                )  ## {'status': 'success', 'country': 'Sweden', 'countryCode': 'SE', 'region': 'AB', 'regionName': 'Stockholm County', 'city': 'Stockholm', 'zip': '100 05', 'lat': 59.3293, 'lon': 18.0686, 'timezone': 'Europe/Stockholm', 'isp': 'Svea Hosting AB', 'org': 'Svea Hosting AB', 'as': 'AS41634 Svea Hosting AB', 'query': '193.239.232.102'}
+                response = loads(response.text)  ## {'status': 'success', 'country': 'Sweden', 'countryCode': 'SE', 'region': 'AB', 'regionName': 'Stockholm County', 'city': 'Stockholm', 'zip': '100 05', 'lat': 59.3293, 'lon': 18.0686, 'timezone': 'Europe/Stockholm', 'isp': 'Svea Hosting AB', 'org': 'Svea Hosting AB', 'as': 'AS41634 Svea Hosting AB', 'query': '193.239.232.102'}
 
                 country = response.get('country')
             except Exception as exc:
                 pass
 
             if first_arg == 'msg':
-                msgn(f'<span color=\"{getenv("green")}\">✔</span> <span color=\"{getenv("orange")}\">{title}</span> = true ({ip}, {country})')
+                msgn(f'<span color=\"{getenv("gruvbox_green")}\">✔</span> <span color=\"{getenv("gruvbox_orange")}\">{title}</span> = true ({ip}, {country})')
             else:
-                print(Col.green('✔ ') + Col.grey(f'true ({ip}, {country})'))
+                print(Col.green('✔ ') + Col.gray(f'true ({ip}, {country})'))

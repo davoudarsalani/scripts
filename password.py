@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/nnnn/main/scripts/venv/bin/python3
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
@@ -14,7 +14,7 @@ from re import sub
 from subprocess import run
 from sys import argv
 
-from gp import Color, invalid, fzf
+from gp import Color, invalid, pip_to_fzf
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
@@ -23,11 +23,9 @@ Col = Color()
 
 def display_help() -> None:  ## {{{
     run('clear', shell=True)
-    print(
-        f'''{Col.heading(f'{title}')} {Col.yellow('help')}
+    print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-l|--length=')}{Col.default('[30]')}
-{Col.flag('-c|--count=')}{Col.default('[5]')}'''
-    )
+{Col.flag('-c|--count=')}{Col.default('[5]')}''')
     exit()
 
 
@@ -64,10 +62,8 @@ def prompt(*args: list[str]) -> None:  ## {{{
                 count
             except:
                 count = 5
-
-
 ## }}}
-def generate(uppercase: bool = True, lowercase: bool = True, digits: bool = True, symbols: bool = True) -> None:  ## {{{
+def generate(uppercase: bool=True, lowercase: bool=True, digits: bool=True, symbols: bool=True) -> None:  ## {{{
     letters = ''
     if uppercase:
         letters += string.ascii_uppercase
@@ -88,8 +84,6 @@ def generate(uppercase: bool = True, lowercase: bool = True, digits: bool = True
     for x in range(count):
         password = ''.join(sample(letters, length))
         print(password)
-
-
 ## }}}
 
 getopts()
@@ -97,7 +91,7 @@ getopts()
 print(Col.heading(title))
 
 main_items = ['password', 'help']
-main_item = fzf(main_items)
+main_item = pip_to_fzf(main_items)
 
 if main_item == 'password':
     prompt('-l', '-c')

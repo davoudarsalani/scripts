@@ -1,4 +1,4 @@
-## {{{ requirements
+## requirements
 ## for .venv_keylogger: keylogger
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
@@ -33,333 +33,181 @@
 ##   youtube_dl
 ##   [jedi]
 ## )
-## }}}
-## {{{ imports
+
+## imports
 from os import getenv  ## for send_email* functions
 from typing import Any  ## for Audio, get_input, get_single_input, get_last, get_datetime
 
-## }}}
 
-
-class Color:  ## {{{
-    ## {{{
-    @staticmethod
-    def red(text: str) -> str:
-        return f'\033[00;49;031m{text}\033[0m'
-
+class Color:
     @staticmethod
-    def green(text: str) -> str:
-        return f'\033[00;49;032m{text}\033[0m'
-
+    def red(text: str) -> str:    return f'\033[00;49;031m{text}\033[0m'
     @staticmethod
-    def yellow(text: str) -> str:
-        return f'\033[00;49;033m{text}\033[0m'
-
+    def green(text: str) -> str:  return f'\033[00;49;032m{text}\033[0m'
     @staticmethod
-    def blue(text: str) -> str:
-        return f'\033[00;49;034m{text}\033[0m'
-
+    def yellow(text: str) -> str: return f'\033[00;49;033m{text}\033[0m'
     @staticmethod
-    def purple(text: str) -> str:
-        return f'\033[00;49;035m{text}\033[0m'
-
+    def blue(text: str) -> str:   return f'\033[00;49;034m{text}\033[0m'
     @staticmethod
-    def cyan(text: str) -> str:
-        return f'\033[00;49;036m{text}\033[0m'
-
+    def purple(text: str) -> str: return f'\033[00;49;035m{text}\033[0m'
     @staticmethod
-    def white(text: str) -> str:
-        return f'\033[00;49;037m{text}\033[0m'
-
+    def cyan(text: str) -> str:   return f'\033[00;49;036m{text}\033[0m'
     @staticmethod
-    def grey(text: str) -> str:
-        return f'\033[00;49;090m{text}\033[0m'
-
+    def white(text: str) -> str:  return f'\033[00;49;037m{text}\033[0m'
     @staticmethod
-    def brown(text: str) -> str:
-        return f'\033[38;05;094m{text}\033[0m'
-
+    def gray(text: str) -> str:   return f'\033[00;49;090m{text}\033[0m'
     @staticmethod
-    def orange(text: str) -> str:
-        return f'\033[38;05;202m{text}\033[0m'
-
+    def brown(text: str) -> str:  return f'\033[38;05;094m{text}\033[0m'
     @staticmethod
-    def olive(text: str) -> str:
-        return f'\033[38;05;064m{text}\033[0m'
-
-    ## }}}
-    ## {{{ bold
-    @staticmethod
-    def red_bold(text: str) -> str:
-        return f'\033[01;49;031m{text}\033[0m'
-
+    def orange(text: str) -> str: return f'\033[38;05;202m{text}\033[0m'
     @staticmethod
-    def green_bold(text: str) -> str:
-        return f'\033[01;49;032m{text}\033[0m'
+    def olive(text: str) -> str:  return f'\033[38;05;064m{text}\033[0m'
 
+    ## bold
     @staticmethod
-    def yellow_bold(text: str) -> str:
-        return f'\033[01;49;033m{text}\033[0m'
-
+    def red_bold(text: str) -> str:    return f'\033[01;49;031m{text}\033[0m'
     @staticmethod
-    def blue_bold(text: str) -> str:
-        return f'\033[01;49;034m{text}\033[0m'
-
+    def green_bold(text: str) -> str:  return f'\033[01;49;032m{text}\033[0m'
     @staticmethod
-    def purple_bold(text: str) -> str:
-        return f'\033[01;49;035m{text}\033[0m'
-
+    def yellow_bold(text: str) -> str: return f'\033[01;49;033m{text}\033[0m'
     @staticmethod
-    def cyan_bold(text: str) -> str:
-        return f'\033[01;49;036m{text}\033[0m'
-
+    def blue_bold(text: str) -> str:   return f'\033[01;49;034m{text}\033[0m'
     @staticmethod
-    def white_bold(text: str) -> str:
-        return f'\033[01;49;037m{text}\033[0m'
-
+    def purple_bold(text: str) -> str: return f'\033[01;49;035m{text}\033[0m'
     @staticmethod
-    def grey_bold(text: str) -> str:
-        return f'\033[01;49;090m{text}\033[0m'
-
-    ## }}}
-    ## {{{ dim
-    @staticmethod
-    def red_dim(text: str) -> str:
-        return f'\033[02;49;031m{text}\033[0m'
-
+    def cyan_bold(text: str) -> str:   return f'\033[01;49;036m{text}\033[0m'
     @staticmethod
-    def green_dim(text: str) -> str:
-        return f'\033[02;49;032m{text}\033[0m'
-
+    def white_bold(text: str) -> str:  return f'\033[01;49;037m{text}\033[0m'
     @staticmethod
-    def yellow_dim(text: str) -> str:
-        return f'\033[02;49;033m{text}\033[0m'
+    def gray_bold(text: str) -> str:   return f'\033[01;49;090m{text}\033[0m'
 
+    ## dim
     @staticmethod
-    def blue_dim(text: str) -> str:
-        return f'\033[02;49;034m{text}\033[0m'
-
+    def red_dim(text: str) -> str:    return f'\033[02;49;031m{text}\033[0m'
     @staticmethod
-    def purple_dim(text: str) -> str:
-        return f'\033[02;49;035m{text}\033[0m'
-
+    def green_dim(text: str) -> str:  return f'\033[02;49;032m{text}\033[0m'
     @staticmethod
-    def cyan_dim(text: str) -> str:
-        return f'\033[02;49;036m{text}\033[0m'
-
+    def yellow_dim(text: str) -> str: return f'\033[02;49;033m{text}\033[0m'
     @staticmethod
-    def white_dim(text: str) -> str:
-        return f'\033[02;49;037m{text}\033[0m'
-
+    def blue_dim(text: str) -> str:   return f'\033[02;49;034m{text}\033[0m'
     @staticmethod
-    def grey_dim(text: str) -> str:
-        return f'\033[02;49;090m{text}\033[0m'
-
-    ## }}}
-    ## {{{ italic
-    @staticmethod
-    def red_italic(text: str) -> str:
-        return f'\033[03;49;031m{text}\033[0m'
-
+    def purple_dim(text: str) -> str: return f'\033[02;49;035m{text}\033[0m'
     @staticmethod
-    def green_italic(text: str) -> str:
-        return f'\033[03;49;032m{text}\033[0m'
-
+    def cyan_dim(text: str) -> str:   return f'\033[02;49;036m{text}\033[0m'
     @staticmethod
-    def yellow_italic(text: str) -> str:
-        return f'\033[03;49;033m{text}\033[0m'
-
+    def white_dim(text: str) -> str:  return f'\033[02;49;037m{text}\033[0m'
     @staticmethod
-    def blue_italic(text: str) -> str:
-        return f'\033[03;49;034m{text}\033[0m'
+    def gray_dim(text: str) -> str:   return f'\033[02;49;090m{text}\033[0m'
 
+    ## italic
     @staticmethod
-    def purple_italic(text: str) -> str:
-        return f'\033[03;49;035m{text}\033[0m'
-
+    def red_italic(text: str) -> str:    return f'\033[03;49;031m{text}\033[0m'
     @staticmethod
-    def cyan_italic(text: str) -> str:
-        return f'\033[03;49;036m{text}\033[0m'
-
+    def green_italic(text: str) -> str:  return f'\033[03;49;032m{text}\033[0m'
     @staticmethod
-    def white_italic(text: str) -> str:
-        return f'\033[03;49;037m{text}\033[0m'
-
+    def yellow_italic(text: str) -> str: return f'\033[03;49;033m{text}\033[0m'
     @staticmethod
-    def grey_italic(text: str) -> str:
-        return f'\033[03;49;090m{text}\033[0m'
-
-    ## }}}
-    ## {{{ underline
-    @staticmethod
-    def red_underline(text: str) -> str:
-        return f'\033[04;49;031m{text}\033[0m'
-
+    def blue_italic(text: str) -> str:   return f'\033[03;49;034m{text}\033[0m'
     @staticmethod
-    def green_underline(text: str) -> str:
-        return f'\033[04;49;032m{text}\033[0m'
-
+    def purple_italic(text: str) -> str: return f'\033[03;49;035m{text}\033[0m'
     @staticmethod
-    def yellow_underline(text: str) -> str:
-        return f'\033[04;49;033m{text}\033[0m'
-
+    def cyan_italic(text: str) -> str:   return f'\033[03;49;036m{text}\033[0m'
     @staticmethod
-    def blue_underline(text: str) -> str:
-        return f'\033[04;49;034m{text}\033[0m'
-
+    def white_italic(text: str) -> str:  return f'\033[03;49;037m{text}\033[0m'
     @staticmethod
-    def purple_underline(text: str) -> str:
-        return f'\033[04;49;035m{text}\033[0m'
+    def gray_italic(text: str) -> str:   return f'\033[03;49;090m{text}\033[0m'
 
+    ## underline
     @staticmethod
-    def cyan_underline(text: str) -> str:
-        return f'\033[04;49;036m{text}\033[0m'
-
+    def red_underline(text: str) -> str:    return f'\033[04;49;031m{text}\033[0m'
     @staticmethod
-    def white_underline(text: str) -> str:
-        return f'\033[04;49;037m{text}\033[0m'
-
+    def green_underline(text: str) -> str:  return f'\033[04;49;032m{text}\033[0m'
     @staticmethod
-    def grey_underline(text: str) -> str:
-        return f'\033[04;49;090m{text}\033[0m'
-
-    ## }}}
-    ## {{{ blink
-    @staticmethod
-    def red_blink(text: str) -> str:
-        return f'\033[05;49;031m{text}\033[0m'
-
+    def yellow_underline(text: str) -> str: return f'\033[04;49;033m{text}\033[0m'
     @staticmethod
-    def green_blink(text: str) -> str:
-        return f'\033[05;49;032m{text}\033[0m'
-
+    def blue_underline(text: str) -> str:   return f'\033[04;49;034m{text}\033[0m'
     @staticmethod
-    def yellow_blink(text: str) -> str:
-        return f'\033[05;49;033m{text}\033[0m'
-
+    def purple_underline(text: str) -> str: return f'\033[04;49;035m{text}\033[0m'
     @staticmethod
-    def blue_blink(text: str) -> str:
-        return f'\033[05;49;034m{text}\033[0m'
-
+    def cyan_underline(text: str) -> str:   return f'\033[04;49;036m{text}\033[0m'
     @staticmethod
-    def purple_blink(text: str) -> str:
-        return f'\033[05;49;035m{text}\033[0m'
-
+    def white_underline(text: str) -> str:  return f'\033[04;49;037m{text}\033[0m'
     @staticmethod
-    def cyan_blink(text: str) -> str:
-        return f'\033[05;49;036m{text}\033[0m'
+    def gray_underline(text: str) -> str:   return f'\033[04;49;090m{text}\033[0m'
 
+    ## blink
     @staticmethod
-    def white_blink(text: str) -> str:
-        return f'\033[05;49;037m{text}\033[0m'
-
+    def red_blink(text: str) -> str:    return f'\033[05;49;031m{text}\033[0m'
     @staticmethod
-    def grey_blink(text: str) -> str:
-        return f'\033[05;49;090m{text}\033[0m'
-
-    ## }}}
-    ## {{{ bg
-    @staticmethod
-    def red_bg(text: str) -> str:
-        return f'\033[07;49;031m{text}\033[0m'
-
+    def green_blink(text: str) -> str:  return f'\033[05;49;032m{text}\033[0m'
     @staticmethod
-    def green_bg(text: str) -> str:
-        return f'\033[07;49;032m{text}\033[0m'
-
+    def yellow_blink(text: str) -> str: return f'\033[05;49;033m{text}\033[0m'
     @staticmethod
-    def yellow_bg(text: str) -> str:
-        return f'\033[07;49;033m{text}\033[0m'
-
+    def blue_blink(text: str) -> str:   return f'\033[05;49;034m{text}\033[0m'
     @staticmethod
-    def blue_bg(text: str) -> str:
-        return f'\033[07;49;034m{text}\033[0m'
-
+    def purple_blink(text: str) -> str: return f'\033[05;49;035m{text}\033[0m'
     @staticmethod
-    def purple_bg(text: str) -> str:
-        return f'\033[07;49;035m{text}\033[0m'
-
+    def cyan_blink(text: str) -> str:   return f'\033[05;49;036m{text}\033[0m'
     @staticmethod
-    def cyan_bg(text: str) -> str:
-        return f'\033[07;49;036m{text}\033[0m'
-
+    def white_blink(text: str) -> str:  return f'\033[05;49;037m{text}\033[0m'
     @staticmethod
-    def white_bg(text: str) -> str:
-        return f'\033[07;49;037m{text}\033[0m'
+    def gray_blink(text: str) -> str:   return f'\033[05;49;090m{text}\033[0m'
 
+    ## bg
     @staticmethod
-    def grey_bg(text: str) -> str:
-        return f'\033[07;49;090m{text}\033[0m'
-
+    def red_bg(text: str) -> str:    return f'\033[07;49;031m{text}\033[0m'
     @staticmethod
-    def brown_bg(text: str) -> str:
-        return f'\033[48;05;094m{text}\033[0m'
-
+    def green_bg(text: str) -> str:  return f'\033[07;49;032m{text}\033[0m'
     @staticmethod
-    def orange_bg(text: str) -> str:
-        return f'\033[48;05;202m{text}\033[0m'
-
+    def yellow_bg(text: str) -> str: return f'\033[07;49;033m{text}\033[0m'
     @staticmethod
-    def olive_bg(text: str) -> str:
-        return f'\033[48;05;064m{text}\033[0m'
-
-    ## }}}
-    ## {{{ strikethrough
-    @staticmethod
-    def red_strikethrough(text: str) -> str:
-        return f'\033[09;49;031m{text}\033[0m'
-
+    def blue_bg(text: str) -> str:   return f'\033[07;49;034m{text}\033[0m'
     @staticmethod
-    def green_strikethrough(text: str) -> str:
-        return f'\033[09;49;032m{text}\033[0m'
-
+    def purple_bg(text: str) -> str: return f'\033[07;49;035m{text}\033[0m'
     @staticmethod
-    def yellow_strikethrough(text: str) -> str:
-        return f'\033[09;49;033m{text}\033[0m'
-
+    def cyan_bg(text: str) -> str:   return f'\033[07;49;036m{text}\033[0m'
     @staticmethod
-    def blue_strikethrough(text: str) -> str:
-        return f'\033[09;49;034m{text}\033[0m'
-
+    def white_bg(text: str) -> str:  return f'\033[07;49;037m{text}\033[0m'
     @staticmethod
-    def purple_strikethrough(text: str) -> str:
-        return f'\033[09;49;035m{text}\033[0m'
-
+    def gray_bg(text: str) -> str:   return f'\033[07;49;090m{text}\033[0m'
     @staticmethod
-    def cyan_strikethrough(text: str) -> str:
-        return f'\033[09;49;036m{text}\033[0m'
-
+    def brown_bg(text: str) -> str:  return f'\033[48;05;094m{text}\033[0m'
     @staticmethod
-    def white_strikethrough(text: str) -> str:
-        return f'\033[09;49;037m{text}\033[0m'
-
+    def orange_bg(text: str) -> str: return f'\033[48;05;202m{text}\033[0m'
     @staticmethod
-    def grey_strikethrough(text: str) -> str:
-        return f'\033[09;49;090m{text}\033[0m'
+    def olive_bg(text: str) -> str:  return f'\033[48;05;064m{text}\033[0m'
 
-    ## }}}
-    def heading(self, text: str) -> str:
-        return self.green(text)
-
-    def ask(self, text: str) -> str:
-        return self.olive(text)
-
-    def flag(self, text: str) -> str:
-        return self.purple(text)
+    ## strikethrough
+    @staticmethod
+    def red_strikethrough(text: str) -> str:    return f'\033[09;49;031m{text}\033[0m'
+    @staticmethod
+    def green_strikethrough(text: str) -> str:  return f'\033[09;49;032m{text}\033[0m'
+    @staticmethod
+    def yellow_strikethrough(text: str) -> str: return f'\033[09;49;033m{text}\033[0m'
+    @staticmethod
+    def blue_strikethrough(text: str) -> str:   return f'\033[09;49;034m{text}\033[0m'
+    @staticmethod
+    def purple_strikethrough(text: str) -> str: return f'\033[09;49;035m{text}\033[0m'
+    @staticmethod
+    def cyan_strikethrough(text: str) -> str:   return f'\033[09;49;036m{text}\033[0m'
+    @staticmethod
+    def white_strikethrough(text: str) -> str:  return f'\033[09;49;037m{text}\033[0m'
+    @staticmethod
+    def gray_strikethrough(text: str) -> str:   return f'\033[09;49;090m{text}\033[0m'
 
-    def default(self, text: str) -> str:
-        return self.white_dim(text)
+    def heading(self, text: str) -> str: return self.green(text)
+    def ask(self, text: str) -> str:     return self.olive(text)
+    def flag(self, text: str) -> str:    return self.purple(text)
+    def default(self, text: str) -> str: return self.white_dim(text)
 
+class Audio:
 
-## }}}
-class Audio:  ## {{{
     @staticmethod
     def vol(arg: str) -> Any:
         from re import match
         from subprocess import run, check_output
-
-        # port  = check_output(f'pacmd list-sinks | grep -iA 65 "*" | grep -i "active port" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
-        name = check_output(f'pacmd list-sinks | grep -iA 1 "*" | grep -i "name:" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
+      # port  = check_output(f'pacmd list-sinks | grep -iA 65 "*" | grep -i "active port" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
+        name  = check_output(f'pacmd list-sinks | grep -iA 1 "*" | grep -i "name:" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
         index = check_output(f'pacmd list-sinks | grep -i "*"', shell=True, universal_newlines=True).strip().split()[-1]
         level = check_output(f'pacmd list-sinks | grep -iA 6 {name} | grep -i "volume: front"', shell=True, universal_newlines=True).strip().split()[4].replace("%", "")
         state = check_output(f'pacmd list-sinks | grep -iA 3 {name} | grep -i "state:"', shell=True, universal_newlines=True).strip().split()[-1]
@@ -369,100 +217,71 @@ class Audio:  ## {{{
         else:
             mute_status = check_output(f'pacmd list-sinks | grep -i "muted"', shell=True, universal_newlines=True).strip().split()[-1]
 
-        if arg == 'name':
-            return name
-        elif arg == 'index':
-            return index
-        elif arg == 'level':
-            return level
-        elif arg == 'state':
-            return state
-        elif arg == 'mute_status':
-            return mute_status
-        # elif arg == 'port':        return port
-        elif arg == 'mute':
-            run(f'pactl set-sink-mute {index} 1', shell=True)
-        elif arg == 'unmute':
-            run(f'pactl set-sink-mute {index} 0', shell=True)
+        if   arg == 'name':        return name
+        elif arg == 'index':       return index
+        elif arg == 'level':       return level
+        elif arg == 'state':       return state
+        elif arg == 'mute_status': return mute_status
+      # elif arg == 'port':        return port
+        elif arg == 'mute':        run(f'pactl set-sink-mute {index} 1', shell=True)
+        elif arg == 'unmute':      run(f'pactl set-sink-mute {index} 0', shell=True)
 
     @staticmethod
     def mic(arg: str) -> Any:
         from re import match
         from subprocess import run, check_output
-
-        # port        = check_output(f'pacmd list-sources | grep -iA 65 "*" | grep -i "active port" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
-        name = check_output(f'pacmd list-sources | grep -iA 1 "*" | grep -i "name:" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
-        index = check_output(f'pacmd list-sources | grep -i "*"', shell=True, universal_newlines=True).strip().split()[-1]
-        level = check_output(f'pacmd list-sources | grep -iA 6 {name} | grep -i "volume: front"', shell=True, universal_newlines=True).strip().split()[4].replace('%', '')
-        state = check_output(f'pacmd list-sources | grep -iA 3 {name} | grep -i "state:"', shell=True, universal_newlines=True).strip().split()[-1]
+      # port        = check_output(f'pacmd list-sources | grep -iA 65 "*" | grep -i "active port" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
+        name        = check_output(f'pacmd list-sources | grep -iA 1 "*" | grep -i "name:" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
+        index       = check_output(f'pacmd list-sources | grep -i "*"', shell=True, universal_newlines=True).strip().split()[-1]
+        level       = check_output(f'pacmd list-sources | grep -iA 6 {name} | grep -i "volume: front"', shell=True, universal_newlines=True).strip().split()[4].replace('%', '')
+        state       = check_output(f'pacmd list-sources | grep -iA 3 {name} | grep -i "state:"', shell=True, universal_newlines=True).strip().split()[-1]
         mute_status = check_output(f'pacmd list-sources | grep -A 10 {name} | grep -i "muted"', shell=True, universal_newlines=True).strip().split()[-1]
 
-        if arg == 'name':
-            return name
-        elif arg == 'index':
-            return index
-        elif arg == 'level':
-            return level
-        elif arg == 'state':
-            return state
-        elif arg == 'mute_status':
-            return mute_status
-        # elif arg == 'port':        return port
-        elif arg == 'mute':
-            run(f'pactl set-source-mute   {index} 1', shell=True)
-        elif arg == 'unmute':
-            run(f'pactl set-source-mute   {index} 0', shell=True)
-        elif arg == '0':
-            run(f'pactl set-source-volume {index} 0%', shell=True)
-        elif arg == '25':
-            run(f'pactl set-source-volume {index} 25%', shell=True)
+        if   arg == 'name':        return name
+        elif arg == 'index':       return index
+        elif arg == 'level':       return level
+        elif arg == 'state':       return state
+        elif arg == 'mute_status': return mute_status
+      # elif arg == 'port':        return port
+        elif arg == 'mute':        run(f'pactl set-source-mute   {index} 1', shell=True)
+        elif arg == 'unmute':      run(f'pactl set-source-mute   {index} 0', shell=True)
+        elif arg == '0':           run(f'pactl set-source-volume {index} 0%', shell=True)
+        elif arg == '25':          run(f'pactl set-source-volume {index} 25%', shell=True)
 
     @staticmethod
     def mon(arg: str) -> Any:
         from re import match
         from subprocess import run, check_output
-
-        mons = check_output(f'pacmd list-sources | grep -i "\.monitor" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip().split()
+        mons = check_output(fr'pacmd list-sources | grep -i "\.monitor" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip().split()
         for eachmon in mons:
             name = eachmon
             if match('^bluez_sink', name):
                 break
 
-        index = check_output(f'pacmd list-sources | grep -iB 1 {name} | grep -i "index"', shell=True, universal_newlines=True).strip().split()[-1]
-        level = check_output(f'pacmd list-sources | grep -iA 6 {name} | grep -i "volume: front"', shell=True, universal_newlines=True).strip().split()[4].replace('%', '')
-        state = check_output(f'pacmd list-sources | grep -iA 3 {name} | grep -i "state:"', shell=True, universal_newlines=True).strip().split()[-1]
+        index       = check_output(f'pacmd list-sources | grep -iB 1 {name} | grep -i "index"', shell=True, universal_newlines=True).strip().split()[-1]
+        level       = check_output(f'pacmd list-sources | grep -iA 6 {name} | grep -i "volume: front"', shell=True, universal_newlines=True).strip().split()[4].replace('%', '')
+        state       = check_output(f'pacmd list-sources | grep -iA 3 {name} | grep -i "state:"', shell=True, universal_newlines=True).strip().split()[-1]
         mute_status = check_output(f'pacmd list-sources | grep -A 10 {name} | grep -i "muted"', shell=True, universal_newlines=True).strip().split()[-1]
 
-        if arg == 'name':
-            return name
-        elif arg == 'index':
-            return index
-        elif arg == 'level':
-            return level
-        elif arg == 'state':
-            return state
-        elif arg == 'mute_status':
-            return mute_status
-        elif arg == 'mute':
-            run(f'pactl set-source-mute   {index} 1', shell=True)
-        elif arg == 'unmute':
-            run(f'pactl set-source-mute   {index} 0', shell=True)
-        elif arg == '0':
-            run(f'pactl set-source-volume {index} 0%', shell=True)
-        elif arg == '100':
-            run(f'pactl set-source-volume {index} 100%', shell=True)
+        if   arg == 'name':        return name
+        elif arg == 'index':       return index
+        elif arg == 'level':       return level
+        elif arg == 'state':       return state
+        elif arg == 'mute_status': return mute_status
+        elif arg == 'mute':        run(f'pactl set-source-mute   {index} 1', shell=True)
+        elif arg == 'unmute':      run(f'pactl set-source-mute   {index} 0', shell=True)
+        elif arg == '0':           run(f'pactl set-source-volume {index} 0%', shell=True)
+        elif arg == '100':         run(f'pactl set-source-volume {index} 100%', shell=True)
 
+class Screen:
 
-## }}}
-class Screen:  ## {{{
     @staticmethod
     def screen_1() -> tuple[str, str, int, int]:
         from subprocess import check_output
-
-        scr_1 = check_output('xrandr | grep -iw connected | grep -i primary', shell=True, universal_newlines=True).strip()
-        scr_1_name, *_ = scr_1.split()  ## eDP-1
-        scr_1_res_total = scr_1.split()[3]  ## 1366x768+1920+0
-        scr_1_res, *_ = scr_1_res_total.split('+')  ## 1366x768
+        scr_1            = check_output('xrandr | grep -iw connected | grep -i primary', shell=True, universal_newlines=True).strip()
+        scr_1_name, *_   = scr_1.split()  ## eDP-1
+        scr_1_res_total  = scr_1.split()[3]  ## 1366x768+1920+0
+        scr_1_res, *_    = scr_1_res_total.split('+')  ## 1366x768
         scr_1_x, scr_1_y = scr_1_res.split('x')  ## 1366 768
         scr_1_x_offset, scr_1_y_offset = scr_1_res_total.split('+')[1:]  ## 1920 0
 
@@ -471,11 +290,10 @@ class Screen:  ## {{{
     @staticmethod
     def screen_2() -> tuple[str, str, int, int]:
         from subprocess import check_output
-
-        scr_2 = check_output('xrandr | grep -iw connected | grep -vi primary | sed "1q;d"', shell=True, universal_newlines=True).strip()
-        scr_2_name, *_ = scr_2.split()
-        scr_2_res_total = scr_2.split()[2]
-        scr_2_res, *_ = scr_2_res_total.split('+')
+        scr_2            = check_output('xrandr | grep -iw connected | grep -vi primary | sed "1q;d"', shell=True, universal_newlines=True).strip()
+        scr_2_name, *_   = scr_2.split()
+        scr_2_res_total  = scr_2.split()[2]
+        scr_2_res, *_    = scr_2_res_total.split('+')
         scr_2_x, scr_2_y = scr_2_res.split('x')
         scr_2_x_offset, scr_2_y_offset = scr_2_res_total.split('+')[1:]
 
@@ -484,11 +302,10 @@ class Screen:  ## {{{
     @staticmethod
     def screen_3() -> tuple[str, str, int, int]:
         from subprocess import check_output
-
-        scr_3 = check_output('xrandr | grep -iw connected | grep -vi primary | sed "2q;d"', shell=True, universal_newlines=True).strip()
-        scr_3_name, *_ = scr_3.split()
+        scr_3           = check_output('xrandr | grep -iw connected | grep -vi primary | sed "2q;d"' , shell=True, universal_newlines=True).strip()
+        scr_3_name, *_  = scr_3.split()
         scr_3_res_total = scr_3.split()[2]
-        scr_3_res, *_ = scr_3_res_total.split('+')
+        scr_3_res, *_   = scr_3_res_total.split('+')
 
         ## scr_3 may have a name but no proper scr_3_res (e.g. is 'normal' instead of '1920x1080') because
         ## screen 3 has been turned off at startup with 'xrandr --output "$scr_3_name" --off' command
@@ -506,7 +323,6 @@ class Screen:  ## {{{
     @staticmethod
     def screen_all() -> str:
         from subprocess import check_output
-
         scr_all_res = list(check_output('xrandr | grep -iw current', shell=True, universal_newlines=True).strip().split())
         scr_all_res = scr_all_res[7:10]
         scr_all_res = ''.join(scr_all_res).replace(',', '')
@@ -516,14 +332,11 @@ class Screen:  ## {{{
     @staticmethod
     def screens_count() -> int:
         from subprocess import check_output
-
         screens_count = check_output('xrandr --listmonitors', shell=True, universal_newlines=True).strip().split()[1]  ## 2
 
         return screens_count
 
-
-## }}}
-class Record:  ## {{{
+class Record:
     from halo import Halo
 
     def __init__(self):
@@ -533,7 +346,6 @@ class Record:  ## {{{
     def audio(self, duration: str, output: str, suffix: str, timer_secs: int) -> None:
         from subprocess import run
         from threading import Thread
-
         th = Thread(target=timer, args=(suffix, timer_secs), daemon=True)
         th.start()
         run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -t {duration} {output} -loglevel quiet', shell=True)
@@ -541,58 +353,39 @@ class Record:  ## {{{
     def screen(self, resolution: str, x_offset: int, duration: str, output: str, suffix: str, timer_secs: int) -> None:
         from subprocess import run
         from threading import Thread
-
         th = Thread(target=timer, args=(suffix, timer_secs), daemon=True)
         th.start()
-        run(
-            f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -f x11grab -r 30 \
+        run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -f x11grab -r 30 \
               -video_size {resolution} -i :0.0+{x_offset},0 -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 \
-              -pix_fmt yuv420p -vf eq=saturation=1.3 -t {duration} {output} -loglevel quiet',
-            shell=True,
-        )
+              -pix_fmt yuv420p -vf eq=saturation=1.3 -t {duration} {output} -loglevel quiet', shell=True)
 
     def video(self, duration: str, output: str, suffix: str, timer_secs: int) -> None:
         from subprocess import run
         from threading import Thread
-
         th = Thread(target=timer, args=(suffix, timer_secs), daemon=True)
         th.start()
-        run(
-            f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {self.def_video_dev} -f pulse -i {self.Aud.mon("index")} \
-              -f pulse -i default -filter_complex amix=inputs=2 -t {duration} {output} -loglevel quiet',
-            shell=True,
-        )
+        run(f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {self.def_video_dev} -f pulse -i {self.Aud.mon("index")} \
+              -f pulse -i default -filter_complex amix=inputs=2 -t {duration} {output} -loglevel quiet', shell=True)
 
     @Halo(color='green', spinner='dots12')
     def audio_ul(self, output: str) -> None:
         from subprocess import run
-
         run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 {output} -loglevel quiet', shell=True)
 
     @Halo(color='green', spinner='dots12')
     def screen_ul(self, resolution: str, x_offset: int, output: str) -> None:
         from subprocess import run
-
-        run(
-            f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -f x11grab -r 30 \
+        run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -f x11grab -r 30 \
               -video_size {resolution} -i :0.0+{x_offset},0 -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 \
-              -pix_fmt yuv420p -vf eq=saturation=1.3 {output} -loglevel quiet',
-            shell=True,
-        )
+              -pix_fmt yuv420p -vf eq=saturation=1.3 {output} -loglevel quiet', shell=True)
 
     @Halo(color='green', spinner='dots12')
     def video_ul(self, output: str) -> None:
         from subprocess import run
+        run(f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {self.def_video_dev} -f pulse -i {self.Aud.mon("index")} \
+              -f pulse -i default -filter_complex amix=inputs=2 {output} -loglevel quiet', shell=True)
 
-        run(
-            f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {self.def_video_dev} -f pulse -i {self.Aud.mon("index")} \
-              -f pulse -i default -filter_complex amix=inputs=2 {output} -loglevel quiet',
-            shell=True,
-        )
-
-
-## }}}
-def fzf(items: list[str], header: str = '') -> str:  ## {{{
+def pip_to_fzf(items: list[str], header: str='') -> str:
     from os import getenv
     from pyfzf.pyfzf import FzfPrompt
 
@@ -613,15 +406,11 @@ def fzf(items: list[str], header: str = '') -> str:  ## {{{
         print(Col.red('No item selected'))
         exit(38)
 
-
-## }}}
-def invalid(text: str) -> None:  ## {{{
+def invalid(text: str) -> None:
     print(Color().red(text))
     exit(38)
 
-
-## }}}
-def relative_date(start_date) -> str:  ## {{{
+def relative_date(start_date) -> str:
     ## convert start_date to second if not one
     try:
         start_date_in_seconds = int(start_date)
@@ -633,16 +422,12 @@ def relative_date(start_date) -> str:  ## {{{
 
     return f"{convert_second(diff, 'verbose')} ago"
 
-
-## }}}
-def convert_to_second(fulldate: str) -> int:  ## {{{ convert 2021-04-15T11:10:03+0430 to 1618468803
+def convert_to_second(fulldate: str) -> int:  ## convert 2021-04-15T11:10:03+0430 to 1618468803
     from datetime import datetime
 
     return int(datetime.strptime(fulldate, '%Y-%m-%dT%H:%M:%S%Z').timestamp())
 
-
-## }}}
-def convert_second(seconds: int, verbose: bool = False) -> str:  ## {{{
+def convert_second(seconds: int, verbose: bool=False) -> str:
     from re import sub
 
     seconds = int(seconds)
@@ -681,6 +466,7 @@ def convert_second(seconds: int, verbose: bool = False) -> str:  ## {{{
         else:
             result = f'{yy}:{mo}:{dd}:{hh}:{mi}:{ss}'
 
+
     ## NOTE the same modifications in JUMP_4 are applied in
     ##        1. convert_second function in gb
     ##        2. 'relative' method of whatever-its-name-is class in models.py in django app
@@ -705,15 +491,11 @@ def convert_second(seconds: int, verbose: bool = False) -> str:  ## {{{
 
     return result
 
-
-## }}}
-def duration_wrapper() -> str:  ## {{{ TODO is str correct for outputs?
+def duration_wrapper() -> str:  ## TODO is str correct for outputs?
     from typing import Callable
-
     def dec(func: Callable) -> str:
         from functools import wraps
         from time import perf_counter
-
         @wraps(func)
         def wrapper(*args: str, **kwargs: str) -> str:
             start = perf_counter()
@@ -722,26 +504,18 @@ def duration_wrapper() -> str:  ## {{{ TODO is str correct for outputs?
             secs = end - start
 
             return convert_second(secs)
-
         return wrapper
-
     return dec
 
+def get_headers() -> dict[str, str]:
+    return {'User-Agent'     : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+            'Accept'         : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip',
+            'DNT'            : '1',  ## do not track request header
+            'Connection'     : 'close'}
 
-## }}}
-def get_headers() -> dict[str, str]:  ## {{{
-    return {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Accept-Encoding': 'gzip',
-        'DNT': '1',  ## do not track request header
-        'Connection': 'close',
-    }
-
-
-## }}}
-def get_width() -> int:  ## {{{
+def get_width() -> int:
     from shutil import get_terminal_size
 
     return get_terminal_size()[0]
@@ -749,21 +523,16 @@ def get_width() -> int:  ## {{{
     # import subprocess
     # return subprocess.check_output('tput cols', shell=True, universal_newlines=True).strip()
 
-
-## }}}
-def get_input(prompt: str) -> Any:  ## {{{
-    answer = input(Color().ask(f'{prompt} '))
+def get_input(prompt: str) -> Any:
+    answer=input(Color().ask(f'{prompt} '))
     if answer:
         return answer
 
-
-## }}}
-def get_single_input(prompt: str) -> Any:  ## {{{ https://stackoverflow.com/questions/510357/how-to-read-a-single-character-from-the-user
+def get_single_input(prompt: str) -> Any:  ## https://stackoverflow.com/questions/510357/how-to-read-a-single-character-from-the-user
     def _find_getch() -> Any:
         from sys import stdin
         from termios import tcgetattr, tcsetattr, TCSADRAIN
         from tty import setraw
-
         def _getch() -> Any:
             print(Color().ask(f'{prompt} '), end='')
             fd = stdin.fileno()
@@ -775,7 +544,6 @@ def get_single_input(prompt: str) -> Any:  ## {{{ https://stackoverflow.com/ques
                 tcsetattr(fd, TCSADRAIN, old_settings)
 
             return ch
-
         return _getch
 
     getch = _find_getch()
@@ -795,42 +563,27 @@ def get_single_input(prompt: str) -> Any:  ## {{{ https://stackoverflow.com/ques
     return single_character
     '''
 
-
-## }}}
-def get_datetime(frmt: str) -> Any:  ## {{{
+def get_datetime(frmt: str) -> Any:
     from datetime import datetime as dt
     from jdatetime import datetime as jdt
-
-    if frmt == 'ymdhms':
-        output = dt.now().strftime('%Y%m%d%H%M%S')
-    elif frmt == 'ymd':
-        output = dt.now().strftime('%Y%m%d')
-    elif frmt == 'hms':
-        output = dt.now().strftime('%H%M%S')
-    elif frmt == 'seconds':
-        output = dt.now().strftime('%s')
-    elif frmt == 'weekday':
-        output = dt.now().strftime('%A')
-    elif frmt == 'jymdhms':
-        output = jdt.now().strftime('%Y%m%d%H%M%S')
-    elif frmt == 'jymd':
-        output = jdt.now().strftime('%Y%m%d')
-    elif frmt == 'jhms':
-        output = jdt.now().strftime('%H%M%S')
-    elif frmt == 'jseconds':
-        output = int(jdt.now().timestamp())  ## exceptionally written in this format. have to use int to get rid of decimals
-    elif frmt == 'jweekday':
-        output = jdt.now().strftime('%A')
+    if   frmt == 'ymdhms':   output =  dt.now().strftime('%Y%m%d%H%M%S')
+    elif frmt == 'ymd':      output =  dt.now().strftime('%Y%m%d')
+    elif frmt == 'hms':      output =  dt.now().strftime('%H%M%S')
+    elif frmt == 'seconds':  output =  dt.now().strftime('%s')
+    elif frmt == 'weekday':  output =  dt.now().strftime('%A')
+    elif frmt == 'jymdhms':  output = jdt.now().strftime('%Y%m%d%H%M%S')
+    elif frmt == 'jymd':     output = jdt.now().strftime('%Y%m%d')
+    elif frmt == 'jhms':     output = jdt.now().strftime('%H%M%S')
+    elif frmt == 'jseconds': output = int(jdt.now().timestamp())   ## exceptionally written in this format. have to use int to get rid of decimals
+    elif frmt == 'jweekday': output = jdt.now().strftime('%A')
 
     return output
 
-
-## }}}
-def convert_byte(size_in_bytes: int) -> str:  ## {{{ https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
+def convert_byte(size_in_bytes: int) -> str:  ## https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
     from math import floor, log, pow as math_pow
     from re import compile as re_compile, match, sub
 
-    reg = '^[0-9]+\.00$'
+    reg = r'^[0-9]+\.00$'
 
     if size_in_bytes == 0:
         return '0B'
@@ -842,15 +595,12 @@ def convert_byte(size_in_bytes: int) -> str:  ## {{{ https://stackoverflow.com/q
 
     ## remove trailing 00
     if match(reg, conv):
-        conv = sub('\.00$', '', conv)
+        conv = sub(r'\.00$', '', conv)
 
     return f'{conv}{suff[i]}'
 
-
-## }}}
-def if_exists(dest) -> str:  ## {{{
+def if_exists(dest) -> str:
     from os import path
-
     append_index = 2
     if path.exists(dest):
         while path.exists(f'{dest}_{append_index:02}'):
@@ -859,86 +609,64 @@ def if_exists(dest) -> str:  ## {{{
 
     return dest
 
-
-## }}}
-def last_file_exists(last_file) -> bool:  ## {{{
+def last_file_exists(last_file) -> bool:
     from os import path
-
     condition = [path.exists(last_file)]
 
     return all(condition)
 
-
-## }}}
-def get_last(last_file) -> Any:  ## {{{
+def get_last(last_file) -> Any:
     with open(last_file, 'r') as opened_last_file:
         output = opened_last_file.read().splitlines()[-1]
 
     return output
 
-
-## }}}
-def save_as_last(last_file, text) -> None:  ## {{{
+def save_as_last(last_file, text) -> None:
     current_datetime = get_datetime('jymdhms')
     weekday = get_datetime('jweekday')
     with open(last_file, 'w') as opened_last_file:
         opened_last_file.write(f'{current_datetime}\t{weekday}\n{text}\n')
 
-
-## }}}
-def save_error(error_file, text) -> None:  ## {{{
+def save_error(error_file, text) -> None:
     current_datetime = get_datetime('jymdhms')
     weekday = get_datetime('jweekday')
     with open(error_file, 'w') as opened_error_file:
         opened_error_file.write(f'{current_datetime}\t{weekday}\n{text}\n')
 
-
-## }}}
-def msgn(message: str, title: str = '', icon: str = '', duration: int = 10) -> None:  ## {{{
+def msgn(message: str, title: str='', icon: str='', duration: int=10) -> None:
     ## https://notify2.readthedocs.io/en/latest/#notify2.Notification.set_urgency
     ## also have a look at https://www.devdungeon.com/content/desktop-notifications-linux-python
     import notify2
-
     notify2.init('app name')
     n = notify2.Notification(str(message), str(title), icon)
-    n.timeout = duration * 1000
+    n.timeout = duration*1000
     n.set_urgency(notify2.URGENCY_NORMAL)  ## URGENCY_CRITICAL, URGENCY_LOW & URGENCY_NORMAL
     n.show()
     notify2.uninit()
 
-
-## }}}
-def msgc(message: str, title: str = '', icon: str = '') -> None:  ## {{{
+def msgc(message: str, title: str='', icon: str='') -> None:
     ## https://notify2.readthedocs.io/en/latest/#notify2.Notification.set_urgency
     ## also have a look at https://www.devdungeon.com/content/desktop-notifications-linux-python
     import notify2
-
     notify2.init('app name')
     n = notify2.Notification(str(message), str(title), icon)
     n.set_urgency(notify2.URGENCY_CRITICAL)  ## URGENCY_CRITICAL, URGENCY_LOW & URGENCY_NORMAL
     n.show()
     notify2.uninit()
 
-
-## }}}
-def countdown(start: int = 5) -> None:  ## {{{
+def countdown(start: int=5) -> None:
     from time import sleep
-
     for i in range(start, 0, -1):
         msgn(i, duration=1)
         sleep(1)
     sleep(1)
 
-
-## }}}
-def centralize(text: str, wrapper: str = ' ') -> str:  ## {{{
+def centralize(text: str, wrapper: str=' ') -> str:
     width = get_width()
 
     return text.center(width, wrapper)
 
-
-## }}}
-def dmenu(items: list[str] = [], title: str = '', fg: str = '') -> str:  ## {{{ Docs: https://dmenu.readthedocs.io/en/latest/
+def pip_to_dmenu(items: list[str]=[], title: str='', fg: str='') -> str:  ## Docs: https://dmenu.readthedocs.io/en/latest/
     from os import getenv
     import dmenu
 
@@ -948,8 +676,7 @@ def dmenu(items: list[str] = [], title: str = '', fg: str = '') -> str:  ## {{{ 
         sb = getenv('dmenusb')
 
     try:
-        return dmenu.show(
-            items,
+        return dmenu.show(items,
             case_insensitive=True,
             lines=getenv('dmenulines'),
             background=getenv('dmenunb'),
@@ -963,101 +690,52 @@ def dmenu(items: list[str] = [], title: str = '', fg: str = '') -> str:  ## {{{ 
         print(Color().red('No item selected'))
         exit(38)
 
-
-## }}}
-def rofi(items: list[str] = [], title: str = '', fg: str = '') -> str:  ## {{{
-    from os import getenv
-    from subprocess import check_output
-
-    items = '\n'.join(items)
-
-    if not fg == 'red':
-        theme = f'{getenv("HOME")}/.config/rofi/onedark.rasi'
-    else:
-        theme = f'{getenv("HOME")}/.config/rofi/onedark-red.rasi'
-
-    try:
-        return check_output(f'echo -e "{items}" | rofi -theme {theme} -dmenu -i -p "{title}"', shell=True, universal_newlines=True).strip()
-    except Exception:
-        print(Color().red('No item selected'))
-        exit(38)
-
-
-## }}}
-def get_password(prompt: str) -> str:  ## {{{ https://linuxhint.com/python-getpass-module/
+def get_password(prompt: str) -> str:  ## https://linuxhint.com/python-getpass-module/
     from getpass import getpass
-
     while len(password := getpass(prompt=Color().ask(prompt))) < 1:
         pass
 
     return password
 
-
-## }}}
-def remove_leading_zeros(number: int) -> int:  ## {{{
+def remove_leading_zeros(number: int) -> int:
     from re import sub
-
     number = str(number)
     number = sub(r'^0*', r'', number)
 
     return number
 
-
-## }}}
-def remove_trailing_slash(string: str) -> str:  ## {{{
+def remove_trailing_slash(string: str) -> str:
     from re import sub
-
     string = str(string)
     string = sub(r'/$', r'', string)
 
     return string
 
+def set_widget(widget: str, attr: str, value: str) -> None:
+    from subprocess import run
 
-## }}}
-def set_widget(widget: str, attr: str, value: str) -> None:  ## {{{
-    from os import getenv
-    from subprocess import check_output, run
+    # widget = f'{widget}_ct'
 
-    if attr == 'fg':
-        widget = f'{widget}_ct'
-        if value == 'reset':
-            fg = check_output(f'grep "{widget} *=" {getenv("HOME")}/.config/awesome/rc.lua', shell=True, universal_newlines=True).strip().replace(')', '').split()[-1]
-            if fg == 'fg_d' or fg == 'fg_l':
-                value = getenv(fg)
-            else:
-                value = getenv('purple')
-    run(f'echo "{widget}:set_{attr}(\'{value}\')" | awesome-client', shell=True)
+    run(f'awesome-client "{widget}.{attr} = \'{value}\'"', shell=True)
 
-
-## }}}
-def record_icon() -> str:  ## {{{
+def record_icon() -> str:
     return 'RE'
 
-
-## }}}
-def refresh_icon() -> str:  ## {{{
+def refresh_icon() -> str:
     from os import getenv
 
     return getenv('refresh_icon')
 
-
-## }}}
-def def_video_dev() -> str:  ## {{{
+def def_video_dev() -> str:
     return '/dev/video0'
 
-
-## }}}
-def update_audio() -> None:  ## {{{
+def update_audio() -> None:
     from os import getenv
     from subprocess import run
-
     run(f'{getenv("HOME")}/main/scripts/awesome-widgets audio', shell=True)
 
-
-## }}}
-def timer(suffix: str, timer_secs: int) -> None:  ## {{{
+def timer(suffix: str, timer_secs: int) -> None:
     from time import sleep
-
     start = int(get_datetime('jhms'))
     record_icon_suffix = f'{record_icon()}:{suffix}'
 
@@ -1069,9 +747,7 @@ def timer(suffix: str, timer_secs: int) -> None:  ## {{{
         set_widget('record', 'markup', hms)
         sleep(1)
 
-
-## }}}
-def uptime(verbose: bool = False) -> str:  ## {{{
+def uptime(verbose: bool=False) -> str:
     with open('/proc/uptime', 'r') as opened_uptime_file:
         secs = opened_uptime_file.read().strip().split()[0]
         secs = int(float(secs))
@@ -1080,9 +756,7 @@ def uptime(verbose: bool = False) -> str:  ## {{{
     else:
         return convert_second(secs)
 
-
-## }}}
-def open_windows() -> list[str]:  ## {{{
+def open_windows() -> list[str]:
     from Xlib import display
 
     screen = display.Display().screen()
@@ -1095,9 +769,7 @@ def open_windows() -> list[str]:  ## {{{
 
     return names
 
-
-## }}}
-def send_email(subject: str, body: str, sender: str = getenv('email1'), receiver: str = getenv('email2')) -> None:  ## {{{
+def send_email(subject: str, body: str, sender: str=getenv('email1'), receiver: str=getenv('email2')) -> None:
     ## https://realpython.com/python-send-email/
     from os import getenv
     from smtplib import SMTP_SSL
@@ -1105,14 +777,14 @@ def send_email(subject: str, body: str, sender: str = getenv('email1'), receiver
 
     if sender == getenv('email1'):
         password = getenv('email1_password1')
-        server = 'smtp.mail.yahoo.com'
+        server   = 'smtp.mail.yahoo.com'
     elif sender == getenv('email2'):
         password = getenv('email2_password1')
-        server = 'smtp.gmail.com'
+        server   = 'smtp.gmail.com'
 
-    port = 465
+    port    = 465
     context = create_default_context()
-    text = f'Subject: {subject}\n\n{body}'  ## NOTE do NOT change the format
+    text    = f'Subject: {subject}\n\n{body}'  ## NOTE do NOT change the format
 
     with SMTP_SSL(server, port, context=context) as opened_server:
         try:
@@ -1120,11 +792,9 @@ def send_email(subject: str, body: str, sender: str = getenv('email1'), receiver
             opened_server.sendmail(sender, receiver, text)
         except Exception as exc:
             print(Color().red(f'ERROR sending mail:\n{exc!r}'))
-            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
+            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 
-
-## }}}
-def send_email_with_attachment(subject: str, body: str, attachment: str, sender: str = getenv('email1'), receiver: str = getenv('email2')) -> None:  ## {{{
+def send_email_with_attachment(subject: str, body: str, attachment: str, sender: str=getenv('email1'), receiver: str=getenv('email2')) -> None:
     ## https://realpython.com/python-send-email/
     from email import encoders
     from email.mime.base import MIMEBase
@@ -1136,17 +806,17 @@ def send_email_with_attachment(subject: str, body: str, attachment: str, sender:
 
     if sender == getenv('email1'):
         password = getenv('email1_password1')
-        server = 'smtp.mail.yahoo.com'
+        server   = 'smtp.mail.yahoo.com'
     elif sender == getenv('email2'):
         password = getenv('email2_password1')
-        server = 'smtp.gmail.com'
+        server   = 'smtp.gmail.com'
 
     port = 465
 
     ## create a multipart message and set headers
-    message = MIMEMultipart()
-    message['From'] = sender
-    message['To'] = receiver
+    message            = MIMEMultipart()
+    message['From']    = sender
+    message['To']      = receiver
     message['Subject'] = subject
     # message['Bcc']   = receiver_email  ## recommended for mass emails
 
@@ -1178,49 +848,38 @@ def send_email_with_attachment(subject: str, body: str, attachment: str, sender:
             opened_server.sendmail(sender, receiver, text)
         except Exception as exc:
             print(Color().red(f'ERROR sending mail:\n{exc!r}'))
-            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/linux/themes/alert-w.png')
+            msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 
-
-## }}}
-def hash_string(string: str) -> str:  ## {{{
+def hash_string(string: str) -> str:
     from hashlib import sha1, sha256, sha512, md5
-
-    string = f'{string}\n'
-    sha1_hash = sha1(string.encode()).hexdigest()
+    string      = f'{string}\n'
+    sha1_hash   = sha1(string.encode()).hexdigest()
     sha256_hash = sha256(string.encode()).hexdigest()
     sha512_hash = sha512(string.encode()).hexdigest()
-    md5_hash = md5(string.encode()).hexdigest()
+    md5_hash    = md5(string.encode()).hexdigest()
 
     return f'string\t{string}sha1\t{sha1_hash}\nsha256\t{sha256_hash}\nsha512\t{sha512_hash}\nmd5\t{md5_hash}'
 
-
-## }}}
-def hash_file(file: str) -> str:  ## {{{
+def hash_file(file: str) -> str:
     from hashlib import sha1, sha256, sha512, md5
-
     with open(file, 'r') as opened_file:
         opened_file = opened_file.read()
-    sha1_hash = sha1(opened_file.encode()).hexdigest()
+    sha1_hash   = sha1(opened_file.encode()).hexdigest()
     sha256_hash = sha256(opened_file.encode()).hexdigest()
     sha512_hash = sha512(opened_file.encode()).hexdigest()
-    md5_hash = md5(opened_file.encode()).hexdigest()
+    md5_hash    = md5(opened_file.encode()).hexdigest()
 
     return f'file\t{file}\nsha1\t{sha1_hash}\nsha256\t{sha256_hash}\nsha512\t{sha512_hash}\nmd5\t{md5_hash}'
 
-
-## }}}
-def garbage() -> None:  ## {{{
+def garbage() -> None:
     from random import randbytes
     from time import sleep
-
     while True:
         text = randbytes(80).decode(errors='ignore')
         print(text, end='')
         sleep(0.01)
 
-
-## }}}
-def to_seconds(dur: str) -> int:  ## {{{ https://stackoverflow.com/questions/16742381/how-to-convert-youtube-api-duration-to-seconds/49976787#49976787
+def to_seconds(dur: str) -> int:  ## https://stackoverflow.com/questions/16742381/how-to-convert-youtube-api-duration-to-seconds/49976787#49976787
     '''converts youtube api duration (e.g. PT1H25M41S) to seconds (e.g. 5141)'''
     from re import match
 
@@ -1228,36 +887,31 @@ def to_seconds(dur: str) -> int:  ## {{{ https://stackoverflow.com/questions/167
     def _js_parseInt(string) -> int:
         return int(''.join([c for c in string if c.isdigit()]))
 
-    mtch = match('PT(\d+H)?(\d+M)?(\d+S)?', dur).groups()
-    hours = _js_parseInt(mtch[0]) if mtch[0] else 0
+    mtch = match(r'PT(\d+H)?(\d+M)?(\d+S)?', dur).groups()
+    hours   = _js_parseInt(mtch[0]) if mtch[0] else 0
     minutes = _js_parseInt(mtch[1]) if mtch[1] else 0
     seconds = _js_parseInt(mtch[2]) if mtch[2] else 0
 
     return hours * 3600 + minutes * 60 + seconds
 
-
-## }}}
-def if_tor() -> None:  ## {{{ https://tor.stackexchange.com/questions/19858/how-to-check-if-tor-socks-proxy-is-working-programatically-python
+def if_tor() -> None:  ## https://tor.stackexchange.com/questions/19858/how-to-check-if-tor-socks-proxy-is-working-programatically-python
     import socket
     import sys
-
     try:
         tor_c = socket.create_connection(('127.0.0.1', 9051))
         tor_c.send('AUTHENTICATE "{}"\r\nGETINFO status/circuit-established\r\nQUIT\r\n'.format('YOUR_PWD'))
         response = tor_c.recv(1024)
         print(response)
         if 'circuit-established=1' not in response:
-            print('Something is not right.')
+           print('Something is not right.')
         else:
-            print('Looks good.')
+           print('Looks good.')
         tor_c.close()
     except Exception as exc:
         print(Color().red(f'{exc!r}'))
 
-
-## }}}
 ###########################
-def compress_tar(inpt: str) -> None:  ## {{{
+def compress_tar(inpt: str) -> None:
     from os import path, chdir, listdir
     from tarfile import open as tarfile_open
 
@@ -1276,9 +930,7 @@ def compress_tar(inpt: str) -> None:  ## {{{
         with tarfile_open(dest_tar, 'w') as opened_new_tarfile:
             opened_new_tarfile.add(base)
 
-
-## }}}
-def compress_gz(inpt: str) -> None:  ## {{{ https://stackoverflow.com/questions/8156707/gzip-a-file-in-python
+def compress_gz(inpt: str) -> None:  ## https://stackoverflow.com/questions/8156707/gzip-a-file-in-python
     from os import path, chdir, listdir
     from gzip import open as gzip_open
 
@@ -1292,9 +944,7 @@ def compress_gz(inpt: str) -> None:  ## {{{ https://stackoverflow.com/questions/
         with gzip_open(dest_gz, 'wb') as f_out:
             f_out.writelines(f_in)
 
-
-## }}}
-def compress_zip(inpt: str, password: str = '') -> None:  ## {{{
+def compress_zip(inpt: str, password: str='') -> None:
     from os import chdir, path, listdir
     import shutil
     from zipfile import ZipFile, ZIP_DEFLATED
@@ -1321,14 +971,11 @@ def compress_zip(inpt: str, password: str = '') -> None:  ## {{{
             with ZipFile(dest_zip, 'w', compression=ZIP_DEFLATED) as opened_new_zipfile:
                 opened_new_zipfile.write(base)
     else:
-        if path.isdir(inpt):
-            invalid('files only. currently, cannot create password-protected directories.')
+        if path.isdir(inpt): invalid('files only. currently, cannot create password-protected directories.')
         dest_zip = f'{inpt}.zip'
         compress(inpt, None, dest_zip, password, 5)
 
-
-## }}}
-def compress_rar(inpt: str, set_password: bool = False) -> None:  ## {{{ FIXME find a pythonic way to create rar file
+def compress_rar(inpt: str, set_password: bool=False) -> None:  ## FIXME find a pythonic way to create rar file
     from os import path, chdir
     from subprocess import run
 
@@ -1343,12 +990,9 @@ def compress_rar(inpt: str, set_password: bool = False) -> None:  ## {{{ FIXME f
     else:
         run(f'rar a {dest_rar} {base}', shell=True)
 
-
-## }}}
-def xtract_tar(inpt: str) -> None:  ## {{{
+def xtract_tar(inpt: str) -> None:
     from os import path, mkdir
     from tarfile import open as tarfile_open
-
     inpt = remove_trailing_slash(inpt)
     root_base, _ = path.splitext(inpt)
     dest_dir = root_base
@@ -1357,9 +1001,7 @@ def xtract_tar(inpt: str) -> None:  ## {{{
     with tarfile_open(inpt) as opened_cur_tarfile:
         opened_cur_tarfile.extractall(dest_dir)
 
-
-## }}}
-def xtract_gz(inpt: str) -> None:  ## {{{ https://stackoverflow.com/questions/31028815/how-to-unzip-gz-file-using-python
+def xtract_gz(inpt: str) -> None:  ## https://stackoverflow.com/questions/31028815/how-to-unzip-gz-file-using-python
     from gzip import open as gzip_open
     from os import path, mkdir
     from shutil import copyfileobj
@@ -1376,12 +1018,9 @@ def xtract_gz(inpt: str) -> None:  ## {{{ https://stackoverflow.com/questions/31
         with open(dest, 'wb') as f_out:
             copyfileobj(f_in, f_out)
 
-
-## }}}
-def xtract_zip(inpt: str, password: str = '') -> None:  ## {{{
+def xtract_zip(inpt: str, password: str='') -> None:
     from os import path, mkdir
     from zipfile import ZipFile
-
     inpt = remove_trailing_slash(inpt)
     root_base, _ = path.splitext(inpt)
     dest_dir = root_base
@@ -1395,12 +1034,9 @@ def xtract_zip(inpt: str, password: str = '') -> None:  ## {{{
             opened_cur_zipfile.setpassword(pwd=bytes(password, 'utf-8'))
             opened_cur_zipfile.extractall(dest_dir)
 
-
-## }}}
-def xtract_rar(inpt: str, password: str = '') -> None:  ## {{{
+def xtract_rar(inpt: str, password: str='') -> None:
     from os import path, mkdir, chdir
     from rarfile import RarFile
-
     inpt = remove_trailing_slash(inpt)
     root_base, _ = path.splitext(inpt)
     dest_dir = root_base
@@ -1414,6 +1050,3 @@ def xtract_rar(inpt: str, password: str = '') -> None:  ## {{{
         with RarFile(inpt, 'r') as opened_cur_rarfile:
             opened_cur_rarfile.extractall(pwd=password)
     ## previously: subprocess.run(f'unrar x {inpt} 1>/dev/null', shell=True)
-
-
-## }}}
