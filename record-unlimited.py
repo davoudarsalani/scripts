@@ -17,7 +17,7 @@ Col = Color()
 Rec = Record()
 Scr = Screen()
 
-def received_ctrl_c(signum: int, stack) -> None:  ## {{{
+def received_ctrl_c(signum: int, stack) -> None:
     ## https://stackoverflow.com/questions/52269334/python-trap-routine
     Aud.mic('mute')
     Aud.mic('0')
@@ -28,7 +28,6 @@ def received_ctrl_c(signum: int, stack) -> None:  ## {{{
 
     exit()
 handler = signal(SIGINT, received_ctrl_c)
-## }}}
 
 print(Col.heading(title))
 

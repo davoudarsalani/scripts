@@ -6,7 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-calculation.sh
 ##    https://davoudarsalani.ir
 
-function float_pad {  ## {{{
+function float_pad {
     local input new_l_length new_r_length floated l r r_length lacking_pad
 
     input="$1"              ## an int, floated or expression, e.g. 43, 6.82, or "${var}*932/12" (no spaces allowd in expression)
@@ -59,8 +59,8 @@ function float_pad {  ## {{{
         printf '%s%s\n' "$l" "$r"
     fi
 }
-## }}}
-function compare_floats {  ## {{{
+
+function compare_floats {
     ## https://stackoverflow.com/questions/8654051/how-to-compare-two-floating-point-numbers-in-bash
     ## usage: is_smaller="$(compare_floats "$first" '<' "$second")"  ## returns true or false
 
@@ -84,8 +84,8 @@ function compare_floats {  ## {{{
             [ "$(awk '{printf($1 >  $2) ? "Yes" : "No"}' <<< "$float1 $float2")" == 'Yes' ] && printf 'true\n' || printf 'false\n' ;;
     esac
 }
-## }}}
-function convert_byte {  ## {{{
+
+function convert_byte {
     local size
 
     size="$1"
@@ -100,4 +100,3 @@ function convert_byte {  ## {{{
         size="$(float_pad "${size//[a-zA-Z]/}/${byte_size}" "$new_l_length" "$new_r_length")"
     }
 }
-## }}}

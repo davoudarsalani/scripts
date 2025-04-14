@@ -82,17 +82,6 @@ case "$1" in
     ## -------------------------------
 
     clock )
-        case "$2" in
-            date_jdate )
-                message="$(printf '%s\n%s\n%s\n%s' \
-                        "$(get_datetime 'jweekday')" \
-                        "$(date  +%Y-%m-%d)" \
-                        "$(jdate +%Y-%m-%d)" \
-                        "$(jdate +%H:%M:%S)"
-                        )"
-                msgn "$message" ;;
-        esac
-
         hm="$(date '+%I:%M')"
         set_widget 'clock' 'markup' "$hm" ;;
 
@@ -292,16 +281,28 @@ msgn "$text" ;;
                 message_text="$(printf "<span color=\"%s\">Memory</span>\n%s\n\n<span color=\"%s\">CPU</span>\n%s\n" "$gruvbox_orange" "$top_memory" "$gruvbox_orange" "$top_cpu")"
                 msgn "$message_text" ;;
             usage )
-                ## NOTE JUMP_3 memory should be calculated at the end becuase IFS=$ in memory section interferes with the calculations in cpu and cpu temperature
+                ## NOTE JUMP_3 memory should be calculated at the end
+                ##      becuase IFS=$ in memory section interferes
+                ##      with the calculations in cpu and cpu temperature
 
+                ## ------------
                 ## cpu (https://www.idnt.net/en-US/kb/941772)
-                ## get last usage
-                cpu_last_file=~/main/scripts/.last/cpu
-                cpu_sum_last_file=~/main/scripts/.last/cpu_sum
-                cpu_temp_last_file=~/main/scripts/.last/cpu_temp
-                read -a cpu_last < "$cpu_last_file" || cpu_last=( cpu 0 0 0 0 0 0 0 0 0 0 )  ## JUMP_2
-                cpu_sum_last="$(< "$cpu_sum_last_file")" || cpu_sum_last=0  ## NOTE do NOT add 2>/dev/null
-                cpu_temp_last="$(< "$cpu_temp_last_file")" || cpu_temp_last=0  ## NOTE do NOT add 2>/dev/null
+
+                ## get last cpu
+                cpu_last="$(redis-cli GET 'awesome_widget__cpu')"
+                ## '--> cpu 0 0 0 0 0 0 0 0 0 0 (is str)
+                ##
+                if [ "$cpu_last" ]; then
+                    ## str -> array
+                    read -a cpu_last <<< "$cpu_last"
+                else
+                    cpu_last=( cpu 0 0 0 0 0 0 0 0 0 0 )
+                fi
+
+                ## get last cpu sum
+                cpu_sum_last="$(redis-cli GET 'awesome_widget__cpu_sum')"  ## 19410508
+                ##
+                [ "$cpu_sum_last" ] || cpu_sum_last=0
 
                 ## get new usage
                 read -a cpu_now < /proc/stat               ## get the first line with aggregate of all cpus
@@ -312,10 +313,13 @@ msgn "$text" ;;
                 (( cpu_idle="cpu_now[4] - cpu_last[4]" ))  ## get the idle time delta
                 (( cpu_used="cpu_delta - cpu_idle" ))      ## calc time spent working
                 cpu_perc="$(float_pad "100*${cpu_used}/${cpu_delta}" 1 1)"
-                ## save these as last to compare in our next read
-                printf '%s ' "${cpu_now[@]}" > "$cpu_last_file"  ## NOTE no \n
-                printf '\n' >> "$cpu_last_file"  ## NOTE JUMP_2 have to append new line (because none was appended in the previous line) otherwise it will exit non-zero when creating cpu_last and therefore activating pipe
-                printf '%s\n' "$cpu_sum" > "$cpu_sum_last_file"
+
+                ## array -> str
+                cpu_now__str="$(printf '%s ' "${cpu_now[@]}")"
+
+                ## save for our next read
+                redis-cli SET 'awesome_widget__cpu'     "$cpu_now__str" || msgn 'ERROR saving cpu_now'
+                redis-cli SET 'awesome_widget__cpu_sum' "$cpu_sum"      || msgn 'ERROR saving cpu_sum'
 
                 cpu_geater="$(compare_floats "$cpu_perc" ">" "$threshhold")"
                 [ "$cpu_geater" == 'true' ] && cpu_perc="<span color=\"${gruvbox_red}\">${cpu_perc}</span>"
@@ -325,23 +329,11 @@ msgn "$text" ;;
                 cpu_temp_greater="$(compare_floats "$cpu_temp" '>' "$threshhold")"
                 [ "$cpu_temp_greater" == 'true' ] && cpu_temp="<span color=\"${gruvbox_red}\">${cpu_temp}</span>"
 
-                ## cpu governor
-                readarray -t cpu_governor < <(for file in /sys/devices/system/cpu/cpu{0..3}/cpufreq/scaling_governor; {
-                    [ -f "$file" ] && [ -r "$file" ] || continue
-                    cat "$file"
-                } | sort --unique)
-                [ "$(printf '%s\n' "${cpu_governor[@]}" | \grep -i 'powersave')" ] || cpu_gov=" <span color=\"${gruvbox_red}\">${cpu_governor[@]^^}</span>"
-
-                ## cpu governors (https://wiki.archlinux.org/title/CPU_frequency_scaling):
-                ## performance   Run the CPU at the maximum frequency.
-                ## powersave     Run the CPU at the minimum frequency.
-                ## userspace     Run the CPU at user specified frequencies.
-                ## ondemand      Scales the frequency dynamically according to current load. Jumps to the highest frequency and then possibly back off as the idle time increases.
-                ## conservative  Scales the frequency dynamically according to current load. Scales the frequency more gradually than ondemand.
-                ## schedutil     Scheduler-driven CPU frequency selection [2], [3].
-
-
-                ## memory  ## NOTE JUMP_3 memory should be calculated at the end becuase IFS=$ in memory section interferes with the calculations in cpu and cpu temperature
+                ## ------------
+                ## memory
+                ## NOTE JUMP_3 memory should be calculated at the end
+                ##      becuase IFS=$ in memory section interferes
+                ##      with the calculations in cpu and cpu temperature
                 IFS=$
                 mem_info="$(< /proc/meminfo)"
                 mem_total="$(printf '%s\n'   "$mem_info" | \grep '^MemTotal'     | awk '{print $2}')"
@@ -363,9 +355,6 @@ msgn "$text" ;;
         source ~/main/scripts/gb-calculation.sh
 
         case "$2" in
-            partitions )
-                partitions_text="$(printf "<span color=\"%s\">lsblk</span>\n%s\n\n<span color=\"%s\">mounted drives</span>\n%s\n" "$gruvbox_orange" "$(lsblk_full)" "$gruvbox_orange" "$(mounted_drives 'human_readable')")"
-                msgn "$partitions_text" ;;
             usage )
                 root_size="$(mounted_drives | \grep '\/$' | awk '{print $3}')"
                 root_used="$(mounted_drives | \grep '\/$' | awk '{print $4}')"
@@ -649,8 +638,6 @@ msgn "$text" ;;
             source ~/main/scripts/gb-audacious.sh
         }
 
-        csols_file=~/main/scripts/.last/csols
-
         update_variables
 
         if [ "$album" == 'speech' ]; then
@@ -664,13 +651,17 @@ msgn "$text" ;;
                 audtool --playback-playpause ;;  ## OR audacious -t
             pause )
                 [ "$play_status" == 'playing' ] && audtool --playback-pause ;;
-            main_window )
-                audtool --mainwin-show ;;  ## OR audacious -H OR audacious -m
             resume )
-                [ "$album" == 'speech' ] && audtool --playback-seek "$(< "$csols_file")" ;;
+                [ "$album" == 'speech' ] || exit
+
+                ## get last value
+                csols_last="$(redis-cli GET 'awesome_widget__csols')"  ## 240
+                [ "$csols_last" ] || csols_last=0
+
+                [ "$csols_last" -gt 0 ] && audtool --playback-seek "$csols_last" ;;
             tog_shuff )
                 audtool --playlist-shuffle-toggle ;;
-            prev )
+            previous )
                 audtool --playlist-reverse ;;  ## OR audacious -r
             next )
                 audtool --playlist-advance ;;  ## OR audacious -f
@@ -704,11 +695,11 @@ msgn "$text" ;;
             text=''
             bar_position=0
         else
-            ## save currnt song output length seconds (csols) if speech
-            regex='^(playing|paused)$'
-            [[ "$play_status" =~ $regex ]] && [ "$album" == 'speech' ] && {
-                printf '%s\n' "$current_position_in_seconds" > "$csols_file"
-                # msgn 'saved csol' "<span color=\"${gruvbox_orange}\">${current_position}</span>"
+            ## save csols (currnt song output length seconds) if speech
+            play_status_regex='^(playing|paused)$'
+            [ "$album" == 'speech' ] && [[ "$play_status" =~ $play_status_regex ]] && {
+                ## save for our next read
+                redis-cli SET 'awesome_widget__csols' "$current_position_in_seconds" || msgn 'ERROR saving current_position_in_seconds'
             }
 
             [ "$play_status" == 'playing' ] || paused_text='PAUSED '
@@ -722,7 +713,7 @@ msgn "$text" ;;
             left="$(convert_second "$left_in_seconds")"  ## 01:05:16
             left="$(shorten_duration "$left")"  ## 1:05:16
 
-            paused_text="<span color=\"${gruvbox_yellow}\">${paused_text}</span>"
+            paused_text="<span color=\"${gruvbox_yellow_d}\">${paused_text}</span>"
             equalizer="<span color=\"${gruvbox_aqua}\">${equalizer}</span>"
             shuffle_text="<span color=\"${gruvbox_purple}\">${shuffle_text}</span>"
             ##

@@ -6,7 +6,6 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/download.py
 ##    https://davoudarsalani.ir
 
-## {{{ imports
 from __future__ import unicode_literals
 from dataclasses import dataclass, field
 from datetime import timedelta, datetime as dt
@@ -30,8 +29,8 @@ from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
 from gp import Color, convert_byte, convert_second, duration_wrapper, pip_to_fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
-## }}}
-def display_help() -> None:  ## {{{
+
+def display_help() -> None:
     run('clear', shell=True)
     print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-s|--source=')}a text file (e.g. $HOME/main/downloads/lucy),
@@ -50,19 +49,19 @@ def display_help() -> None:  ## {{{
 {Col.flag('-v|--verbose')}
 {Col.flag('-p|--purge')}''')  ## JUMP_1 whatever downloader you add/remove, update the allowed list of downloaders in Ini.verify_args()
     exit()
-## }}}
-def separator() -> str:  ## {{{
+
+def separator() -> str:
     width = int(get_width())
 
     return Col.gray('-'*width)
-## }}}
-def make_attempts() -> list[int]:  ## {{{
+
+def make_attempts() -> list[int]:
     return [_ for _ in range(1, int(Ini.retries)+1)]
-## }}}
-def make_qualities() -> list[str]:  ## {{{
+
+def make_qualities() -> list[str]:
     return ['18', '22', '133', '134', '135', '136', '137', '140', '160', '242', '243', '244', '247', '248', '249', '250', '251', '278', '394', '395', '396', '397', '398', '399', 'best']
-## }}}
-def make_errors() -> dict[str, str]:  ## {{{
+
+def make_errors() -> dict[str, str]:
     '''possible errors (i.e. keys) and what we should do (i.e. values)'''
 
     return {
@@ -232,8 +231,8 @@ def make_errors() -> dict[str, str]:  ## {{{
         ## Full: gaierror(-3, 'Temporary failure in name resolution')
         ## ]]
     }
-## }}}
-def restart_tor() -> None:  ## {{{
+
+def restart_tor() -> None:
     ## restart tor only if it is already on
     try:
         tor_status = check_output('pgrep "tor"', shell=True, universal_newlines=True).strip()
@@ -251,8 +250,8 @@ def restart_tor() -> None:  ## {{{
             return
 
         sleep(15)
-## }}}
-def savelog_print(text: Any, fg: str='', prnt: bool=True) -> None:  ## {{{
+
+def savelog_print(text: Any, fg: str='', prnt: bool=True) -> None:
     text = str(text)
 
     ## savelog
@@ -270,8 +269,8 @@ def savelog_print(text: Any, fg: str='', prnt: bool=True) -> None:  ## {{{
         elif fg == 'white_dim': print(Col.white_dim(text))
         elif fg == 'white':     print(Col.white(text))
         elif fg == 'yellow':    print(Col.yellow(text))
-## }}}
-def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str='') -> None:  ## {{{ TODO is Type correct?
+
+def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str='') -> None:  ## TODO is Type correct?
     class_ins.should_restart_tor = False  ## TODO is it needed here?
 
     if nth_attempt < len(class_ins.attempts):
@@ -305,22 +304,22 @@ def analyze(stderr: str, nth_attempt: int, class_ins: Type, caller: str='') -> N
 
     if class_ins.should_restart_tor:
         restart_tor()
-## }}}
-def normalize(text: str) -> str:  ## {{{
+
+def normalize(text: str) -> str:
     text = text.lower()
     text = sub(r'[\s_]', r'-', text)  ##    ,-- \w does not include _
     text = sub(r'[^\w-]', r'', text)  ## <--'-- that's why _ is included in the previous command
     text = sub(r'-+', r'-', text)
 
     return text
-## }}}
-def calculate_order() -> dict[str, str]:  ## {{{
+
+def calculate_order() -> dict[str, str]:
     perc = int((Cur.index * 100) / Ini.urls_length)
 
     return {f'{Cur.index}/{Ini.urls_length}': f'%{perc}'}
-## }}}
+
 @duration_wrapper()
-def main() -> None:  ## {{{
+def main() -> None:
     print(Col.heading(title))
 
     Ini.getopts()
@@ -366,11 +365,9 @@ def main() -> None:  ## {{{
         ## END urls
     elif item == 'help':
         display_help()
-## }}}
 
 @dataclass
-class Initial:  ## {{{
-    ## {{{
+class Initial:
     time: int                   = field(repr=False, default=get_datetime('jhms'))
     attrs: dict[str, str]       = field(repr=False, default_factory=dict)
     urls: list[str]             = field(repr=False, default_factory=list)
@@ -404,8 +401,8 @@ class Initial:  ## {{{
     no_information: bool = False
     verbose: bool        = False
     purge: bool          = False
-    ## }}}
-    def getopts(self) -> None:  ## {{{
+
+    def getopts(self) -> None:
         try:
             duos, duos_long = getopt(
                 script_args,
@@ -428,9 +425,9 @@ class Initial:  ## {{{
         except Exception as exc:
             getopts_error_msg = f'{exc!r}'
             invalid({'GETOPTS ERROR': getopts_error_msg})
-    ## }}}
-    def verify_args(self) -> None:  ## {{{
-            ## {{{ self.source + self.urls, self.dest_dir & self.log_file
+
+    def verify_args(self) -> None:
+            ## self.source + self.urls, self.dest_dir & self.log_file
             ## https://www.geeksforgeeks.org/python-check-url-string/
             url_regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
             playlist_id_regex = '^PL'  ## TODO better regex (I don't think - is required after PL)
@@ -515,46 +512,45 @@ class Initial:  ## {{{
             self.dest_dir = if_exists(self.dest_dir)
             mkdir(self.dest_dir)
             chdir(self.dest_dir)
-            ## }}}
-            ## {{{ file_type
+
+            ## file_type
             if self.file_type not in ['v', 's', 'vs', 'a', 't', 'o']:
                 invalid('invalid file type')
-            ## }}}
-            ## {{{ downloader JUMP_1
+
+            ## downloader JUMP_1
             if self.downloader and ((self.file_type in ['v', 's', 'vs', 't', 'a'] and not self.downloader == 'curl') or (self.file_type == 'o' and self.downloader not in ['requests', 'wget', 'curl'])):
                 invalid(f'invalid downloader for {self.file_type}')
-            ## }}}
-            ## {{{ quality
+
+            ## quality
             if self.quality not in self.valid_qualities:
                 invalid(f'invalid quality. It has to be one of these: {self.valid_qualities}')
-            ## }}}
-            ## {{{ increment
+
+            ## increment
             if self.increment:
                 try:
                     self.increment = int(self.increment)
                 except Exception:
                     invalid('increment should be a number')
-            ## }}}
-            ## {{{ retries
+
+            ## retries
             try:
                 self.retries = int(self.retries)  ## make sure self.retries is an int
                 _ = 1 / self.retries  ## make sure self.retries is not 0
                 self.retries = abs(self.retries)  ## make sure self.retries is greater than 0
             except Exception:
                 invalid('retries should be a number and greater than zero')
-            ## }}}
-            ## {{{ when
+
+            ## when
             if self.when not in ['n', 'h']:
                 invalid('invalid time')
-            ## }}}
-    ## }}}
-    def remove_duplicates(self) -> None:  ## {{{
+
+    def remove_duplicates(self) -> None:
         dup_urls = self.urls_length - len(set(self.urls))
         if dup_urls > 0:
             self.urls = list(dict.fromkeys(self.urls))
             print(Col.yellow(f'Removed {dup_urls} duplicate(s) from the urls list.'))
-    ## }}}
-    def create_current(self, url) -> None:  ## {{{
+
+    def create_current(self, url) -> None:
         global Cur
 
         if self.file_type in ['v', 's', 'vs', 'a', 't']:
@@ -563,8 +559,8 @@ class Initial:  ## {{{
             Cur = File()
 
         Cur.get_info(url)  ## TODO how can we pass url directly when creating the class above?
-    ## }}}
-    def calculate_total_downloaded(self) -> None:  ## {{{
+
+    def calculate_total_downloaded(self) -> None:
         ## FIXME <--,-- we are currently calculating dest_dir size after each download but this is not a reliable way
         ##          |-- because new files may replace existing files that have the same name.
         ##          |-- what's more, adding Cur.file_raw_size to Ini.total_downloaded_raw after each download is not reliable either
@@ -573,23 +569,23 @@ class Initial:  ## {{{
         root_directory = Path(self.dest_dir)
         self.total_downloaded_raw = sum(file.stat().st_size for file in root_directory.glob('**/*'))
         self.total_downloaded = convert_byte(self.total_downloaded_raw)
-    ## }}}
-    def add_to_failures(self) -> None:  ## {{{
+
+    def add_to_failures(self) -> None:
         self.failures.append({**Cur.order, 'url': Cur.url, **Cur.error_dict})
         self.failures_count += 1
-    ## }}}
-    def draw_failed_table(self) -> str:  ## {{{
+
+    def draw_failed_table(self) -> str:
         if self.failures:
             # self.table_header = ['count', 'more info']
             self.table_rows = [[f'{fail_index}/{self.failures_count}', failure] for fail_index, failure in enumerate(self.failures, start=1)]
             self.failed_table = tabulate(self.table_rows, headers=self.table_header, tablefmt='grid')
 
             savelog_print(self.failed_table, 'red')
-    ## }}}
-    def update_time(self) -> None:  ## {{{
+
+    def update_time(self) -> None:
         self.time = int(get_datetime('jhms'))
-    ## }}}
-    def check_to_start(self) -> None:  ## {{{
+
+    def check_to_start(self) -> None:
         self.update_time()
         self.calculate_wait_duration()
 
@@ -597,51 +593,50 @@ class Initial:  ## {{{
             self.permission = True
         else:
             savelog_print({'time': self.time, 'wait': self.wait_duration}, 'brown')
-    ## }}}
-    def check_to_exit(self) -> None:  ## {{{
+
+    def check_to_exit(self) -> None:
         self.update_time()
 
         if self.when == 'h' and self.time > self.happy_hours_end_time:
             savelog_print('Happy hours over. Exit.', 'brown')
             exit()
-    ## }}}
-    def calculate_wait_duration(self) -> None:  ## {{{ https://stackoverflow.com/questions/36810003/calculate-seconds-from-now-to-specified-time-today-or-tomorrow
+
+    ## https://stackoverflow.com/questions/36810003/calculate-seconds-from-now-to-specified-time-today-or-tomorrow
+    def calculate_wait_duration(self) -> None:
         hr = int(str(self.happy_hours_start_time)[:1])  ## 2
         mins = int(str(self.happy_hours_start_time)[1:3])  ## 10
         now = dt.now()  ## 2021-08-05 18:55:06.865231
         secsleft = int((timedelta(hours=24) - (now - now.replace(hour=hr, minute=mins, second=0, microsecond=0))).total_seconds() % (24 * 3600))
         self.wait_duration = convert_second(secsleft)
-    ## }}}
-    def report(self) -> None:  ## {{{
+
+    def report(self) -> None:
         ## report failures if any
         Ini.draw_failed_table()
 
         self.update_time()
         savelog_print({'time': self.time, 'took': self.total_duration}, 'brown')
-    ## }}}
+
     @property
-    def urls_length(self) -> int:  ## {{{
+    def urls_length(self) -> int:
         return len(self.urls)
-    ## }}}
+
     @property
-    def log_file(self) -> str:  ## {{{
+    def log_file(self) -> str:
         return f'{self.dest_dir}/log'
-    ## }}}
+
     @property
-    def total_downloaded_dict(self) -> dict[str, str]:  ## {{{
+    def total_downloaded_dict(self) -> dict[str, str]:
         self.calculate_total_downloaded()
         return {'total downloaded': self.total_downloaded}
-    ## }}}
+
     @property
-    def failures_count_dict(self) -> dict[str, str]:  ## {{{
+    def failures_count_dict(self) -> dict[str, str]:
         if self.failures_count:
             return {'failures': self.failures_count}
         return {}
-    ## }}}
-## }}}
+
 @dataclass
-class Profile:  ## {{{
-    ## {{{
+class Profile:
     errors: dict[str, str]   = field(repr=False, default_factory=make_errors)
     attempts: list[int]      = field(repr=False, default_factory=make_attempts)
     attempt: int             = field(repr=False, default=None)
@@ -657,37 +652,35 @@ class Profile:  ## {{{
     time: int             = None
     url: int              = None
     outputname: str       = None
-    ## }}}
-    def report(self) -> None:  ## {{{
+
+    def report(self) -> None:
         savelog_print({**self.download_duration_dict, **Ini.total_downloaded_dict, **Ini.failures_count_dict}, 'brown')
         savelog_print(separator())
-    ## }}}
-    def index_up(self) -> None:  ## {{{
+
+    def index_up(self) -> None:
         Profile.counter += 1
         self.index = Profile.counter
-    ## }}}
+
     @property
-    def download_duration_dict(self) -> dict[str, str]:  ## {{{
+    def download_duration_dict(self) -> dict[str, str]:
         return {'took': self.download_duration}
-    ## }}}
+
     @property
-    def error_dict(self) -> dict[str, str]:  ## {{{
+    def error_dict(self) -> dict[str, str]:
         return {'ERROR MSG': self.error_msg}
-    ## }}}
+
     @property
-    def attempt_dict(self) -> dict[str, int]:  ## {{{
+    def attempt_dict(self) -> dict[str, int]:
         return {'attempt': self.attempt}
-    ## }}}
+
     @property
-    def attempt_message(self) -> None:  ## {{{
+    def attempt_message(self) -> None:
         if self.attempt == 1:
             return self
         return self.attempt_dict
-    ## }}}
-## }}}
+
 @dataclass
-class File(Profile):  ## {{{
-    ## {{{
+class File(Profile):
     progress_file_downloaded_raw: int  = field(repr=False, default=0)  ## NOTE do NOT replace 0 with None because it'll be later added to in JUMP_4
     progress_file_downloaded: int      = field(repr=False, default=None)
     progress_file_downloaded_perc: int = field(repr=False, default=None)
@@ -699,12 +692,12 @@ class File(Profile):  ## {{{
     file_size: str          = None
     file_content_type: str  = None
     file_last_modified: str = None
-    ## }}}
-    def __post_init__(self):  ## {{{
+
+    def __post_init__(self):
         super().__init__()
         self.index_up()
-    ## }}}
-    def get_info(self, url) -> None:  ## {{{
+
+    def get_info(self, url) -> None:
         if Ini.increment:
             Ini.increment_prefix = f'{Ini.increment:03}-RNMD-'
 
@@ -760,8 +753,8 @@ class File(Profile):  ## {{{
 
         self.order, self.time, self.url, self.file_raw_size, self.file_size, self.file_content_type, self.file_last_modified, self.outputname = info
         self.check_raw_size_validity()  ## self.file_raw_size may be set as NOINFO (if requested so), ERROR or 0
-    ## }}}
-    def check_raw_size_validity(self) -> None:  ## {{{
+
+    def check_raw_size_validity(self) -> None:
         '''helps decide which progress_info to display'''
 
         try:
@@ -779,8 +772,8 @@ class File(Profile):  ## {{{
                 self.file_raw_size_invalidity_msg = f'UNKNOWN: {self.file_raw_size}'
 
             self.file_raw_size_validity = False
-    ## }}}
-    def calculate_progress(self) -> None:  ## {{{
+
+    def calculate_progress(self) -> None:
             self.progress_file_downloaded_raw += self.chunksize  ## JUMP_4
             self.progress_file_downloaded = convert_byte(self.progress_file_downloaded_raw)
             self.progress_file_downloaded_perc = (self.progress_file_downloaded_raw * 100) / self.file_raw_size
@@ -792,11 +785,11 @@ class File(Profile):  ## {{{
                 self.progress_file_downloaded = self.file_size
             if self.progress_file_downloaded_perc > 100:
                 self.progress_file_downloaded_perc = 100
-    ## }}}
+
     @duration_wrapper()
-    def download(self) -> None:  ## {{{
+    def download(self) -> None:
         try:
-            if not Ini.downloader:  ## {{{ uses urlopen
+            if not Ini.downloader:  ## uses urlopen
 
                 if Ini.tor:
                     ## TODO not tested if proxy really works for urlopen. Needs more tests.
@@ -820,8 +813,8 @@ class File(Profile):  ## {{{
                         for chunk in iter(partial(download_urlopen_response.read, self.chunksize), b''):
                             print(Col.orange(self.progress_info_error_dict), end=endpoint)
                             opened_outputname.write(chunk)
-            ## }}}
-            elif Ini.downloader == 'requests':  ## {{{
+
+            elif Ini.downloader == 'requests':
                 if Ini.tor:
                     Ses.proxies = {'http': tor_proxy, 'https': tor_proxy}
 
@@ -841,8 +834,8 @@ class File(Profile):  ## {{{
                             for chunk in opened_session.iter_content(chunk_size=self.chunksize):
                                 print(Col.orange(self.progress_info_error_dict), end=endpoint)
                                 opened_outputname.write(chunk)
-            ## }}}
-            elif Ini.downloader == 'wget':  ## {{{
+
+            elif Ini.downloader == 'wget':
 
                 ## https://stackoverflow.com/questions/58125279/python-wget-module-doesnt-show-progress-bar
                 ## https://www.itersdesktop.com/2020/09/06/downloading-files-in-python-using-wget-module/
@@ -868,8 +861,8 @@ class File(Profile):  ## {{{
                     wget_download(url=self.url, out=self.outputname, bar=wget_bar)
                 else:
                     wget_download(url=self.url, out=self.outputname, bar=wget_bar_error)
-            ## }}}
-            elif Ini.downloader == 'curl':  ## {{{ http://pycurl.io/docs/latest/index.html
+
+            elif Ini.downloader == 'curl':  ## http://pycurl.io/docs/latest/index.html
                 ## examples: https://www.programcreek.com/python/example/1602/pycurl
                 cc = Curl()  ## curl connection
                 cc.setopt(cc.URL, self.url)
@@ -890,7 +883,6 @@ class File(Profile):  ## {{{
                     cc.perform()
 
                 cc.close()
-            ## }}}
 
             print()  ## to prevent the removal of progress_info
             self.should_break = True
@@ -898,19 +890,17 @@ class File(Profile):  ## {{{
         except Exception as exc:
             method_name = stack()[0][3]
             analyze(f'{exc!r}', nth_attempt=self.attempt, class_ins=Cur, caller=method_name)
-    ## }}}
+
     @property
-    def progress_info_dict(self) -> dict[str, str]:  ## {{{
+    def progress_info_dict(self) -> dict[str, str]:
         return {f'{self.progress_file_downloaded}/{self.file_size}': f'%{self.progress_file_downloaded_perc:.2f}'}
-    ## }}}
+
     @property
-    def progress_info_error_dict(self) -> dict[str, str]:  ## {{{
+    def progress_info_error_dict(self) -> dict[str, str]:
         return {'BAR ERROR MSG': self.file_raw_size_invalidity_msg}
-    ## }}}
-## }}}
+
 @dataclass
-class Youtube(Profile):  ## {{{
-    ## {{{
+class Youtube(Profile):
     progress_status: str                = field(repr=False, default=None)
     progress_speed_raw: int             = field(repr=False, default=None)
     progress_speed: str                 = field(repr=False, default=None)
@@ -930,12 +920,12 @@ class Youtube(Profile):  ## {{{
     video_view_count: int    = None
     video_like_count: int    = None
     video_ext: str           = None
-    ## }}}
-    def __post_init__(self):  ## {{{
+
+    def __post_init__(self):
         super().__init__()
         self.index_up()
-    ## }}}
-    def get_info(self, url) -> None:  ## {{{
+
+    def get_info(self, url) -> None:
         if Ini.increment:
             Ini.increment_prefix = f'{Ini.increment:03}-RNMD-'
 
@@ -989,10 +979,10 @@ class Youtube(Profile):  ## {{{
                     break
 
         self.order, self.time, self.url, self.video_title, self.video_uploader, self.video_channel, self.video_duration, self.video_view_count, self.video_like_count, self.video_ext, self.outputname = info
-    ## }}}
+
     @duration_wrapper()
-    def download(self) -> None:  ## {{{
-        ## {{{ useful links
+    def download(self) -> None:
+        ## useful links
         ## https://stackoverflow.com/questions/18054500/how-to-use-youtube-dl-from-a-python-program
         ## https://github.com/ytdl-org/youtube-dl/blob/master/README.md#embedding-youtube-dl
         ## https://github.com/ytdl-org/youtube-dl/blob/3e4cedf9e8cd3157df2457df7274d0c842421945/youtube_dl/YoutubeDL.py#L137-L312 (available options)
@@ -1001,7 +991,6 @@ class Youtube(Profile):  ## {{{
         ## https://programtalk.com/python-examples/youtube_dl.YoutubeDL/
         ## https://codingdict.com/sources/py/youtube_dl/16491.html
         ## https://vimsky.com/zh-tw/examples/detail/python-method-youtube_dl.YoutubeDL.html
-        ## }}}
 
         ## FIXME does not display for s and t
         ## https://stackoverflow.com/questions/23727943/how-to-get-information-from-youtube-dl-in-python
@@ -1074,24 +1063,22 @@ class Youtube(Profile):  ## {{{
         except Exception as exc:
             method_name = stack()[0][3]
             analyze(f'{exc!r}', nth_attempt=self.attempt, class_ins=Cur, caller=method_name)
-    ## }}}
+
     @property
-    def progress_info_dict(self) -> dict[str, str]:  ## {{{
+    def progress_info_dict(self) -> dict[str, str]:
         return {
             f'{self.progress_video_downloaded}/{self.progress_video_size}': f'%{self.video_downloaded_percent:.2f}',
             'speed': self.progress_speed,
             'elapsed': self.progress_elapsed,
             'eta': self.progress_eta,
         }
-    ## }}}
+
     @property
-    def progress_info_error_dict(self) -> dict[str, str]:  ## {{{
+    def progress_info_error_dict(self) -> dict[str, str]:
         return {'BAR ERROR MSG': f'{self.progress_status} {self.progress_info_error}'}
-    ## }}}
-## }}}
+
 @dataclass
-class Playlist(Profile):  ## {{{
-    ## {{{
+class Playlist(Profile):
     pl_fullinfo: dict[str, str] = field(repr=False, default_factory=dict)
     pl_urls: list[str]          = field(repr=False, default_factory=list)
 
@@ -1099,11 +1086,11 @@ class Playlist(Profile):  ## {{{
     pl_uploader: str      = None
     pl_entries: list[str] = field(repr=False, default_factory=list)
     pl_entries_count: int = None
-    ## }}}
-    def __post_init__(self):  ## {{{
+
+    def __post_init__(self):
         super().__init__()
-    ## }}}
-    def get_info(self) -> None:  ## {{{
+
+    def get_info(self) -> None:
         options = {
             'proxy': tor_proxy,
             'skip_download': True,
@@ -1144,9 +1131,8 @@ class Playlist(Profile):  ## {{{
                 break
 
         self.pl_title, self.pl_uploader, self.pl_entries_count = info
-        ## }}}
-## }}}
-class YoutubedlLoggerW:  ## {{{
+
+class YoutubedlLoggerW:
     '''logger for youtube_dl displaying warning messages'''
 
     @staticmethod
@@ -1162,8 +1148,8 @@ class YoutubedlLoggerW:  ## {{{
     @staticmethod
     def error(log_msg) -> None:
         pass
-## }}}
-class YoutubedlLoggerEmpty:  ## {{{
+
+class YoutubedlLoggerEmpty:
     '''logger for youtube_dl displaying no messages'''
 
     @staticmethod
@@ -1177,7 +1163,6 @@ class YoutubedlLoggerEmpty:  ## {{{
     @staticmethod
     def error(log_msg) -> None:
         pass
-## }}}
 
 if __name__ == '__main__':
     title = path.basename(__file__).replace('.py', '')
@@ -1192,7 +1177,7 @@ if __name__ == '__main__':
     Ini.total_duration = main()
     Ini.report()
 
-## {{{ we can use these to analyze warnings in warning methods in YoutubedlLogger* classes
+## we can use these to analyze warnings in warning methods in YoutubedlLogger* classes
 # warnings = [
 #     'Unable to download thumbnail "https://i.ytimg.com/vi_webp/f_bml-MILAs/maxresdefault.webp": <urlopen error EOF occurred in violation of protocol (_ssl.c:1129)>',
 #     'Could not send HEAD request to https://www.youtube.com/watch?=vglU: <urlopen error [Errno 111] Connection refused>',
@@ -1202,4 +1187,3 @@ if __name__ == '__main__':
 #     'Unable to download webpage: HTTP Error 429: Too Many Requests',
 #     'Falling back on generic information extractor.',
 # ]
-## }}}

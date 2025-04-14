@@ -182,7 +182,7 @@ case "$main_item" in
         display_help ;;
 esac
 
-## {{{ notes
+## notes
 
 ## Add title:
 # -metadata title='my title'
@@ -219,4 +219,3 @@ esac
 ## ├────────────────────────┴───────────────────────────────────────────────┤
 ## │ https://trac.ffmpeg.org/wiki/Encode/MP3                                │
 ## ╰────────────────────────────────────────────────────────────────────────╯
-# }}}

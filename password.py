@@ -21,16 +21,14 @@ script_args = argv[1:]
 Col = Color()
 
 
-def display_help() -> None:  ## {{{
+def display_help() -> None:
     run('clear', shell=True)
     print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-l|--length=')}{Col.default('[30]')}
 {Col.flag('-c|--count=')}{Col.default('[5]')}''')
     exit()
 
-
-## }}}
-def getopts() -> None:  ## {{{
+def getopts() -> None:
     global length, count
 
     try:
@@ -46,9 +44,7 @@ def getopts() -> None:  ## {{{
         elif opt in ('-c', '--count'):
             count = int(arg)
 
-
-## }}}
-def prompt(*args: list[str]) -> None:  ## {{{
+def prompt(*args: list[str]) -> None:
     global length, count
 
     for arg in args:
@@ -62,8 +58,8 @@ def prompt(*args: list[str]) -> None:  ## {{{
                 count
             except:
                 count = 5
-## }}}
-def generate(uppercase: bool=True, lowercase: bool=True, digits: bool=True, symbols: bool=True) -> None:  ## {{{
+
+def generate(uppercase: bool=True, lowercase: bool=True, digits: bool=True, symbols: bool=True) -> None:
     letters = ''
     if uppercase:
         letters += string.ascii_uppercase
@@ -84,7 +80,6 @@ def generate(uppercase: bool=True, lowercase: bool=True, digits: bool=True, symb
     for x in range(count):
         password = ''.join(sample(letters, length))
         print(password)
-## }}}
 
 getopts()
 

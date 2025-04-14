@@ -17,14 +17,14 @@ title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
 Col = Color()
 
-def display_help() -> None:  ## {{{
+def display_help() -> None:
     run('clear', shell=True)
     print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 {Col.flag('-i|--input=')}
 {Col.flag('-p|--password=')}''')
     exit()
-## }}}
-def getopts() -> None:  ## {{{
+
+def getopts() -> None:
     global inpt, password
 
     try:
@@ -36,8 +36,8 @@ def getopts() -> None:  ## {{{
         if   opt in ('-h', '--help'):     display_help()
         elif opt in ('-i', '--input'):    inpt = arg
         elif opt in ('-p', '--password'): password = arg
-## }}}
-def prompt(*args: list[str]) -> None:  ## {{{
+
+def prompt(*args: list[str]) -> None:
     global inpt, password
 
     for arg in args:
@@ -48,7 +48,6 @@ def prompt(*args: list[str]) -> None:  ## {{{
         elif arg == '-p':
             try:    password
             except: password = get_password('password ')
-## }}}
 
 getopts()
 

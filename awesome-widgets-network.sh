@@ -14,8 +14,19 @@ source ~/main/scripts/gb-network.sh
 ## ⮟ U+2B9F
 ## ⮜ U+2B9C
 ## ⮞ U+2B9E
-down_icon="<span color=\"${gruvbox_blue_d}\">⮟ </span>"
-up_icon="<span color=\"${gruvbox_purple_d}\">⮝ </span>"
+## ▲ ▼
+down_icon="<span color=\"${gruvbox_blue_d}\">⮟</span>"
+up_icon="<span color=\"${gruvbox_purple_d}\">⮝</span>"
+
+total_color_low="$gruvbox_gray_d"
+total_color_medium="$gruvbox_gray_d"
+total_color_high="$gruvbox_purple"
+total_color_ultRRRigh="$gruvbox_red"
+
+diff_color_low="$gruvbox_fg"
+diff_color_medium="$gruvbox_fg"
+diff_color_high="$gruvbox_blue"
+diff_color_ultRRRigh="$gruvbox_green"
 
 diff_text=''
 total_text=''
@@ -32,45 +43,41 @@ connection_text="${wf_conn}${eth_conn}${if_simcard}${if_wf_down}${vpn_conn}"
 ## total and diff -----------------------
 ## https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
 
-for interface in 'wifi' 'ethernet'; {
-    case "$interface" in
+for adapter in 'wifi' 'ethernet'; {
+    case "$adapter" in
         wifi )
             device_name="$wf_devc"
-            interface_state="$wf_state"
+            adapter_state="$wf_state"
             ;;
         ethernet )
             device_name="$eth_devc"
-            interface_state="$eth_state"
+            adapter_state="$eth_state"
             ;;
     esac
 
-    [ "$interface_state" == 'connected' ] || continue
+    [ "$adapter_state" == 'connected' ] || continue
 
-    down_last_file=~/main/scripts/.last/network_"${interface}"_down
-    up_last_file=~/main/scripts/.last/network_"${interface}"_up
+    ## get total last
+    down_total_last="$(redis-cli GET "awesome_widget__${adapter}_down")"  ## 19410508
+    up_total_last="$(  redis-cli GET "awesome_widget__${adapter}_up")"    ## 19410508
+    ##
+    [ "$down_total_last" ] || down_total_last=0
+    [ "$up_total_last"   ] || up_total_last=0
 
-    ## get last total down/up
-    down_total_last="$(< "$down_last_file")" || down_total_last=0  ## 19410508  ## NOTE do NOT add 2>/dev/null
-    up_total_last="$(<   "$up_last_file")"   || up_total_last=0    ## 19410508  ## NOTE do NOT add 2>/dev/null
 
-    ## get down_total_now/up_total_now
-    ## NOTE do NOT replace " with ' in awk
-    totals_now="$(\grep "$device_name" /proc/net/dev | awk '{print "down_total_now="$2, "up_total_now="$10}')"
-    eval "$totals_now"  ## 19410509 789384
+    ## get total now
+    ## NOTE do NOT " -> ' in awk
+    _totals_now="$(\grep "$device_name" /proc/net/dev | awk '{print "down_total_now="$2, "up_total_now="$10}')"
+    eval "$_totals_now"  ## 19410509 789384
 
-    ## save down_total_now/up_total_now as last
-    ## for our next read
+
+    ## save for our next read
     ## (in bytes, before converting them)
-    printf '%s\n' "$down_total_now" > "$down_last_file"
-    printf '%s\n' "$up_total_now"   > "$up_last_file"
+    redis-cli SET "awesome_widget__${adapter}_down" "$down_total_now" || msgn 'ERROR saving down_total_now'
+    redis-cli SET "awesome_widget__${adapter}_up"   "$up_total_now"   || msgn 'ERROR saving up_total_now'
 
     ## ---
-
-    ## set color for down_total_now/up_total_now
-    total_color_low="$gruvbox_gray_d"
-    total_color_medium="$gruvbox_gray_d"
-    total_color_high="$gruvbox_purple"
-    total_color_ultRRRigh="$gruvbox_red"
+    ## set total color
 
     if   (( down_total_now < "$K"     )); then down_total_color="$total_color_low"        ## is B
     elif (( down_total_now < "$M"     )); then down_total_color="$total_color_low"        ## is K
@@ -79,7 +86,6 @@ for interface in 'wifi' 'ethernet'; {
     elif (( down_total_now < "$G"     )); then down_total_color="$total_color_high"       ## is below 1G
     else                                       down_total_color="$total_color_ultRRRigh"  ## is 1G or higher
     fi
-    down_total_conv="<span color=\"${down_total_color}\">$(convert_byte "$down_total_now" 1 1)</span>"  ## 4.32G
 
     if   (( up_total_now < "$K"     )); then up_total_color="$total_color_low"        ## is B
     elif (( up_total_now < "$M"     )); then up_total_color="$total_color_low"        ## is K
@@ -88,26 +94,23 @@ for interface in 'wifi' 'ethernet'; {
     elif (( up_total_now < "$G"     )); then up_total_color="$total_color_high"       ## is below 1G
     else                                     up_total_color="$total_color_ultRRRigh"  ## is 1G or higher
     fi
+
+    ## ---
+    ## convert total
+
+    down_total_conv="<span color=\"${down_total_color}\">$(convert_byte "$down_total_now" 1 1)</span>"  ## 4.32G
     up_total_conv="<span color=\"${up_total_color}\">$(convert_byte "$up_total_now" 1 1)</span>"  ## 4.32G
 
     ## ---
-    ## calculate down_diff/up_diff
+    ## calculate diff
 
-    ## for n seconds (i.e. network_refresh_interval seconds)
-    (( down_diff="down_total_now - down_total_last" ))  ## 1341440
-    (( up_diff="up_total_now - up_total_last" ))        ## 1341440
-    ##
-    ## average for one second
-    (( down_diff="down_diff / network_refresh_interval" ))
-    (( up_diff="up_diff / network_refresh_interval" ))
+    ## devided by network_refresh_interval
+    ## to get average for 1 second
+    (( down_diff="(down_total_now - down_total_last) / network_refresh_interval" ))  ## 1341440
+    (( up_diff="(up_total_now - up_total_last) / network_refresh_interval" ))        ## 1341440
 
     ## ---
-    ## set color for down_diff/up_diff
-
-    diff_color_low="$gruvbox_fg"
-    diff_color_medium="$gruvbox_fg"
-    diff_color_high="$gruvbox_blue"
-    diff_color_ultRRRigh="$gruvbox_green"
+    ## set diff color
 
     if   (( down_diff < "$K"     )); then down_diff_color="$diff_color_low"        ## is B
     elif (( down_diff < "$K_400" )); then down_diff_color="$diff_color_low"        ## is below 400K
@@ -115,7 +118,6 @@ for interface in 'wifi' 'ethernet'; {
     elif (( down_diff < "$M"     )); then down_diff_color="$diff_color_high"       ## is below 1M
     else                                  down_diff_color="$diff_color_ultRRRigh"  ## is M or G
     fi
-    down_diff_conv="<span color=\"${down_diff_color}\">$(convert_byte "$down_diff" 1 1)</span>"  ## 1.31M
 
     if   (( up_diff < "$K"     )); then up_diff_color="$diff_color_low"        ## is B
     elif (( up_diff < "$K_400" )); then up_diff_color="$diff_color_low"        ## is below 400K
@@ -123,12 +125,17 @@ for interface in 'wifi' 'ethernet'; {
     elif (( up_diff < "$M"     )); then up_diff_color="$diff_color_high"       ## is below 1M
     else                                up_diff_color="$diff_color_ultRRRigh"  ## is M or G
     fi
+
+    ## ---
+    ## convert diff
+
+    down_diff_conv="<span color=\"${down_diff_color}\">$(convert_byte "$down_diff" 1 1)</span>"  ## 1.31M
     up_diff_conv="<span color=\"${up_diff_color}\">$(convert_byte "$up_diff" 1 1)</span>"  ## 1.31M
 
     ## ---
 
-    diff_text+=" | ${down_icon}${down_diff_conv}  ${up_icon}${up_diff_conv}"  ## 317K 2.31M
-    total_text+=" | ${down_icon}${down_total_conv}  ${up_icon}${up_total_conv}"  ## 4.32G 4.32G
+    diff_text+=" | ${down_icon} ${down_diff_conv}  ${up_icon} ${up_diff_conv}"  ## 317K 2.31M
+    total_text+=" | ${down_icon} ${down_total_conv}  ${up_icon} ${up_total_conv}"  ## 4.32G 4.32G
 }
 
 ## remove leading ' | '

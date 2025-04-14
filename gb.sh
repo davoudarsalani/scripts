@@ -174,10 +174,6 @@ function pipe_to_rofi {
     fi
 }
 
-function lsblk_full {
-    \lsblk -o NAME,LABEL,SIZE,UUID,FSTYPE,TYPE,MOUNTPOINT,OWNER,GROUP,MODE,MAJ:MIN,RM,RO
-}
-
 function mounted_drives {
     if [ "$1" ]; then
         printf '%s\n' "$(df -hT)"

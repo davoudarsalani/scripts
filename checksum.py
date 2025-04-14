@@ -17,14 +17,14 @@ title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
 Col = Color()
 
-def display_help() -> None:  ## {{{
+def display_help() -> None:
     run('clear', shell=True)
     print(f'''{Col.heading(f'{title}')} {Col.yellow('help')}
 string  {Col.flag('-s|--string=')}
 file    {Col.flag('-f|--file=')}''')
     exit()
-## }}}
-def getopts() -> None:  ## {{{
+
+def getopts() -> None:
     global file, string
 
     try:
@@ -36,8 +36,8 @@ def getopts() -> None:  ## {{{
         if   opt in ('-h', '--help'):   display_help()
         elif opt in ('-s', '--string'): string = arg
         elif opt in ('-f', '--file'):   file = arg
-## }}}
-def prompt(*args: list[str]) -> None:  ## {{{
+
+def prompt(*args: list[str]) -> None:
     global file, string
 
     for arg in args:
@@ -49,7 +49,6 @@ def prompt(*args: list[str]) -> None:  ## {{{
         elif arg == '-s':
             try:    string
             except: string = get_input('string')
-## }}}
 
 getopts()
 

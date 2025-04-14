@@ -52,7 +52,7 @@ function get_opt {
 get_opt "$@"
 
 case "$1" in
-    mount )  ## {{{
+    mount )
         get_mountable_umountable
         [ "$mountable" ] || {
             msgn 'nothing to mount'
@@ -120,8 +120,8 @@ case "$1" in
         fi
 
         exit ;;  ## NOTE do NOT comment
-    ## }}}
-    umount )  ## {{{
+
+    umount )
         get_mountable_umountable
         [ "$umountable" ] || {
             msgn 'nothing to umount'
@@ -145,24 +145,21 @@ case "$1" in
         sudo umount /dev/"$name" && msg_umount_successful || msg_umount_failed
 
         exit ;;  ## NOTE do NOT comment
-    ## }}}
 esac
 
 heading "$title"
 
-main_items=( 'udisksctl mount -b' 'udisksctl unmount -b' 'lsblk' 'blkid and lsblk -f' 'lsusb' 'lsmod (modules loaded)' 'lspci' 'mounted drives' 'kernel drivers' 'remount root partition' 'mountable' 'umountable' 'format usb device' 'cat /proc/mounts' 'help' )
+main_items=( 'udisksctl mount -b' 'udisksctl unmount -b' 'blkid and lsblk -f' 'lsusb' 'lsmod (modules loaded)' 'lspci' 'mounted drives' 'kernel drivers' 'remount root partition' 'mountable' 'umountable' 'format usb device' 'cat /proc/mounts' 'help' )
 fzf__title=''
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
     'udisksctl mount -b' )
         prompt -d
-        sudo udisksctl mount -b "$device" && lsblk_full && accomplished "$device mounted" ;;
+        sudo udisksctl mount -b "$device" && lsblk && accomplished "$device mounted" ;;
     'udisksctl unmount -b' )
         prompt -d
-        sudo udisksctl unmount -b "$device" && lsblk_full && accomplished "$device umounted" ;;
-    lsblk )
-        lsblk_full && accomplished ;;
+        sudo udisksctl unmount -b "$device" && lsblk && accomplished "$device umounted" ;;
     'blkid and lsblk -f' )
         sudo blkid
         printf '\n'

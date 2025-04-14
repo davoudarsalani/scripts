@@ -66,7 +66,7 @@ RG+=" $case_sensitive"
 ## JUMP_1
 INITIAL_QUERY=''
 eval "$RG '$INITIAL_QUERY'" | sed "s#$HOME#~#" | \
-    fzf --preview 'eval "$HIGHLIGHT" {-1} 2>/dev/null | \
+    fzf --preview 'eval cat {-1} 2>/dev/null | \
                    eval "\rg $RG_MATCH_FLAGS" {q} 2>/dev/null' \
         --header "rg in $(to_tilda "$PWD")" \
         --bind "Return:reload:$RG {q} || true" --phony --query "$INITIAL_QUERY"
