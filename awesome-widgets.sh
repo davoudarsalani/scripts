@@ -23,62 +23,6 @@ case "$1" in
                 msgn "<span color=\"${gruvbox_orange}\">wifi</span> turn off failed" ;;
         esac ;;
 
-    openvpn )
-        original=/etc/resolv.conf
-        backup=/etc/resolv.conf--backup
-        head=/etc/resolv.conf.head
-
-        function start_openvpn {
-            ## --verb 0: No output except fatal errors.
-            sudo openvpn \
-                 --config         /etc/openvpn/client/RRR.ovpn \
-                 --auth-user-pass ~/main/configs/cfg-openvpn/00-credentials-RRR-openvpn \
-                 --askpass        ~/main/configs/cfg-openvpn/00-credentials-RRR-openvpn-private-key-password \
-                 --log            /tmp/RRR-openvpn-$(date '+%Y-%m-%d-%H-%M-%S').log \
-                 --daemon \
-                 --verb 0 || return 1
-
-            ## wait briefly to let VPN establish
-            sleep 3
-
-            ## create backup if not exists
-            if [ ! -f "$backup" ]; then
-                sudo cp "$original" "$backup" || return 1
-            fi
-
-            sudo cp "$head" "$original" || return 1
-        }
-
-        function stop_openvpn {
-            ## kill forcefully
-            sudo pkill -9 openvpn || return 1
-
-            if [ -f "$backup" ]; then
-                sudo cp "$backup" "$original" || return 1
-            fi
-        }
-
-        function check_status {
-            if_on="$(pgrep 'openvpn')"
-        }
-        check_status
-
-        case "$2" in
-            start )
-                if [ "$if_on" ]; then
-                    message_suffix='already on'
-                else
-                    start_openvpn && message_suffix='started' || message_suffix='start failed'
-                fi ;;
-            stop )
-                stop_openvpn && message_suffix='stopped' || message_suffix='stop failed' ;;
-            restart )
-                message_suffix='restart failed'
-                stop_openvpn && start_openvpn && message_suffix='restarted' ;;
-        esac
-
-        msgn "<span color=\"${gruvbox_orange}\">openvpn</span> ${message_suffix}" ;;
-
     ## -------------------------------
 
     clock )
@@ -501,7 +445,7 @@ msgn "$text" ;;
         ## -P inhibits the conversion of port numbers to port names for network files
         ## -n does not use DNS name
         ##
-        ## 127.0.0.1:8001 is bestoon project
+        ## 127.0.0.1:8001 is project1 project
         open_ports="$(sudo lsof -i -P -n | \grep 'LISTEN' | \grep -v -E '127.0.0.1:8001|mysql|redis|code')"
         open_ports_count="$(wc -l < <(printf '%s\n' "${open_ports:?'NONE'}"))"  ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
                                                                                 ##          '--> throws non-skippable error when open_ports nat available
@@ -717,9 +661,9 @@ msgn "$text" ;;
             equalizer="<span color=\"${gruvbox_aqua}\">${equalizer}</span>"
             shuffle_text="<span color=\"${gruvbox_purple}\">${shuffle_text}</span>"
             ##
-            timestamp="<span color=\"${gruvbox_blue_d}\">${timestamp}</span>"
-            title="<span color=\"${gruvbox_blue_d}\">${title}</span>"
-            artist="<span color=\"${gruvbox_blue_d}\">${artist}</span>"
+            timestamp="<span color=\"${gruvbox_blue}\">${timestamp}</span>"
+            title="<span color=\"${gruvbox_blue}\">${title}</span>"
+            artist="<span color=\"${gruvbox_blue}\">${artist}</span>"
 
             text="${paused_text}${equalizer}${shuffle_text}${order} ${timestamp} -${left} ${title} ${album} ${artist}"
         fi

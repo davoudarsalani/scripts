@@ -75,7 +75,11 @@ while true; do
     msgc "Failed to set volume to $desired_volume"
     sleep 2
 done
+##
 audacious ~/main/configs/sounds/login_mint.ogg &
+
+
+~/main/scripts/awesome-apps.sh 'terminal'
 
 
 msgn ' ' ' ' ~/main/configs/themes/ok-w.png

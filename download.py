@@ -448,7 +448,7 @@ class Initial:
                 root_base, _ = path.splitext(self.source)  ## $HOME/main/downloads/lucy, .txt
                 self.dest_dir = root_base
 
-            ## check if we should download videos from my website
+            ## check if we should download videos from my project5
             ## better be placed before the statement that makes sure self.source is not a directory (i.e. JUMP_3)
             elif self.source == 'free':
                 v_dirs = glob(f'{getenv("HOME")}/main/dl/video/*')
@@ -793,7 +793,7 @@ class File(Profile):
 
                 if Ini.tor:
                     ## TODO not tested if proxy really works for urlopen. Needs more tests.
-                    ## https://stackoverflow.com/questions/3168171/how-can-i-open-a-website-with-urllib-via-proxy-in-python
+                    ## https://stackoverflow.com/questions/3168171/how-can-i-open-a-project5-with-urllib-via-proxy-in-python
                     ## https://stackoverflow.com/questions/34576665/setting-proxy-to-urllib-request-python3
                     proxy_support = ProxyHandler({'http': tor_proxy, 'https': tor_proxy})
                     proxy_opener = build_opener(proxy_support)
@@ -874,7 +874,7 @@ class File(Profile):
                 if Ini.tor:
                     cc.setopt(cc.PROXY, '127.0.0.1')
                     cc.setopt(cc.PROXYPORT, 9050)
-                    cc.setopt(cc.PROXYTYPE, cc.PROXYTYPE_SOCKS5_HOSTNAME)  ## https://stackoverflow.com/questions/32396115/access-denied-to-a-website-using-tor
+                    cc.setopt(cc.PROXYTYPE, cc.PROXYTYPE_SOCKS5_HOSTNAME)  ## https://stackoverflow.com/questions/32396115/access-denied-to-a-project5-using-tor
                     # cc.setopt(cc.PROXYTYPE, cc.PROXYTYPE_SOCKS5)  ## https://stackoverflow.com/questions/8252722/tor-with-pycurl-usage
 
                 with open(self.outputname, 'wb') as opened_outputname:

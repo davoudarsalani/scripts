@@ -36,7 +36,8 @@ function error_removing {
 }
 
 function if_empty {  ## JUMP_1 the same used in ~/main/scripts/speech.sh
-    local count="$1"
+    ## remove all commas
+    local count="${1//,/}"
 
     ## check if count is an int
     [ "$count" -eq "$count" ] || {

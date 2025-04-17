@@ -151,7 +151,7 @@ $(flag '-d|--directory=')"
 exit
 }
 
-function website_create_audio_template_help {
+function project5_create_audio_template_help {
 clear
 printf '%s\n' \
 "$(heading "$title") $(yellow "help")
