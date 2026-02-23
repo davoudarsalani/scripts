@@ -6,7 +6,10 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-apps.sh
 ##    https://davoudarsalani.ir
 
+
 case "$1" in
+    android-studio )
+        android-studio &>/dev/null & ;;
     audacious )
         audacious &>/dev/null & ;;
     blueman_applet )
@@ -16,10 +19,6 @@ case "$1" in
     chromium )
         chromium &>/dev/null & ;;
     dbgate )
-        ## added this just to make sure dbgate is going to launch
-        ## because it takes a few seconds to load
-        msgn 'opening dbgate'
-
         ~/main/configs/sources/dbgate/dbgate-latest.AppImage &>/dev/null & ;;
     firefox )
         firefox &>/dev/null & ;;

@@ -6,6 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/launcher.sh
 ##    https://davoudarsalani.ir
 
+
 case "$1" in
     rofi )
         # ~/.config/rofi/launchers/type-2/style-12.rasi
@@ -15,7 +16,7 @@ case "$1" in
              -show combi \
              -theme ~/.config/rofi/launchers/type-5/style-4.rasi \
              -theme-str 'window { width: 1000; }' \
-             -theme-str "window { background-color: ${gruvbox_bg_d}; }" \
+             -theme-str "window { background-color: ${gruvbox_bg0_h}; }" \
              -theme-str 'window { border-radius: 0px; }'
         ;;
     dmenu )

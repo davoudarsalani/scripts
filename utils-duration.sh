@@ -2,9 +2,10 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-duration.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-duration.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-duration.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-duration.sh
 ##    https://davoudarsalani.ir
+
 
 function get_duration {
     local file_ duration

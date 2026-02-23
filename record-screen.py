@@ -8,7 +8,7 @@
 
 from os import getenv
 
-from gp import Screen, Record, Audio, get_datetime, pip_to_dmenu, update_audio, convert_second, invalid
+from utils import Screen, Record, Audio, get_datetime, pipe_to_dmenu, update_audio, convert_second, invalid
 
 Scr = Screen()
 scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset = Scr.screen_1()
@@ -16,7 +16,7 @@ scr_2_name, scr_2_res, scr_2_x, scr_2_y, scr_2_x_offset, scr_2_y_offset = Scr.sc
 scr_all_res = Scr.screen_all()
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
-length = pip_to_dmenu(lengths, 'rec screen')
+length = pipe_to_dmenu(lengths, 'rec screen')
 if   length == '30s': secs = 30
 elif length == '1m':  secs = 60
 elif length == '5m':  secs = 300
@@ -31,7 +31,7 @@ else: exit()
 
 dur = convert_second(secs)
 screens = ['1', '2', 'all']
-screen = pip_to_dmenu(screens, 'screen')
+screen = pipe_to_dmenu(screens, 'screen')
 if   screen == '1':   x_offset, resolution, suffix = scr_1_x_offset, scr_1_res,   'SCR-1'
 elif screen == '2':   x_offset, resolution, suffix = scr_2_x_offset, scr_2_res,   'SCR-2'
 elif screen == 'all': x_offset, resolution, suffix = 0,              scr_all_res, 'SCR-ALL'
@@ -42,7 +42,7 @@ Aud = Audio()
 Rec = Record()
 
 need_mics = ['no', 'yes']
-need_mic = pip_to_dmenu(need_mics, 'need mic?')
+need_mic = pipe_to_dmenu(need_mics, 'need mic?')
 if   need_mic == 'yes':
     Aud.mic('unmute')
     Aud.mic('25')

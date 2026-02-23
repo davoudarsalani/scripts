@@ -2,9 +2,10 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-audio.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-audio.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-audio.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-audio.sh
 ##    https://davoudarsalani.ir
+
 
 ## can also use pactl
 

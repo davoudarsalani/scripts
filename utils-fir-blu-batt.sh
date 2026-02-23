@@ -2,17 +2,20 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-fir-blu-batt.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-fir-blu-batt.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-fir-blu-batt.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-fir-blu-batt.sh
 ##    https://davoudarsalani.ir
+
 
 ## firewall
 firewall_status="$(sudo ufw status | \grep -i status | awk '{print $NF}')"
 
 ## bluetooth
 bluetooth_status="$(rfkill list | \grep -iA 1 bluetooth | xargs | awk '{print $NF}')"
-def_ctrlr_mac="$(bluetoothctl list | \grep -i default | awk '{print $2}')"
-headset_mac="$(bluetoothctl devices | \grep 'Headset$' | awk '{print $2}')"
+##
+## commented because take too much time
+# def_ctrlr_mac="$(bluetoothctl list | \grep -i default | awk '{print $2}')"
+# headset_mac="$(bluetoothctl devices | \grep 'Headset$' | awk '{print $2}')"
 
 ## battery
 read -a batt_info < <(acpi)  ## Battery 0: Charging, 1%, charging at zero rate - will never fully charge.

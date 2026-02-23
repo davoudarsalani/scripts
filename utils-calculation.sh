@@ -2,9 +2,10 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-calculation.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-calculation.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-calculation.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-calculation.sh
 ##    https://davoudarsalani.ir
+
 
 function float_pad {
     local input new_l_length new_r_length floated l r r_length lacking_pad

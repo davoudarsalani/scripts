@@ -6,7 +6,8 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/commands.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
+
+source ~/main/scripts/utils.sh
 
 title="${0##*/}"
 

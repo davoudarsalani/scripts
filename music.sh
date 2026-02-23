@@ -6,8 +6,9 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/music.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-audacious.sh
+
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-audacious.sh
 
 function no_such_dir {
     msgc 'ERROR' "no such directory as <span color=\"${gruvbox_orange}\">~/main/music/${directory}</span>" ~/main/configs/themes/delete-w.png

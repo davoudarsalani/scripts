@@ -6,9 +6,10 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/colors.sh
 ##    https://davoudarsalani.ir
 
+
 ## https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
-source ~/main/scripts/gb.sh
+source ~/main/scripts/utils.sh
 
 title="${0##*/}"
 

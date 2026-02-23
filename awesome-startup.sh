@@ -6,7 +6,8 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-startup.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
+
+source ~/main/scripts/utils.sh
 
 autorun_file=/tmp/autorun
 [ -f "$autorun_file" ] && exit || touch "$autorun_file"
@@ -24,14 +25,15 @@ autorun_file=/tmp/autorun
 
 start-pulseaudio-x11 || msgc "start-pulseaudio-x11 failed"
 
-# source ~/main/scripts/gb-screen.sh
-# xrandr --output  "$scr_1_name" --mode 1366x768 --rate 60 --primary
-# xrandr --addmode "$scr_2_name" 1600x900
-# xrandr --output  "$scr_2_name" --mode 1600x900 --rate 60 --right-of "$scr_1_name"
-# xrandr --output  "$scr_2_name" --gamma .85:1:1.14  ## + custom mode (80 100 75)
-# xrandr --output  "$scr_2_name" --gamma .65:1:.9    ## + standard mode
+# /usr/bin/nvidia-smi -pm 1 || msgc "'/usr/bin/nvidia-smi -pm 1' failed"
+
+# source ~/main/scripts/utils-screen.sh
+xrandr --output  eDP1 --mode 1366x768 --rate 60 --primary
+xrandr --addmode HDMI1 1920x1080
+xrandr --output  HDMI1 --mode 1920x1080 --rate 60 --right-of eDP1
 
 nm-applet &
+kdeconnectd &
 greenclip daemon &
 picom --daemon &  # --shadow-opacity=0
 
@@ -40,7 +42,7 @@ picom --daemon &  # --shadow-opacity=0
 # --log-file ~/main/configs/keylogs/keylog-"$(get_datetime 'jymd')" &
 
 
-# source ~/main/scripts/gb-network.sh
+# source ~/main/scripts/utils-network.sh
 # [ "$eth_ip" ] || {
 #    add_desired_ip_to_ethernet
 #    msgn "added <span color=\"${gruvbox_orange}\">${desired_eth_ip}</span> to <span color=\"${gruvbox_orange}\">${eth_devc}</span>"
@@ -65,9 +67,9 @@ fi
 
 declare -i desired_volume=30
 while true; do
-    source ~/main/scripts/gb-audio.sh
+    source ~/main/scripts/utils-audio.sh
     pactl set-sink-volume "$def_sink_index" "${desired_volume}%"
-    source ~/main/scripts/gb-audio.sh
+    source ~/main/scripts/utils-audio.sh
     if (( vol_level == 30 )); then
         msgn "Volume set to $desired_volume"
         break

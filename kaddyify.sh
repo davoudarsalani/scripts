@@ -6,8 +6,10 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/kaddyify.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-color.sh
+
+source ~/main/scripts/helps.sh
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-color.sh
 
 ## --archive, -a            archive mode is -rlptgoD (no -A,-X,-U,-N,-H)
 ## --recursive, -r          recurse into directories
@@ -19,11 +21,6 @@ source ~/main/scripts/gb-color.sh
 
 title="${0##*/}"
 
-function display_help {
-    source ~/main/scripts/.help.sh
-    kaddyify_help
-}
-
 function get_opt {
     local options
 
@@ -32,7 +29,7 @@ function get_opt {
     while true; do
         case "$1" in
             -h|--help )
-                display_help ;;
+                kaddyify_help ;;
             -s|--sync )
                 flags='--archive --progress --delete' ;;
             -f|--diff )
@@ -63,7 +60,7 @@ function get_opt {
                     exit
                 }
 
-                sync_prompt="$(get_single_input "sync $(to_tilda "$selected_directory") to $(to_tilda "$home_kaddy_dir")?")" && printf '\n'
+                sync_prompt="$(get_input "sync $(to_tilda "$selected_directory") to $(to_tilda "$home_kaddy_dir")?")" && printf '\n'
                 [ "$sync_prompt" == 'y' ] || exit
                 ;;
             -- )
@@ -78,7 +75,7 @@ home_kaddy_dir=~/kaddy
 get_opt "$@"
 heading "$title"
 
-[ ! "$1" ] || [ ! "$flags" ] && display_help
+[ ! "$1" ] || [ ! "$flags" ] && kaddyify_help
 
 if [ "$selected_directory" ]; then
     ## NOTE JUMP_2 keep $flags unquoted

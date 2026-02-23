@@ -6,16 +6,13 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/application.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-color.sh
+
+source ~/main/scripts/helps.sh
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-color.sh
 shopt -s globstar  ## is it needed?
 
 title="${0##*/}"
-
-function display_help {
-    source ~/main/scripts/.help.sh
-    application_help
-}
 
 function prompt {
     for _ in "$@"; {
@@ -37,7 +34,7 @@ function get_opt {
     while true; do
         case "$1" in
             -h|--help )
-                display_help ;;
+                application_help ;;
             -p|--package )
                 shift
                 package="$1" ;;
@@ -79,18 +76,18 @@ case "$main_item" in
             'download (no install)' )
                 pacman -Slq | fzf --preview 'pacman -Si {1}' | xargs -ro sudo pacman -Sw && accomplished ;;
             'reinstall all packages' )
-                reinstall_prompt="$(get_single_input 'you sure?')" && printf '\n'
+                reinstall_prompt="$(get_input 'you sure?')" && printf '\n'
                 case "$reinstall_prompt" in
                     y ) sudo pacman -Qnq | pacman -S - && accomplished ;;
                 esac ;;
             'lts kernel & header' )
-                start_prompt="$(get_single_input 'start?')" && printf '\n'
+                start_prompt="$(get_input 'start?')" && printf '\n'
                 case "$start_prompt" in
                     y )
                         action_now 'Installing'
                         sudo pacman -S --needed linux-lts linux-lts-headers
                         printf '\n'
-                        update_prompt="$(get_single_input 'update bootloader?')" && printf '\n'
+                        update_prompt="$(get_input 'update bootloader?')" && printf '\n'
                         case "$update_prompt" in
                             y )
                                 action_now 'Updating bootloader'
@@ -146,14 +143,19 @@ case "$main_item" in
     'clear cache and clipboard' )
         action_now 'clearing clipboard'
         greenclip_clear
-        action_now "cache size: $(du -sh /var/cache/pacman/pkg/)"  ## installed apps database dir: var/lib/pacman/
+
+        ## installed apps database dir: var/lib/pacman/
+        action_now "cache size: $(du -sh /var/cache/pacman/pkg/)"
+
         action_now 'removing cache and database'
-        sudo pacman -Sc --noconfirm  ## cc will clean all the files (which is not a good idea)
+        ## cc will clean all the files (which is not a good idea)
+        sudo pacman -Sc --noconfirm
+
         action_now 'checking for orphans'
         readarray -t orphans < <(sudo pacman -Qtdq)  ## is sudo needed?
         if [ "$orphans" ]; then
             printf '%s\n' "${orphans[@]}" | sort | column
-            remove_orphans="$(get_single_input "remove "${#orphans[@]}" orphans?")" && printf '\n'
+            remove_orphans="$(get_input "remove "${#orphans[@]}" orphans?")" && printf '\n'
             case "$remove_orphans" in
                 y )
                     sudo pacman -Rns "${orphans[@]}" --noconfirm ;;
@@ -163,13 +165,14 @@ case "$main_item" in
         else
             printf '  no orphans\n'
         fi
+
         action_now "removing ~/.cache (size: $(du -sh ~/.cache/ | awk '{print $1}')):"
         rm -rf ~/.cache
 
         printf '\n'
         printf '%s shutdown\n' "$(blue '1')"
         printf '%s reboot\n'   "$(blue '2')"
-        reboot_prompt="$(get_single_input '>')" && printf '\n'
+        reboot_prompt="$(get_input '>')" && printf '\n'
         case "$reboot_prompt" in
             1 ) shutdown -h now ;;
             2 ) shutdown -r now ;;
@@ -177,7 +180,7 @@ case "$main_item" in
         accomplished ;;
 
     update )
-        update_items=( 'pacman' 'yay' 'yay + torsocks' 'sync repos' 'available updates' 'last update' )
+        update_items=( 'pacman' 'yay' 'yay + torsocks' 'sync repos' 'available updates' )
         fzf__title=''
         update_item="$(pipe_to_fzf "${update_items[@]}")" && wrap_fzf_choice "$update_item" || exit 37
 
@@ -217,10 +220,6 @@ case "$main_item" in
                 else
                     msgn "no available updates"
                 fi ;;
-            'last update' )
-                last_update_date="$(grep -E 'pacman -Syu' /var/log/pacman.log | tail -1 | awk '{print $1}' | sed 's/^\[\(.*\)\]$/\1/')"  ## 2021-04-15T11:10:03+0430
-                dur="$(relative_date "$last_update_date")"
-                printf 'last update: %s (on %s)\n' "$dur" "$last_update_date"
         esac ;;
 
     systemd )
@@ -286,6 +285,6 @@ case "$main_item" in
         esac ;;
 
     help )
-        display_help ;;
+        application_help ;;
 
 esac

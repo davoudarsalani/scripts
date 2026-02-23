@@ -6,7 +6,8 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-widgets.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
+
+source ~/main/scripts/utils.sh
 
 declare -i threshhold=70
 
@@ -31,7 +32,7 @@ case "$1" in
 
     audio )
         function update_variables {
-            source ~/main/scripts/gb-audio.sh
+            source ~/main/scripts/utils-audio.sh
         }
 
         update_variables
@@ -76,21 +77,6 @@ case "$1" in
         # function mon_100 {
         #     pactl set-source-volume "$def_source_mon_index" 100%
         # }
-
-        function connecttoheadset {
-            source ~/main/scripts/gb-fir-blu-batt.sh
-            local output text
-
-            msgn "connecting to headset <span color=\"${gruvbox_orange}\">${headset_mac}</span>"
-
-            output="$(bluetoothctl connect "$headset_mac")"
-            if ! \grep -qi 'failed to connect' <<< "$output"; then
-                msgn "connected to <span color=\"${gruvbox_orange}\">${headset_mac}</span>"
-            else
-                text="$(printf "connecting to <span color=\"%s\">%s</span>\n%s\n" "$gruvbox_orange" "$headset_mac" "$output")"
-                 msgc 'ERROR' "$text" ~/main/configs/themes/alert-w.png
-            fi
-        }
 
         case "$2" in
             vol_30 )
@@ -141,8 +127,6 @@ case "$1" in
             mon_0 )
                 pactl set-source-volume "$def_source_mon_index" 0% ;;
 
-            connect_to_headset )
-                connecttoheadset ;;
             full_info )
 text="$(printf '%s\n' \
 "<span color=\"${gruvbox_orange}\">Vol</span>
@@ -216,7 +200,7 @@ msgn "$text" ;;
         set_widget 'audio' 'markup' "${vol_level}${vol_on_off}${mic_info}${mon_info}${xtra_info}" ;;
 
     memory_cpu )
-        source ~/main/scripts/gb-calculation.sh
+        source ~/main/scripts/utils-calculation.sh
 
         case "$2" in
             intensives )
@@ -296,7 +280,7 @@ msgn "$text" ;;
         esac ;;
 
     harddisk )
-        source ~/main/scripts/gb-calculation.sh
+        source ~/main/scripts/utils-calculation.sh
 
         case "$2" in
             usage )
@@ -327,31 +311,12 @@ msgn "$text" ;;
                 set_widget 'harddisk' 'markup' "${root_used}  ${home_used}  ${swap_used}  ${hdd_temp}°" ;;
         esac ;;
 
-    # gpu )
-    #     active_gpu="$(optimus-manager --status | \grep 'Current GPU mode' | awk '{print $NF}')"
-    #     active_gpu="${active_gpu::1}"
-    #     [ "$active_gpu" == 'n' ] && active_gpu="<span color=\"${gruvbox_red}\">${active_gpu}</span>"
-    #     set_widget 'gpu' 'markup' "$active_gpu" ;;
-
-    processes )
-        processes_count="$(wc -l < <(pgrep .))"  ## previously: "$(wc -l < <(ps -aux))"
-        set_widget 'processes' 'markup' "$processes_count" ;;
-
     status )
         ~/main/scripts/status.py ;;
 
-    mbl_umbl )
-        get_mountable_umountable
-        m_count="${#mountable[@]}";  (( m_count > 0 )) && M="M:${m_count}"
-        u_count="${#umountable[@]}"; (( u_count > 0 )) && U="U:${u_count}"
-        (( m_count > 0 && u_count > 0 )) && seperator=','
-        (( m_count > 0 || u_count > 0 )) && text="${M}${seperator}${U}" || text='MU'
-
-        set_widget 'mbl_umbl' 'markup' "$text" ;;
-
     firewall )
         function update_variables {
-            source ~/main/scripts/gb-fir-blu-batt.sh
+            source ~/main/scripts/utils-fir-blu-batt.sh
         }
 
         update_variables
@@ -361,6 +326,8 @@ msgn "$text" ;;
                 sudo ufw enable  ;;
             turn_off )
                 sudo ufw disable ;;
+            status )
+                msgn "$(sudo ufw status)" ;;
         esac
 
         update_variables
@@ -374,7 +341,7 @@ msgn "$text" ;;
 
     bluetooth )
         function update_variables {
-            source ~/main/scripts/gb-fir-blu-batt.sh
+            source ~/main/scripts/utils-fir-blu-batt.sh
         }
 
         update_variables
@@ -387,6 +354,8 @@ msgn "$text" ;;
         esac
 
         update_variables
+
+        echo $bluetooth_status
 
         case "$bluetooth_status" in
             yes )
@@ -426,9 +395,12 @@ msgn "$text" ;;
 
     established )
         ## we can add sudo in this case to get instances other than the user-related ones:
-        estab="$(sudo lsof -i -P -n | \grep 'ESTABLISHED' | awk '{print $1}' | sort --unique)"  ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
-        estab_count="$(wc -l < <(printf '%s\n' "${estab:?'NONE'}"))"  ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
-                                                                      ##          '--> throws non-skippable error when estab nat available
+        ## -i looks for listing ports, -P inhibits the conversion of port numbers to port names for network files, -n does not use DNS name (https://www.cyberciti.biz/faq/how-to-check-open-ports-in-linux-using-the-cli/)
+        estab="$(sudo lsof -i -P -n | \grep 'ESTABLISHED' | awk '{print $1}' | sort --unique)"
+
+        estab_count="$(wc -l < <(printf '%s\n' "${estab:?'NONE'}"))"
+        ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+        ##          '--> throws non-skippable error when estab nat available
 
         (( estab_count > 0 )) && estab_text="ES:${estab_count}" || estab_text='ES'
         set_widget 'established' 'markup' "$estab_text"
@@ -445,10 +417,13 @@ msgn "$text" ;;
         ## -P inhibits the conversion of port numbers to port names for network files
         ## -n does not use DNS name
         ##
-        ## 127.0.0.1:8001 is project1 project
-        open_ports="$(sudo lsof -i -P -n | \grep 'LISTEN' | \grep -v -E '127.0.0.1:8001|mysql|redis|code')"
-        open_ports_count="$(wc -l < <(printf '%s\n' "${open_ports:?'NONE'}"))"  ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
-                                                                                ##          '--> throws non-skippable error when open_ports nat available
+        open_ports="$(sudo lsof -i -P -n | \grep 'LISTEN')"
+        ## | \grep -v -E '127.0.0.1:8001|mysql|redis|code' (127.0.0.1:8001 is project1 project)
+
+        open_ports_count="$(wc -l < <(printf '%s\n' "${open_ports:?'NONE'}"))"
+        ## JUMP_1 --,--> expansion structure from https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+        ##          '--> throws non-skippable error when open_ports nat available
+
         (( open_ports_count > 0 )) && open_ports_text="OP:${open_ports_count}" || open_ports_text='OP'
         set_widget 'open_ports' 'markup' "$open_ports_text"
 
@@ -478,63 +453,51 @@ msgn "$text" ;;
         set_widget 'tor' 'markup' "$tor_status_text" ;;
 
     git )
-        source ~/main/scripts/gb-git.sh
-
-        modified_repos=''
+        source ~/main/scripts/utils-git.sh
 
         set_widget 'git' 'markup' "$refresh_icon"
 
-        ## FIXME cant use FZF_DEFAULT_COMMAND and FZF_ALT_C_COMMAND_GIT because they are apparently not accessible to this option
-        ## FIXME a bit too slow
+        modified_repos=''
 
-        ## synced with path flags for FZF_DEFAULT_COMMAND in /etc/bash.bashrc
-        path_flags_1="! -path '*.git/*' ! -path '*.cache/*' ! -path '*.venv*/*' ! -path '*kaddy/*' ! -path '*trash/*' 2>/dev/null"
+        ## FIXME
+        ## can't use FZF_DEFAULT_COMMAND and FZF_ALT_C_COMMAND_GIT
+        ## because they are apparently not accessible to this option
 
-        ## synced with path flags for FZF_ALT_C_COMMAND_GIT in /etc/bash.bashrc
-        path_flags_2="! -path '*.config/*' ! -path '*.vim/*' ! -path '*go/*' ! -path '*trash/*'"
+        ## synced with path flags for FZF_DEFAULT_COMMAND in ~/.bashrc
+        path_flags_1='\
+          ! -path "*.git/*"       \
+          ! -path "*.cache/*"     \
+          ! -path "*venv*/*"      \
+          ! -path "*downloads/*" \
+          ! -path "*kaddy/*"      \
+          ! -path "*trash/*"      \
+          ! -path "*lost+found/*" \
+          2>/dev/null'
 
-        find_cmd="find ~/main/ -type d $path_flags_1 $path_flags_2 -iname '.git' | sed 's#/\.git##' | sort"
+        ## synced with path flags for FZF_ALT_C_COMMAND_GIT in ~/.bashrc
+        path_flags_2='\
+          ! -path "*.config/*"    \
+          ! -path "*.vim/*"       \
+          ! -path "*go/*"         \
+          ! -path "*trash/*"      \
+          ! -path "*lost+found/*" \
+            -iname ".git" | sed "s#/\.git##" | sort'
+
+        find_cmd="find ~/main/ -type d $path_flags_1 $path_flags_2"
 
         readarray -t all_repos < <(eval "$find_cmd")
 
-        readarray -t non_public_repos < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep -v 'public')
-        readarray -t public_repos     < <(printf '%s\n' "${all_repos[@]/\~/$HOME}" | \grep    'public')
-
-        ## non-public repos:
-        for non_public_repo in "${non_public_repos[@]}"; {
-            status_count="$(wc -l < <(git_status "$non_public_repo"))"
+        for repo in "${all_repos[@]}"; {
+            status_count="$(wc -l < <(git_status "$repo"))"
 
             (( status_count > 0 )) && {
-                base="${non_public_repo##*/}"
+                base="${repo##*/}"
                 modified_repos+="${base::2}${status_count},"
             }
         }
 
-        ## public repos:
-        regex_status=' ST:'
-        regex_commits_ahead=' AH:'
-        for public_repo in "${public_repos[@]%/.git}"; {
-            base="${public_repo##*/}"
-
-            ## check if repo is ahead of origin
-            commits_ahead="$(git_commits_ahead "$public_repo")"
-            (( commits_ahead > 0 )) && {
-                [[ "$modified_repos" =~ $regex_commits_ahead ]] || pref="$regex_commits_ahead"
-                modified_repos+=" ${pref}${base::2}${commits_ahead},"
-                unset pref
-            }
-
-            ## check if there are changes
-            status_count="$(wc -l < <(git_status "$public_repo"))"
-            (( status_count > 0 )) && {
-                [[ "$modified_repos" =~ $regex_status ]] || pref="$regex_status"
-                modified_repos+=" ${pref}${base::2}${status_count},"
-                unset pref
-            }
-
-        }
-
-        [ "$modified_repos" ] && git_text="GI:${modified_repos%,*}" || git_text="GI"  ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)
+        ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)
+        [ "$modified_repos" ] && git_text="GI:${modified_repos%,*}" || git_text='GI'
         set_widget 'git' 'markup' "$git_text" ;;
 
     ping )
@@ -575,11 +538,11 @@ msgn "$text" ;;
         set_widget 'ping' 'markup' "$stts" ;;
 
     audacious )
-        source ~/main/scripts/gb-calculation.sh
-        source ~/main/scripts/gb-duration.sh
+        source ~/main/scripts/utils-calculation.sh
+        source ~/main/scripts/utils-duration.sh
 
         function update_variables {
-            source ~/main/scripts/gb-audacious.sh
+            source ~/main/scripts/utils-audacious.sh
         }
 
         update_variables
@@ -617,10 +580,10 @@ msgn "$text" ;;
             #     else
             #         audtool --playback-seek-relative "+${forward_length}"
             #     fi ;;
-            -60 )
-                audtool --playback-seek-relative -60 ;;
-            +60 )
-                audtool --playback-seek-relative +60 ;;
+            -30 )
+                audtool --playback-seek-relative -30 ;;
+            +30 )
+                audtool --playback-seek-relative +30 ;;
             songs )
                 IFS=$'\n'
                 readarray -t current_songs < <(audtool --playlist-display)

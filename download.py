@@ -28,7 +28,7 @@ from requests import Session
 from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
-from gp import Color, convert_byte, convert_second, duration_wrapper, pip_to_fzf, get_datetime, get_input, get_single_input, invalid, get_width, get_headers, if_exists
+from utils import Color, convert_byte, convert_second, duration_wrapper, pipe_to_fzf, get_datetime, get_input, get_input, invalid, get_width, get_headers, if_exists
 
 def display_help() -> None:
     run('clear', shell=True)
@@ -325,7 +325,7 @@ def main() -> None:
     Ini.getopts()
 
     items = ['download', 'help']
-    item = pip_to_fzf(items)
+    item = pipe_to_fzf(items)
 
     if item == 'download':
 
@@ -851,7 +851,7 @@ class File(Profile):
                 if Ini.tor:
                     ## FIXME find how to set proxy for wget
                     ## JUMP_6 FIXME it prompts for every url
-                    continue_without_proxy = get_single_input('setting tor for wget for o is not possible at the moment. continue without proxy?')
+                    continue_without_proxy = get_input('setting tor for wget for o is not possible at the moment. continue without proxy?')
                     if not continue_without_proxy == 'y':
                         exit()
 
@@ -1044,7 +1044,7 @@ class Youtube(Profile):
             ##          |-- wget throws 'DownloadError('ERROR: wget exited with code 8')' for v, vs and a but works well for s and t
             ##          '-- axel throws 'DownloadError('ERROR: axel exited with code 1')' for v, vs and a but works well for s and t
             ## JUMP_6 FIXME it prompts for every url
-            continue_with_default_downloader = get_single_input('setting downloader other than curl for v/s/vs/a/t is not possible at the moment. continue with default downloader (i.e. youtube_dl)?')
+            continue_with_default_downloader = get_input('setting downloader other than curl for v/s/vs/a/t is not possible at the moment. continue with default downloader (i.e. youtube_dl)?')
             if not continue_with_default_downloader == 'y':
                 exit()
 

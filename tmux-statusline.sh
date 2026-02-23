@@ -6,6 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/tmux-statusline.sh
 ##    https://davoudarsalani.ir
 
+
 case "$1" in
     if_kaddy )
         ## NOTE do NOT "$HOME" -> ~
@@ -16,7 +17,7 @@ case "$1" in
             exit
         fi
 
-        source ~/main/scripts/gb-calculation.sh
+        source ~/main/scripts/utils-calculation.sh
 
         size="$(du -bs "$2" | awk '{print $1}')"
         size="$(convert_byte "$size")"
@@ -28,7 +29,7 @@ case "$1" in
 
         printf '%s %s %s%s\n' "$size" "$directories_count" "$files_count" "$links_count" ;;
     git )
-        source ~/main/scripts/gb-git.sh
+        source ~/main/scripts/utils-git.sh
 
         [ "$(if_git "$2")" == 'false' ] && exit
 

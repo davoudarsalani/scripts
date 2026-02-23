@@ -2,11 +2,12 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/.help.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/.help.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/helps.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/helps.sh
 ##    https://davoudarsalani.ir
 
-source ~/scripts/gb-color
+
+source ~/main/scripts/utils-color.sh
 
 function application_help {
 clear
@@ -38,14 +39,6 @@ add 0.3 saturation     $(flag '-i|--input-file=') $(flag '-o|--output=')
 show streams           $(flag '-i|--input-file=')
 audio stream to keep   $(flag '-i|--input-file=') $(flag '-u|--audio-stream=') (e.g. 1) $(flag '-o|--output=')
 live camera            $(flag '-c|--camera=') (e.g. /dev/video0)"
-exit
-}
-
-function firewall_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-allow app    $(flag '-a|--application=')"
 exit
 }
 
@@ -89,19 +82,10 @@ function network_help {
 clear
 printf '%s\n' \
 "$(heading "$title") $(yellow "help")
-up ethernet/wifi connection     $(flag '-c|--connection=')
-down ethernet/wifi connection   $(flag '-c|--connection=')
+ethernet/wifi connection        $(flag '-c|--connection=')
 add ip                          $(flag '-i|--ip=') $(flag '-d|--device=')
 delete all ips                  $(flag '-d|--device=')
 connect to a new wifi network   $(flag '-s|--ssid=') $(flag '-p|--password=')"
-exit
-}
-
-function pulseaudio_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-$(flag '-d|--default=') default sink/source index/name"
 exit
 }
 
@@ -111,53 +95,5 @@ printf '%s\n' \
 "$(heading "$title") $(yellow "help")
 $(flag '-c|--case-sensitive')
 $(flag '-d|--directory=')"
-exit
-}
-
-function dell_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-$(flag '-n|--name=') dir/file name"
-exit
-}
-
-function typer_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-$(flag '-f|--file=')
-$(flag '-i|--interval=') (e.g. random, 0.2, 1, etc)
-$(flag '-n|--no-countdown')
-$(flag '-q|--quiet')"
-exit
-}
-
-function user_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-create group             $(flag '-g|--group=')
-add nnnn to a group      $(flag '-g|--group=')
-remove nnnn from a group $(flag '-g|--group=')"
-exit
-}
-
-function video_subtitle_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-$(flag '-d|--directory=')"
-exit
-}
-
-function project5_create_audio_template_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-$(flag '-l|--length=')
-$(flag '-d|--directory=')
-$(flag '-p|--per-page=')
-$(flag '-f|--destination-file=')"
 exit
 }

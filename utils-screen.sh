@@ -2,15 +2,16 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-screen.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-screen.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-screen.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-screen.sh
 ##    https://davoudarsalani.ir
+
 
 xrandr_output="$(xrandr)"
 
 scr_1_name="$(printf '%s\n' "$xrandr_output" | \grep -iw 'connected' | \grep -i  'primary'              | awk '{print $1}')"
 scr_2_name="$(printf '%s\n' "$xrandr_output" | \grep -iw 'connected' | \grep -iv 'primary' | sed '1q;d' | awk '{print $1}')"
-scr_3_name="$(printf '%s\n' "$xrandr_output" | \grep -iw 'connected' | \grep -iv 'primary' | sed '2q;d' | awk '{print $1}')"
+# scr_3_name="$(printf '%s\n' "$xrandr_output" | \grep -iw 'connected' | \grep -iv 'primary' | sed '2q;d' | awk '{print $1}')"
 
 scr_1_res_total="$(printf '%s\n' "$xrandr_output" | \grep "^$scr_1_name" | awk '{print $4}')"  ## 1366x768+1920+0
 scr_1_res="$(printf '%s\n' "$scr_1_res_total" | cut -d '+' -f 1)"  ## 1366x768
@@ -26,12 +27,12 @@ scr_2_y="$(printf '%s\n' "$scr_2_res" | cut -d 'x' -f 2)"
 scr_2_x_offset="$(printf '%s\n' "$scr_2_res_total" | sed "s/${scr_2_res}+//" | cut -d '+' -f 1)"
 scr_2_y_offset="$(printf '%s\n' "$scr_2_res_total" | sed "s/${scr_2_res}+//" | cut -d '+' -f 2)"
 
-scr_3_res_total="$(printf '%s\n' "$xrandr_output" | \grep "^$scr_3_name" | awk '{print $3}')"
-scr_3_res="$(printf '%s\n' "$scr_3_res_total" | cut -d '+' -f 1)"
-scr_3_x="$(printf '%s\n' "$scr_3_res" | cut -d 'x' -f 1)"
-scr_3_y="$(printf '%s\n' "$scr_3_res" | cut -d 'x' -f 2)"
-scr_3_x_offset="$(printf '%s\n' "$scr_3_res_total" | sed "s/${scr_3_res}+//" | cut -d '+' -f 1)"
-scr_3_y_offset="$(printf '%s\n' "$scr_3_res_total" | sed "s/${scr_3_res}+//" | cut -d '+' -f 2)"
+# scr_3_res_total="$(printf '%s\n' "$xrandr_output" | \grep "^$scr_3_name" | awk '{print $3}')"
+# scr_3_res="$(printf '%s\n' "$scr_3_res_total" | cut -d '+' -f 1)"
+# scr_3_x="$(printf '%s\n' "$scr_3_res" | cut -d 'x' -f 1)"
+# scr_3_y="$(printf '%s\n' "$scr_3_res" | cut -d 'x' -f 2)"
+# scr_3_x_offset="$(printf '%s\n' "$scr_3_res_total" | sed "s/${scr_3_res}+//" | cut -d '+' -f 1)"
+# scr_3_y_offset="$(printf '%s\n' "$scr_3_res_total" | sed "s/${scr_3_res}+//" | cut -d '+' -f 2)"
 
 scr_all_res="$(printf '%s\n' "$xrandr_output" | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',')"                    ## <--,
 scr_all_x="$(printf '%s\n' "$xrandr_output"   | \grep -iw 'current' | awk '{print $8 "" $9 "" $10}' | tr -d ',' | cut -d 'x' -f 1)"  ## <--|-- NOTE do NOT replace " with ' in awk

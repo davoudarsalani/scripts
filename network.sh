@@ -6,18 +6,15 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/network.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-network.sh
+
+source ~/main/scripts/helps.sh
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-network.sh
 
 title="${0##*/}"
 
-function display_help {
-    source ~/main/scripts/.help.sh
-    network_help
-}
-
 function add_desired_ip_to_ethernet {
-    source ~/main/scripts/gb-network.sh
+    source ~/main/scripts/utils-network.sh
     sudo ip address add "$desired_eth_ip" broadcast + dev "$eth_devc"
 }
 
@@ -47,7 +44,7 @@ function get_opt {
     while true; do
         case "$1" in
             -h|--help )
-                display_help ;;
+                network_help ;;
             -i|--ip )
                 shift
                 ip="$1" ;;
@@ -137,5 +134,5 @@ ${vpn_devc}     ${vpn_mac}" && accomplished ;;
         prompt -s -p
         sudo nmcli device wifi connect "$ssid" password "$password" && accomplished ;;
     help )
-        display_help ;;
+        network_help ;;
 esac

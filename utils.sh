@@ -2,9 +2,10 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils.sh
 ##    https://davoudarsalani.ir
+
 
 function to_tilda {
     ## - using // to replace all occurrences
@@ -39,31 +40,31 @@ function get_datetime {
 }
 
 function heading {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
 
     echo -e "$(green "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 
 function flag {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
 
     echo -e "$(purple "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 
 function action_now {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
 
     echo -e "$(green '→') $(gray "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 
 function accomplished {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
 
     echo -e "$(green '✔') $(gray "$@")"  ## JUMP_2 can't use printf as it returns literal foo\nbar if 'foo\nbar' is passed to it
 }
 
 function wrap_fzf_choice {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
 
     printf '%s %s %s\n' "$(brown '--=[')" "$@" "$(brown ']=--')"
 }
@@ -75,10 +76,10 @@ function select_file {
 
     local item
 
-    eval "$FZF_CTRL_T_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf "$@" | \
+    eval "$FZF_CTRL_T_COMMAND" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" fzf "$@" | \
     while read -r item; do
         item="$(head -2 <<< "$item" | tail -1)"
-        printf '%s\n' "${item/\~/$HOME}"
+        printf '%s\n' "$item"
     done
 }
 
@@ -99,8 +100,8 @@ function select_directory {
         FZF_ALT_C_COMMAND="$FZF_ALT_C_COMMAND_GIT"
     }
 
-    dir="$(eval "$FZF_ALT_C_COMMAND" | sed "s#$HOME#~#" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
-    [ "$dir" ] && printf '%q\n' "${dir/\~/$HOME}"
+    dir="$(eval "$FZF_ALT_C_COMMAND" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
+    [ "$dir" ] && printf '%q\n' "$dir"
 }
 
 function pipe_to_fzf {
@@ -200,17 +201,17 @@ function clear_playlist {
 }
 
 function turn_off_shuffle {
-    source ~/main/scripts/gb-audacious.sh
+    source ~/main/scripts/utils-audacious.sh
     [ "$shuffle_status" == 'on'  ] && audtool --playlist-shuffle-toggle
 }
 
 function turn_on_shuffle {
-    source ~/main/scripts/gb-audacious.sh
+    source ~/main/scripts/utils-audacious.sh
     [ "$shuffle_status" == 'off' ] && audtool --playlist-shuffle-toggle
 }
 
 function play_shutdown_track {
-    source ~/main/scripts/gb-audio.sh
+    source ~/main/scripts/utils-audio.sh
     pacmd play-file ~/main/configs/sounds/shutdown.ogg "$def_sink_index"
 }
 
@@ -237,60 +238,78 @@ function convert_to_second {  ## convert 2021-04-15T11:10:03+0430 to 1618468803
 }
 
 function convert_second {
-    local seconds sec min hour day mont year result
+    local seconds ss mi hh dd mo yy result
 
-    seconds="${1%.*}"  ## remove decimal in case arg is a float
-
-    if (( seconds < 1 )); then
+    ## $1 is neither int nor float
+    if ! [[ "$1" =~ ^[0-9.]+$ ]] || [ -z "$1" ]; then
         if [ "$2" == 'verbose' ]; then
-            result="less than a second"
+            printf '%s\n' '0'
         else
-            result="00:00:00"
+            printf '%s\n' '0:00'
+        fi
+        return
+    fi
+
+    seconds="$1"
+
+    ## exact zero (float-aware)
+    if awk "BEGIN {exit !($seconds == 0)}"; then
+        if [ "$2" == 'verbose' ]; then
+            printf '%s\n' '0'
+        else
+            printf '%s\n' '0:00'
+        fi
+        return
+    fi
+
+    ## 0 < seconds < 1
+    if awk "BEGIN {exit !($seconds < 1)}"; then
+        if [ "$2" == 'verbose' ]; then
+            printf '%s\n' '~0'
+        else
+            printf '%s\n' '~0:00'
+        fi
+        return
+    fi
+
+    ## float -> int
+    seconds="$(awk "BEGIN {printf \"%d\", $seconds}")"
+
+    ss="$(printf "%02d" "$(( "$seconds" % 60 ))")"
+    mi="$(printf "%02d" "$(( "$seconds" / 60 % 60 ))")"
+    hh="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
+    dd="$(printf "%02d" "$(( "$seconds" / 3600 / 24 % 30 ))")"
+    mo="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
+    yy="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
+
+    if [ "$yy" == '00' ] && [ "$mo" == '00' ] && [ "$dd" == '00' ]; then
+        if [ "$2" == 'verbose' ]; then
+            result="$hh hrs, $mi mins and $ss secs"
+        else
+            result="${hh}:${mi}:${ss}"
+        fi
+    elif [ "$yy" == '00' ] && [ "$mo" == '00' ]; then
+        if [ "$2" == 'verbose' ]; then
+            result="$dd days, $hh hrs and $mi mins"
+        else
+            result="${dd}:${hh}:${mi}:${ss}"
+        fi
+    elif [ "$yy" == '00' ]; then
+        if [ "$2" == 'verbose' ]; then
+            result="$mo months, $dd days and $hh hrs"
+        else
+            result="${mo}:${dd}:${hh}:${mi}:${ss}"
         fi
     else
-        sec="$(printf  "%02d" "$(( "$seconds" % 60 ))")"
-        min="$(printf  "%02d" "$(( "$seconds" / 60 % 60 ))")"
-        hour="$(printf "%02d" "$(( "$seconds" / 3600 % 24 ))")"
-        day="$(printf  "%02d" "$(( "$seconds" / 3600 / 24 % 30 ))")"
-        mont="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 % 12 ))")"
-        year="$(printf "%02d" "$(( "$seconds" / 3600 / 24 / 30 / 12 ))")"
-
-        ## NOTE used [ "$var" -eq 0 ] instead of (( var == 0 )) because
-        ##      1. (( var == 0 )) is stupid (i.e. it returns true even if var does not exist)
-        ##      2. ints here are two-digit and (( var == 0 )) can't handle that
-        if [ "$year" -eq 0 ] && [ "$mont" -eq 0 ] && [ "$day" -eq 0 ]; then
-            if [ "$2" == 'verbose' ]; then
-                result="$hour hours, $min minutes and $sec seconds"
-            else
-                result="${hour}:${min}:${sec}"
-            fi
-        elif [ "$year" -eq 0 ] && [ "$mont" -eq 0 ]; then
-            if [ "$2" == 'verbose' ]; then
-                result="$day days, $hour hours, $min minutes and $sec seconds"
-            else
-                result="${day}:${hour}:${min}:${sec}"
-            fi
-        elif [ "$year" -eq 0 ]; then
-            if [ "$2" == 'verbose' ]; then
-                result="$mont months, $day days, $hour hours, $min minutes and $sec seconds"
-            else
-                result="${mont}:${day}:${hour}:${min}:${sec}"
-            fi
+        if [ "$2" == 'verbose' ]; then
+            result="$yy years, $mo months and $dd days"
         else
-            if [ "$2" == 'verbose' ]; then
-                result="$year years, $mont months, $day days, $hour hours, $min minutes and $sec seconds"
-            else
-                result="${year}:${mont}:${day}:${hour}:${min}:${sec}"
-            fi
+            result="${yy}:${mo}:${dd}:${hh}:${mi}:${ss}"
         fi
+    fi
 
-
-        ## NOTE the same modifications in JUMP_4 are applied in
-        ##        1. convert_second function in gb.py
-        ##        2. 'relative' method of whatever-its-name-is class in models.py in django app
-        ##      so any changes you make here, make sure to update them too
-
-        ## JUMP_4 remove items whose values are 00, and adjust comma and 'and'
+    if [ "$2" == 'verbose' ]; then
+        ## remove items whose values are 00, and adjust comma and 'and'
         result="$(printf '%s\n' "$result" | \
             sed 's|00 [a-z]\+s, ||g' | \
             sed 's|00 [a-z]\+s and ||' | \
@@ -304,10 +323,27 @@ function convert_second {
             sed 's|, \([0-9][0-9] [a-z]\+s\)$| and \1|' \
         )"
 
-        ## JUMP_4 remove plural s when value is 01
+        ## remove plural s when value is 01
         result="$(printf '%s\n' "$result" | sed 's|\(01 [a-z]\+\)s |\1 |g;s|\(01 [a-z]\+\)s, |\1, |g;s|\(01 [a-z]\+\)s$|\1|')"
 
+        ## ..., 01 hr, ...  -> ..., 1 hr, ...
+        result="$(printf '%s\n' "$result" | sed 's|, 0\([0-9]\)|, \1|g')"
+
+        ## ... and 05 hrs ... -> ... and 5 hrs ...
+        ## (this seems to be a bug in the original function)
+        result="$(printf '%s\n' "$result" | sed 's|and 0\([0-9]\)|and \1|g')"
+    else
+        ## 0:00:12 -> 0:12
+        ## 0:08:12 -> 8:12        
+        result="$(printf '%s\n' "$result" | sed 's|^0\+:0\([0-9]\):|\1:|')"
+
+        ## 0:10:12 -> 10:12
+        result="$(printf '%s\n' "$result" | sed 's|^0\+:\([1-9]\)\([0-9]\):|\1\2:|')"
     fi
+
+    ## 02 days, ... -> 2 days, ...
+    ## 01:23        -> 1:23
+    result="$(printf '%s\n' "$result" | sed 's|^0\([0-9]\)|\1|')"
 
     printf '%s\n' "$result"
 }
@@ -332,7 +368,7 @@ function random_wallpaper {
 }
 
 function copy_random_wallpaper_for_startup {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
     local rand_wall dest_dir
 
     rand_wall="$(shuf -n 1 < <(find ~/main/wallpapers -mindepth 1 -maxdepth 1 -type f -iname '*.jpg'))"  ## JUMP_1
@@ -358,7 +394,7 @@ function set_widget {
 }
 
 function get_input {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
     local input
 
     unset input
@@ -367,7 +403,7 @@ function get_input {
 }
 
 function get_single_input {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
     local single_input
 
     unset single_input
@@ -376,7 +412,7 @@ function get_single_input {
 }
 
 function line {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
 
     gray "$(printf "%$(tput cols)s\n" | sed "s/ /▬/g")"
 }
@@ -392,8 +428,8 @@ function get_kaddy_counterpart {
 }
 
 function remove_older_pkgs {
-    source ~/main/scripts/gb.sh
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils.sh
+    source ~/main/scripts/utils-color.sh
 
     local src_dir uniq count file exceed idx remove_propmt
     declare -a files uniques repeats to_be_removed
@@ -414,7 +450,7 @@ function remove_older_pkgs {
 
     if [ "$to_be_removed" ]; then
         printf '%s\n' "${to_be_removed[@]##*/}" | sort | column
-        remove_propmt="$(get_single_input "remove ${#to_be_removed[@]} pkgs?")" && printf '\n'
+        remove_propmt="$(get_input "remove ${#to_be_removed[@]} pkgs?")" && printf '\n'
         case "$remove_propmt" in
             y )
                 action_now "removing from $(to_tilda "$src_dir")"
@@ -427,7 +463,7 @@ function remove_older_pkgs {
 }
 
 function expand_ips_from_ranges {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
     local ip1 ip2 dest_file ip1_4_new
     local ip1_1 ip1_2 ip1_3 ip1_4 ip2_1 ip2_2 ip2_3 ip2_4
 
@@ -551,8 +587,8 @@ function lock_now {
 # function compare_network_speed {
 #    ## this function takes only one arg which can only be either old or new
 
-#    source ~/main/scripts/gb-calculation.sh
-#    source ~/main/scripts/gb-color.sh
+#    source ~/main/scripts/utils-calculation.sh
+#    source ~/main/scripts/utils-color.sh
 
 #    declare -a loop_durs loops_durs
 
@@ -616,9 +652,9 @@ function lock_now {
 
 ## timer and record_*
 # function timer {
-#     source ~/main/scripts/gb-color.sh
-#     source ~/main/scripts/gb-screen.sh
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-color.sh
+#     source ~/main/scripts/utils-screen.sh
+#     source ~/main/scripts/utils-audio.sh
 #     start="$(get_datetime 'jhms')"
 #     for ((i=1; i<="$1"; i++)); {
 #         current="$(get_datetime 'jhms')"
@@ -634,8 +670,8 @@ function lock_now {
 # }
 
 # function record_audio {
-#     source ~/main/scripts/gb-screen.sh
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-screen.sh
+#     source ~/main/scripts/utils-audio.sh
 #     timer "$3" "$4" &
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default                \
@@ -644,8 +680,8 @@ function lock_now {
 # }
 
 # function record_audio_ul {
-#     source ~/main/scripts/gb-screen.sh
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-screen.sh
+#     source ~/main/scripts/utils-audio.sh
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
 #            -filter_complex amix=inputs=2 \
@@ -653,7 +689,7 @@ function lock_now {
 # }
 
 # function record_screen {
-#     source ~/main/scripts/gb-screen.sh
+#     source ~/main/scripts/utils-screen.sh
 #     timer "$3" "$6" &
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
@@ -664,8 +700,8 @@ function lock_now {
 # }
 
 # function record_screen_ul {
-#     source ~/main/scripts/gb-screen.sh
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-screen.sh
+#     source ~/main/scripts/utils-audio.sh
 #     ffmpeg -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
 #            -filter_complex amix=inputs=2 \
@@ -675,8 +711,8 @@ function lock_now {
 # }
 
 # function record_video {
-#     source ~/main/scripts/gb-screen.sh
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-screen.sh
+#     source ~/main/scripts/utils-audio.sh
 #     timer "$3" "$4" &
 #     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
 #            -f pulse -i "$def_source_mon_index" \
@@ -686,8 +722,8 @@ function lock_now {
 # }
 
 # function record_video_ul {
-#     source ~/main/scripts/gb-screen.sh
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-screen.sh
+#     source ~/main/scripts/utils-audio.sh
 #     ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i "$def_video_dev" \
 #            -f pulse -i "$def_source_mon_index" \
 #            -f pulse -i default \
@@ -696,7 +732,7 @@ function lock_now {
 # }
 
 # function record_mic_mon_on {
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-audio.sh
 #     unmute_mic
 #     mic_25
 #     unmute_mon
@@ -704,13 +740,13 @@ function lock_now {
 # }
 
 # function record_mon_on {
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-audio.sh
 #     unmute_mon
 #     mon_100
 # }
 
 # function record_mic_mon_off {
-#     source ~/main/scripts/gb-audio.sh
+#     source ~/main/scripts/utils-audio.sh
 #     mute_mic
 #     mic_0
 #     mute_mon

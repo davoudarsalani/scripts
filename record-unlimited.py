@@ -9,7 +9,7 @@
 from os import getenv, path
 from signal import signal, SIGINT
 
-from gp import Screen, Color, Audio, Record, get_datetime, pip_to_fzf, update_audio, invalid, get_single_input
+from utils import Screen, Color, Audio, Record, get_datetime, pipe_to_fzf, update_audio, invalid, get_input
 
 title = path.basename(__file__).replace('.py', '')
 Aud = Audio()
@@ -32,9 +32,9 @@ handler = signal(SIGINT, received_ctrl_c)
 print(Col.heading(title))
 
 main_items = ['audio', 'screen 1', 'screen 2', 'screen all', 'video']
-main_item = pip_to_fzf(main_items)
+main_item = pipe_to_fzf(main_items)
 
-mic = get_single_input('need mic?')
+mic = get_input('need mic?')
 if   mic == 'y':
     Aud.mic('unmute')
     Aud.mic('25')

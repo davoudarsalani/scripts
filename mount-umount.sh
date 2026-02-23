@@ -6,14 +6,11 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/mount-umount.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
+
+source ~/main/scripts/helps.sh
+source ~/main/scripts/utils.sh
 
 title="${0##*/}"
-
-function display_help {
-    source ~/main/scripts/.help.sh
-    mount_umount_help
-}
 
 function prompt {
     for _ in "$@"; {
@@ -35,7 +32,7 @@ function get_opt {
     while true; do
         case "$1" in
             -h|--help )
-                display_help ;;
+                mount_umount_help ;;
             -d|--device )
                 shift
                 device="$1" ;;
@@ -175,7 +172,7 @@ case "$main_item" in
     'kernel drivers' )
         lspci -k && accomplished ;;
     'remount root partition' )
-        remount_prompt="$(get_single_input 'You sure?')" && printf '\n'
+        remount_prompt="$(get_input 'You sure?')" && printf '\n'
         case "$remount_prompt" in
             y ) mount -o remount,rw / && accomplished ;;
         esac ;;
@@ -207,5 +204,5 @@ case "$main_item" in
     'cat /proc/mounts' )
         cat /proc/mounts && accomplished ;;
     help )
-        display_help ;;
+        mount_umount_help ;;
 esac

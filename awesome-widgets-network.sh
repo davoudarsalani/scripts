@@ -6,25 +6,32 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-widgets-network.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-calculation.sh
-source ~/main/scripts/gb-network.sh
+
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-calculation.sh
+source ~/main/scripts/utils-network.sh
 
 ## ⮝ U+2B9D
 ## ⮟ U+2B9F
 ## ⮜ U+2B9C
 ## ⮞ U+2B9E
 ## ▲ ▼
-down_icon="<span color=\"${gruvbox_blue_d}\">⮟</span>"
-up_icon="<span color=\"${gruvbox_purple_d}\">⮝</span>"
+down_icon='⮟'
+up_icon='⮝'
+
+down_icon_diff="<span color=\"${gruvbox_blue_d}\">${down_icon}</span>"
+up_icon_diff="<span color=\"${gruvbox_purple_d}\">${up_icon}</span>"
+
+down_icon_total="<span color=\"${gruvbox_gray_d}\">${down_icon}</span>"
+up_icon_total="<span color=\"${gruvbox_gray_d}\">${up_icon}</span>"
 
 total_color_low="$gruvbox_gray_d"
 total_color_medium="$gruvbox_gray_d"
 total_color_high="$gruvbox_purple"
 total_color_ultRRRigh="$gruvbox_red"
 
-diff_color_low="$gruvbox_fg"
-diff_color_medium="$gruvbox_fg"
+diff_color_low="$gruvbox_fg2"
+diff_color_medium="$gruvbox_fg2"
 diff_color_high="$gruvbox_blue"
 diff_color_ultRRRigh="$gruvbox_green"
 
@@ -37,8 +44,9 @@ total_text=''
 [ "$wf_conn" == 'MCI'        ] && if_simcard="<span color=\"${gruvbox_orange}\"> SIM</span>"
 [ "$wf_state" == 'connected' ] || if_wf_down="<span color=\"${gruvbox_red}\"> WiFi DOWN</span>"
 [ "$vpn_info"                ] && vpn_conn="<span color=\"${gruvbox_gray_d}\"> ${vpn_conn}</span>"
+[ "$(pgrep 'openvpn')"       ] && openvpn="<span color=\"${gruvbox_gray_d}\"> OP</span>"
 
-connection_text="${wf_conn}${eth_conn}${if_simcard}${if_wf_down}${vpn_conn}"
+connection_text="${wf_conn}${eth_conn}${if_simcard}${if_wf_down}${openvpn}${vpn_conn}"
 
 ## total and diff -----------------------
 ## https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
@@ -134,8 +142,8 @@ for adapter in 'wifi' 'ethernet'; {
 
     ## ---
 
-    diff_text+=" | ${down_icon} ${down_diff_conv}  ${up_icon} ${up_diff_conv}"  ## 317K 2.31M
-    total_text+=" | ${down_icon} ${down_total_conv}  ${up_icon} ${up_total_conv}"  ## 4.32G 4.32G
+    diff_text+=" | ${down_icon_diff} ${down_diff_conv}  ${up_icon_diff} ${up_diff_conv}"  ## 317K 2.31M
+    total_text+=" | ${down_icon_total} ${down_total_conv}  ${up_icon_total} ${up_total_conv}"  ## 4.32G 4.32G
 }
 
 ## remove leading ' | '

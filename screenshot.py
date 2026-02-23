@@ -12,7 +12,7 @@ from gi import require_version
 require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from PIL import Image
-from gp import Screen, get_datetime, pip_to_dmenu, msgn, msgc, countdown
+from utils import Screen, get_datetime, pipe_to_dmenu, msgn, msgc, countdown
 
 def convert_to_jpg(png_image: str) -> None:
     global output
@@ -27,7 +27,7 @@ def convert_to_jpg(png_image: str) -> None:
         pass
 
 main_items = ['screen 1', 'screen 2', 'screen all', 'current window', 'selected area']
-main_item = pip_to_dmenu(main_items, 'screenshot')
+main_item = pipe_to_dmenu(main_items, 'screenshot')
 
 now = get_datetime('jymdhms')
 global output

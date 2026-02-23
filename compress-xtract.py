@@ -11,7 +11,7 @@ from os import path
 from subprocess import run
 from sys import argv
 
-from gp import Color, pip_to_fzf, invalid, get_input, get_single_input, get_password, compress_tar, xtract_tar, compress_zip, xtract_zip, xtract_rar
+from utils import Color, pipe_to_fzf, invalid, get_input, get_input, get_password, compress_tar, xtract_tar, compress_zip, xtract_zip, xtract_rar
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
@@ -54,7 +54,7 @@ getopts()
 print(Col.heading(title))
 
 main_items = ['tar', 'untar', 'zip', 'unzip', 'unrar', 'help']
-main_item = pip_to_fzf(main_items)
+main_item = pipe_to_fzf(main_items)
 
 if   main_item == 'tar':
     prompt('-i')
@@ -63,7 +63,7 @@ elif main_item == 'untar':
     prompt('-i')
     xtract_tar(inpt)
 elif main_item == 'zip':
-    use_password = get_single_input('use password (y/n)?')
+    use_password = get_input('use password (y/n)?')
     if   use_password == 'y':
         prompt('-i', '-p')
         compress_zip(inpt, password)
@@ -73,7 +73,7 @@ elif main_item == 'zip':
     else:
         invalid('wrong choice')
 elif main_item == 'unzip':
-    has_password = get_single_input('has password (y/n)?')
+    has_password = get_input('has password (y/n)?')
     if   has_password == 'y':
         prompt('-i', '-p')
         xtract_zip(inpt, password)
@@ -83,7 +83,7 @@ elif main_item == 'unzip':
     else:
         invalid('wrong choice')
 elif main_item == 'unrar':
-    has_password = get_single_input('has password (y/n)?')
+    has_password = get_input('has password (y/n)?')
     if   has_password == 'y':
         prompt('-i', '-p')
         xtract_rar(inpt, password)

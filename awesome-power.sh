@@ -6,7 +6,8 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/awesome-power.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
+
+source ~/main/scripts/utils.sh
 
 ## options match ones in power.sh
 case "$1" in

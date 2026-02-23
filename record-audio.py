@@ -8,10 +8,10 @@
 
 from os import getenv
 
-from gp import Audio, Record, get_datetime, pip_to_dmenu, update_audio, convert_second, invalid
+from utils import Audio, Record, get_datetime, pipe_to_dmenu, update_audio, convert_second, invalid
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
-length = pip_to_dmenu(lengths, 'rec audio')
+length = pipe_to_dmenu(lengths, 'rec audio')
 if   length == '30s': secs = 30
 elif length == '1m':  secs = 60
 elif length == '5m':  secs = 300
@@ -31,7 +31,7 @@ Aud = Audio()
 Rec = Record()
 
 need_mics = ['no', 'yes']
-need_mic = pip_to_dmenu(need_mics, 'need mic?')
+need_mic = pipe_to_dmenu(need_mics, 'need mic?')
 if need_mic == 'yes':
     Aud.mic('unmute')
     Aud.mic('25')

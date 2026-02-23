@@ -2,8 +2,8 @@
 ## for .venv_keylogger: keylogger
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gp.py
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gp.py
+##    https://github.com/davoudarsalani/scripts/blob/master/utils.py
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils.py
 ##    https://davoudarsalani.ir
 
 ## for .venv: (
@@ -385,7 +385,7 @@ class Record:
         run(f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {self.def_video_dev} -f pulse -i {self.Aud.mon("index")} \
               -f pulse -i default -filter_complex amix=inputs=2 {output} -loglevel quiet', shell=True)
 
-def pip_to_fzf(items: list[str], header: str='') -> str:
+def pipe_to_fzf(items: list[str], header: str='') -> str:
     from os import getenv
     from pyfzf.pyfzf import FzfPrompt
 
@@ -394,7 +394,9 @@ def pip_to_fzf(items: list[str], header: str='') -> str:
 
     Col = Color()
     fzf = FzfPrompt()
-    fzf_opts = f'{getenv("FZF_DEFAULT_OPTS")} {header}'
+
+    fzf_opts = f' {header}'
+    ## previously: fzf_opts = f'{getenv("FZF_DEFAULT_OPTS")} {header}'
 
     try:
         item = fzf.prompt(items, fzf_opts)
@@ -666,7 +668,7 @@ def centralize(text: str, wrapper: str=' ') -> str:
 
     return text.center(width, wrapper)
 
-def pip_to_dmenu(items: list[str]=[], title: str='', fg: str='') -> str:  ## Docs: https://dmenu.readthedocs.io/en/latest/
+def pipe_to_dmenu(items: list[str]=[], title: str='', fg: str='') -> str:  ## Docs: https://dmenu.readthedocs.io/en/latest/
     from os import getenv
     import dmenu
 

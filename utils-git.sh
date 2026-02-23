@@ -2,11 +2,13 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-git.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-git.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-git.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-git.sh
 ##    https://davoudarsalani.ir
 
-# NOTE assigning dest="${1:-.}" and using git -C "$dest" instead of git -C "${1:-.}" did not work
+
+## NOTE assigning dest="${1:-.}" and using git -C "$dest"
+##      instead of git -C "${1:-.}" did not work
 
 ## %x09 = tab (https://stackoverflow.com/questions/1441010/the-shortest-possible-output-from-git-log-containing-author-and-date)
 ##            (https://git-scm.com/docs/pretty-formats)
@@ -33,25 +35,30 @@ function git_diff_specific {
 function git_log {
     ## NOTE nearly share the same options for log as JUMP_1
 
-    ## %G?: show "G" for a good (valid) signature, "B" for a bad signature, "U" for a good signature with unknown validity and "N" for no signature
+    ## %G?: shows:
+    ##   "G" for a good (valid) signature,
+    ##   "B" for a bad signature,
+    ##   "U" for a good signature with unknown validity
+    ##   "N" for no signature
     git -C "${1:-.}" \
-        log --color --abbrev-commit --full-history --all --graph \
-            --format='%C(always,blue)%h %C(always,magenta)%G? %C(always,bold black)%>(15,trunc)%cr %C(always,green)%<(4,trunc)%cn %C(always,green)%d %C(always,reset)%s'
+        log --all --decorate --graph --color --full-history \
+            --format='%C(always,dim blue)%h %C(always,dim white)%>(14,trunc)%cr %C(always,dim green)%d %C(always,reset)%s'
+            ## %C(always,green)%<(7,trunc)%cn
 }
 
 function git_reflog {
-    ## NOTE nearly share the same options for log as JUMP_1
+    ## JUMP_1
     git -C "${1:-.}" \
-        reflog --color --abbrev-commit --full-history \
-               --format='%C(always,yellow)%h %C(always,magenta)%G? %C(always,bold black)%>(15,trunc)%cr %C(always,green)%<(4,trunc)%cn %C(always,green)%d %C(always,reset)%s'
+        reflog --color --full-history \
+               --format='%C(always,dim yellow)%h %C(always,dim white)%>(14,trunc)%cr %C(always,dim green)%d %C(always,reset)%s'
+               ## %C(always,green)%<(7,trunc)%cn
 }
 
-function git_show { show changes for a commit
+function git_show {  ## show changes for a commit
     git -C "${1:-.}" show --unified=0 --color=always "$2"  ## $2 is commit hash
     ## --unified=0 makes git show only the modified lines
     ## --color-words show modified words side-by-side
 }
-
 
 function git_add_all {
     git -C "${1:-.}" add -A
@@ -178,8 +185,8 @@ function git_hash_last_commit {
 }
 
 function git_if_behind {
-    source ~/main/scripts/gb-color.sh
-    local commits_ahead commits_behind commits_behind_ahead temp_path
+    source ~/main/scripts/utils-color.sh
+    local commits_ahead commits_behind commits_behind_ahead
 
     action_now 'updating remote'
     commits_ahead="$(git_commits_ahead "${1:-.}")"
@@ -193,9 +200,8 @@ function git_if_behind {
     ## getting commits_behind
     (( commits_behind="commits_behind_ahead - commits_ahead" ))
     (( commits_behind > 0 )) && {
-        temp_path="$(printf '%s\n' "${1:-.}" | sed "s|$HOME|\~|")"  ## NOTE do NOT replace | with / in sed
         red "local is $commits_behind commits behind remote."
-        red "try: git -C $temp_path pull"
+        red "try: git -C ${1:-.} pull"
         exit 37
     }
 }
@@ -217,7 +223,7 @@ function git_pull_proxy {
 }
 
 function git_push_failed {
-    source ~/main/scripts/gb-color.sh
+    source ~/main/scripts/utils-color.sh
 
     red 'push failed.'
     red "try: git -C ${1:-.} push --set-upstream origin master"  ## --set-upstream or -u

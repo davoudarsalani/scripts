@@ -6,14 +6,11 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/ffmpeg.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
+
+source ~/main/scripts/helps.sh
+source ~/main/scripts/utils.sh
 
 title="${0##*/}"
-
-function display_help {
-    source ~/main/scripts/.help.sh
-    ffmpeg_help
-}
 
 function prompt {
     for _ in "$@"; {
@@ -62,7 +59,7 @@ function get_opt {
     while true; do
         case "$1" in
             -h|--help )
-                display_help ;;
+                ffmpeg_help ;;
             -i|--input-file )
                 shift
                 input_file="$1" ;;
@@ -179,7 +176,7 @@ case "$main_item" in
         prompt -c
         ffplay "$camera" ;;
     help )
-        display_help ;;
+        ffmpeg_help ;;
 esac
 
 ## notes

@@ -6,16 +6,13 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/git.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-color.sh
-source ~/main/scripts/gb-git.sh
+
+source ~/main/scripts/helps.sh
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-color.sh
+source ~/main/scripts/utils-git.sh
 
 title="${0##*/}"
-
-function display_help {
-    source ~/main/scripts/.help.sh
-    git_help
-}
 
 function add_to_changes {
     local icon member
@@ -34,9 +31,9 @@ function branch_info {  ## https://revelry.co/terminal-workflow-fzf/
 
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
                                          ##        we have to do the sourcing for the very same reason
-    ## no need to --preview-window "$preview_status" because it uses the value set in bahrc in FZF_DEFAULT_OPTS
+    ## no need to --preview-window "$preview_status" because it uses the value set in .bahrc in FZF_DEFAULT_OPTS
     fzf_choice="$(printf '%s\n' "$@" | fzf \
-                  --preview 'source ~/main/scripts/gb-git.sh; git_log "${directory2:-.}" \
+                  --preview 'source ~/main/scripts/utils-git.sh; git_log "${directory2:-.}" \
                   $(sed s/^..// <<< {} | cut -d " " -f 1)' #| sed 's/^..//' | cut -d " " -f 1
                   ## ^^ ORIG: --preview 'git -C "${directory2:-.}" log --oneline --graph --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d " " -f 1) | head -'$LINES | sed 's/^..//'
                 )"
@@ -100,6 +97,8 @@ function pipe_to_fzf_locally {
     [ "$multiple" == 'true' ] && multi_arg='--multi'
     short_pwd="$(to_tilda "$PWD")"
     short_directory="$(to_tilda "$directory")"
+    [ "$short_directory" == '.' ] && short_directory="$short_pwd"  ## . -> ~/main/scripts
+
     export directory2="$directory"  ## JUMP_3 we have to do the export because --preview uses subshell making the original directory useless here
                                     ##        we have to do the sourcing for the very same reason
 
@@ -107,14 +106,14 @@ function pipe_to_fzf_locally {
         fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
                                                --preview-window "$preview_status" \
                                                ${multi_arg} \
-                                               --preview '(source ~/main/scripts/gb-git.sh; git_show "${directory2:-.}" {2})')"
-                                               ## ^^ ORIG: --preview '(source ~/main/scripts/gb-git.sh; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+                                               --preview '(source ~/main/scripts/utils-git.sh; git_show "${directory2:-.}" {2})')"
+                                               ## ^^ ORIG: --preview '(source ~/main/scripts/utils-git.sh; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     else
         fzf_choice="$(printf '%s\n' "$@" | fzf --header "git in ${short_directory:-$short_pwd}" --nth 2..,.. \
                                                --preview-window "$preview_status" \
                                                ${multi_arg} \
-                                               --preview '(source ~/main/scripts/gb-git.sh; git_diff_specific "${directory2:-.}" {-1})')"
-                                               ## ^^ ORIG: --preview '(source ~/main/scripts/gb-git.sh; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
+                                               --preview '(source ~/main/scripts/utils-git.sh; git_diff_specific "${directory2:-.}" {-1})')"
+                                               ## ^^ ORIG: --preview '(source ~/main/scripts/utils-git.sh; git_diff_specific "${directory2:-.}" {-1}; cat {-1}) | head -500'
     fi
     [ "$fzf_choice" ] && printf '%s\n' "$fzf_choice" || return 37
 }
@@ -167,7 +166,7 @@ function get_opt {
     while true; do
         case "$1" in
             -h|--help )
-                display_help ;;
+                git_help ;;
             -x|--proxy )
                 proxy='true' ;;
             -d|--directory )
@@ -212,7 +211,7 @@ main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" ||
 
 case "$main_item" in
     help )
-        display_help ;;
+        git_help ;;
 
     "setup in $(to_tilda "$PWD")" )
         test_dir="$PWD"
@@ -220,7 +219,7 @@ case "$main_item" in
             red "$(to_tilda "$test_dir")/.git already exists"
             exit
         }
-        start_init="$(get_single_input 'start?')" && printf '\n'
+        start_init="$(get_input 'start?')" && printf '\n'
         case "$start_init" in
             y )
                 {
@@ -234,8 +233,11 @@ case "$main_item" in
                     git_commit_with_message "$test_dir" 'initiated' &>/dev/null
                     action_now 'set master'
                     git -C "$test_dir" branch -M master
-                    action_now "add origin https://www.github.com/${github_username}/${test_dir##*/}.git"
-                    git -C "$test_dir" remote add origin https://www.github.com/${github_username}/${test_dir##*/}.git
+
+                    remote_origin_url="git@github.com:${github_username}/${test_dir##*/}.git"
+                    action_now "add origin $remote_origin_url"
+                    git -C "$test_dir" remote add origin ${remote_origin_url}
+
                     printf "%s  curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}' &>/dev/null\n" "$(blue 'create remote')" "${test_dir##*/}"
                     printf "               curl -X POST -H \"Authorization: token \${github_token}\" https://api.github.com/user/repos -d '{\"name\": \"%s\", \"private\": \"true\"}' &>/dev/null\n" "${test_dir##*/}"
                     # printf "              curl -su \"${github_username}:\$github_token\" https://api.github.com/user/repos -d '{\"name\": \"%s\"}'\n" "${test_dir##*/}"
@@ -650,7 +652,7 @@ case "$main_item" in
         jump_item="$(pipe_to_fzf_locally "${jump_items[@]}")" && wrap_fzf_choice "$jump_item" || exit 37
 
         prompt -c
-        jump_prompt="$(get_single_input "$jump_item to ${commit_hash}?")" && printf '\n'
+        jump_prompt="$(get_input "$jump_item to ${commit_hash}?")" && printf '\n'
         [ "$jump_prompt" == 'y' ] || exit
 
         if_locked
@@ -670,7 +672,7 @@ case "$main_item" in
         esac ;;
 
     'garbage clean' )
-        clean_prompt="$(get_single_input 'sure?')" && printf '\n'
+        clean_prompt="$(get_input 'sure?')" && printf '\n'
         case "$clean_prompt" in
             y )
                 git_garbage_clean "$directory" && \

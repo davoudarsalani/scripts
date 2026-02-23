@@ -2,9 +2,10 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-audacious.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-audacious.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-audacious.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-audacious.sh
 ##    https://davoudarsalani.ir
+
 
 length_in_seconds="$(audtool --current-song-length-seconds)" || length_in_seconds=0  ## 3304
 length="$(audtool --current-song-length)"  ## 5:47

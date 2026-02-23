@@ -14,7 +14,7 @@ from re import sub
 from subprocess import run
 from sys import argv
 
-from gp import Color, invalid, pip_to_fzf
+from utils import Color, invalid, pipe_to_fzf
 
 title = path.basename(__file__).replace('.py', '')
 script_args = argv[1:]
@@ -86,7 +86,7 @@ getopts()
 print(Col.heading(title))
 
 main_items = ['password', 'help']
-main_item = pip_to_fzf(main_items)
+main_item = pipe_to_fzf(main_items)
 
 if main_item == 'password':
     prompt('-l', '-c')

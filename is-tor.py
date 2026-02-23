@@ -11,7 +11,7 @@ from os import path, getenv
 from sys import argv
 
 from requests import Session
-from gp import Color, msgn, get_headers
+from utils import Color, msgn, get_headers
 
 title = path.basename(__file__).replace('.py', '')
 istor = False
@@ -27,6 +27,8 @@ Ses.proxies = {
     'https': tor_proxy
 }
 
+attempts = 10
+
 script_args = argv[1:]
 if script_args:
     first_arg = script_args[0]
@@ -35,9 +37,7 @@ else:
 
 if first_arg == 'msg':
     msgn(f'<span color=\"{getenv("gruvbox_orange")}\">{title}</span> checking')
-    attempts = 10
 else:
-    attempts = 1000
     print(Col.heading(title))
 
 for attempt in range(1, attempts+1):

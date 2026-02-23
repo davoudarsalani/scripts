@@ -2,9 +2,10 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-color.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-color.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-color.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-color.sh
 ##    https://davoudarsalani.ir
+
 
 ## 40 for black
 ## 49 for transparent

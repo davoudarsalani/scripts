@@ -6,9 +6,10 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/movie.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-audacious.sh
-source ~/main/scripts/gb-duration.sh
+
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-audacious.sh
+source ~/main/scripts/utils-duration.sh
 
 function no_such_file {
     msgc 'ERROR' "no such file as <span color=\"${gruvbox_orange}\">$(to_tilda "$movie_full_path")</span>" ~/main/configs/themes/alert-w.png

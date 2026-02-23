@@ -6,8 +6,9 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/copy.sh
 ##    https://davoudarsalani.ir
 
-source ~/main/scripts/gb.sh
-source ~/main/scripts/gb-color.sh
+
+source ~/main/scripts/utils.sh
+source ~/main/scripts/utils-color.sh
 
 title="${0##*/}"
 
@@ -27,7 +28,7 @@ function copy {
     readarray -t files < <(find "$dest_dir" -mindepth 1 -maxdepth 1 ! -iname '*00-*' | sort)
     printf '%s\n' "${files[@]##*/}" # | column
 
-    remove_propmt="$(get_single_input 'remove these?')" && printf '\n'
+    remove_propmt="$(get_input 'remove these?')" && printf '\n'
     case "$remove_propmt" in
         y )
             rm -rf "${files[@]}" ;;
@@ -51,6 +52,7 @@ main_items=(
     'mimeapps.list'
     'mysql'
     'optimus-manager'
+    'ranger'
     'rofi'
     'ssh'
     'sublime'
@@ -79,13 +81,14 @@ case "$main_item" in
     bash )
         copy ~/.bashrc \
              ~/.bash_history \
+             ~/.bash_profile \
              /etc/{bash.bashrc,environment,inputrc,profile} ;;
 
     fzf )
         copy ~/.fzf/ ;;
 
     git )
-        copy ~/{.gitconfig,.git-credentials} ;;
+        copy ~/.config/git/config ;;
 
     greenclip )
         copy ~/.config/greenclip.toml ;;
@@ -99,6 +102,9 @@ case "$main_item" in
     optimus-manager )
         copy /etc/optimus-manager/optimus-manager.conf \
              /etc/X11/xorg.conf.d/10-optimus-manager.conf ;;
+
+    ranger )
+        copy ~/.config/ranger/* ;;
 
     rofi )
         copy ~/.config/rofi/* \

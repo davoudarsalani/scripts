@@ -2,15 +2,18 @@
 
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
-##    https://github.com/davoudarsalani/scripts/blob/master/gb-network.sh
-##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/gb-network.sh
+##    https://github.com/davoudarsalani/scripts/blob/master/utils-network.sh
+##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils-network.sh
 ##    https://davoudarsalani.ir
+
 
 ## also have a look at --,--> nmcli -c no --terse --fields DEVICE,CONNECTION,STATE dev status
 ##                       '--> nmcli -c no -t device
 
+nmcli_output="$(nmcli --colors no device)"
+
 ## ethernet
-read -a eth_info < <(nmcli -c no device | \grep 'ethernet')                ## enp4s0f1 ethernet connected CAB
+read -a eth_info < <(printf '%s\n' "$nmcli_output" | \grep 'ethernet')     ## enp4s0f1 ethernet connected CAB
 [ "$eth_info" ] && {
     eth_devc="${eth_info[0]}"                                              ## enp4s0f1
     eth_state="${eth_info[2]}"                                             ## connected
@@ -21,7 +24,7 @@ read -a eth_info < <(nmcli -c no device | \grep 'ethernet')                ## en
 }
 
 ## wifi
-read -a wf_info < <(nmcli -c no device | \grep 'wifi[^-]')                 ## wlp3s0 wifi connected LTE
+read -a wf_info < <(printf '%s\n' "$nmcli_output" | \grep 'wifi[^-]')      ## wlp3s0 wifi connected LTE
 [ "$wf_info" ] && {
     wf_devc="${wf_info[0]}"                                                ## wlp3s0
     wf_state="${wf_info[2]}"                                               ## connected
@@ -32,7 +35,7 @@ read -a wf_info < <(nmcli -c no device | \grep 'wifi[^-]')                 ## wl
 }
 
 ## vpn
-read -a vpn_info < <(nmcli -c no device | \grep 'tun')                     ## tun0 tun connected RRR
+read -a vpn_info < <(printf '%s\n' "$nmcli_output" | \grep 'tun')          ## tun0 tun connected RRR
 [ "$vpn_info" ] && {
     vpn_devc="${vpn_info[0]}"                                              ## tun0
     vpn_state="${vpn_info[2]}"                                             ## connected
@@ -43,3 +46,5 @@ read -a vpn_info < <(nmcli -c no device | \grep 'tun')                     ## tu
 }
 
 desired_eth_ip='192.168.200.1/24'
+
+unset nmcli_output
