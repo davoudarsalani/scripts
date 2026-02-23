@@ -230,7 +230,7 @@ function relative_date {
 
     now_in_seconds="$(get_datetime 'seconds')"
 
-    printf '%s ago\n' "$(convert_second "(( now_in_seconds - start_date_in_seconds ))" 'verbose')"
+    printf '%s ago\n' "$(convert_second "$(( now_in_seconds - start_date_in_seconds ))" 'verbose')"
 }
 
 function convert_to_second {  ## convert 2021-04-15T11:10:03+0430 to 1618468803
@@ -240,8 +240,10 @@ function convert_to_second {  ## convert 2021-04-15T11:10:03+0430 to 1618468803
 function convert_second {
     local seconds ss mi hh dd mo yy result
 
-    ## $1 is neither int nor float
-    if ! [[ "$1" =~ ^[0-9.]+$ ]] || [ -z "$1" ]; then
+    seconds="$1"
+
+    ## $seconds is neither int nor float
+    if ! [[ "$seconds" =~ ^[0-9.]+$ ]]; then
         if [ "$2" == 'verbose' ]; then
             printf '%s\n' '0'
         else
@@ -249,8 +251,6 @@ function convert_second {
         fi
         return
     fi
-
-    seconds="$1"
 
     ## exact zero (float-aware)
     if awk "BEGIN {exit !($seconds == 0)}"; then
