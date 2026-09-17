@@ -10,10 +10,10 @@
 source ~/main/scripts/helps.sh
 source ~/main/scripts/utils.sh
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 function prompt {
-    for _ in "$@"; {
+    for _ in "$@"; do
         case "$1" in
             -d )
                 device="${device:-"$(get_input 'device (e.g. /dev/sdc)')"}" ;;
@@ -21,7 +21,7 @@ function prompt {
                 name="${name:-"$(get_input 'name (e.g. nnnn)')"}" ;;
         esac
         shift
-    }
+    done
 }
 
 function get_opt {
@@ -56,9 +56,7 @@ case "$1" in
             exit
         }
 
-        rofi__title="$title"
-        rofi__subtitle="$1"
-        mountable_item="$(pipe_to_rofi "${mountable[@]}")" || exit 37
+        mountable_item="$(pipe_to_rofi --header "$title" --subheader "$1" "${mountable[@]}")" || exit 37
 
         current_datetime="$(get_datetime 'jymdhms')"
         name="$(printf '%s\n' "$mountable_item" | awk '{print $1}')"  ## sdb1
@@ -125,9 +123,7 @@ case "$1" in
             exit
         }
 
-        rofi__title="$title"
-        rofi__subtitle="$1"
-        umountable_item="$(pipe_to_rofi "${umountable[@]}")" || exit 37
+        umountable_item="$(pipe_to_rofi --header "$title" --subheader "$1" "${umountable[@]}")" || exit 37
 
         name="$(printf '%s\n' "$umountable_item" | awk '{print $1}')"
 
@@ -147,7 +143,6 @@ esac
 heading "$title"
 
 main_items=( 'udisksctl mount -b' 'udisksctl unmount -b' 'blkid and lsblk -f' 'lsusb' 'lsmod (modules loaded)' 'lspci' 'mounted drives' 'kernel drivers' 'remount root partition' 'mountable' 'umountable' 'format usb device' 'cat /proc/mounts' 'help' )
-fzf__title=''
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -190,7 +185,6 @@ case "$main_item" in
         sudo cfdisk "$device" && accomplished
         sleep 0.5
 
-        fzf__title=''
         filesystem="$(pipe_to_fzf 'ext4' 'vfat')" && wrap_fzf_choice "$filesystem" || exit 37
 
         device+=1  ## /dev/sdc1

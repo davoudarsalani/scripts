@@ -19,13 +19,11 @@ function update_audacious {
     ~/main/scripts/awesome-widgets.sh audacious
 }
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 readarray -t directories < <(find ~/main/music -mindepth 1 -maxdepth 1 -type d | sort)
 
-rofi__title="$title"
-# rofi__subtitle="$1"
-directory="$(pipe_to_rofi "${directories[@]##*/}")" || exit 37
+directory="$(pipe_to_rofi --header "$title" "${directories[@]##*/}")" || exit 37
 
 [ -d ~/main/music/"$directory" ] || no_such_dir
 
@@ -34,6 +32,10 @@ clear_playlist ; sleep 0.1
 
 msgn 'playing' "<span color=\"${gruvbox_orange}\">${directory}</span>" ~/main/configs/themes/musical-note-w.png
 
-readarray -t files < <(find ~/main/music/"$directory" -mindepth 1 -type f -iname '*.mp3' | sort)  ## <--,-- -maxdepth 1 is not needed here
-audacious -E "${files[@]}"                                                                        ##    |-- NOTE do NOT add cut -c 3- (it would open multiple error boxes
-update_audacious                                                                                  ##    '-- saying 'Error reading *****. No such file or directory')
+## NOTE
+##   - do NOT add cut -c 3- (it would open multiple error boxes
+##     saying 'Error reading *****. No such file or directory')
+##   - `-maxdepth 1` not needed here
+readarray -t files < <(find ~/main/music/"$directory" -mindepth 1 -type f -iname '*.mp3' | sort)
+audacious -E "${files[@]}"
+update_audacious

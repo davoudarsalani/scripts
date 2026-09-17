@@ -6,6 +6,7 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/download.py
 ##    https://davoudarsalani.ir
 
+
 from __future__ import unicode_literals
 from dataclasses import dataclass, field
 from datetime import timedelta, datetime as dt
@@ -24,11 +25,28 @@ from typing import Any, Type
 from urllib.request import urlopen, ProxyHandler, build_opener, install_opener
 
 from pycurl import Curl
+from RRRavard import (
+    convert_byte,
+    convert_second,
+)
 from requests import Session
 from tabulate import tabulate
 from wget import download as wget_download
 from youtube_dl import YoutubeDL
-from utils import Color, convert_byte, convert_second, duration_wrapper, pipe_to_fzf, get_datetime, get_input, get_input, invalid, get_width, get_headers, if_exists
+
+from utils import (
+    HTTP_HEADERS,
+    TIMEOUT,
+    Color,
+    create_unique_dir_name,
+    duration_wrapper,
+    get_datetime,
+    get_input,
+    get_width,
+    invalid,
+    pipe_to_fzf,
+)
+
 
 def display_help() -> None:
     run('clear', shell=True)
@@ -509,7 +527,7 @@ class Initial:
             if self.purge:
                 self.dest_dir = f'/tmp/purge_{self.time}'
 
-            self.dest_dir = if_exists(self.dest_dir)
+            self.dest_dir = create_unique_dir_name(self.dest_dir)
             mkdir(self.dest_dir)
             chdir(self.dest_dir)
 
@@ -730,7 +748,7 @@ class File(Profile):
                         headers[header_k] = header_v.strip()
 
                     ## get headers (method 2: using requests)
-                    # get_info_requests_response = Ses.head(url, headers=hdrs, timeout=20)
+                    # get_info_requests_response = Ses.head(url, headers=HTTP_HEADERS, timeout=20)
                     # headers = get_info_requests_response.headers
                     # status_code = get_info_requests_response.status_code  ## 200
 
@@ -819,7 +837,7 @@ class File(Profile):
                     Ses.proxies = {'http': tor_proxy, 'https': tor_proxy}
 
                 ## https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
-                with Ses.get(self.url, headers=hdrs, timeout=20, stream=True) as opened_session:
+                with Ses.get(self.url, headers=HTTP_HEADERS, timeout=TIMEOUT, stream=True) as opened_session:
                     opened_session.raise_for_status()
 
                     with open(self.outputname, 'wb') as opened_outputname:
@@ -866,8 +884,8 @@ class File(Profile):
                 ## examples: https://www.programcreek.com/python/example/1602/pycurl
                 cc = Curl()  ## curl connection
                 cc.setopt(cc.URL, self.url)
-                cc.setopt(cc.CONNECTTIMEOUT, 20)
-                cc.setopt(cc.USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0')  ## NOTE get_headers() or hdrs wouldn't work
+                cc.setopt(cc.CONNECTTIMEOUT, TIMEOUT)
+                cc.setopt(cc.USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:8.0) Gecko/20100101 Firefox/8.0')  ## NOTE HTTP_HEADERS wouldn't work
                 # cc.setopt(cc.TIMEOUT, 120)
                 # cc.setopt(cc.FOLLOWLOCATION, True)  ## following redirects
 
@@ -1165,11 +1183,10 @@ class YoutubedlLoggerEmpty:
         pass
 
 if __name__ == '__main__':
-    title = path.basename(__file__).replace('.py', '')
+    title = path.basename(__file__)
     tor_proxy = 'socks5://127.0.0.1:9050'
     script_args = argv[1:]
     endpoint = '\r'
-    hdrs = get_headers()
     Ses = Session()
     Col = Color()
     Ini = Initial()

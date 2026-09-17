@@ -19,7 +19,7 @@ source ~/main/scripts/utils-color.sh
 ## --dry-run -v, -n -v      perform a trial run with no changes made (-v is added by me)
 ## --itemize-changes, -i    output a change-summary for all updates
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 function get_opt {
     local options
@@ -31,11 +31,11 @@ function get_opt {
             -h|--help )
                 kaddyify_help ;;
             -s|--sync )
-                flags='--archive --progress --delete' ;;
+                flags=( --archive --progress --delete ) ;;
             -f|--diff )
                 ## https://unix.stackexchange.com/questions/57305/rsync-compare-directories
                 ## -v not needed here
-                flags='--archive --itemize-changes --dry-run' ;;  ## --archive OR --recursive
+                flags=( --archive --itemize-changes --dry-run ) ;;  ## --archive OR --recursive
             -d|--directory )
                 shift
                 selected_directory="$1"
@@ -43,11 +43,9 @@ function get_opt {
                 reg='^\.$'
                 [[ "$selected_directory" =~ $reg ]] && selected_directory="$PWD"
 
-                ## NOTE JUMP_1 remove trailing slash
-                ##             important because we want the directory itself
-                ##             to be synced/copeid to destination
-                ##             rather than its content
-                selected_directory="${selected_directory%/}"
+                ## remove trailing slash because we want the directory itself
+                ## to be synced/copeid to destination rather than its content
+                selected_directory="$(remove_trailing_slashes "$selected_directory")"
 
                 dest_kaddy_dir="$home_kaddy_dir"/"${selected_directory##*/}"  ## ~/kaddy/scripts
 
@@ -78,30 +76,25 @@ heading "$title"
 [ ! "$1" ] || [ ! "$flags" ] && kaddyify_help
 
 if [ "$selected_directory" ]; then
-    ## NOTE JUMP_2 keep $flags unquoted
-    rsync $flags "$selected_directory" "$home_kaddy_dir" | \grep -v 'incremental file list'
+    rsync "${flags[@]}" "$selected_directory" "$home_kaddy_dir" | \grep -v 'incremental file list'
 else
     readarray -t kaddy_directories < <(find "$home_kaddy_dir" -mindepth 1 -maxdepth 1 -type d | sort)  ## ! -path '*lost+found*'
 
-    for kaddy_dir in "${kaddy_directories[@]}"; {
+    for kaddy_dir in "${kaddy_directories[@]}"; do
         base="${kaddy_dir##*/}"
 
-        ## NOTE JUMP_1 remove trailing slash
-        ##             important because we want the directory itself
-        ##             to be synced/copeid to destination
-        ##             rather than its content
-        base="${base%/}"
+        ## remove trailing slash because we want the directory itself
+        ## to be synced/copeid to destination rather than its content
+        base="$(remove_trailing_slashes "$base")"
 
         home_dir=~/main/"$base"
 
         blue "$(to_tilda "$home_dir")"
 
-        ## NOTE JUMP_2 keep $flags unquoted
-        rsync $flags "$home_dir" "$home_kaddy_dir" | \grep -v 'incremental file list'
-    }
+        rsync "${flags[@]}" "$home_dir" "$home_kaddy_dir" | \grep -v 'incremental file list'
+    done
 fi
 
-exit 0
 
 ## Explanation of each bit position and value in rsync's output:
 ## (https://stackoverflow.com/questions/4493525/what-does-f-mean-in-rsync-logs)

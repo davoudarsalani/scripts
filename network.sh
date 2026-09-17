@@ -11,7 +11,7 @@ source ~/main/scripts/helps.sh
 source ~/main/scripts/utils.sh
 source ~/main/scripts/utils-network.sh
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 function add_desired_ip_to_ethernet {
     source ~/main/scripts/utils-network.sh
@@ -19,7 +19,7 @@ function add_desired_ip_to_ethernet {
 }
 
 function prompt {
-    for _ in "$@"; {
+    for _ in "$@"; do
         case "$1" in
             -i )
                 ip="${ip:-"$(get_input 'ip')"}" ;;
@@ -33,7 +33,7 @@ function prompt {
                 password="${password:-"$(get_input 'password')"}" ;;
         esac
         shift
-    }
+    done
 }
 
 function get_opt {
@@ -71,7 +71,6 @@ get_opt "$@"
 heading "$title"
 
 main_items=( 'all' 'status + ip + mac address' 'available wifi access points' "connect $eth_devc" "disconnect $eth_devc" "connect $wf_devc" "disconnect $wf_devc" 'up ethernet/wifi connection' 'down ethernet/wifi connection' 'turn wifi on' 'turn wifi off' 'network controllers' 'stored passwords (root only)' 'nearby wifi networks' 'add ip to a device' "add "$desired_eth_ip" to $eth_devc" 'delete all ips' 'enable NetworkManager' 'disable NetworkManager' 'connect to a new wifi network' 'help' )
-fzf__title=''
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in

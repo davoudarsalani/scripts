@@ -12,18 +12,20 @@ source ~/main/scripts/utils.sh
 source ~/main/scripts/utils-color.sh
 source ~/main/scripts/utils-git.sh
 
-title="${0##*/}"
+title="$(basename "$0")"
+
+separator='---'
 
 function add_to_changes {
     local icon member
-    declare -a received=( "$@" )
+    local -a received=( "$@" )
 
     icon="${received[0]}"
     unset 'received[0]'
 
-    for member in "${received[@]}"; {
-        changes+=( "${icon}---${member}" )
-    }
+    for member in "${received[@]}"; do
+        changes+=( "${icon}${separator}${member}" )
+    done
 }
 
 function branch_info {  ## https://revelry.co/terminal-workflow-fzf/
@@ -41,7 +43,7 @@ function branch_info {  ## https://revelry.co/terminal-workflow-fzf/
 }
 
 function branches_array {
-    declare -a branches_list
+    local -a branches_list
     readarray -t branches_list < <(git_branches "$directory")  ## branches
     printf '%s\n' "${branches_list[@]}"
 }
@@ -66,7 +68,9 @@ function if_amend_allowed {
 function if_changed {
     local stts
 
-    changes=()  ## NOTE do NOT use declare -a changes since declare makes changes a local variable
+    ## NOTE do NOT use local -a changes since declare makes changes a local variable
+    changes=()
+
     stts="$(git_status "$directory")"
     readarray -t mod   < <(printf '%s\n' "$stts" | \grep '^ M'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${mod[@]}"
     readarray -t del   < <(printf '%s\n' "$stts" | \grep '^ D'           | awk '{print $2}' | sed 's/\/$//'); add_to_changes '' "${del[@]}"
@@ -120,7 +124,7 @@ function pipe_to_fzf_locally {
 
 function select_hash {
     local log_item
-    declare -a log_items
+    local -a log_items
 
     IFS=$'\n'
     preview_status='hidden'
@@ -136,7 +140,7 @@ function wrap_fzf_multi {
 }
 
 function prompt {
-    for _ in "$@"; {
+    for _ in "$@"; do
         case "$1" in
             -p )
                 pattern="${pattern:-"$(get_input 'pattern (e.g. *.py)')"}"  ## NOTE pattern does NOT need quotes here, but if pattern is passed as arg, it will
@@ -155,7 +159,7 @@ function prompt {
                 file="${file:-"$(get_input 'file')"}" ;;
         esac
         shift
-    }
+    done
 }
 
 function get_opt {
@@ -206,7 +210,6 @@ get_opt "$@"
 heading "$title"
 
 main_items=( 'status' 'add [+]' 'commit' 'add+commit [+]' 'commit amend' 'empty commit' 'restore [+]' 'unstage [+]' 'delete untracked [+]' 'log' 'reflog' 'push' 'pull' 'remove' 'branch' 'tag' 'remotes' 'reset' 'garbage clean' 'source file from a commit' 'commits' 'config' 'add all, commit updated, push' "setup in $(to_tilda "$PWD")" 'help' )
-fzf__title=''
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in
@@ -277,13 +280,13 @@ if_locked
 case "$main_item" in
     status )
         if_changed
-        pipe_to_fzf_locally "${changes[@]/---/' '}" && accomplished ;;
+        pipe_to_fzf_locally "${changes[@]/$separator/' '}" && accomplished ;;
 
     'add [+]' )
         if_changed
         IFS=$'\n'
         multiple='true'
-        add_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${add_items[@]}" || exit 37
+        add_items=( $(pipe_to_fzf_locally "${changes[@]/$separator/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${add_items[@]}" || exit 37
 
         case "${no_sign_arr[@]}" in
             pattern )
@@ -297,11 +300,11 @@ case "$main_item" in
                 accomplished 'all added' ;;
             * )
                 if_locked
-                for i in "${no_sign_arr[@]}"; {
+                for i in "${no_sign_arr[@]}"; do
                     git_add_specific_or_pattern "$directory" "$i"
                     accomplished "$i added"
                     (:)
-                } ;;
+                done ;;
         esac ;;
 
     commit )
@@ -330,7 +333,7 @@ case "$main_item" in
         if_changed
         IFS=$'\n'
         multiple='true'
-        add_commit_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all' 'all+amend(in-vim)' 'all+amend(auto)') ) && wrap_fzf_multi "${add_commit_items[@]}" || exit 37
+        add_commit_items=( $(pipe_to_fzf_locally "${changes[@]/$separator/' '}" 'pattern' 'all' 'all+amend(in-vim)' 'all+amend(auto)') ) && wrap_fzf_multi "${add_commit_items[@]}" || exit 37
 
         case "${no_sign_arr[@]}" in
             pattern )
@@ -360,11 +363,11 @@ case "$main_item" in
             * )
                 prompt -m
                 if_locked
-                for i in "${no_sign_arr[@]}"; {
+                for i in "${no_sign_arr[@]}"; do
                    git_add_specific_or_pattern "$directory" "$i"
                    accomplished "$i added"
                    (:)
-                }
+                done
                 git_commit_with_message "$directory" "$colonized $message" && \
                 accomplished "message: $colonized $message" ;;
         esac ;;
@@ -406,7 +409,7 @@ case "$main_item" in
         if_changed
         IFS=$'\n'
         multiple='true'
-        restore_item=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${restore_item[@]}" || exit 37
+        restore_item=( $(pipe_to_fzf_locally "${changes[@]/$separator/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${restore_item[@]}" || exit 37
 
         case "${no_sign_arr[@]}" in
              pattern )
@@ -420,11 +423,11 @@ case "$main_item" in
                 accomplished "all restored" ;;
              * )
                 if_locked
-                for i in "${no_sign_arr[@]}"; {
+                for i in "${no_sign_arr[@]}"; do
                     git_restore_specific_or_pattern "$directory" "$i"
                     accomplished "$i restored"
                     (:)
-                } ;;
+                done ;;
         esac ;;
 
     'unstage [+]' )
@@ -437,7 +440,7 @@ case "$main_item" in
         multiple='true'
         preview_status='hidden'
 
-        unstage_items=( $(pipe_to_fzf_locally "${changes[@]/---/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${unstage_items[@]}" || exit 37
+        unstage_items=( $(pipe_to_fzf_locally "${changes[@]/$separator/' '}" 'pattern' 'all') ) && wrap_fzf_multi "${unstage_items[@]}" || exit 37
 
         case "${no_sign_arr[@]}" in
             pattern )
@@ -451,11 +454,11 @@ case "$main_item" in
                 accomplished 'all unstaged' ;;
             * )
                 if_locked
-                for i in "${no_sign_arr[@]}"; {
+                for i in "${no_sign_arr[@]}"; do
                     git_unstage_specific_or_pattern "$directory" "$i"
                     accomplished "$i unstaged"
                     (:)
-                } ;;
+                done ;;
         esac ;;
 
     'delete untracked [+]' )
@@ -468,28 +471,28 @@ case "$main_item" in
         multiple='true'
         preview_status='hidden'
 
-        untracked_items=( $(pipe_to_fzf_locally "${unt[@]/---/' '}" 'all') ) && wrap_fzf_multi "${untracked_items[@]}" || exit 37  ## NOTE JUMP_1 exceptionally removed pattern from options
+        untracked_items=( $(pipe_to_fzf_locally "${unt[@]/$separator/' '}" 'all') ) && wrap_fzf_multi "${untracked_items[@]}" || exit 37  ## NOTE JUMP_1 exceptionally removed pattern from options
 
         case "${no_sign_arr[@]}" in
             # pattern )  ## JUMP_1 exceptionally commented this option because
             #            ##        the pattern used in JUMP_2 should be a regex pattern (e.g. .*py or ^.*py$)
             #            ##        while pattern used in JUMP_4 (i.e. check_pattern function) is a glob
             #     prompt -p
-            #     for u in "${unt[@]}"; {
+            #     for u in "${unt[@]}"; do
             #         if [[ "$u" =~ $pattern ]]; then  ## JUMP_2
             #             rm -rv "$directory"/"$u"
             #             (:)
             #         fi
-            #     } && \
+            #     done && \
             #     accomplished "$pattern deleted" ;;
             all )
                 rm -rv "${unt[@]}" && \
                 accomplished 'all deleted' ;;
             * )
-                for i in "${no_sign_arr[@]}"; {
+                for i in "${no_sign_arr[@]}"; do
                     rm -rv "$directory"/"$i"
                     (:)
-                } ;;
+                done ;;
         esac ;;
 
     log )
@@ -689,9 +692,9 @@ case "$main_item" in
     commits )  ## tell how many times items have been commited (https://github.com/terminalforlife/BashConfig/blob/master/source/.bash_functions)
         readarray -t items < <(find "$directory" -mindepth 1 -maxdepth 1 ! -iname '.git' | sort)  ## used .git (instead of .git*) to keep .gitignore included
 
-        for item in "${items[@]##*/}"; {
+        for item in "${items[@]##*/}"; do
             printf '%s %s\n' "$(git_commits_count_specific "$directory" "$item")" "$item"
-        } | sort --numeric-sort --reverse | column && \
+        done | sort --numeric-sort --reverse | column && \
         accomplished ;;  ## --numeric-sort is for comparing according to string numerical value
 
     'add all, commit updated, push' )

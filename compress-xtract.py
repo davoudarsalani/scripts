@@ -6,14 +6,27 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/compress-xtract.py
 ##    https://davoudarsalani.ir
 
+
 from getopt import getopt
 from os import path
 from subprocess import run
 from sys import argv
 
-from utils import Color, pipe_to_fzf, invalid, get_input, get_input, get_password, compress_tar, xtract_tar, compress_zip, xtract_zip, xtract_rar
+from utils import (
+    Color,
+    compress_tar,
+    compress_zip,
+    get_input,
+    get_password,
+    invalid,
+    pipe_to_fzf,
+    xtract_rar,
+    xtract_tar,
+    xtract_zip,
+)
 
-title = path.basename(__file__).replace('.py', '')
+
+title = path.basename(__file__)
 script_args = argv[1:]
 Col = Color()
 

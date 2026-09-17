@@ -34,9 +34,9 @@ function float_pad {
     r_length="${#r}"
     if (( new_r_length > r_length )); then  ## add trailing zeros to r if shorter than new_r_length
         (( lacking_pad="new_r_length - r_length" ))
-        for ((i=0; i<"$lacking_pad"; i++)); {
+        for ((i=0; i<"$lacking_pad"; i++)); do
             r="${r}0"
-        }
+        done
     elif (( new_r_length < r_length )); then  ## trim r if longer than new_r_length
         r="${r::$new_r_length}"
     fi
@@ -93,11 +93,11 @@ function convert_byte {
     new_l_length="${2:-1}"
     new_r_length="${3:-2}"
 
-    for unit in B K M G T P E Z Y; {
+    for unit in B K M G T P E Z Y; do
         (( "${size%.*}" < byte_size )) && {
             printf '%s%s\n' "$size" "$unit"
             break
         }
         size="$(float_pad "${size//[a-zA-Z]/}/${byte_size}" "$new_l_length" "$new_r_length")"
-    }
+    done
 }

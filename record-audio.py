@@ -6,9 +6,20 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-audio.py
 ##    https://davoudarsalani.ir
 
+
 from os import getenv
 
-from utils import Audio, Record, get_datetime, pipe_to_dmenu, update_audio, convert_second, invalid
+from RRRavard import convert_second
+
+from utils import (
+    Audio,
+    Record,
+    get_datetime,
+    invalid,
+    pipe_to_dmenu,
+    update_audio,
+)
+
 
 lengths = ['30s', '1m', '5m', '10m', '30m', '1h', '2h', '3h', '4h', '5h']
 length = pipe_to_dmenu(lengths, 'rec audio')

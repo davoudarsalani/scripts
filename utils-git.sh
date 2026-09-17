@@ -347,3 +347,34 @@ function git_unstage_specific_or_pattern {
     git -C "${1:-.}" restore --staged "$2"  ## $2 is item/pattern
     ## PREVIOUSLY: git -C "${1:-.}" reset HEAD -- "$2"  ## $2 is item/pattern
 }
+
+
+function find_all_git_repos {
+    ## synced with FZF_ALT_C_COMMAND_GIT in ~/.bashrc
+    ## but with these differences:
+    ##   - "$HOME" -> "$HOME"/main
+    find "$HOME/main" \
+        -type d \
+        \( \
+            -name .cache \
+            -o -name .config \
+            -o -name .vim \
+            -o -name 'docker-*' \
+            -o -name downloads \
+            -o -name go \
+            -o -name junk \
+            -o -name kaddy \
+            -o -name lost+found \
+            -o -name venv \
+            -o -name 'venv-*' \
+            -o -name venvs \
+        \) -prune -o \
+        -type d \
+        -name .git \
+        -printf '%h\n' \
+    2>/dev/null |
+    sort -u
+    ## /path/to/dir1
+    ## /path/to/dir2
+    ## ...
+}

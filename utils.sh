@@ -6,36 +6,123 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils.sh
 ##    https://davoudarsalani.ir
 
+function is_int {
+    ## returns:
+    ##   0 (success) if arg is a valid integer
+    ##     Examples:
+    ##       0
+    ##       42
+    ##       +5
+    ##       -7
+    ##
+    ##   1 (failure) otherwise
+    ##     Examples:
+    ##       ''     (is empty)
+    ##       ' 42'  (has whitespace)
+    ##       '3.14'
+    ##       '1e10'
+    ##       'abc'
+
+    ## usage:
+    ##   1.
+    ##     if is_int 1234; then
+    ##         ...
+    ##     fi
+    ##   2.
+    ##     is_int 1234 && ...
+    ##     is_int 1234 || ...
+    ##
+    ## WRONG USAGE:
+    ##     result="$(is_int 1234)"
+
+    if [[ $1 =~ ^[+-]?[0-9]+$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function pkill_process {
+    ## returns:
+    ##   exit status 0  (success) if at least one matching process was killed
+    ##   exit status 1  (failure) if no matching process existed
+    ##   exit status >1 (failure) if pkill encountered an error
+
+    ## usage:
+    ##   1.
+    ##     if pkill_process 'openvpn'; then
+    ##         ...
+    ##     fi
+    ##   2.
+    ##     pkill_process 'openvpn' && ...
+    ##     pkill_process 'openvpn' || ...
+    ##
+    ## WRONG USAGE:
+    ##     result="$(pkill_process 'openvpn')"
+
+    ## `pkill` instead of `pkill -9`
+    ## because the latter prevents cleanup hooks
+    sudo pkill --exact "$1"  ## exit status 0/1/...
+}
+
+function process_is_running {
+    ## returns:
+    ##   exit status 0 (success) if process exists
+    ##   exit status 1 (failure) if process does not exist
+
+    ## usage:
+    ##   1.
+    ##     if process_is_running 'openvpn'; then
+    ##         ...
+    ##     fi
+    ##   2.
+    ##     process_is_running 'openvpn' && ...
+    ##     process_is_running 'openvpn' || ...
+    ##
+    ## WRONG USAGE:
+    ##     result="$(process_is_running 'openvpn')"
+
+    pgrep --exact "$1" >/dev/null  ## exit status 0/1
+}
+
+function remove_trailing_slashes {
+    ## /a/b/c// -> /a/b/c
+    ## /a/b/c/  -> /a/b/c
+    ## /a/b/c   -> /a/b/c
+    ## //       -> (empty)
+    ## /        -> (empty)
+    ## (empty)  -> (empty)
+
+    printf '%s\n' "$1" | sed 's|/\+$||'
+}
 
 function to_tilda {
-    ## - using // to replace all occurrences
-    ## - using $@ instead of $1 because arguments
-    ##   can be passed as an array
-    printf '%s\n' "${@//$HOME/\~}"
+    ## using // to replace all occurrences
+    printf '%s\n' "${1//$HOME/\~}"
 }
 
 function get_datetime {
     case "$1" in
-            ymdhms )
-                printf '%(%Y%m%d%H%M%S)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d%H%M%S)"
-            ymd )
-                printf '%(%Y%m%d)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d)"
-            hms )
-                printf '%(%H%M%S)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%H%M%S)"
-            seconds )
-                printf '%(%s)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%s)"
-            weekday )
-                printf '%(%A)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%A)"
-            jymdhms )
-                printf '%s\n' "$(jdate +%Y%m%d%H%M%S)" ;;
-            jymd )
-                printf '%s\n' "$(jdate +%Y%m%d)" ;;
-            jhms )
-                printf '%s\n' "$(jdate +%H%M%S)" ;;
-            jseconds )
-                printf '%s\n' "$(jdate +%s)" ;;
-            jweekday )
-                printf '%s\n' "$(jdate +%A)" ;;
+        ymdhms )
+            printf '%(%Y%m%d%H%M%S)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d%H%M%S)"
+        ymd )
+            printf '%(%Y%m%d)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%Y%m%d)"
+        hms )
+            printf '%(%H%M%S)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%H%M%S)"
+        seconds )
+            printf '%(%s)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%s)"
+        weekday )
+            printf '%(%A)T\n' ;; ## PREVIOUSLY: printf '%s\n' "$(date +%A)"
+        jymdhms )
+            printf '%s\n' "$(jdate +%Y%m%d%H%M%S)" ;;
+        jymd )
+            printf '%s\n' "$(jdate +%Y%m%d)" ;;
+        jhms )
+            printf '%s\n' "$(jdate +%H%M%S)" ;;
+        jseconds )
+            printf '%s\n' "$(jdate +%s)" ;;
+        jweekday )
+            printf '%s\n' "$(jdate +%A)" ;;
     esac
 }
 
@@ -95,10 +182,10 @@ function select_directory {
 
     local dir
 
-    [ "$1" == 'git' ] && {  ## display git repositories only
-        [ "$2" ] && FZF_ALT_C_COMMAND_GIT+=" | \grep "$2""  ## display specific git repositories only
+    if [ "$1" == 'git' ]; then  ## display git repositories only
+        [ "$2" ] && FZF_ALT_C_COMMAND_GIT+=" | \grep $2"  ## display specific git repositories only
         FZF_ALT_C_COMMAND="$FZF_ALT_C_COMMAND_GIT"
-    }
+    fi
 
     dir="$(eval "$FZF_ALT_C_COMMAND" | FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS --header ''" fzf)"
     [ "$dir" ] && printf '%q\n' "$dir"
@@ -106,72 +193,168 @@ function select_directory {
 
 function pipe_to_fzf {
     ## usage:
-    ##   item="$(pipe_to_fzf "${items[@]}")"
+    ##   selected_items="$(pipe_to_fzf [--multi] [--header 'Header text'] "${items[@]}")"
 
-    if [ "$fzf__title" ]; then
-        printf '%s\n' "$@" | fzf --header "$fzf__title"
+    local multi='' header=''
+
+    ## parse optional flags
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --multi  ) multi="$1";  shift   ;;
+            --header ) header="$2"; shift 2 ;;
+            * ) break ;;  ## first non-flag argument is items
+        esac
+    done
+
+    if [ -n "$header" ]; then
+        printf '%s\n' "$@" | fzf $multi --header "$header"
     else
-        printf '%s\n' "$@" | fzf
+        printf '%s\n' "$@" | fzf $multi
     fi
 }
 
 function pipe_to_dmenu {
     ## usage:
-    ##   item="$(pipe_to_dmenu "${items[@]}")"
+    ##   selected_item="$(pipe_to_dmenu [--header 'Header text'] "${items[@]}")"
+
+    local header=''
+
+    ## parse optional flags
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --header ) header="$2"; shift 2 ;;
+            * ) break ;;  ## first non-flag argument is items
+        esac
+    done
 
     printf '%s\n' "$@" | \
-    dmenu -i -l "$dmenulines" -nb "$dmenunb" -nf "$dmenunf" -sb "$dmenusb" -sf "$dmenusf" -fn "$dmenufn" -p "$dmenu__title"
+      dmenu -i \
+        -l "$dmenulines" \
+        -nb "$dmenunb" -nf "$dmenunf" \
+        -sb "$dmenusb" -sf "$dmenusf" \
+        -fn "$dmenufn" \
+        -p "$header"
 }
 
-function pipe_to_rofi__confirm() {
+function pipe_to_rofi__confirm {
     ## borrowed from ~/main/configs/cfg-rofi/powermenu/type-1/powermenu.sh
 
     ## usage:
-    ##   item="$(pipe_to_rofi__confirm "${items[@]}")"
+    ##   selected_item="$(pipe_to_rofi__confirm "${items[@]}")"
 
     local theme_path
     theme_path=~/.config/rofi/powermenu/type-1/style-1.rasi
 
     printf 'Yes\nNo\n' | \
-	rofi -dmenu \
-		 -theme "$theme_path" \
-         -theme-str 'window {location: center; anchor: center; fullscreen: false; width: 250px;}' \
-		 -theme-str 'mainbox {children: [ "message", "listview" ];}' \
-		 -theme-str 'listview {columns: 2; lines: 1;}' \
-		 -theme-str 'element-text {horizontal-align: 0.5;}' \
-		 -theme-str 'textbox {horizontal-align: 0.5;}' \
-		 -p 'Confirmation' \
-		 -mesg 'Are You Sure?'
+	rofi \
+        -dmenu \
+        -theme "$theme_path" \
+        -theme-str '
+            window {
+                width: 250px;
+                border-radius: 15px;
+                location: center;
+                anchor: center;
+                fullscreen: false;
+            }
+        ' \
+		-theme-str '
+            mainbox {
+                children: [ "message", "listview" ];
+            }
+        ' \
+		-theme-str '
+            listview {
+                columns: 2; lines: 1;
+            }
+        ' \
+		-theme-str '
+            element-text {
+                horizontal-align: 0.5;
+            }
+        ' \
+		-theme-str '
+            textbox {
+                horizontal-align: 0.5;
+            }
+        ' \
+		-p 'Confirmation' \
+		-mesg 'Are You Sure?'
 }
 
 function pipe_to_rofi {
     ## usage:
-    ##   item="$(pipe_to_rofi "${items[@]}")"
+    ##   selected_item="$(pipe_to_rofi [--header 'Header text'] [--subheader 'Subheader text'] "${items[@]}")"
+
+    local header='' subheader=''
+
+    ## parse optional flags
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --header )    header="$2";    shift 2 ;;
+            --subheader ) subheader="$2"; shift 2 ;;
+            * ) break ;;  ## first non-flag argument is items
+        esac
+    done
 
     local theme_path
     theme_path=~/.config/rofi/launchers/type-1/style-3.rasi
 
-    ## not adding this line because
-    ## it made elements look striped
-    # -theme-str "window { background-color: ${gruvbox_bg_d}; }"
-
-    if [ "$rofi__subtitle" ]; then
+    if [ "$subheader" ]; then
         printf '%s\n' "$@" | \
-        rofi -dmenu \
-             -theme "$theme_path" \
-             -theme-str 'window { border-radius: 0px; }' \
-             -theme-str "prompt { text-color: ${gruvbox_green}; }" \
-             -theme-str "inputbar { text-color: ${gruvbox_gray_d}; }" \
-             -p "$rofi__title" \
-             -mesg "$rofi__subtitle"
+        rofi \
+            -dmenu \
+            -theme "$theme_path" \
+            -theme-str '
+                listview {
+                    lines: 20;
+                    fixed-height: false;
+                }
+            ' \
+            -theme-str '
+                window {
+                    border-radius: 15px;
+                }
+            ' \
+            -theme-str "
+                prompt {
+                    text-color: ${gruvbox_green};
+                }
+            " \
+            -theme-str "
+                inputbar {
+                    text-color: ${gruvbox_gray_d};
+                }
+            " \
+            -p "$header" \
+            -mesg "$subheader"
     else
         printf '%s\n' "$@" | \
-        rofi -dmenu \
-             -theme "$theme_path" \
-             -theme-str 'window { border-radius: 0px; }' \
-             -theme-str "prompt { text-color: ${gruvbox_green}; }" \
-             -theme-str "inputbar { text-color: ${gruvbox_gray_d}; }" \
-             -p "$rofi__title"
+        rofi \
+            -dmenu \
+            -theme "$theme_path" \
+            -theme-str '
+                listview {
+                    lines: 20;
+                    fixed-height: false;
+                }
+            ' \
+            -theme-str '
+                window {
+                    border-radius: 15px;
+                }
+            ' \
+            -theme-str "
+                prompt {
+                    text-color: ${gruvbox_green};
+                }
+            " \
+            -theme-str "
+                inputbar {
+                    text-color: ${gruvbox_gray_d};
+                }
+            " \
+            -p "$header"
     fi
 }
 
@@ -381,16 +564,14 @@ function copy_random_wallpaper_for_startup {
 }
 
 function set_widget {
-    ## only the awesome-widgets use this function but it'd better be here (rather than the script itself)
-    ## because sometimes it's needed by 0-test
-
     local widget attr value
 
     widget="$1"
     attr="$2"
     value="$3"
 
-    awesome-client "${widget}.${attr} = '${value}'"  ## NOTE do NOT change quotes
+    ## NOTE do NOT change quotes
+    awesome-client "${widget}.${attr} = '${value}'"
 }
 
 function get_input {
@@ -432,21 +613,21 @@ function remove_older_pkgs {
     source ~/main/scripts/utils-color.sh
 
     local src_dir uniq count file exceed idx remove_propmt
-    declare -a files uniques repeats to_be_removed
+    local -a files uniques repeats to_be_removed
     declare -i keep=2
 
     src_dir=~/main/linux-pkg
     readarray -t files < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f ! -iname '*.sig' ! -iname '*:*' | sort)
     readarray -t uniques < <(printf '%s\n' "${files[@]}" | sed 's|-[0-9]\+[^:]*||g' | sort | uniq --count)
-    for uniq in "${uniques[@]}"; {
+    for uniq in "${uniques[@]}"; do
         read count file <<< "$uniq"  ## 8 /home/nnnn/main/linux-pkg/alsa-card-profiles
         (( count <= keep )) && continue
         (( exceed="count - keep" ))  ## 5
         readarray -t repeats < <(find "$src_dir" -mindepth 1 -maxdepth 1 -type f -iname "${file##*/}*" ! -iname '*.sig' ! -iname '*:*' | sort)
-        for ((idx=0; idx<${exceed}; idx++)); {
+        for ((idx=0; idx<${exceed}; idx++)); do
             to_be_removed+=( "${repeats[${idx}]}" )
-        }
-    }
+        done
+    done
 
     if [ "$to_be_removed" ]; then
         printf '%s\n' "${to_be_removed[@]##*/}" | sort | column
@@ -546,19 +727,19 @@ function lock_now {
 
 #     dups_file=/tmp/duplicates-"$(date '+%s')"
 #     dups_string=''
-#     declare -A dups_array
+#     local -a dups_array
 
 #     readarray -t files < <(find "$1" -mindepth 1 -type f -iname "*.${2}" | sort)
 #     orig_count="${#files[@]}"
 
-#     for ((idx=0; idx<"${orig_count}"; idx++)); {
+#     for ((idx=0; idx<"${orig_count}"; idx++)); do
 #         f_1="${files[$idx]}"
 
 #         ## skip comparing if f_1 is already in dups_string
 #         \grep -q "$f_1" <<< "$dups_string" && continue
 
 #         printf '%s/%s %s\n' "$((idx+1))" "${orig_count}" "$f_1"
-#         for f_2 in "${files[@]}"; {
+#         for f_2 in "${files[@]}"; do
 #             ## prevent comparing with itself
 #             [ "$f_1" == "$f_2" ] || {
 #                 [ "$(diff "$f_1" "$f_2")" ] || {
@@ -567,18 +748,18 @@ function lock_now {
 #                     dups_array+=([${f_1}]="$f_2")
 #                 }
 #             }
-#         }
+#         done
 #         unset "files[${idx}]"
 #         (( "${#dups_array[@]}" > 0 )) && printf '  -> %s found\n' "${#dups_array[@]}"
-#     }
+#     done
 
 #     ## printf duplicates if any
 #     if (( "${#dups_array[@]}" > 0 )); then  ## NOTE dups_array is an associative array and '[ "$dups_array" ] &&' didn't work to check if it's full
 #         printf '\n\n %s set(s) of duplicates found (file names also saved at %s):\n\n' "${#dups_array[@]}" "$dups_file"
-#         for key in "${!dups_array[@]}"; {
+#         for key in "${!dups_array[@]}"; do
 #             rm "${dups_array[${key}]}"
 #             printf '%s\n%s removed\n\n' "$key" "${dups_array[${key}]}"
-#         }
+#         done
 #     else
 #         printf '\nok\n'
 #     fi
@@ -590,7 +771,7 @@ function lock_now {
 #    source ~/main/scripts/utils-calculation.sh
 #    source ~/main/scripts/utils-color.sh
 
-#    declare -a loop_durs loops_durs
+#    local -a loop_durs loops_durs
 
 #    durs_file=/tmp/0-durs
 #    totals_file=/tmp/0-totals
@@ -606,28 +787,28 @@ function lock_now {
 #    ## so let's empty totals_file first
 #    [ "$position" == "old" ] && > "$totals_file"
 
-#    for ((i=1; i<="$loops_count"; i++)); {
+#    for ((i=1; i<="$loops_count"; i++)); do
 #        printf 'loop %s\n' "$i"
 #        > "$durs_file"
-#        for ((j=1; j<="$loops_count"; j++)); {
+#        for ((j=1; j<="$loops_count"; j++)); do
 #            { time -p ~/main/scripts/awesome-widgets network ;} &>>"$durs_file"
 #            printf '\n' >> "$durs_file"
 #            sleep 1
-#        }
+#        done
 
 #        loop_dur=0
 #        readarray -t loop_durs < <(\grep 'real' "$durs_file" | awk '{print $NF}')
-#        for a_sm in "${loop_durs[@]}"; {
+#        for a_sm in "${loop_durs[@]}"; do
 #            loop_dur="$(float_pad "${loop_dur}+${a_sm}" 1 2)"
-#        }
+#        done
 #        printf '%s %s\n' "$position" "$loop_dur" >> "$totals_file"
-#    }
+#    done
 
 #    loops_dur=0
 #    readarray -t loops_durs < <(\grep "$position" "$totals_file" | awk '{print $NF}')
-#    for a_big in "${loops_durs[@]}"; {
+#    for a_big in "${loops_durs[@]}"; do
 #        loops_dur="$(float_pad "${loops_dur}+${a_big}" 1 2)"
-#    }
+#    done
 #    printf '%s = %s\n\n' "$position" "$loops_dur" >> "$totals_file"
 
 #    ## compare
@@ -656,7 +837,7 @@ function lock_now {
 #     source ~/main/scripts/utils-screen.sh
 #     source ~/main/scripts/utils-audio.sh
 #     start="$(get_datetime 'jhms')"
-#     for ((i=1; i<="$1"; i++)); {
+#     for ((i=1; i<="$1"; i++)); do
 #         current="$(get_datetime 'jhms')"
 #         (( seconds="current - start" ))
 #         echo -en '\r  \r'
@@ -666,7 +847,7 @@ function lock_now {
 #         w="$(printf "$2 %02d:%02d:%02d" "$h" "$m" "$s"  ## NOTE no \n ??
 #         set_widget 'record' 'markup' "<span color=\"${gruvbox_red}\">${record_icon} <b>${w}</b></span>"
 #         sleep 1
-#     }
+#     done
 # }
 
 # function record_audio {

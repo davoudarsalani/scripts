@@ -12,9 +12,9 @@ case "$1" in
         android-studio &>/dev/null & ;;
     audacious )
         audacious &>/dev/null & ;;
-    blueman_applet )
+    blueman-applet )
         blueman-applet &>/dev/null & ;;
-    blueman_manager )
+    blueman-manager )
         blueman-manager &>/dev/null & ;;
     chromium )
         chromium &>/dev/null & ;;
@@ -30,6 +30,8 @@ case "$1" in
         goldendict &>/dev/null & ;;
     gparted )
         sudo gparted &>/dev/null & ;;
+    gthumb )
+        gthumb &>/dev/null & ;;
     keepass )
         keepass &>/dev/null & ;;
     libreoffice )
@@ -41,7 +43,7 @@ case "$1" in
     terminal )
         "$terminal" &>/dev/null & ;;
     terminal_tmux )
-        if [ "$(pgrep 'tmux')" ]; then
+        if process_is_running 'tmux'; then
             "$terminal" -e 'tmux new' &>/dev/null &
         else
             "$terminal" -e 'tmux new -s 1' &>/dev/null &
@@ -49,12 +51,12 @@ case "$1" in
     terminal_torsocks )
         torsocks "$terminal" &>/dev/null & ;;
     thunar )
-        if [ -d ~/main/downloads/ ]; then
-            thunar ~/main/downloads/ &>/dev/null &
+        dir_path=~/main/downloads
+        if [ -d "$dir_path" ]; then
+            thunar "$dir_path" &>/dev/null &
         else
             thunar &>/dev/null &
-        fi
-        ;;
+        fi ;;
     uget )
         uget-gtk &>/dev/null & ;;
     visual-studio-code )

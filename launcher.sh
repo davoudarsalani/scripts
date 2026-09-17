@@ -9,21 +9,28 @@
 
 case "$1" in
     rofi )
-        # ~/.config/rofi/launchers/type-2/style-12.rasi
+        theme_path=~/.config/rofi/launchers/type-5/style-4.rasi
+        # theme_path=~/.config/rofi/launchers/type-2/style-12.rasi
+
         rofi \
-             -combi-modi ":greenclip print,window,drun" \
-             -modi "combi,:greenclip print,window,drun" \
-             -show combi \
-             -theme ~/.config/rofi/launchers/type-5/style-4.rasi \
-             -theme-str 'window { width: 1000; }' \
-             -theme-str "window { background-color: ${gruvbox_bg0_h}; }" \
-             -theme-str 'window { border-radius: 0px; }'
+            -combi-modi ':greenclip print,window,drun' \
+            -modi 'combi,:greenclip print,window,drun' \
+            -show combi \
+            -theme "$theme_path" \
+            -theme-str '
+                window {
+                    width: 1000;
+                    border-radius: 15px;
+                }
+            '
         ;;
     dmenu )
         dmenu_run \
-          -i \
-          -p 'dmenu' \
-          -l "$dmenulines" -fn "$dmenufn" \
-          -nb "$dmenunb"   -nf "$dmenunf" \
-          -sb "$dmenusb"   -sf "$dmenusf" ;;
+            -i \
+            -p 'dmenu' \
+            -nb "$dmenunb" -nf "$dmenunf" \
+            -sb "$dmenusb" -sf "$dmenusf" \
+            -l "$dmenulines" \
+            -fn "$dmenufn"
+        ;;
 esac

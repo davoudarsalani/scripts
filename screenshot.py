@@ -6,13 +6,27 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/screenshot.py
 ##    https://davoudarsalani.ir
 
-from os import path, remove, getenv
+
+from os import (
+    path,
+    remove,
+    getenv,
+)
 
 from gi import require_version
 require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from PIL import Image
-from utils import Screen, get_datetime, pipe_to_dmenu, msgn, msgc, countdown
+
+from utils import (
+    Screen,
+    countdown,
+    get_datetime,
+    msgc,
+    msgn,
+    pipe_to_dmenu,
+)
+
 
 def convert_to_jpg(png_image: str) -> None:
     global output

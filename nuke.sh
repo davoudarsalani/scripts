@@ -7,24 +7,23 @@
 ##    https://davoudarsalani.ir
 
 
-## https://revelry.co/terminal-workflow-fzf/
-## https://github.com/junegunn/fzf/wiki/examples
-
 source ~/main/scripts/utils.sh
 
-IFS=$'\n'
 if (( UID > 0 )); then
-    readarray -t processes < <(ps -f -u "$UID")
+    readarray -t processes < <(ps -f -u "$UID" --no-headers)
 else
-    readarray -t processes < <(ps -ef)
+    readarray -t processes < <(ps -ef --no-headers)
 fi
 
-fzf__title=''
 process="$(pipe_to_fzf "${processes[@]}")" && wrap_fzf_choice "$process" || exit 37
 
-process="$(printf '%s\n' "$process" | awk '{print $2}')"
+process="$(awk '{print $2}' <<< "$process")"
 
-kill_prompt="$(get_input "kill ${process}?")" && printf '\n'
+kill_prompt="$(get_input "kill ${process}?")"
+
 case "$kill_prompt" in
-    y ) [ "$process" ] && printf '%s\n' "$process" | xargs -ro kill -9 ;;
+    y ) if [ "$process" ] && [ "$process" -ne 0 ]; then
+            ## prefer normal kill first
+            kill "$process" || kill -9 "$process"
+        fi ;;
 esac

@@ -9,15 +9,6 @@
 
 source ~/main/scripts/utils-color.sh
 
-function application_help {
-clear
-printf '%s\n' \
-"$(heading "$title") $(yellow "help")
-$(flag '-p|--package=')
-$(flag '-u|--unit=')"
-exit
-}
-
 function ffmpeg_help {
 clear
 printf '%s\n' \

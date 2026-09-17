@@ -9,7 +9,7 @@
 
 source ~/main/scripts/utils.sh
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 function ctc_msg {
     local trimmed
@@ -23,7 +23,6 @@ IFS=$'\n'
 heading "$title"
 
 readarray -t main_items < <(sed -n '/^COMMANDS:START$/,//p' "$0" | sed '1d')
-fzf__title=''
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 main_item="${main_item##*---> }"
@@ -129,9 +128,9 @@ clears the line ---> printf '\33[A'
 print function name ---> function myfunction { printf 'This function is %s\n' "$FUNCNAME" ;} ; myfunction
 print lines with whose length are between 10 to 20 ---> grep -x '.\{10,20\}'
 generate random number ---> (( var="RANDOM % 1000" ))
-sequence [i]   ---> for i in `seq 1 10`; { MYCOMMAND ;}
-sequence [ii]  ---> for i in {1..10}   ; { MYCOMMAND ;}
-sequence [iii] ---> for i in $(seq 10) ; { MYCOMMAND ;}
+sequence [i]   ---> for i in `seq 1 10`; do MYCOMMAND ; done
+sequence [ii]  ---> for i in {1..10}   ; do MYCOMMAND ; done
+sequence [iii] ---> for i in $(seq 10) ; do MYCOMMAND ; done
 mutt pattern ---> printf 'MESSAGEBODY\n' | mutt -s 'SUBJECT' RECEPIENTEMAIL -a FILE
 type unicode characters ---> crl + shift + u + HEXADECIMALDIGITS
 close terminal without terminating tasks ---> disown -a && exit
@@ -140,7 +139,7 @@ print variable length [i]   ---> printf '%s\n' "${#VAR}"
 print variable length [ii]  ---> printf '%s' "$VAR" | wc -c  ## NOTE no \n
 print variable length [iii] ---> echo -n "$VAR" | wc -c
 arrays ---> ARRAY=()             create an empty array
-            declare -a ARRAY     create an empty array (local)
+            declare -a ARRAY     create an empty array
             ARRAY=(1 2 3)        initialize array
 
             readarray -t content < /proc/version  ## turn all output into an array (-t removes trailing \n)  ## returns Line1 Line2 Line3
@@ -202,7 +201,7 @@ chack if variable is a number [i]  ---> regex='^[0-9]+$'; if [[ "$VAR" =~ $regex
 chack if variable is a number [ii] ---> if [ "$VAR" -eq "$VAR" ] 2>/dev/null; then printf 'number\n';  else printf 'not number\n'; fi
 chack if variable matches pattern ---> regex='*abc*'; [[ "$VAR" == $regex ]] && printf 'match\n'  ## NOTE do not replace [[ with [, and do NOT quote $regex
 newest item in clipboard ---> xclip -o
-join many mp3 files (NOT tested) ---> ffmpeg -f concat -safe 0 -i <(for f in ./*.mp3; { printf '%s\n' "file '$PWD/$f'" ;} ) -c copy ./output.mp3
+join many mp3 files (NOT tested) ---> ffmpeg -f concat -safe 0 -i <(for f in ./*.mp3; do printf '%s\n' "file '$PWD/$f'" ; done ) -c copy ./output.mp3
 to debug bash script ---> set -x; trap read debug
 ls /usr/share/xsessions/ returns awesome.desktop
 send both stdout and stderr to null ---> &>/dev/null OR >&/dev/null

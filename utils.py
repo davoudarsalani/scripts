@@ -1,42 +1,79 @@
-## requirements
-## for .venv_keylogger: keylogger
+from datetime import datetime as dt
+from email import encoders
 ## By Davoud Arsalani
 ##    https://github.com/davoudarsalani/scripts
 ##    https://github.com/davoudarsalani/scripts/blob/master/utils.py
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/utils.py
 ##    https://davoudarsalani.ir
 
-## for .venv: (
-##   beautifulsoup4
-##   black
-##   clipboard
-##   dbus-python
-##   dmenu
-##   google-api-python-client
-##   halo
-##   jdatetime
-##   notify2
-##   pillow
-##   pycurl
-##   pyfzf
-##   PyGObject (instead of vext.gi which threw error when installing)
-##   pyminizip
-##   pynput
-##   python-magic
-##   rarfile
-##   requests
-##   requests[socks]
-##   tabulate
-##   tinytag
-##   wget
-##   wordcloud
-##   youtube_dl
-##   [jedi]
-## )
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from functools import wraps, lru_cache
+from getpass import getpass
+from gzip import open as gzip_open
+from os import getenv, path, chdir, listdir, mkdir
+from re import match, sub
+from shutil import get_terminal_size, make_archive as shutil_make_archive, copyfileobj
+from smtplib import SMTP_SSL
+from socket import create_connection as socket_create_connection
+from ssl import create_default_context
+from subprocess import run, check_output
+from sys import stdin
+from tarfile import open as tarfile_open
+from termios import tcgetattr, tcsetattr, TCSADRAIN
+from threading import Thread
+from time import perf_counter, sleep
+from tty import setraw
+from typing import Any, Callable
+from zipfile import ZipFile, ZIP_DEFLATED
 
-## imports
-from os import getenv  ## for send_email* functions
-from typing import Any  ## for Audio, get_input, get_single_input, get_last, get_datetime
+from dmenu import show as dmenu_show
+from halo import Halo
+from jdatetime import datetime as jdt
+from pyfzf.pyfzf import FzfPrompt
+from pyminizip import compress
+from RRRavard import convert_second
+from rarfile import RarFile
+
+import notify2
+
+TIMEOUT       = 20
+ERROR_DIR     = f'{getenv("HOME")}/main/scripts/.error'
+REFRESH_ICON  = getenv('refresh_icon')
+RECORD_ICON   = 'RE'
+DEF_VIDEO_DEV = '/dev/video0'
+
+## number of cached entries,
+## not a time in seconds
+LRU_CACHE_MAXSIZE = 128  ## default is 128
+
+HTTP_HEADERS = {
+    'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept':          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+
+    ## Do Not Track
+    'DNT': '1',
+
+    ## using 'close' can slow down scraping
+    ## or mark you as unusual
+    'Connection': 'keep-alive',
+
+    ## this is sent by browsers when accessing HTTPS URLs
+    ## and signals the browser prefers secure content
+    'Upgrade-Insecure-Requests': '1',
+
+    # 'Referer': 'https://example.com/',
+
+    ## Modern browsers send these in real requests.
+    ## They're important for bypassing bot protections like Cloudflare, Akamai, etc.
+    # 'Sec-Fetch-Dest': 'document',
+    # 'Sec-Fetch-Mode': 'navigate',
+    # 'Sec-Fetch-Site': 'none',   # or 'same-origin', 'cross-site' depending on context
+    # 'Sec-Fetch-User': '?1',
+}
 
 
 class Color:
@@ -201,11 +238,8 @@ class Color:
     def default(self, text: str) -> str: return self.white_dim(text)
 
 class Audio:
-
     @staticmethod
     def vol(arg: str) -> Any:
-        from re import match
-        from subprocess import run, check_output
       # port  = check_output(f'pacmd list-sinks | grep -iA 65 "*" | grep -i "active port" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
         name  = check_output(f'pacmd list-sinks | grep -iA 1 "*" | grep -i "name:" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
         index = check_output(f'pacmd list-sinks | grep -i "*"', shell=True, universal_newlines=True).strip().split()[-1]
@@ -228,8 +262,6 @@ class Audio:
 
     @staticmethod
     def mic(arg: str) -> Any:
-        from re import match
-        from subprocess import run, check_output
       # port        = check_output(f'pacmd list-sources | grep -iA 65 "*" | grep -i "active port" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
         name        = check_output(f'pacmd list-sources | grep -iA 1 "*" | grep -i "name:" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip()
         index       = check_output(f'pacmd list-sources | grep -i "*"', shell=True, universal_newlines=True).strip().split()[-1]
@@ -250,8 +282,6 @@ class Audio:
 
     @staticmethod
     def mon(arg: str) -> Any:
-        from re import match
-        from subprocess import run, check_output
         mons = check_output(fr'pacmd list-sources | grep -i "\.monitor" | grep -ioP "(?<=<).*?(?=>)"', shell=True, universal_newlines=True).strip().split()
         for eachmon in mons:
             name = eachmon
@@ -274,10 +304,8 @@ class Audio:
         elif arg == '100':         run(f'pactl set-source-volume {index} 100%', shell=True)
 
 class Screen:
-
     @staticmethod
     def screen_1() -> tuple[str, str, int, int]:
-        from subprocess import check_output
         scr_1            = check_output('xrandr | grep -iw connected | grep -i primary', shell=True, universal_newlines=True).strip()
         scr_1_name, *_   = scr_1.split()  ## eDP-1
         scr_1_res_total  = scr_1.split()[3]  ## 1366x768+1920+0
@@ -289,7 +317,6 @@ class Screen:
 
     @staticmethod
     def screen_2() -> tuple[str, str, int, int]:
-        from subprocess import check_output
         scr_2            = check_output('xrandr | grep -iw connected | grep -vi primary | sed "1q;d"', shell=True, universal_newlines=True).strip()
         scr_2_name, *_   = scr_2.split()
         scr_2_res_total  = scr_2.split()[2]
@@ -301,7 +328,6 @@ class Screen:
 
     @staticmethod
     def screen_3() -> tuple[str, str, int, int]:
-        from subprocess import check_output
         scr_3           = check_output('xrandr | grep -iw connected | grep -vi primary | sed "2q;d"' , shell=True, universal_newlines=True).strip()
         scr_3_name, *_  = scr_3.split()
         scr_3_res_total = scr_3.split()[2]
@@ -322,7 +348,6 @@ class Screen:
 
     @staticmethod
     def screen_all() -> str:
-        from subprocess import check_output
         scr_all_res = list(check_output('xrandr | grep -iw current', shell=True, universal_newlines=True).strip().split())
         scr_all_res = scr_all_res[7:10]
         scr_all_res = ''.join(scr_all_res).replace(',', '')
@@ -331,28 +356,20 @@ class Screen:
 
     @staticmethod
     def screens_count() -> int:
-        from subprocess import check_output
         screens_count = check_output('xrandr --listmonitors', shell=True, universal_newlines=True).strip().split()[1]  ## 2
 
         return screens_count
 
 class Record:
-    from halo import Halo
-
     def __init__(self):
         self.Aud = Audio()
-        self.def_video_dev = def_video_dev()
 
     def audio(self, duration: str, output: str, suffix: str, timer_secs: int) -> None:
-        from subprocess import run
-        from threading import Thread
         th = Thread(target=timer, args=(suffix, timer_secs), daemon=True)
         th.start()
         run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -t {duration} {output} -loglevel quiet', shell=True)
 
     def screen(self, resolution: str, x_offset: int, duration: str, output: str, suffix: str, timer_secs: int) -> None:
-        from subprocess import run
-        from threading import Thread
         th = Thread(target=timer, args=(suffix, timer_secs), daemon=True)
         th.start()
         run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -f x11grab -r 30 \
@@ -360,43 +377,37 @@ class Record:
               -pix_fmt yuv420p -vf eq=saturation=1.3 -t {duration} {output} -loglevel quiet', shell=True)
 
     def video(self, duration: str, output: str, suffix: str, timer_secs: int) -> None:
-        from subprocess import run
-        from threading import Thread
         th = Thread(target=timer, args=(suffix, timer_secs), daemon=True)
         th.start()
-        run(f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {self.def_video_dev} -f pulse -i {self.Aud.mon("index")} \
+        run(f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {DEF_VIDEO_DEV} -f pulse -i {self.Aud.mon("index")} \
               -f pulse -i default -filter_complex amix=inputs=2 -t {duration} {output} -loglevel quiet', shell=True)
 
     @Halo(color='green', spinner='dots12')
     def audio_ul(self, output: str) -> None:
-        from subprocess import run
         run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 {output} -loglevel quiet', shell=True)
 
     @Halo(color='green', spinner='dots12')
     def screen_ul(self, resolution: str, x_offset: int, output: str) -> None:
-        from subprocess import run
         run(f'ffmpeg -f pulse -i {self.Aud.mon("index")} -f pulse -i default -filter_complex amix=inputs=2 -f x11grab -r 30 \
               -video_size {resolution} -i :0.0+{x_offset},0 -vcodec libx264 -preset veryfast -crf 18 -acodec libmp3lame -q:a 1 \
               -pix_fmt yuv420p -vf eq=saturation=1.3 {output} -loglevel quiet', shell=True)
 
     @Halo(color='green', spinner='dots12')
     def video_ul(self, output: str) -> None:
-        from subprocess import run
-        run(f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {self.def_video_dev} -f pulse -i {self.Aud.mon("index")} \
+        run(f'ffmpeg -f v4l2 -framerate 25 -video_size 1366x768 -i {DEF_VIDEO_DEV} -f pulse -i {self.Aud.mon("index")} \
               -f pulse -i default -filter_complex amix=inputs=2 {output} -loglevel quiet', shell=True)
 
-def pipe_to_fzf(items: list[str], header: str='') -> str:
-    from os import getenv
-    from pyfzf.pyfzf import FzfPrompt
+def pipe_to_fzf(items: list[str], multi: bool=False, header: str='') -> str:
+    fzf_opts = ''
+
+    if multi:
+        fzf_opts += f' --multi'
 
     if header:
-        header = f'--header {header}'
+        fzf_opts += f' --header {header}'
 
     Col = Color()
     fzf = FzfPrompt()
-
-    fzf_opts = f' {header}'
-    ## previously: fzf_opts = f'{getenv("FZF_DEFAULT_OPTS")} {header}'
 
     try:
         item = fzf.prompt(items, fzf_opts)
@@ -408,96 +419,29 @@ def pipe_to_fzf(items: list[str], header: str='') -> str:
         print(Col.red('No item selected'))
         exit(38)
 
+## Docs: https://dmenu.readthedocs.io/en/latest/
+def pipe_to_dmenu(items: list[str]=[], header: str='') -> str:
+    try:
+        return dmenu_show(items,
+            case_insensitive=True,
+            lines=getenv('dmenulines'),
+            background=getenv('dmenunb'),
+            foreground=getenv('dmenunf'),
+            background_selected=getenv('dmenusb'),
+            foreground_selected=getenv('dmenusf'),
+            font=getenv('dmenufn'),
+            prompt=header,
+        )
+    except Exception:
+        print(Color().red('No item selected'))
+        exit(38)
+
 def invalid(text: str) -> None:
     print(Color().red(text))
     exit(38)
 
-def relative_date(start_date) -> str:
-    ## convert start_date to second if not one
-    try:
-        start_date_in_seconds = int(start_date)
-    except ValueError:
-        start_date_in_seconds = convert_to_second(start_date)
-
-    now_in_seconds = get_datetime('seconds')
-    diff = int(now_in_seconds) - int(start_date_in_seconds)
-
-    return f"{convert_second(diff, 'verbose')} ago"
-
-def convert_to_second(fulldate: str) -> int:  ## convert 2021-04-15T11:10:03+0430 to 1618468803
-    from datetime import datetime
-
-    return int(datetime.strptime(fulldate, '%Y-%m-%dT%H:%M:%S%Z').timestamp())
-
-def convert_second(seconds: int, verbose: bool=False) -> str:
-    from re import sub
-
-    seconds = int(seconds)
-
-    if seconds < 1:
-        if verbose:
-            return 'less than a second'
-        else:
-            return '00:00:00'
-
-    ss = f'{int(seconds % 60):02}'
-    mi = f'{int(seconds / 60 % 60):02}'
-    hh = f'{int(seconds / 3600 % 24):02}'
-    dd = f'{int(seconds / 3600 / 24 % 30):02}'
-    mo = f'{int(seconds / 3600 / 24 / 30 % 12):02}'
-    yy = f'{int(seconds / 3600 / 24 / 30 / 12):02}'
-
-    if yy == '00' and mo == '00' and dd == '00':
-        if verbose:
-            result = f'{hh} hours, {mi} minutes and {ss} seconds'
-        else:
-            result = f'{hh}:{mi}:{ss}'
-    elif yy == '00' and mo == '00':
-        if verbose:
-            result = f'{dd} days, {hh} hours, {mi} minutes and {ss} seconds'
-        else:
-            result = f'{dd}:{hh}:{mi}:{ss}'
-    elif yy == '00':
-        if verbose:
-            result = f'{mo} months, {dd} days, {hh} hours, {mi} minutes and {ss} seconds'
-        else:
-            result = f'{mo}:{dd}:{hh}:{mi}:{ss}'
-    else:
-        if verbose:
-            result = f'{yy} years, {mo} months, {dd} days, {hh} hours, {mi} minutes and {ss} seconds'
-        else:
-            result = f'{yy}:{mo}:{dd}:{hh}:{mi}:{ss}'
-
-
-    ## NOTE the same modifications in JUMP_4 are applied in
-    ##        1. convert_second function in gb
-    ##        2. 'relative' method of whatever-its-name-is class in models.py in django app
-    ##      so any changes you make here, make sure to update them too
-
-    ## JUMP_4 remove items whose values are 00, and adjust comma and 'and'
-    result = sub(r'00 [a-z]+s, ', r'', result)
-    result = sub(r'00 [a-z]+s and ', r'', result)
-    result = sub(r'00 [a-z]+s$', r'', result)
-    result = sub(r', ([0-9][0-9] [a-z]+s )', r' and \1', result)
-    result = sub(r'and 00 [a-z]+s ', r'', result)
-    result = sub(r' and $', r'', result)
-    result = sub(r', ([0-9][0-9] [a-z]+)$', r' and \1', result)
-    result = sub(r' and ([0-9][0-9] [a-z]+) and', r', \1 and', result)
-    result = sub(r', +$', r'', result)
-    result = sub(r', ([0-9][0-9] [a-z]+s)$', r' and \1', result)
-
-    ## JUMP_4 remove plural s when value is 01
-    result = sub(r'(01 [a-z]+)s ', r'\1 ', result)
-    result = sub(r'(01 [a-z]+)s, ', r'\1, ', result)
-    result = sub(r'(01 [a-z]+)s$', r'\1', result)
-
-    return result
-
 def duration_wrapper() -> str:  ## TODO is str correct for outputs?
-    from typing import Callable
     def dec(func: Callable) -> str:
-        from functools import wraps
-        from time import perf_counter
         @wraps(func)
         def wrapper(*args: str, **kwargs: str) -> str:
             start = perf_counter()
@@ -509,32 +453,17 @@ def duration_wrapper() -> str:  ## TODO is str correct for outputs?
         return wrapper
     return dec
 
-def get_headers() -> dict[str, str]:
-    return {'User-Agent'     : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-            'Accept'         : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip',
-            'DNT'            : '1',  ## do not track request header
-            'Connection'     : 'close'}
-
 def get_width() -> int:
-    from shutil import get_terminal_size
-
     return get_terminal_size()[0]
-    ## OR:
-    # import subprocess
-    # return subprocess.check_output('tput cols', shell=True, universal_newlines=True).strip()
 
 def get_input(prompt: str) -> Any:
     answer=input(Color().ask(f'{prompt} '))
     if answer:
         return answer
+    return None
 
-def get_single_input(prompt: str) -> Any:  ## https://stackoverflow.com/questions/510357/how-to-read-a-single-character-from-the-user
+def get_single_input(prompt: str) -> Any:
     def _find_getch() -> Any:
-        from sys import stdin
-        from termios import tcgetattr, tcsetattr, TCSADRAIN
-        from tty import setraw
         def _getch() -> Any:
             print(Color().ask(f'{prompt} '), end='')
             fd = stdin.fileno()
@@ -566,8 +495,6 @@ def get_single_input(prompt: str) -> Any:  ## https://stackoverflow.com/question
     '''
 
 def get_datetime(frmt: str) -> Any:
-    from datetime import datetime as dt
-    from jdatetime import datetime as jdt
     if   frmt == 'ymdhms':   output =  dt.now().strftime('%Y%m%d%H%M%S')
     elif frmt == 'ymd':      output =  dt.now().strftime('%Y%m%d')
     elif frmt == 'hms':      output =  dt.now().strftime('%H%M%S')
@@ -581,28 +508,7 @@ def get_datetime(frmt: str) -> Any:
 
     return output
 
-def convert_byte(size_in_bytes: int) -> str:  ## https://stackoverflow.com/questions/5194057/better-way-to-convert-file-sizes-in-python
-    from math import floor, log, pow as math_pow
-    from re import compile as re_compile, match, sub
-
-    reg = r'^[0-9]+\.00$'
-
-    if size_in_bytes == 0:
-        return '0B'
-
-    suff = ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
-    i = int(floor(log(size_in_bytes, 1024)))
-    p = math_pow(1024, i)
-    conv = f'{float(size_in_bytes / p):.2f}'
-
-    ## remove trailing 00
-    if match(reg, conv):
-        conv = sub(r'\.00$', '', conv)
-
-    return f'{conv}{suff[i]}'
-
-def if_exists(dest) -> str:
-    from os import path
+def create_unique_dir_name(dest) -> str:
     append_index = 2
     if path.exists(dest):
         while path.exists(f'{dest}_{append_index:02}'):
@@ -610,24 +516,6 @@ def if_exists(dest) -> str:
         dest = f'{dest}_{append_index:02}'
 
     return dest
-
-def last_file_exists(last_file) -> bool:
-    from os import path
-    condition = [path.exists(last_file)]
-
-    return all(condition)
-
-def get_last(last_file) -> Any:
-    with open(last_file, 'r') as opened_last_file:
-        output = opened_last_file.read().splitlines()[-1]
-
-    return output
-
-def save_as_last(last_file, text) -> None:
-    current_datetime = get_datetime('jymdhms')
-    weekday = get_datetime('jweekday')
-    with open(last_file, 'w') as opened_last_file:
-        opened_last_file.write(f'{current_datetime}\t{weekday}\n{text}\n')
 
 def save_error(error_file, text) -> None:
     current_datetime = get_datetime('jymdhms')
@@ -638,7 +526,7 @@ def save_error(error_file, text) -> None:
 def msgn(message: str, title: str='', icon: str='', duration: int=10) -> None:
     ## https://notify2.readthedocs.io/en/latest/#notify2.Notification.set_urgency
     ## also have a look at https://www.devdungeon.com/content/desktop-notifications-linux-python
-    import notify2
+    
     notify2.init('app name')
     n = notify2.Notification(str(message), str(title), icon)
     n.timeout = duration*1000
@@ -649,7 +537,6 @@ def msgn(message: str, title: str='', icon: str='', duration: int=10) -> None:
 def msgc(message: str, title: str='', icon: str='') -> None:
     ## https://notify2.readthedocs.io/en/latest/#notify2.Notification.set_urgency
     ## also have a look at https://www.devdungeon.com/content/desktop-notifications-linux-python
-    import notify2
     notify2.init('app name')
     n = notify2.Notification(str(message), str(title), icon)
     n.set_urgency(notify2.URGENCY_CRITICAL)  ## URGENCY_CRITICAL, URGENCY_LOW & URGENCY_NORMAL
@@ -657,7 +544,6 @@ def msgc(message: str, title: str='', icon: str='') -> None:
     notify2.uninit()
 
 def countdown(start: int=5) -> None:
-    from time import sleep
     for i in range(start, 0, -1):
         msgn(i, duration=1)
         sleep(1)
@@ -668,78 +554,51 @@ def centralize(text: str, wrapper: str=' ') -> str:
 
     return text.center(width, wrapper)
 
-def pipe_to_dmenu(items: list[str]=[], title: str='', fg: str='') -> str:  ## Docs: https://dmenu.readthedocs.io/en/latest/
-    from os import getenv
-    import dmenu
-
-    if fg == 'red':
-        sb = getenv('red_dark')
-    else:
-        sb = getenv('dmenusb')
-
-    try:
-        return dmenu.show(items,
-            case_insensitive=True,
-            lines=getenv('dmenulines'),
-            background=getenv('dmenunb'),
-            foreground=getenv('dmenunf'),
-            background_selected=sb,
-            foreground_selected=getenv('dmenusf'),
-            font=getenv('dmenufn'),
-            prompt=title,
-        )
-    except Exception:
-        print(Color().red('No item selected'))
-        exit(38)
-
 def get_password(prompt: str) -> str:  ## https://linuxhint.com/python-getpass-module/
-    from getpass import getpass
     while len(password := getpass(prompt=Color().ask(prompt))) < 1:
         pass
 
     return password
 
-def remove_leading_zeros(number: int) -> int:
-    from re import sub
-    number = str(number)
-    number = sub(r'^0*', r'', number)
+@lru_cache(maxsize=LRU_CACHE_MAXSIZE)
+def remove_trailing_slashes(string: str) -> str:
+    '''
+    Remove trailing slashes from a string.
 
-    return number
+    Args:
+        string (str): String to normalize.
 
-def remove_trailing_slash(string: str) -> str:
-    from re import sub
-    string = str(string)
-    string = sub(r'/$', r'', string)
+    Returns:
+        str: The normalized string without trailing slashes.
 
-    return string
+    Examples:
+        >>> remove_trailing_slashes('test')
+        'test'
+
+        >>> remove_trailing_slashes('test/')
+        'test'
+
+        >>> remove_trailing_slashes('test//')
+        'test'
+
+        >>> remove_trailing_slashes('https://example.com/')
+        'https://example.com'
+    '''
+    ## __HAS_TEST__
+
+    return sub(r'/+$', r'', string)
 
 def set_widget(widget: str, attr: str, value: str) -> None:
-    from subprocess import run
-
     # widget = f'{widget}_ct'
 
     run(f'awesome-client "{widget}.{attr} = \'{value}\'"', shell=True)
 
-def record_icon() -> str:
-    return 'RE'
-
-def refresh_icon() -> str:
-    from os import getenv
-
-    return getenv('refresh_icon')
-
-def def_video_dev() -> str:
-    return '/dev/video0'
-
 def update_audio() -> None:
-    from os import getenv
-    from subprocess import run
     run(f'{getenv("HOME")}/main/scripts/awesome-widgets audio', shell=True)
 
 def timer(suffix: str, timer_secs: int) -> None:
-    from time import sleep
     start = int(get_datetime('jhms'))
-    record_icon_suffix = f'{record_icon()}:{suffix}'
+    record_icon_suffix = f'{RECORD_ICON}:{suffix}'
 
     for i in range(int(timer_secs)):
         current = int(get_datetime('jhms'))
@@ -749,33 +608,31 @@ def timer(suffix: str, timer_secs: int) -> None:
         set_widget('record', 'markup', hms)
         sleep(1)
 
-def uptime(verbose: bool=False) -> str:
-    with open('/proc/uptime', 'r') as opened_uptime_file:
-        secs = opened_uptime_file.read().strip().split()[0]
-        secs = int(float(secs))
-    if verbose:
-        return convert_second(secs, verbose=True)
-    else:
-        return convert_second(secs)
+@lru_cache(maxsize=LRU_CACHE_MAXSIZE)
+def hms_to_seconds(hms: str) -> int:
+    '''
+    Convert a time string in HH:MM:SS format to total seconds.
 
-def open_windows() -> list[str]:
-    from Xlib import display
+    Args:
+        hms (str): Time string in 'HH:MM:SS' format.
 
-    screen = display.Display().screen()
-    root_win = screen.root
+    Returns:
+        int: Total number of seconds represented by the input.
 
-    names = []
-    for window in root_win.query_tree()._data['children']:
-        name = window.get_wm_name()
-        names.append(name)
+    Examples:
+        >>> hms_to_seconds('04:38:23')
+        16703
 
-    return names
+        >>> hms_to_seconds('00:12:19')
+        739
+    '''
+    ## __HAS_TEST__
 
-def send_email(subject: str, body: str, sender: str=getenv('email1'), receiver: str=getenv('email2')) -> None:
+    h, m, s = map(int, hms.split(':'))
+    return h*3600 + m*60 + s
+
+def send_email(subject: str, body: str, sender: str, receiver: str) -> None:
     ## https://realpython.com/python-send-email/
-    from os import getenv
-    from smtplib import SMTP_SSL
-    from ssl import create_default_context
 
     if sender == getenv('email1'):
         password = getenv('email1_password1')
@@ -796,16 +653,8 @@ def send_email(subject: str, body: str, sender: str=getenv('email1'), receiver: 
             print(Color().red(f'ERROR sending mail:\n{exc!r}'))
             msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 
-def send_email_with_attachment(subject: str, body: str, attachment: str, sender: str=getenv('email1'), receiver: str=getenv('email2')) -> None:
+def send_email_with_attachment(subject: str, body: str, attachment: str, sender: str, receiver: str) -> None:
     ## https://realpython.com/python-send-email/
-    from email import encoders
-    from email.mime.base import MIMEBase
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    from os import getenv
-    from smtplib import SMTP_SSL
-    from ssl import create_default_context
-
     if sender == getenv('email1'):
         password = getenv('email1_password1')
         server   = 'smtp.mail.yahoo.com'
@@ -852,72 +701,10 @@ def send_email_with_attachment(subject: str, body: str, attachment: str, sender:
             print(Color().red(f'ERROR sending mail:\n{exc!r}'))
             msgc('ERROR', f'sending email\n{exc!r}', f'{getenv("HOME")}/main/configs/themes/alert-w.png')
 
-def hash_string(string: str) -> str:
-    from hashlib import sha1, sha256, sha512, md5
-    string      = f'{string}\n'
-    sha1_hash   = sha1(string.encode()).hexdigest()
-    sha256_hash = sha256(string.encode()).hexdigest()
-    sha512_hash = sha512(string.encode()).hexdigest()
-    md5_hash    = md5(string.encode()).hexdigest()
-
-    return f'string\t{string}sha1\t{sha1_hash}\nsha256\t{sha256_hash}\nsha512\t{sha512_hash}\nmd5\t{md5_hash}'
-
-def hash_file(file: str) -> str:
-    from hashlib import sha1, sha256, sha512, md5
-    with open(file, 'r') as opened_file:
-        opened_file = opened_file.read()
-    sha1_hash   = sha1(opened_file.encode()).hexdigest()
-    sha256_hash = sha256(opened_file.encode()).hexdigest()
-    sha512_hash = sha512(opened_file.encode()).hexdigest()
-    md5_hash    = md5(opened_file.encode()).hexdigest()
-
-    return f'file\t{file}\nsha1\t{sha1_hash}\nsha256\t{sha256_hash}\nsha512\t{sha512_hash}\nmd5\t{md5_hash}'
-
-def garbage() -> None:
-    from random import randbytes
-    from time import sleep
-    while True:
-        text = randbytes(80).decode(errors='ignore')
-        print(text, end='')
-        sleep(0.01)
-
-def to_seconds(dur: str) -> int:  ## https://stackoverflow.com/questions/16742381/how-to-convert-youtube-api-duration-to-seconds/49976787#49976787
-    '''converts youtube api duration (e.g. PT1H25M41S) to seconds (e.g. 5141)'''
-    from re import match
-
-    ## js-like parseInt (https://gist.github.com/douglasmiranda/2174255)
-    def _js_parseInt(string) -> int:
-        return int(''.join([c for c in string if c.isdigit()]))
-
-    mtch = match(r'PT(\d+H)?(\d+M)?(\d+S)?', dur).groups()
-    hours   = _js_parseInt(mtch[0]) if mtch[0] else 0
-    minutes = _js_parseInt(mtch[1]) if mtch[1] else 0
-    seconds = _js_parseInt(mtch[2]) if mtch[2] else 0
-
-    return hours * 3600 + minutes * 60 + seconds
-
-def if_tor() -> None:  ## https://tor.stackexchange.com/questions/19858/how-to-check-if-tor-socks-proxy-is-working-programatically-python
-    import socket
-    import sys
-    try:
-        tor_c = socket.create_connection(('127.0.0.1', 9051))
-        tor_c.send('AUTHENTICATE "{}"\r\nGETINFO status/circuit-established\r\nQUIT\r\n'.format('YOUR_PWD'))
-        response = tor_c.recv(1024)
-        print(response)
-        if 'circuit-established=1' not in response:
-           print('Something is not right.')
-        else:
-           print('Looks good.')
-        tor_c.close()
-    except Exception as exc:
-        print(Color().red(f'{exc!r}'))
-
 ###########################
-def compress_tar(inpt: str) -> None:
-    from os import path, chdir, listdir
-    from tarfile import open as tarfile_open
 
-    inpt = remove_trailing_slash(inpt)
+def compress_tar(inpt: str) -> None:
+    inpt = remove_trailing_slashes(inpt)
     root, base = path.split(inpt)
     dest_dir = root
     chdir(dest_dir)
@@ -932,11 +719,8 @@ def compress_tar(inpt: str) -> None:
         with tarfile_open(dest_tar, 'w') as opened_new_tarfile:
             opened_new_tarfile.add(base)
 
-def compress_gz(inpt: str) -> None:  ## https://stackoverflow.com/questions/8156707/gzip-a-file-in-python
-    from os import path, chdir, listdir
-    from gzip import open as gzip_open
-
-    inpt = remove_trailing_slash(inpt)
+def compress_gz(inpt: str) -> None:
+    inpt = remove_trailing_slashes(inpt)
     root, base = path.split(inpt)
     dest_dir = root
     chdir(dest_dir)
@@ -947,12 +731,7 @@ def compress_gz(inpt: str) -> None:  ## https://stackoverflow.com/questions/8156
             f_out.writelines(f_in)
 
 def compress_zip(inpt: str, password: str='') -> None:
-    from os import chdir, path, listdir
-    import shutil
-    from zipfile import ZipFile, ZIP_DEFLATED
-    from pyminizip import compress
-
-    inpt = remove_trailing_slash(inpt)
+    inpt = remove_trailing_slashes(inpt)
     root, base = path.split(inpt)
     dest_dir = root
     chdir(dest_dir)
@@ -960,7 +739,7 @@ def compress_zip(inpt: str, password: str='') -> None:
     if password == '':
         dest_zip = f'{base}.zip'
         if path.isdir(inpt):
-            shutil.make_archive(inpt, 'zip', inpt)
+            shutil_make_archive(inpt, 'zip', inpt)
 
             ## OR: FIXME the problem is it creats empty zip when inpt is a dir containing dir(s)
             # with ZipFile(dest_zip, 'w', compression=ZIP_DEFLATED) as opened_new_zipfile:
@@ -978,10 +757,7 @@ def compress_zip(inpt: str, password: str='') -> None:
         compress(inpt, None, dest_zip, password, 5)
 
 def compress_rar(inpt: str, set_password: bool=False) -> None:  ## FIXME find a pythonic way to create rar file
-    from os import path, chdir
-    from subprocess import run
-
-    inpt = remove_trailing_slash(inpt)
+    inpt = remove_trailing_slashes(inpt)
     root, base = path.split(inpt)
     dest_dir = root
     chdir(dest_dir)
@@ -993,9 +769,7 @@ def compress_rar(inpt: str, set_password: bool=False) -> None:  ## FIXME find a 
         run(f'rar a {dest_rar} {base}', shell=True)
 
 def xtract_tar(inpt: str) -> None:
-    from os import path, mkdir
-    from tarfile import open as tarfile_open
-    inpt = remove_trailing_slash(inpt)
+    inpt = remove_trailing_slashes(inpt)
     root_base, _ = path.splitext(inpt)
     dest_dir = root_base
     mkdir(dest_dir)
@@ -1003,12 +777,8 @@ def xtract_tar(inpt: str) -> None:
     with tarfile_open(inpt) as opened_cur_tarfile:
         opened_cur_tarfile.extractall(dest_dir)
 
-def xtract_gz(inpt: str) -> None:  ## https://stackoverflow.com/questions/31028815/how-to-unzip-gz-file-using-python
-    from gzip import open as gzip_open
-    from os import path, mkdir
-    from shutil import copyfileobj
-
-    inpt = remove_trailing_slash(inpt)
+def xtract_gz(inpt: str) -> None:
+    inpt = remove_trailing_slashes(inpt)
     root_base, _ = path.splitext(inpt)
     dest_dir = root_base
     mkdir(dest_dir)
@@ -1021,9 +791,7 @@ def xtract_gz(inpt: str) -> None:  ## https://stackoverflow.com/questions/310288
             copyfileobj(f_in, f_out)
 
 def xtract_zip(inpt: str, password: str='') -> None:
-    from os import path, mkdir
-    from zipfile import ZipFile
-    inpt = remove_trailing_slash(inpt)
+    inpt = remove_trailing_slashes(inpt)
     root_base, _ = path.splitext(inpt)
     dest_dir = root_base
     mkdir(dest_dir)
@@ -1037,9 +805,7 @@ def xtract_zip(inpt: str, password: str='') -> None:
             opened_cur_zipfile.extractall(dest_dir)
 
 def xtract_rar(inpt: str, password: str='') -> None:
-    from os import path, mkdir, chdir
-    from rarfile import RarFile
-    inpt = remove_trailing_slash(inpt)
+    inpt = remove_trailing_slashes(inpt)
     root_base, _ = path.splitext(inpt)
     dest_dir = root_base
     mkdir(dest_dir)

@@ -16,8 +16,8 @@ source ~/main/scripts/utils-network.sh
 ## ⮜ U+2B9C
 ## ⮞ U+2B9E
 ## ▲ ▼
-down_icon='⮟'
 up_icon='⮝'
+down_icon='⮟'
 
 down_icon_diff="<span color=\"${gruvbox_blue_d}\">${down_icon}</span>"
 up_icon_diff="<span color=\"${gruvbox_purple_d}\">${up_icon}</span>"
@@ -35,6 +35,8 @@ diff_color_medium="$gruvbox_fg2"
 diff_color_high="$gruvbox_blue"
 diff_color_ultRRRigh="$gruvbox_green"
 
+vpn_color="$gruvbox_blue_d"
+
 diff_text=''
 total_text=''
 
@@ -43,15 +45,24 @@ total_text=''
 [ "$eth_conn" == '--'        ] && eth_conn='' || eth_conn=" $eth_conn"
 [ "$wf_conn" == 'MCI'        ] && if_simcard="<span color=\"${gruvbox_orange}\"> SIM</span>"
 [ "$wf_state" == 'connected' ] || if_wf_down="<span color=\"${gruvbox_red}\"> WiFi DOWN</span>"
-[ "$vpn_info"                ] && vpn_conn="<span color=\"${gruvbox_gray_d}\"> ${vpn_conn}</span>"
-[ "$(pgrep 'openvpn')"       ] && openvpn="<span color=\"${gruvbox_gray_d}\"> OP</span>"
+
+## using two spaces instead of one for better visibility
+spaces='  '
+##
+process_is_running 'openvpn' && openvpn="<span color=\"${vpn_color}\">${spaces}OP</span>"
+[ "$vpn_info" ] && {
+    config_file="$(pgrep -af openvpn | cut -d ' ' -f 2- | uniq | \grep -o '/etc/openvpn/client/[^ ]*\.ovpn')"  ## /etc/openvpn/client/V1-Fast.ovpn
+    config_file="$(basename "$config_file" .ovpn)"  ## V1-Fast
+
+    vpn_conn="<span color=\"${vpn_color}\">${spaces}${vpn_conn}${spaces}${config_file}</span>"  ## tun0 V1-Fast
+}
 
 connection_text="${wf_conn}${eth_conn}${if_simcard}${if_wf_down}${openvpn}${vpn_conn}"
 
 ## total and diff -----------------------
 ## https://www.adminsehow.com/2010/03/shell-script-to-show-network-speed/
 
-for adapter in 'wifi' 'ethernet'; {
+for adapter in 'wifi' 'ethernet'; do
     case "$adapter" in
         wifi )
             device_name="$wf_devc"
@@ -144,7 +155,7 @@ for adapter in 'wifi' 'ethernet'; {
 
     diff_text+=" | ${down_icon_diff} ${down_diff_conv}  ${up_icon_diff} ${up_diff_conv}"  ## 317K 2.31M
     total_text+=" | ${down_icon_total} ${down_total_conv}  ${up_icon_total} ${up_total_conv}"  ## 4.32G 4.32G
-}
+done
 
 ## remove leading ' | '
 diff_text="${diff_text# | }"

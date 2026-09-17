@@ -10,7 +10,8 @@
 source ~/main/scripts/utils.sh
 
 autorun_file=/tmp/autorun
-[ -f "$autorun_file" ] && exit || touch "$autorun_file"
+[ -f "$autorun_file" ] && exit
+touch "$autorun_file"
 
 ## tricks for the time when power saving screws audio
 # printf '0\n' | sudo tee /sys/module/snd_hda_intel/parameters/power_save
@@ -23,7 +24,7 @@ autorun_file=/tmp/autorun
 ## previously (ditched after moving to SSD):
 # pulseaudio --start &
 
-start-pulseaudio-x11 || msgc "start-pulseaudio-x11 failed"
+start-pulseaudio-x11 || msgc 'start-pulseaudio-x11 failed'
 
 # /usr/bin/nvidia-smi -pm 1 || msgc "'/usr/bin/nvidia-smi -pm 1' failed"
 
@@ -58,10 +59,10 @@ widgets=(
 )
 
 if [ "$widgets" ]; then
-    for widget in "${widgets[@]}"; {
+    for widget in "${widgets[@]}"; do
         ~/main/scripts/awesome-widgets.sh "$widget"
         sleep .1
-    }
+    done
 fi
 
 

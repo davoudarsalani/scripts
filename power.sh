@@ -9,7 +9,7 @@
 
 source ~/main/scripts/utils.sh
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 ## options match ones in awesome-power.sh
 main_items=(
@@ -27,9 +27,7 @@ main_items=(
     'restart awesome'
 )
 
-rofi__title="$title"
-# rofi__subtitle="$1"
-main_item="$(pipe_to_rofi "${main_items[@]}")" || exit 37
+main_item="$(pipe_to_rofi --header "$title" "${main_items[@]}")" || exit 37
 
 case "$main_item" in
     shutdown )

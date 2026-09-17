@@ -13,25 +13,31 @@
 
 function dl_xtract {
     mkdir -p "$temp_dir"/sources
-    wget --tries=inf -O "$tar_file" "$1"  ## --tries=inf or --tries=0 for infinite retrying
-                                          ## because downloading is sometimes not easy when building images
+
+    ## --tries=inf or --tries=0 for infinite retrying
+    ## because downloading is sometimes not easy when building images
+    wget --tries=inf -O "$tar_file" "$1"
+
     tar -xf "$tar_file" -C "$temp_dir"/sources
     rm "$tar_file"
 }
 
-## needed because user is root when creating docker image, and non-root in GitHub Actions
+## needed because user is root when creating docker image,
+## and non-root in GitHub Actions
 (( UID > 0 )) || is_root='true'
 
-temp_dir="$(mktemp -d /tmp/jdate_tmp_XXXXXX)"  ## NOTE a. do NOT replace -d with --directory
-                                               ##         because mktemp on Alpine was seen to only accept -d
-                                               ##      b. Alpine requires at least six Xs.
-                                               ##         any modifications you make to the template,
-                                               ##         make sure to do the same in the clean-up section in dockerfiles
+## NOTE a. do NOT replace -d with --directory
+##         because mktemp on Alpine was seen to only accept -d
+##      b. Alpine requires at least six Xs.
+##         any modifications you make to the template,
+##         make sure to do the same in the clean-up section in dockerfiles
+temp_dir="$(mktemp -d /tmp/jdate_tmp_XXXXXX)"
+
 tar_file="$temp_dir"/jcal_latest.tar.gz
 
 ## INSTALLING-DEPENDENCIES::START
 printf 'installing dependencies\n'
-for dep in automake build-essential libjalali-dev libtool; {
+for dep in automake build-essential libjalali-dev libtool; do
     [ "$(command -v "$dep")" ] && continue
 
     ## [CHECKING_HOST]
@@ -43,7 +49,7 @@ for dep in automake build-essential libjalali-dev libtool; {
 
     [ "$is_root" == 'true' ] || cmd="sudo $cmd"
     eval "$cmd" || printf 'ERROR installing %s\n' "$dep"
-}
+done
 ## INSTALLING-DEPENDENCIES::END
 
 printf 'cloning/downloading\n'

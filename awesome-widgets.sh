@@ -27,8 +27,7 @@ case "$1" in
     ## -------------------------------
 
     clock )
-        hm="$(date '+%I:%M')"
-        set_widget 'clock' 'markup' "$hm" ;;
+        set_widget 'clock' 'markup' "$(date '+%I:%M')" ;;
 
     audio )
         function update_variables {
@@ -37,20 +36,20 @@ case "$1" in
 
         update_variables
 
-        function mute_vol {
+        function mute_vol_ {
             pactl set-sink-mute "$def_sink_index" 1  ## OR pactl set-sink-mute "$def_sink_index" true  <--,
         }                                            ##                                                   |
                                                      ##                                                   |
-        function unmute_vol {                        ##                                                   |
+        function unmute_vol_ {                       ##                                                   |
             pactl set-sink-mute "$def_sink_index" 0  ## OR pactl set-sink-mute "$def_sink_index" false <--'-- pactl set-sink-mute "$def_sink_index" toggle
         }
 
 
-        function mute_mic {
+        function mute_mic_ {
             pactl set-source-mute "$def_source_index" 1
         }
 
-        function unmute_mic {
+        function unmute_mic_ {
             pactl set-source-mute "$def_source_index" 0
         }
 
@@ -62,11 +61,11 @@ case "$1" in
         #     pactl set-source-volume "$def_source_index" 25%
         # }
 
-        function mute_mon {
+        function mute_mon_ {
             pactl set-source-mute "$def_source_mon_index" 1
         }
 
-        function unmute_mon {
+        function unmute_mon_ {
             pactl set-source-mute "$def_source_mon_index" 0
         }
 
@@ -82,11 +81,19 @@ case "$1" in
             vol_30 )
                 pactl set-sink-volume "$def_sink_index" 30% ;;
 
+            mute_vol )
+                if [ "$vol_mute_status" == 'no' ]; then
+                    mute_vol_
+                fi ;;
+            unmute_vol )
+                if [ "$vol_mute_status" == 'yes' ]; then
+                    unmute_vol_
+                fi ;;
             toggle_vol )
                 if [ "$vol_mute_status" == 'yes' ]; then
-                    unmute_vol
+                    unmute_vol_
                 else
-                    mute_vol
+                    mute_vol_
                 fi ;;
             vol_up )
                 pactl set-sink-volume "$def_sink_index" +5% ;;
@@ -96,12 +103,20 @@ case "$1" in
             #     pactl set-sink-volume "$def_sink_index" 100% ;;
             # vol_0 )
             #     pactl set-sink-volume "$def_sink_index" 0% ;;
-
+            ########################################
+            mute_mic )
+                if [ "$mic_mute_status" == 'no' ]; then
+                    mute_mic_
+                fi ;;
+            unmute_mic )
+                if [ "$mic_mute_status" == 'yes' ]; then
+                    unmute_mic_
+                fi ;;
             toggle_mic )
                 if [ "$mic_mute_status" == 'yes' ]; then
-                    unmute_mic
+                    unmute_mic_
                 else
-                    mute_mic
+                    mute_mic_
                 fi ;;
             mic_up )
                 pactl set-source-volume "$def_source_index" +5% ;;
@@ -112,11 +127,19 @@ case "$1" in
             mic_0 )
                 pactl set-source-volume "$def_source_index" 0% ;;
 
+            mute_mon )
+                if [ "$mon_mute_status" == 'no' ]; then
+                    mute_mon_
+                fi ;;
+            unmute_mon )
+                if [ "$mon_mute_status" == 'yes' ]; then
+                    unmute_mon_
+                fi ;;
             toggle_mon )
                 if [ "$mon_mute_status" == 'yes' ]; then
-                    unmute_mon
+                    unmute_mon_
                 else
-                    mute_mon
+                    mute_mon_
                 fi ;;
             mon_up )
                 pactl set-source-volume "$def_source_mon_index" +5% ;;
@@ -372,25 +395,20 @@ msgn "$text" ;;
         ~/main/scripts/e-mail.py 'gmail' ;;
 
     clipboard )
-        function check_status {
-            if_on="$(pgrep 'greenclip')"
-        }
-        check_status
-
         case "$2" in
             start )
-                if [ "$if_on" ]; then
+                if process_is_running 'greenclip'; then
                     msgn "<span color=\"${gruvbox_orange}\">greenclip</span> already on"
                 else
                     greenclip daemon &
                     msgn "<span color=\"${gruvbox_orange}\">greenclip</span> started"
                 fi ;;
             stop )
-                pkill greenclip
+                pkill_process 'greenclip'
                 msgn "<span color=\"${gruvbox_orange}\">greenclip</span> stopped" ;;
         esac
 
-        [ "$if_on" ] && clipboard_text='CL' || clipboard_text="CL:OF"
+        process_is_running 'greenclip' && clipboard_text='CL' || clipboard_text="CL:OF"
         set_widget 'clipboard' 'markup' "$clipboard_text" ;;
 
     established )
@@ -448,9 +466,8 @@ msgn "$text" ;;
                 ~/main/scripts/is-tor.py 'msg' ;;
         esac
 
-        tor_status="$(pgrep 'tor')"
-        [ "$tor_status" ] && tor_status_text='TO:ON' || tor_status_text='TO'
-        set_widget 'tor' 'markup' "$tor_status_text" ;;
+        process_is_running 'tor' && tor_is_on_text='TO:ON' || tor_is_on_text='TO'
+        set_widget 'tor' 'markup' "$tor_is_on_text" ;;
 
     git )
         source ~/main/scripts/utils-git.sh
@@ -459,42 +476,16 @@ msgn "$text" ;;
 
         modified_repos=''
 
-        ## FIXME
-        ## can't use FZF_DEFAULT_COMMAND and FZF_ALT_C_COMMAND_GIT
-        ## because they are apparently not accessible to this option
+        mapfile -t all_repos < <(find_all_git_repos)
 
-        ## synced with path flags for FZF_DEFAULT_COMMAND in ~/.bashrc
-        path_flags_1='\
-          ! -path "*.git/*"       \
-          ! -path "*.cache/*"     \
-          ! -path "*venv*/*"      \
-          ! -path "*downloads/*" \
-          ! -path "*kaddy/*"      \
-          ! -path "*trash/*"      \
-          ! -path "*lost+found/*" \
-          2>/dev/null'
-
-        ## synced with path flags for FZF_ALT_C_COMMAND_GIT in ~/.bashrc
-        path_flags_2='\
-          ! -path "*.config/*"    \
-          ! -path "*.vim/*"       \
-          ! -path "*go/*"         \
-          ! -path "*trash/*"      \
-          ! -path "*lost+found/*" \
-            -iname ".git" | sed "s#/\.git##" | sort'
-
-        find_cmd="find ~/main/ -type d $path_flags_1 $path_flags_2"
-
-        readarray -t all_repos < <(eval "$find_cmd")
-
-        for repo in "${all_repos[@]}"; {
+        for repo in "${all_repos[@]}"; do
             status_count="$(wc -l < <(git_status "$repo"))"
 
             (( status_count > 0 )) && {
                 base="${repo##*/}"
                 modified_repos+="${base::2}${status_count},"
             }
-        }
+        done
 
         ## %,* is to remove the trailing , and everything coming after that (only one % mean non-greedy)
         [ "$modified_repos" ] && git_text="GI:${modified_repos%,*}" || git_text='GI'
@@ -532,7 +523,6 @@ msgn "$text" ;;
             (( tried++ ))
 
             sleep .1
-
         done
 
         set_widget 'ping' 'markup' "$stts" ;;
@@ -550,7 +540,7 @@ msgn "$text" ;;
         if [ "$album" == 'speech' ]; then
             audtool --equalizer-set 0 0 0 0 0 0 0 0 0 0 0
         else
-            audtool --equalizer-set -2.10 -10.86 4.00 5.14 2.10 -0.19 -2.10 -2.86 -4.00 -4.00 -4.00
+            audtool --equalizer-set -1.0  -4.0  +2.0  +3.0  +1.5  0.0  -1.0  -1.5  -2.0  -2.0  -2.0
         fi
 
         case "$2" in
@@ -588,9 +578,7 @@ msgn "$text" ;;
                 IFS=$'\n'
                 readarray -t current_songs < <(audtool --playlist-display)
 
-                rofi__title="$1"
-                rofi__subtitle="$2"
-                selected_song="$(pipe_to_rofi "${current_songs[@]}")" || exit 37
+                selected_song="$(pipe_to_rofi --header "$1" --subheader "$2" "${current_songs[@]}")" || exit 37
 
                 selected_song_index="$(printf '%s\n' "$selected_song" | awk '{print $1}')"
                 audtool --playlist-jump "$selected_song_index" ;;

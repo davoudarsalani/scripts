@@ -6,12 +6,27 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-unlimited.py
 ##    https://davoudarsalani.ir
 
+
 from os import getenv, path
-from signal import signal, SIGINT
+from signal import (
+    signal,
+    SIGINT,
+)
 
-from utils import Screen, Color, Audio, Record, get_datetime, pipe_to_fzf, update_audio, invalid, get_input
+from utils import (
+    Screen,
+    Color,
+    Audio,
+    Record,
+    get_datetime,
+    get_input,
+    invalid,
+    pipe_to_fzf,
+    update_audio,
+)
 
-title = path.basename(__file__).replace('.py', '')
+
+title = path.basename(__file__)
 Aud = Audio()
 Col = Color()
 Rec = Record()

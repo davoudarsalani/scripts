@@ -6,9 +6,21 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/record-screen.py
 ##    https://davoudarsalani.ir
 
+
 from os import getenv
 
-from utils import Screen, Record, Audio, get_datetime, pipe_to_dmenu, update_audio, convert_second, invalid
+from RRRavard import convert_second
+
+from utils import (
+    Audio,
+    Record,
+    Screen,
+    get_datetime,
+    invalid,
+    pipe_to_dmenu,
+    update_audio,
+)
+
 
 Scr = Screen()
 scr_1_name, scr_1_res, scr_1_x, scr_1_y, scr_1_x_offset, scr_1_y_offset = Scr.screen_1()

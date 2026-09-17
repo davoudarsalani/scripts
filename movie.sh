@@ -72,7 +72,7 @@ declare -a directories_plus_count movies_array
 readarray -t directories < <(find ~/main/movie -mindepth 1 -maxdepth 1 -type d | sort)
 
 ## get movie count in each directory and prepend it to the directory name
-for tmp_directory in "${directories[@]}"; {
+for tmp_directory in "${directories[@]}"; do
     movies_count="$(wc -l < <(find "$tmp_directory" -mindepth 1 -maxdepth 1 -type f ! -iname '*.srt'))"
 
     ## skip adding directories with 0 files
@@ -81,13 +81,11 @@ for tmp_directory in "${directories[@]}"; {
     # fi
 
     directories_plus_count+=( "${movies_count}${separator}${tmp_directory##*/}" )
-}
+done
 
-# title="${0##*/}"
+# title="$(basename "$0")"
 
-rofi__title="$title"
-# rofi__subtitle=''
-directory="$(pipe_to_rofi "${directories_plus_count[@]}")" || exit 37
+directory="$(pipe_to_rofi --header "$title" "${directories_plus_count[@]}")" || exit 37
 
 read count separator directory <<< "$directory"
 ## count     is 8
@@ -104,22 +102,14 @@ case "$1" in
         movie="${movie##*/}" ;;
     select )
         readarray -t movies < <(eval "$find_movies_cmd" | sort)
-        for m in "${movies[@]}"; {
-            duration_second="$(get_duration "$m" "seconds")"
-            duration="$(get_duration "$m")"
-            short_duration="$(shorten_duration "$duration")"
-            short_duration_and_movie="$(printf '%-10s%s\n' "$short_duration" "${m##*/}")"
+        for m in "${movies[@]}"; do
+            ## /path/to/movie.mp4 -> movie.mp4
+            m="${m##*/}"
+            movies_array+=( "$m" )
+        done
 
-            ## __PRINTF_LEFT_ALIGN__
-            movies_array+=( "$short_duration_and_movie" )
-        }
-
-        rofi__title="$directory"
-        rofi__subtitle="${#movies_array[@]} movies"
-        movie="$(pipe_to_rofi "${movies_array[@]}")" || exit 37
-
-        ## remove duration from beginning
-        movie="$(printf '%s\n' "$movie" | sed 's/^.\+ \+//')" ;;
+        movie="$(pipe_to_rofi --header "$directory" --subheader "${#movies_array[@]} movies" "${movies_array[@]}")" || exit 37
+        ;;
     * )
         exit ;;  ## NOTE do NOT remove
 esac
@@ -139,9 +129,7 @@ vlc -f --play-and-exit -- "$movie_full_path" 2>/dev/null
 ## move to WATCHED or remove
 what_to_dos=( 'move to WATCHED' 'remove' )
 
-rofi__title="$no_suffix"
-rofi__subtitle="What to do now?"
-what_to_do="$(pipe_to_rofi "${what_to_dos[@]}")"  # || exit 37  ## the exit is exceptionally commented
+what_to_do="$(pipe_to_rofi --header "$no_suffix" --subheader 'What to do now?' "${what_to_dos[@]}")"  # || exit 37  ## the exit is exceptionally commented
 
 case "$what_to_do" in
     'move to WATCHED' )

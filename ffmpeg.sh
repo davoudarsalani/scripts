@@ -10,10 +10,10 @@
 source ~/main/scripts/helps.sh
 source ~/main/scripts/utils.sh
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 function prompt {
-    for _ in "$@"; {
+    for _ in "$@"; do
         case "$1" in
             -i )
                 input_file="${input_file:-"$(get_input 'input file')"}" ;;
@@ -36,7 +36,6 @@ function prompt {
             -c )
                 if [ ! "$camera" ]; then
                     readarray -t cameras < <(find /dev/ -mindepth 1 -maxdepth 1 -iname '*video*' | sort)
-                    fzf__title=''
                     camera="$(pipe_to_fzf "${cameras[@]}")" && wrap_fzf_choice "$camera" || exit 37
                 fi
                 ;;
@@ -46,7 +45,7 @@ function prompt {
                 sub_index="${sub_index:-"$(get_input 'subtitle index (e.g. 0, 1, etc)')"}" ;;
         esac
         shift
-    }
+    done
 }
 
 function get_opt {
@@ -106,7 +105,6 @@ get_opt "$@"
 heading "$title"
 
 main_items=( 'embed subtitle' 'burn subtitle (increases size)' 'burn embedded subtitle (increases size)' 'sync audio' 'sync video' 'trim' 'convert' 'remove audio' 'replace audio' 'screenshot' 'negate' 'reverse' 'add 0.3 saturation' 'show streams' 'audio stream to keep' 'available cameras' 'live camera' 'help' )
-fzf__title=''
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 case "$main_item" in

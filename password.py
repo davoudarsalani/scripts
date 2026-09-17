@@ -6,7 +6,9 @@
 ##    https://raw.githubusercontent.com/davoudarsalani/scripts/master/password.py
 ##    https://davoudarsalani.ir
 
+
 import string
+
 from getopt import getopt
 from os import path
 from random import sample
@@ -14,9 +16,14 @@ from re import sub
 from subprocess import run
 from sys import argv
 
-from utils import Color, invalid, pipe_to_fzf
+from utils import (
+    Color,
+    invalid,
+    pipe_to_fzf,
+)
 
-title = path.basename(__file__).replace('.py', '')
+
+title = path.basename(__file__)
 script_args = argv[1:]
 Col = Color()
 
@@ -59,26 +66,55 @@ def prompt(*args: list[str]) -> None:
             except:
                 count = 5
 
-def generate(uppercase: bool=True, lowercase: bool=True, digits: bool=True, symbols: bool=True) -> None:
-    letters = ''
-    if uppercase:
-        letters += string.ascii_uppercase
-    if lowercase:
-        letters += string.ascii_lowercase
-    if digits:
-        letters += string.digits
-    if symbols:
-        puncs = string.punctuation
-        puncs = sub(r'[&/\\]', r'', puncs)  ## removing &, / and \\ to prevent possible shell errors
-        letters += puncs
+def generate(
+    uppercase: bool = True,
+    lowercase: bool = True,
+    digits: bool = True,
+    symbols: bool = True,
+) -> None:
+    global length, count
 
-    global length
+    pools = []
+
+    if uppercase:
+        pools.append(string.ascii_uppercase)
+
+    if lowercase:
+        pools.append(string.ascii_lowercase)
+
+    if digits:
+        pools.append(string.digits)
+
+    if symbols:
+        ## remove &, / and \\ to prevent possible shell errors
+        puncs = sub(r'[&/\\]', r'', string.punctuation)
+
+        pools.append(puncs)
+
+    ## flatten all pools into one string
+    letters = ''.join(pools)
+
+    if not letters:
+        invalid('No character sets selected.')
+
     if length > len(letters):
-        print(Col.yellow(f'Length exceeded maximumm number.\nLength is {len(letters)} now.'))
+        print(Col.yellow(f'Length exceeded maximum number.\nLength set to {len(letters)}'))
         length = len(letters)
 
-    for x in range(count):
-        password = ''.join(sample(letters, length))
+    for _ in range(count):
+        password_chars = []
+
+        ## ensure at least one char from each selected pool
+        for pool in pools:
+            password_chars.append(sample(pool, 1)[0])
+
+        remaining_length = length - len(password_chars)
+
+        if remaining_length > 0:
+            password_chars.extend(sample(letters, remaining_length))
+
+        ## shuffle to avoid predictable pattern
+        password = ''.join(sample(password_chars, len(password_chars)))
         print(password)
 
 getopts()

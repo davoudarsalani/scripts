@@ -10,7 +10,7 @@
 source ~/main/scripts/utils.sh
 source ~/main/scripts/utils-color.sh
 
-title="${0##*/}"
+title="$(basename "$0")"
 
 function copy {
     local remove_propmt
@@ -43,14 +43,19 @@ function copy {
 
 heading "$title"
 
+var_cache_pacman_pkg_dir=/var/cache/pacman/pkg
+
 main_items=(
     'awesome'
     'bash'
     'fzf'
     'git'
     'greenclip'
+    'hermes'
+    'lazygit'
     'mimeapps.list'
     'mysql'
+    'opencode'
     'optimus-manager'
     'ranger'
     'rofi'
@@ -66,10 +71,9 @@ main_items=(
     'hosts'
     'xorg.conf'
 
-    '/var/cache/pacman/pkg'
+    "$var_cache_pacman_pkg_dir"
 )
 
-fzf__title=''
 main_item="$(pipe_to_fzf "${main_items[@]}")" && wrap_fzf_choice "$main_item" || exit 37
 
 dest_dir=~/main/configs/cfg-"$main_item"
@@ -93,11 +97,20 @@ case "$main_item" in
     greenclip )
         copy ~/.config/greenclip.toml ;;
 
+    hermes )
+        copy ~/.hermes/config.yaml ;;
+
+    lazygit )
+        copy ~/.config/lazygit/config.yml ;;
+
     mimeapps.list )
         copy ~/.config/mimeapps.list ;;
 
     mysql )
         copy /etc/my.cnf ;;
+
+    opencode )
+        copy ~/.config/opencode/opencode.json ;;
 
     optimus-manager )
         copy /etc/optimus-manager/optimus-manager.conf \
@@ -146,18 +159,20 @@ case "$main_item" in
     xorg.conf )
         copy /etc/X11/xorg.conf ;;
 
+
     ## ----------------
-    ## pkgs with exceptional removing/copying procedures
+    ## pkgs/options with exceptional removing/copying procedures
 
     ## has a different dest_dir
-    /var/cache/pacman/pkg )
+    "$var_cache_pacman_pkg_dir" )
         dest_dir=~/main/linux-pkg
-        readarray -t pkgs < <(find /var/cache/pacman/pkg/ -mindepth 1 -maxdepth 1 -type f)
+
+        readarray -t pkgs < <(find "$var_cache_pacman_pkg_dir" -mindepth 1 -maxdepth 1 -type f)
         if [ "$pkgs" ]; then
-            action_now "copying from /var/cache/pacman/pkg to $(to_tilda "$dest_dir")"
+            action_now "copying from $var_cache_pacman_pkg_dir to $(to_tilda "$dest_dir")"
             cp -r "${pkgs[@]}" "$dest_dir"
 
-            action_now 'removing pkgs in /var/cache/pacman/pkg'
+            action_now "removing pkgs in $var_cache_pacman_pkg_dir"
             sudo rm "${pkgs[@]}"
 
             action_now 'checking if there are older pkgs to remove'
